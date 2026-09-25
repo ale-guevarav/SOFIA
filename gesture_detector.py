@@ -142,6 +142,9 @@ class GestureDetector:
     # =============================================
 
     def get_landmarks(self, pose_data):
+        # Si no hay datos de postura
+        if pose_data is None:
+            return None
 
         # Si recibimos directamente una lista
         # de landmarks suavizados

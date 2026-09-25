@@ -4,6 +4,7 @@ import time
 from pose_detector import PoseDetector
 from hand_detector import HandDetector
 from gesture_detector import GestureDetector
+from smoothing import TemporalConfirmation
 
 
 # -----------------------------
@@ -18,6 +19,19 @@ hand_detector = HandDetector()
 
 # Crear detector de gestos
 gesture_detector = GestureDetector()
+
+
+# -----------------------------
+# CONFIRMACIÓN TEMPORAL
+# -----------------------------
+
+shield_confirmation = TemporalConfirmation(
+    required_frames=5
+)
+
+attack_confirmation = TemporalConfirmation(
+    required_frames=5
+)
 
 
 # -----------------------------
@@ -124,10 +138,16 @@ while True:
     # -----------------------------
     # ESCUDO
     # -----------------------------
-    
-    shield_detected = (
+
+    shield_raw = (
         gesture_detector.detect_shield(
             smoothed_landmarks
+        )
+    )
+
+    shield_detected = (
+        shield_confirmation.update(
+            shield_raw
         )
     )
 
@@ -153,11 +173,16 @@ while True:
 
     # ATAQUE solamente es válido si
     # se cumplen cuerpo + dos pistolas
-    attack_detected = (
+    attack_raw = (
         attack_body_detected
         and gun_hands_detected
     )
 
+    attack_detected = (
+        attack_confirmation.update(
+            attack_raw
+        )
+    )
 
     # -----------------------------
     # RECARGAR

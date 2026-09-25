@@ -93,3 +93,45 @@ class LandmarkSmoother:
     def reset(self):
 
         self.previous_landmarks = None
+
+
+# =============================================
+# CONFIRMACIÓN TEMPORAL
+# =============================================
+
+class TemporalConfirmation:
+
+    def __init__(self, required_frames=5):
+
+        # Número de frames consecutivos
+        # necesarios para confirmar una postura
+        self.required_frames = required_frames
+
+        # Contador de frames positivos
+        self.counter = 0
+
+
+    def update(self, detected):
+
+        # Si la postura está presente,
+        # aumentar el contador
+        if detected:
+
+            self.counter += 1
+
+        else:
+
+            # Si desaparece, reiniciar
+            self.counter = 0
+
+        # Confirmar únicamente cuando
+        # se alcance el número requerido
+        return (
+            self.counter
+            >= self.required_frames
+        )
+
+
+    def reset(self):
+
+        self.counter = 0
