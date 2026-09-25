@@ -50,6 +50,7 @@ previous_time = time.time()
 # el último gesto dinámico detectado
 reload_display_until = 0
 start_display_until = 0
+end_display_until = 0
 
 while True:
 
@@ -153,6 +154,14 @@ while True:
     if start_detected:
         start_display_until = time.time() + 0.8
 
+    # FIN
+    end_detected = gesture_detector.detect_end(
+        pose_result
+    )
+
+    if end_detected:
+        end_display_until = time.time() + 0.8
+
     # -----------------------------
     # POSTURA DETECTADA
     # -----------------------------
@@ -177,6 +186,9 @@ while True:
 
     elif time.time() < start_display_until:
         detected_gesture = "INICIO"
+
+    elif time.time() < end_display_until:
+        detected_gesture = "FIN"
 
     # Mostrar postura actual
     cv2.putText(

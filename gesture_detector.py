@@ -108,6 +108,35 @@ class GestureDetector:
         # la primera palmada
         self.start_first_tap_time = None
 
+        # -----------------------------
+        # CONFIGURACIÓN DE FIN
+        # -----------------------------
+
+        # Una mano debe estar por encima
+        # de esta posición para poder saludar
+        self.end_hand_height_threshold = 0.35
+
+        # Desplazamiento horizontal mínimo
+        # para considerar movimiento real
+        self.end_min_horizontal_movement = 0.12
+
+        # Mano que actualmente está realizando
+        # el saludo: "left", "right" o None
+        self.end_active_hand = None
+
+        # Posición horizontal anterior
+        self.end_previous_x = None
+
+        # Dirección actual del movimiento
+        self.end_direction = None
+
+        # Número de cambios de dirección
+        self.end_direction_changes = 0
+
+        # Cambios de dirección necesarios
+        # para reconocer la despedida
+        self.end_required_direction_changes = 2
+
 
     # =============================================
     # ESCUDO
@@ -661,4 +690,215 @@ class GestureDetector:
             self.start_in_contact = False
 
         # Todavía no declaramos INICIO
+        return False
+
+    # =============================================
+    # FIN - DESPEDIDA
+    # =============================================
+
+    def detect_end(self, pose_result):
+
+        if not pose_result.pose_landmarks:
+            return False
+
+        landmarks = pose_result.pose_landmarks[0]
+
+        # -----------------------------
+        # LANDMARKS NECESARIOS
+        # -----------------------------
+
+        left_shoulder = landmarks[11]
+        right_shoulder = landmarks[12]
+
+        left_wrist = landmarks[15]
+        right_wrist = landmarks[16]
+
+        left_hip = landmarks[23]
+        right_hip = landmarks[24]
+
+        # -----------------------------
+        # REFERENCIAS CORPORALES
+        # -----------------------------
+
+        shoulder_y = (
+            left_shoulder.y
+            + right_shoulder.y
+        ) / 2
+
+        hip_y = (
+            left_hip.y
+            + right_hip.y
+        ) / 2
+
+        torso_height = (
+            hip_y - shoulder_y
+        )
+
+        shoulder_width = abs(
+            left_shoulder.x
+            - right_shoulder.x
+        )
+
+        if (
+            torso_height <= 0
+            or shoulder_width <= 0
+        ):
+            return False
+
+        # -----------------------------
+        # ALTURA DE LAS MANOS
+        # -----------------------------
+
+        left_height = (
+            left_wrist.y - shoulder_y
+        ) / torso_height
+
+        right_height = (
+            right_wrist.y - shoulder_y
+        ) / torso_height
+
+        left_raised = (
+            left_height
+            < self.end_hand_height_threshold
+        )
+
+        right_raised = (
+            right_height
+            < self.end_hand_height_threshold
+        )
+
+        # -----------------------------
+        # ELEGIR MANO ACTIVA
+        # -----------------------------
+
+        if self.end_active_hand is None:
+
+            if right_raised and not left_raised:
+
+                self.end_active_hand = "right"
+
+                self.end_previous_x = (
+                    right_wrist.x
+                    - right_shoulder.x
+                ) / shoulder_width
+
+                return False
+
+            elif left_raised and not right_raised:
+
+                self.end_active_hand = "left"
+
+                self.end_previous_x = (
+                    left_wrist.x
+                    - left_shoulder.x
+                ) / shoulder_width
+
+                return False
+
+            else:
+                return False
+
+        # -----------------------------
+        # MANO DERECHA
+        # -----------------------------
+
+        if self.end_active_hand == "right":
+
+            # Si baja la mano, cancelar saludo
+            if not right_raised:
+
+                self.end_active_hand = None
+                self.end_previous_x = None
+                self.end_direction = None
+                self.end_direction_changes = 0
+
+                return False
+
+            current_x = (
+                right_wrist.x
+                - right_shoulder.x
+            ) / shoulder_width
+
+        # -----------------------------
+        # MANO IZQUIERDA
+        # -----------------------------
+
+        else:
+
+            # Si baja la mano, cancelar saludo
+            if not left_raised:
+
+                self.end_active_hand = None
+                self.end_previous_x = None
+                self.end_direction = None
+                self.end_direction_changes = 0
+
+                return False
+
+            current_x = (
+                left_wrist.x
+                - left_shoulder.x
+            ) / shoulder_width
+
+        # -----------------------------
+        # MOVIMIENTO HORIZONTAL
+        # -----------------------------
+
+        movement = (
+            current_x
+            - self.end_previous_x
+        )
+
+        # Ignorar movimientos pequeños
+        if abs(movement) < self.end_min_horizontal_movement:
+            return False
+
+        if movement > 0:
+            new_direction = "right"
+        else:
+            new_direction = "left"
+
+        # -----------------------------
+        # CAMBIO DE DIRECCIÓN
+        # -----------------------------
+
+        if self.end_direction is None:
+
+            self.end_direction = new_direction
+
+            print(
+                f"Direccion inicial FIN: "
+                f"{new_direction}"
+            )
+
+        elif new_direction != self.end_direction:
+
+            self.end_direction = new_direction
+            self.end_direction_changes += 1
+
+            print(
+                f"Cambio de direccion FIN: "
+                f"{self.end_direction_changes}"
+            )
+
+            # -----------------------------
+            # DESPEDIDA COMPLETADA
+            # -----------------------------
+
+            if (
+                self.end_direction_changes
+                >= self.end_required_direction_changes
+            ):
+
+                self.end_active_hand = None
+                self.end_previous_x = None
+                self.end_direction = None
+                self.end_direction_changes = 0
+
+                return True
+
+        # Actualizar punto de referencia
+        self.end_previous_x = current_x
+
+        # Todavía no declaramos FIN
         return False
