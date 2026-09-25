@@ -137,6 +137,23 @@ class GestureDetector:
         # para reconocer la despedida
         self.end_required_direction_changes = 2
 
+    # =============================================
+    # OBTENER LANDMARKS
+    # =============================================
+
+    def get_landmarks(self, pose_data):
+
+        # Si recibimos directamente una lista
+        # de landmarks suavizados
+        if isinstance(pose_data, list):
+            return pose_data
+
+        # Si recibimos el resultado original
+        # de MediaPipe
+        if not pose_data.pose_landmarks:
+            return None
+
+        return pose_data.pose_landmarks[0]
 
     # =============================================
     # ESCUDO
@@ -145,10 +162,12 @@ class GestureDetector:
     def detect_shield(self, pose_result):
 
         # Comprobar que exista una persona detectada
-        if not pose_result.pose_landmarks:
-            return False
+        landmarks = self.get_landmarks(
+            pose_result
+        )
 
-        landmarks = pose_result.pose_landmarks[0]
+        if landmarks is None:
+            return False
 
         # -----------------------------
         # LANDMARKS NECESARIOS
@@ -286,10 +305,12 @@ class GestureDetector:
     def detect_attack_body(self, pose_result):
 
         # Comprobar que exista una persona detectada
-        if not pose_result.pose_landmarks:
-            return False
+        landmarks = self.get_landmarks(
+            pose_result
+        )
 
-        landmarks = pose_result.pose_landmarks[0]
+        if landmarks is None:
+            return False
 
         # -----------------------------
         # LANDMARKS NECESARIOS
@@ -395,10 +416,12 @@ class GestureDetector:
     def detect_reload(self, pose_result):
 
         # Comprobar que exista una persona detectada
-        if not pose_result.pose_landmarks:
-            return False
+        landmarks = self.get_landmarks(
+            pose_result
+        )
 
-        landmarks = pose_result.pose_landmarks[0]
+        if landmarks is None:
+            return False
 
         # -----------------------------
         # LANDMARKS NECESARIOS
@@ -556,10 +579,12 @@ class GestureDetector:
 
     def detect_start(self, pose_result):
 
-        if not pose_result.pose_landmarks:
-            return False
+        landmarks = self.get_landmarks(
+            pose_result
+        )
 
-        landmarks = pose_result.pose_landmarks[0]
+        if landmarks is None:
+            return False
 
         # -----------------------------
         # LANDMARKS NECESARIOS
@@ -698,10 +723,12 @@ class GestureDetector:
 
     def detect_end(self, pose_result):
 
-        if not pose_result.pose_landmarks:
-            return False
+        landmarks = self.get_landmarks(
+            pose_result
+        )
 
-        landmarks = pose_result.pose_landmarks[0]
+        if landmarks is None:
+            return False
 
         # -----------------------------
         # LANDMARKS NECESARIOS

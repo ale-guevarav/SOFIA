@@ -77,6 +77,17 @@ while True:
         frame_timestamp_ms
     )
 
+    # -----------------------------
+    # SUAVIZADO DE LANDMARKS
+    # -----------------------------
+
+    # Aplicar EMA a los landmarks corporales
+    smoothed_landmarks = (
+        pose_detector.get_smoothed_landmarks(
+            pose_result
+        )
+    )
+
     # Analizar manos
     hand_result = hand_detector.detect(
         frame_rgb,
@@ -87,11 +98,13 @@ while True:
     # postura y manos en el mismo frame
     frame_timestamp_ms += 33
 
+
     # -----------------------------
     # DIBUJAR LANDMARKS
     # -----------------------------
 
-    # Dibujar postura
+    # Dibujar postura usando los
+    # landmarks originales de MediaPipe
     person_detected = pose_detector.draw(
         frame,
         pose_result
@@ -103,19 +116,30 @@ while True:
         hand_result
     )
 
+
     # -----------------------------
     # DETECCIÓN DE GESTOS
     # -----------------------------
 
+    # -----------------------------
     # ESCUDO
-    shield_detected = gesture_detector.detect_shield(
-        pose_result
+    # -----------------------------
+    
+    shield_detected = (
+        gesture_detector.detect_shield(
+            smoothed_landmarks
+        )
     )
 
-    # Geometría corporal de ATAQUE
+    # -----------------------------
+    # ATAQUE
+    # -----------------------------
+
+    # Geometría corporal usando
+    # landmarks suavizados
     attack_body_detected = (
         gesture_detector.detect_attack_body(
-            pose_result
+            smoothed_landmarks
         )
     )
 
@@ -134,33 +158,62 @@ while True:
         and gun_hands_detected
     )
 
+
+    # -----------------------------
     # RECARGAR
-    reload_detected = gesture_detector.detect_reload(
-        pose_result
+    # -----------------------------
+
+    reload_detected = (
+        gesture_detector.detect_reload(
+            smoothed_landmarks
+        )
     )
 
     # Si se completó la recarga,
     # mantener el mensaje visible durante 0.8 segundos
     if reload_detected:
-        reload_display_until = time.time() + 0.8
 
+        reload_display_until = (
+            time.time() + 0.8
+        )
+
+
+    # -----------------------------
     # INICIO
-    start_detected = gesture_detector.detect_start(
-        pose_result
+    # -----------------------------
+
+    start_detected = (
+        gesture_detector.detect_start(
+            smoothed_landmarks
+        )
     )
 
     # Mantener INICIO visible brevemente
     # después de completar las tres palmadas
     if start_detected:
-        start_display_until = time.time() + 0.8
 
+        start_display_until = (
+            time.time() + 0.8
+        )
+
+
+    # -----------------------------
     # FIN
-    end_detected = gesture_detector.detect_end(
-        pose_result
+    # -----------------------------
+
+    end_detected = (
+        gesture_detector.detect_end(
+            smoothed_landmarks
+        )
     )
 
+    # Mantener FIN visible brevemente
+    # después de completar el saludo
     if end_detected:
-        end_display_until = time.time() + 0.8
+
+        end_display_until = (
+            time.time() + 0.8
+        )
 
     # -----------------------------
     # POSTURA DETECTADA
