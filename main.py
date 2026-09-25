@@ -49,6 +49,7 @@ previous_time = time.time()
 # Tiempo hasta el que se mostrará
 # el último gesto dinámico detectado
 reload_display_until = 0
+start_display_until = 0
 
 while True:
 
@@ -142,24 +143,40 @@ while True:
     if reload_detected:
         reload_display_until = time.time() + 0.8
 
+    # INICIO
+    start_detected = gesture_detector.detect_start(
+        pose_result
+    )
+
+    # Mantener INICIO visible brevemente
+    # después de completar las tres palmadas
+    if start_detected:
+        start_display_until = time.time() + 0.8
+
     # -----------------------------
     # POSTURA DETECTADA
     # -----------------------------
-
     detected_gesture = "---"
-    # Las posturas estáticas se muestran
-    # mientras se mantengan físicamente
+
+    # -----------------------------
+    # POSTURAS ESTÁTICAS
+    # -----------------------------
+
     if shield_detected:
         detected_gesture = "ESCUDO"
 
     elif attack_detected:
         detected_gesture = "ATAQUE"
 
-    # RECARGAR es dinámico.
-    # Se muestra brevemente después
-    # de completar el movimiento.
+    # -----------------------------
+    # POSTURAS DINÁMICAS
+    # -----------------------------
+
     elif time.time() < reload_display_until:
         detected_gesture = "RECARGAR"
+
+    elif time.time() < start_display_until:
+        detected_gesture = "INICIO"
 
     # Mostrar postura actual
     cv2.putText(

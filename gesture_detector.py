@@ -81,6 +81,33 @@ class GestureDetector:
         # Momento en que comenzó la recarga
         self.reload_start_time = None
 
+        # -----------------------------
+        # CONFIGURACIÓN DE INICIO
+        # -----------------------------
+
+        # Distancia máxima para considerar
+        # que las manos tocaron los muslos
+        self.start_contact_threshold = 0.35
+
+        # Distancia mínima para considerar
+        # que las manos volvieron a separarse
+        self.start_release_threshold = 0.42
+
+        # Número de palmadas detectadas
+        self.start_tap_count = 0
+
+        # Indica si actualmente las manos
+        # están en contacto con los muslos
+        self.start_in_contact = False
+
+        # Tiempo máximo para completar
+        # las tres palmadas
+        self.start_max_time = 3.0
+
+        # Momento en que se detectó
+        # la primera palmada
+        self.start_first_tap_time = None
+
 
     # =============================================
     # ESCUDO
@@ -492,4 +519,146 @@ class GestureDetector:
 
             return True
 
+        return False
+
+    # =============================================
+    # INICIO - TRES PALMADAS
+    # =============================================
+
+    def detect_start(self, pose_result):
+
+        if not pose_result.pose_landmarks:
+            return False
+
+        landmarks = pose_result.pose_landmarks[0]
+
+        # -----------------------------
+        # LANDMARKS NECESARIOS
+        # -----------------------------
+
+        left_shoulder = landmarks[11]
+        right_shoulder = landmarks[12]
+
+        left_wrist = landmarks[15]
+        right_wrist = landmarks[16]
+
+        left_hip = landmarks[23]
+        right_hip = landmarks[24]
+
+        # -----------------------------
+        # ANCHO DE HOMBROS
+        # -----------------------------
+
+        shoulder_width = abs(
+            left_shoulder.x - right_shoulder.x
+        )
+
+        if shoulder_width <= 0:
+            return False
+
+        # -----------------------------
+        # DISTANCIA MANO - CADERA
+        # -----------------------------
+
+        left_distance = (
+            (
+                (left_wrist.x - left_hip.x) ** 2
+                + (left_wrist.y - left_hip.y) ** 2
+            ) ** 0.5
+        ) / shoulder_width
+
+        right_distance = (
+            (
+                (right_wrist.x - right_hip.x) ** 2
+                + (right_wrist.y - right_hip.y) ** 2
+            ) ** 0.5
+        ) / shoulder_width
+
+        # -----------------------------
+        # CONTACTO CON LOS MUSLOS
+        # -----------------------------
+
+        hands_in_contact = (
+            left_distance
+            < self.start_contact_threshold
+            and
+            right_distance
+            < self.start_contact_threshold
+        )
+
+        # -----------------------------
+        # MANOS SEPARADAS
+        # -----------------------------
+
+        hands_released = (
+            left_distance
+            > self.start_release_threshold
+            and
+            right_distance
+            > self.start_release_threshold
+        )
+
+        # -----------------------------
+        # LÍMITE DE TIEMPO
+        # -----------------------------
+
+        if self.start_first_tap_time is not None:
+
+            elapsed_time = (
+                time.time()
+                - self.start_first_tap_time
+            )
+
+            if elapsed_time > self.start_max_time:
+
+                self.start_tap_count = 0
+                self.start_first_tap_time = None
+                self.start_in_contact = False
+
+        # -----------------------------
+        # CONTAR PALMADA
+        # -----------------------------
+
+        if (
+            hands_in_contact
+            and not self.start_in_contact
+        ):
+
+            # Primera palmada:
+            # iniciar el temporizador
+            if self.start_tap_count == 0:
+
+                self.start_first_tap_time = (
+                    time.time()
+                )
+
+            self.start_tap_count += 1
+            self.start_in_contact = True
+
+            print(
+                f"Palmada detectada: "
+                f"{self.start_tap_count}"
+            )
+
+            # -----------------------------
+            # TRES PALMADAS COMPLETADAS
+            # -----------------------------
+
+            if self.start_tap_count >= 3:
+
+                self.start_tap_count = 0
+                self.start_first_tap_time = None
+
+                return True
+
+        # Las manos deben separarse antes
+        # de permitir una nueva palmada
+        elif (
+            hands_released
+            and self.start_in_contact
+        ):
+
+            self.start_in_contact = False
+
+        # Todavía no declaramos INICIO
         return False
