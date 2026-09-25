@@ -50,6 +50,10 @@ class PoseDetector:
 
         height, width, _ = frame.shape
 
+        # -----------------------------
+        # DIBUJAR ESQUELETO
+        # -----------------------------
+
         # Dibujar conexiones del esqueleto
         for start_idx, end_idx in POSE_CONNECTIONS:
 

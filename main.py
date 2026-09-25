@@ -3,6 +3,7 @@ import time
 
 from pose_detector import PoseDetector
 from hand_detector import HandDetector
+from gesture_detector import GestureDetector
 
 
 # -----------------------------
@@ -14,6 +15,9 @@ pose_detector = PoseDetector()
 
 # Crear detector de manos
 hand_detector = HandDetector()
+
+# Crear detector de gestos
+gesture_detector = GestureDetector()
 
 
 # -----------------------------
@@ -42,6 +46,10 @@ frame_timestamp_ms = 0
 
 previous_time = time.time()
 
+# Tiempo hasta el que se mostrará
+# el último gesto dinámico detectado
+reload_display_until = 0
+
 while True:
 
     ret, frame = cap.read()
@@ -50,20 +58,24 @@ while True:
         print("Error: No se pudo capturar el frame")
         break
 
-    # OpenCV (BGR)
-    # MediaPipe (RGB)
+    # OpenCV trabaja en BGR
+    # MediaPipe trabaja en RGB
     frame_rgb = cv2.cvtColor(
         frame,
         cv2.COLOR_BGR2RGB
     )
 
-    # Analizar la postura
+    # -----------------------------
+    # DETECCIÓN CON MEDIAPIPE
+    # -----------------------------
+
+    # Analizar postura
     pose_result = pose_detector.detect(
         frame_rgb,
         frame_timestamp_ms
     )
 
-    # Analizar las manos
+    # Analizar manos
     hand_result = hand_detector.detect(
         frame_rgb,
         frame_timestamp_ms
@@ -72,6 +84,10 @@ while True:
     # Aumentar timestamp después de analizar
     # postura y manos en el mismo frame
     frame_timestamp_ms += 33
+
+    # -----------------------------
+    # DIBUJAR LANDMARKS
+    # -----------------------------
 
     # Dibujar postura
     person_detected = pose_detector.draw(
@@ -85,7 +101,81 @@ while True:
         hand_result
     )
 
-    # Mostrar estado de detección
+    # -----------------------------
+    # DETECCIÓN DE GESTOS
+    # -----------------------------
+
+    # ESCUDO
+    shield_detected = gesture_detector.detect_shield(
+        pose_result
+    )
+
+    # Geometría corporal de ATAQUE
+    attack_body_detected = (
+        gesture_detector.detect_attack_body(
+            pose_result
+        )
+    )
+
+    # Comprobar que las dos manos
+    # estén haciendo forma de pistola
+    gun_hands_detected = (
+        hand_detector.detect_gun_hands(
+            hand_result
+        )
+    )
+
+    # ATAQUE solamente es válido si
+    # se cumplen cuerpo + dos pistolas
+    attack_detected = (
+        attack_body_detected
+        and gun_hands_detected
+    )
+
+    # RECARGAR
+    reload_detected = gesture_detector.detect_reload(
+        pose_result
+    )
+
+    # Si se completó la recarga,
+    # mantener el mensaje visible durante 0.8 segundos
+    if reload_detected:
+        reload_display_until = time.time() + 0.8
+
+    # -----------------------------
+    # POSTURA DETECTADA
+    # -----------------------------
+
+    detected_gesture = "---"
+    # Las posturas estáticas se muestran
+    # mientras se mantengan físicamente
+    if shield_detected:
+        detected_gesture = "ESCUDO"
+
+    elif attack_detected:
+        detected_gesture = "ATAQUE"
+
+    # RECARGAR es dinámico.
+    # Se muestra brevemente después
+    # de completar el movimiento.
+    elif time.time() < reload_display_until:
+        detected_gesture = "RECARGAR"
+
+    # Mostrar postura actual
+    cv2.putText(
+        frame,
+        f"Postura: {detected_gesture}",
+        (30, 130),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.9,
+        (0, 255, 255),
+        2
+    )
+
+    # -----------------------------
+    # ESTADO DE DETECCIÓN
+    # -----------------------------
+
     if person_detected:
 
         cv2.putText(
@@ -110,10 +200,20 @@ while True:
             2
         )
 
-    # Calcular FPS
+    # -----------------------------
+    # CALCULAR FPS
+    # -----------------------------
+
     current_time = time.time()
 
-    fps = 1 / (current_time - previous_time)
+    time_difference = (
+        current_time - previous_time
+    )
+
+    if time_difference > 0:
+        fps = 1 / time_difference
+    else:
+        fps = 0
 
     previous_time = current_time
 
@@ -127,7 +227,10 @@ while True:
         2
     )
 
-    # Mostrar resultado
+    # -----------------------------
+    # MOSTRAR RESULTADO
+    # -----------------------------
+
     cv2.imshow(
         "SOFIA - Deteccion de Posturas",
         frame
