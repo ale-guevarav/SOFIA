@@ -5,6 +5,7 @@ from pose_detector import PoseDetector
 from hand_detector import HandDetector
 from gesture_detector import GestureDetector
 from smoothing import TemporalConfirmation
+from metrics_logger import PerformanceMetrics
 
 
 # -----------------------------
@@ -35,6 +36,17 @@ attack_confirmation = TemporalConfirmation(
 
 
 # -----------------------------
+# REGISTRO DE MÉTRICAS
+# -----------------------------
+
+metrics = PerformanceMetrics(
+    output_dir="metrics",
+    trial_timeout=6.0,   # segundos para hacer el gesto
+    countdown=3.0,       # cuenta regresiva antes de cada prueba
+)
+
+
+# -----------------------------
 # CONFIGURACIÓN DE LA CÁMARA
 # -----------------------------
 
@@ -46,8 +58,16 @@ if not cap.isOpened():
     hand_detector.close()
     exit()
 
+metrics.set_info(
+    resolucion_camara=(
+        f"{int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))}x"
+        f"{int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}"
+    )
+)
+
 print("Cámara iniciada correctamente")
 print("Presiona 'q' para cerrar")
+print("Métricas: 1-5 probar gesto | 0 modo libre | s guardar")
 
 
 # MediaPipe (timestamp creciente)
@@ -66,294 +86,291 @@ reload_display_until = 0
 start_display_until = 0
 end_display_until = 0
 
-while True:
+try:
 
-    ret, frame = cap.read()
+    while True:
 
-    if not ret:
-        print("Error: No se pudo capturar el frame")
-        break
+        ret, frame = cap.read()
 
-    # OpenCV trabaja en BGR
-    # MediaPipe trabaja en RGB
-    frame_rgb = cv2.cvtColor(
-        frame,
-        cv2.COLOR_BGR2RGB
-    )
+        if not ret:
+            print("Error: No se pudo capturar el frame")
+            break
 
-    # -----------------------------
-    # DETECCIÓN CON MEDIAPIPE
-    # -----------------------------
+        # Empieza a medir el procesamiento
+        # (no incluye la espera de la cámara)
+        metrics.begin_frame()
 
-    # Analizar postura
-    pose_result = pose_detector.detect(
-        frame_rgb,
-        frame_timestamp_ms
-    )
+        # -----------------------------
+        # DETECCIÓN CON MEDIAPIPE
+        # -----------------------------
 
-    # -----------------------------
-    # SUAVIZADO DE LANDMARKS
-    # -----------------------------
+        with metrics.measure("pose"):
 
-    # Aplicar EMA a los landmarks corporales
-    smoothed_landmarks = (
-        pose_detector.get_smoothed_landmarks(
-            pose_result
-        )
-    )
+            # OpenCV trabaja en BGR
+            # MediaPipe trabaja en RGB
+            frame_rgb = cv2.cvtColor(
+                frame,
+                cv2.COLOR_BGR2RGB
+            )
 
-    # Analizar manos
-    hand_result = hand_detector.detect(
-        frame_rgb,
-        frame_timestamp_ms
-    )
+            # Analizar postura
+            pose_result = pose_detector.detect(
+                frame_rgb,
+                frame_timestamp_ms
+            )
 
-    # Aumentar timestamp después de analizar
-    # postura y manos en el mismo frame
-    frame_timestamp_ms += 33
+            # Aplicar EMA a los landmarks corporales
+            smoothed_landmarks = (
+                pose_detector.get_smoothed_landmarks(
+                    pose_result
+                )
+            )
 
+        with metrics.measure("manos"):
 
-    # -----------------------------
-    # DIBUJAR LANDMARKS
-    # -----------------------------
+            # Analizar manos
+            hand_result = hand_detector.detect(
+                frame_rgb,
+                frame_timestamp_ms
+            )
 
-    # Dibujar postura usando los
-    # landmarks originales de MediaPipe
-    person_detected = pose_detector.draw(
-        frame,
-        pose_result
-    )
-
-    # Dibujar manos
-    hand_detector.draw(
-        frame,
-        hand_result
-    )
+        # Aumentar timestamp después de analizar
+        # postura y manos en el mismo frame
+        frame_timestamp_ms += 33
 
 
-    # -----------------------------
-    # DETECCIÓN DE GESTOS
-    # -----------------------------
+        # -----------------------------
+        # DIBUJAR LANDMARKS
+        # -----------------------------
 
-    # -----------------------------
-    # ESCUDO
-    # -----------------------------
+        with metrics.measure("dibujo"):
 
-    shield_raw = (
-        gesture_detector.detect_shield(
-            smoothed_landmarks
-        )
-    )
+            person_detected = pose_detector.draw(
+                frame,
+                pose_result
+            )
 
-    shield_detected = (
-        shield_confirmation.update(
-            shield_raw
-        )
-    )
-
-    # -----------------------------
-    # ATAQUE
-    # -----------------------------
-
-    # Geometría corporal usando
-    # landmarks suavizados
-    attack_body_detected = (
-        gesture_detector.detect_attack_body(
-            smoothed_landmarks
-        )
-    )
-
-    # Comprobar que las dos manos
-    # estén haciendo forma de pistola
-    gun_hands_detected = (
-        hand_detector.detect_gun_hands(
-            hand_result
-        )
-    )
-
-    # ATAQUE solamente es válido si
-    # se cumplen cuerpo + dos pistolas
-    attack_raw = (
-        attack_body_detected
-        and gun_hands_detected
-    )
-
-    attack_detected = (
-        attack_confirmation.update(
-            attack_raw
-        )
-    )
-
-    # -----------------------------
-    # RECARGAR
-    # -----------------------------
-
-    reload_detected = (
-        gesture_detector.detect_reload(
-            smoothed_landmarks
-        )
-    )
-
-    # Si se completó la recarga,
-    # mantener el mensaje visible durante 0.8 segundos
-    if reload_detected:
-
-        reload_display_until = (
-            time.time() + 0.8
-        )
+            hand_detector.draw(
+                frame,
+                hand_result
+            )
 
 
-    # -----------------------------
-    # INICIO
-    # -----------------------------
+        # -----------------------------
+        # DETECCIÓN DE GESTOS
+        # -----------------------------
 
-    start_detected = (
-        gesture_detector.detect_start(
-            smoothed_landmarks
-        )
-    )
+        with metrics.measure("gestos"):
 
-    # Mantener INICIO visible brevemente
-    # después de completar las tres palmadas
-    if start_detected:
+            # ESCUDO
+            shield_raw = (
+                gesture_detector.detect_shield(
+                    smoothed_landmarks
+                )
+            )
 
-        start_display_until = (
-            time.time() + 0.8
-        )
+            shield_detected = (
+                shield_confirmation.update(
+                    shield_raw
+                )
+            )
+
+            # ATAQUE: cuerpo + dos pistolas
+            attack_body_detected = (
+                gesture_detector.detect_attack_body(
+                    smoothed_landmarks
+                )
+            )
+
+            gun_hands_detected = (
+                hand_detector.detect_gun_hands(
+                    hand_result
+                )
+            )
+
+            attack_raw = (
+                attack_body_detected
+                and gun_hands_detected
+            )
+
+            attack_detected = (
+                attack_confirmation.update(
+                    attack_raw
+                )
+            )
+
+            # RECARGAR
+            reload_detected = (
+                gesture_detector.detect_reload(
+                    smoothed_landmarks
+                )
+            )
+
+            if reload_detected:
+                reload_display_until = (
+                    time.time() + 0.8
+                )
+
+            # INICIO
+            start_detected = (
+                gesture_detector.detect_start(
+                    smoothed_landmarks
+                )
+            )
+
+            if start_detected:
+                start_display_until = (
+                    time.time() + 0.8
+                )
+
+            # FIN
+            end_detected = (
+                gesture_detector.detect_end(
+                    smoothed_landmarks
+                )
+            )
+
+            if end_detected:
+                end_display_until = (
+                    time.time() + 0.8
+                )
+
+            # -----------------------------
+            # POSTURA DETECTADA
+            # -----------------------------
+
+            detected_gesture = "---"
+
+            # POSTURAS ESTÁTICAS
+            if shield_detected:
+                detected_gesture = "ESCUDO"
+
+            elif attack_detected:
+                detected_gesture = "ATAQUE"
+
+            # POSTURAS DINÁMICAS
+            elif time.time() < reload_display_until:
+                detected_gesture = "RECARGAR"
+
+            elif time.time() < start_display_until:
+                detected_gesture = "INICIO"
+
+            elif time.time() < end_display_until:
+                detected_gesture = "FIN"
 
 
-    # -----------------------------
-    # FIN
-    # -----------------------------
+        # -----------------------------
+        # TEXTOS EN PANTALLA
+        # -----------------------------
 
-    end_detected = (
-        gesture_detector.detect_end(
-            smoothed_landmarks
-        )
-    )
+        with metrics.measure("dibujo"):
 
-    # Mantener FIN visible brevemente
-    # después de completar el saludo
-    if end_detected:
+            cv2.putText(
+                frame,
+                f"Postura: {detected_gesture}",
+                (30, 130),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9,
+                (0, 255, 255),
+                2
+            )
 
-        end_display_until = (
-            time.time() + 0.8
-        )
+            if person_detected:
 
-    # -----------------------------
-    # POSTURA DETECTADA
-    # -----------------------------
-    detected_gesture = "---"
+                cv2.putText(
+                    frame,
+                    "Persona detectada",
+                    (30, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 255, 0),
+                    2
+                )
 
-    # -----------------------------
-    # POSTURAS ESTÁTICAS
-    # -----------------------------
+            else:
 
-    if shield_detected:
-        detected_gesture = "ESCUDO"
+                cv2.putText(
+                    frame,
+                    "Persona no detectada",
+                    (30, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 0, 255),
+                    2
+                )
 
-    elif attack_detected:
-        detected_gesture = "ATAQUE"
+            # FPS instantáneo
+            current_time = time.time()
+            time_difference = current_time - previous_time
+            fps = 1 / time_difference if time_difference > 0 else 0
+            previous_time = current_time
 
-    # -----------------------------
-    # POSTURAS DINÁMICAS
-    # -----------------------------
+            cv2.putText(
+                frame,
+                f"FPS: {int(fps)}",
+                (30, 90),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (255, 255, 255),
+                2
+            )
 
-    elif time.time() < reload_display_until:
-        detected_gesture = "RECARGAR"
 
-    elif time.time() < start_display_until:
-        detected_gesture = "INICIO"
+        # -----------------------------
+        # REGISTRAR MÉTRICAS DEL FRAME
+        # -----------------------------
 
-    elif time.time() < end_display_until:
-        detected_gesture = "FIN"
-
-    # Mostrar postura actual
-    cv2.putText(
-        frame,
-        f"Postura: {detected_gesture}",
-        (30, 130),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.9,
-        (0, 255, 255),
-        2
-    )
-
-    # -----------------------------
-    # ESTADO DE DETECCIÓN
-    # -----------------------------
-
-    if person_detected:
-
-        cv2.putText(
-            frame,
-            "Persona detectada",
-            (30, 50),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (0, 255, 0),
-            2
-        )
-
-    else:
-
-        cv2.putText(
-            frame,
-            "Persona no detectada",
-            (30, 50),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (0, 0, 255),
-            2
+        metrics.end_frame(
+            detected_gesture,
+            person_detected
         )
 
-    # -----------------------------
-    # CALCULAR FPS
-    # -----------------------------
+        # Estado de la evaluación en pantalla
+        metrics.draw_overlay(frame)
 
-    current_time = time.time()
 
-    time_difference = (
-        current_time - previous_time
-    )
+        # -----------------------------
+        # MOSTRAR RESULTADO
+        # -----------------------------
 
-    if time_difference > 0:
-        fps = 1 / time_difference
-    else:
-        fps = 0
+        cv2.imshow(
+            "SOFIA - Deteccion de Posturas",
+            frame
+        )
 
-    previous_time = current_time
+        key = cv2.waitKey(1) & 0xFF
 
-    cv2.putText(
-        frame,
-        f"FPS: {int(fps)}",
-        (30, 90),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (255, 255, 255),
-        2
-    )
+        # Q para salir
+        if key == ord("q"):
+            break
+
+        # Teclas de evaluación (1-5, 0, x, s)
+        metrics.handle_key(key)
+
+finally:
 
     # -----------------------------
-    # MOSTRAR RESULTADO
+    # LIBERAR RECURSOS
     # -----------------------------
 
-    cv2.imshow(
-        "SOFIA - Deteccion de Posturas",
-        frame
-    )
+    cap.release()
+    cv2.destroyAllWindows()
 
-    # Q para salir
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+    pose_detector.close()
+    hand_detector.close()
 
+    # -----------------------------
+    # GUARDAR MÉTRICAS Y REPORTE
+    # -----------------------------
 
-# -----------------------------
-# LIBERAR RECURSOS
-# -----------------------------
+    json_path = metrics.save()
 
-cap.release()
-cv2.destroyAllWindows()
-
-pose_detector.close()
-hand_detector.close()
+    try:
+        from generate_report import generate
+        generate(json_path)
+    except Exception as error:
+        print(
+            "No se pudo generar el reporte automáticamente: "
+            f"{error}"
+        )
+        print("Puedes generarlo con: python generate_report.py")
