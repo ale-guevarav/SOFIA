@@ -4,6 +4,7 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+from smoothing import LandmarkSmoother
 from pose_connections import POSE_CONNECTIONS
 
 
@@ -11,7 +12,10 @@ class PoseDetector:
 
     def __init__(self, model_path="models/pose_landmarker.task"):
 
-        # Configuración de MediaPipe Pose Landmarker
+        # -----------------------------
+        # CONFIGURACIÓN DE MEDIAPIPE
+        # -----------------------------
+
         base_options = python.BaseOptions(
             model_asset_path=model_path
         )
@@ -25,6 +29,19 @@ class PoseDetector:
         self.detector = vision.PoseLandmarker.create_from_options(
             options
         )
+
+        # -----------------------------
+        # SUAVIZADO DE LANDMARKS
+        # -----------------------------
+
+        self.smoother = LandmarkSmoother(
+            alpha=0.3
+        )
+
+
+    # =============================================
+    # DETECCIÓN DE POSTURA
+    # =============================================
 
     def detect(self, frame_rgb, timestamp_ms):
 
@@ -40,6 +57,32 @@ class PoseDetector:
             timestamp_ms
         )
 
+
+    # =============================================
+    # LANDMARKS SUAVIZADOS
+    # =============================================
+
+    def get_smoothed_landmarks(self, result):
+
+        # Si no se detecta una persona,
+        # reiniciar el filtro
+        if not result.pose_landmarks:
+
+            self.smoother.reset()
+            return None
+
+        landmarks = result.pose_landmarks[0]
+
+        # Aplicar EMA a las coordenadas
+        return self.smoother.smooth(
+            landmarks
+        )
+
+
+    # =============================================
+    # DIBUJAR POSTURA
+    # =============================================
+
     def draw(self, frame, result):
 
         # Comprobar si se detectó una persona
@@ -50,14 +93,20 @@ class PoseDetector:
 
         height, width, _ = frame.shape
 
-        # Dibujar conexiones del esqueleto
+        # -----------------------------
+        # DIBUJAR ESQUELETO
+        # -----------------------------
+
         for start_idx, end_idx in POSE_CONNECTIONS:
 
             start = landmarks[start_idx]
             end = landmarks[end_idx]
 
             # Ignorar conexiones con poca visibilidad
-            if start.visibility < 0.5 or end.visibility < 0.5:
+            if (
+                start.visibility < 0.5
+                or end.visibility < 0.5
+            ):
                 continue
 
             start_point = (
@@ -78,7 +127,10 @@ class PoseDetector:
                 2
             )
 
-        # Dibujar los 33 keypoints
+        # -----------------------------
+        # DIBUJAR KEYPOINTS
+        # -----------------------------
+
         for landmark in landmarks:
 
             # Ignorar puntos con poca visibilidad
@@ -98,7 +150,11 @@ class PoseDetector:
 
         return True
 
+
+    # =============================================
+    # LIBERAR RECURSOS
+    # =============================================
+
     def close(self):
 
-        # Liberar recursos de MediaPipe
         self.detector.close()
