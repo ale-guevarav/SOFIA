@@ -5,7 +5,7 @@ from pose_detector import PoseDetector
 from hand_detector import HandDetector
 from gesture_detector import GestureDetector
 from smoothing import TemporalConfirmation
-from metrics_logger import PerformanceMetrics
+from Vision.metrics_logger import PerformanceMetrics
 
 
 # -----------------------------
@@ -366,7 +366,7 @@ finally:
     json_path = metrics.save()
 
     try:
-        from generate_report import generate
+        from Vision.generate_report import generate
         generate(json_path)
     except Exception as error:
         print(
