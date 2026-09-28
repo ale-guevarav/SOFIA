@@ -1,4 +1,4 @@
-import cv2
+import cv2 
 import time
 
 from pose_detector import PoseDetector
