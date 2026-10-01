@@ -1,0 +1,653 @@
+\documentclass[lettersize,journal]{IEEEtran}
+
+\usepackage{amsmath,amsfonts}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{xcolor}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+		T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{balance}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\newcommand{\status}[1]{\textbf{#1}}
+
+\begin{document}
+	
+	\title{LAB-DST SOFIA O26}
+	
+	\author{
+		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
+		Jorge A. Lizarraga and Luis E. Gonzales Jimenez 
+	}
+	
+	\markboth{Laboratory for the Development of Technological Solutions}
+	{Technical Datasheet of SOFIA Demonstrator Module}
+	
+	\maketitle
+	
+	\begin{abstract}
+		The abstract is a single paragraph of 150--250 words, written last,
+		once results already exist. It must be an objective synthesis of the
+		whole paper, without stating conclusions that are not supported in the
+		body of the text. Even though it has no visible subheadings, draft it
+		following this internal structure: \\
+		(1) \textbf{Context}: what question or need motivates the work? \\
+		(2) \textbf{Methods}: what was done to address it? (approach,
+		materials, main methods, in 1-2 lines). \\
+		(3) \textbf{Results}: what was found? (the main findings, with
+		concrete data if possible). \\
+		(4) \textbf{Conclusion}: what does that finding imply? \\
+		Avoid mathematical or chemical formulas inside the abstract.
+	\end{abstract}
+	
+	\begin{IEEEkeywords}
+		keyword 1, keyword 2, keyword 3 (3 to 6 terms specific to the
+		topic of the paper, yet reasonably common within the discipline --
+		they help other researchers find the work).
+	\end{IEEEkeywords}
+	
+	\section{Introduction}
+	
+	% IEEE journal papers open the first paragraph with a drop-cap letter
+	% via \IEEEPARstart. Keep this wrapper when you replace the guidance
+	% text below with your actual first paragraph.
+	\IEEEPARstart{S}{OFIA} is a modular robotic installation composed of 16
+	mechatronic units arranged in a two-dimensional $4 \times 4$ array, with each
+	unit providing two rotational degrees of freedom actuated by servomotors. The
+	system aims to achieve coordinated control of the multiple actuators while
+	enabling interaction through static and dynamic human gestures. For this
+	purpose, SOFIA integrates embedded control, inter-module communication, and an
+	external computer vision system for gesture recognition.
+	
+	The SOFIA system integrates three main capabilities: automatic configuration
+	and communication of modules through a Modbus network, characterization of the
+	mechanical time constant of the servomotors, and recognition of static and
+	dynamic human gestures through computer vision. These capabilities require the
+	integration of mechanical actuation, servo control, embedded processing, and
+	communication subsystems. Since each of the 16 units uses two servomotors, the
+	complete demonstrator requires the coordinated control of 32 actuators and the
+	generation of multiple PWM signals. The embedded controller must coordinate
+	the desired actuator positions, while the communication architecture should
+	support the future integration of additional SOFIA modules without
+	significantly increasing wiring and control complexity.
+	
+		\begin{table*}[!t]
+		\centering
+		\caption{Comparative matrix of related shape-changing interface systems}
+		\label{tab:related_work_matrix}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		
+		\begin{tabularx}{\textwidth}
+			{@{}P{2.2cm} P{3cm} P{3cm} P{4cm} Y@{}}
+			
+			\toprule
+			Reference & Method / technology & Metric / focus & Main result & Gap with respect to SOFIA \\
+			\midrule
+			
+			Relief \cite{leithinger2010relief} &
+			Array of 120 motorized pins, scalable low-cost control &
+			Actuation density, hardware/software scalability &
+			Continuous surface capable of rendering and animating 3D shapes, with per-pin input sensing &
+			Translational actuation only (1 DOF per pin); no independent rotation per unit \\
+			
+			inFORM \cite{follmer2013inform} &
+			Pin-based shape display on a pre-existing platform &
+			Dynamic physical affordances and constraints, object manipulation &
+			Real-time direct-touch interaction and physical rendering of content &
+			Same translational limitation as Relief; centralized architecture, not modular per unit \\
+			
+			TRANSFORM \cite{ishii2015transform} &
+			Three large-scale pin displays, kinetic energy as input &
+			Aesthetic transformation from static furniture to dynamic system &
+			Over one thousand pins coordinated in real-time wave motion &
+			Installation-scale system; no per-module orientable control or distributed communication between units \\
+			
+			PneUI \cite{yao2013pneui} &
+			Pneumatically actuated multi-layer soft composite materials &
+			Integrated input sensing and shape output in the material itself &
+			Four functional applications (phicons, mobile, case, lamp) with controllable shape change &
+			Soft/pneumatic actuation, not discrete rotational motion; difficult to scale to precise angular control \\
+			
+			LineFORM \cite{nakagaki2015lineform} &
+			Serial chain of one-DOF servo actuators &
+			Line/curve-based interaction affordances &
+			Cord, mobile, and body-constraint interfaces through line-shaped actuation &
+			Serial (chain) configuration, not a two-dimensional array; 1 DOF per unit, not 2 \\
+			
+			ChainFORM \cite{nakagaki2016chainform} &
+			Identical modules with servo, touch sensing, visual output and embedded processing &
+			Hardware modularity and reconfigurability &
+			Modular, reconfigurable platform with rich per-module I/O &
+			Modularity demonstrated, but still a linear chain, not a 2D array with 2 DOF per node \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+	\end{table*}
+	
+	Motorized arrays have been widely explored as a mechanism for generating
+	dynamic physical surfaces. Relief introduced an actuated tabletop composed of
+	120 individually addressable motorized pins and emphasized a scalable hardware
+	and software architecture \cite{leithinger2010relief}. This concept was
+	extended through inFORM, where shape actuation was employed to generate dynamic
+	physical affordances and constraints and to manipulate physical objects
+	\cite{follmer2013inform}. At a larger scale, TRANSFORM explored the
+	transformation of static physical structures into dynamic systems driven by
+	streams of data and energy \cite{ishii2015transform}. These approaches
+	demonstrate the potential of coordinated arrays of actuators, although their
+	architectures primarily focus on large pin-based or installation-scale physical
+	surfaces.
+	
+	Alternative approaches have explored different actuation principles and
+	modular configurations. PneUI demonstrated shape-changing interfaces based on
+	pneumatically actuated soft composite materials, integrating sensing and active
+	shape output within deformable structures \cite{yao2013pneui}. In contrast,
+	LineFORM investigated electromechanical shape transformation through serial
+	chains of one-degree-of-freedom servo actuators
+	\cite{nakagaki2015lineform}. This concept evolved toward greater hardware
+	modularity in ChainFORM, where identical modules incorporate motor actuation,
+	sensing, visual output, and embedded processing
+	\cite{nakagaki2016chainform}. These systems highlight modularity and
+	distributed actuation as relevant design characteristics for reconfigurable
+	physical interfaces.
+	
+	The main technological characteristics and differences identified among the
+	reviewed shape-changing interfaces are summarized in
+	Table~\ref{tab:related_work_matrix}.
+	
+	In contrast to the reviewed shape-changing interfaces, SOFIA combines a
+	two-dimensional $4 \times 4$ arrangement with two rotational degrees of freedom
+	per unit. Unlike pin-based displays, which predominantly constrain motion to a
+	single translational axis, or line-based modular systems organized as serial
+	chains, each SOFIA unit can independently modify its orientation while
+	remaining part of the same physical surface. This configuration introduces
+	design challenges related to coordinated actuation, modularity, scalability,
+	control architecture, electrical integration, and communication. Based on the
+	reviewed literature, these characteristics were identified as relevant criteria
+	for evaluating the technological architecture of the demonstrator.
+	Table~\ref{tab:related_work_matrix} summarizes the comparative analysis of the
+	reviewed systems, while Table~\ref{tab:benchmarking} contrasts SOFIA with the
+	reviewed solutions using the established comparison criteria.
+	
+	\begin{table}[H]
+		\centering
+		\caption{Benchmarking against related shape-changing systems}
+		\label{tab:benchmarking}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{1.7cm} P{1.7cm} P{1cm} Y@{}}
+			
+			\toprule
+			Solution & Configuration & DOF/ unit & Modularity / scalability\\
+			\midrule
+			
+			inFORM \cite{follmer2013inform} &
+			Pin array on fixed platform &
+			1 (translational) &
+			Low -- centralized control, not designed for modular expansion \\
+			
+			LineFORM / ChainFORM \cite{nakagaki2015lineform,nakagaki2016chainform} &
+			Serial chain of modules &
+			1 per module &
+			Medium -- modular, but limited to a linear configuration \\
+			
+			PneUI \cite{yao2013pneui} &
+			Pneumatic soft composite material &
+			Continuous (non-discrete) &
+			Low -- difficult to discretize into individually addressable nodes \\
+			
+			\textbf{SOFIA (proposed)} &
+			2D array, 4$\times$4 modules &
+			\textbf{2 (rotational)} &
+			\textbf{High -- I2C bus + RS-485 designed for future module expansion} \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+	\end{table}
+	
+	From the functional decomposition of the demonstrator and its comparison with
+	the literature, several technological opportunities were identified. One is
+	the development of a scalable control architecture capable of independently
+	coordinating all actuators while reducing the processing load on the main
+	controller. Another is the implementation of an inter-module communication
+	architecture that allows multiple SOFIA modules to operate as part of a larger
+	system. Additional opportunities include the implementation of
+	software-defined motion limits and smoothing strategies to prevent abrupt
+	servo movements and reduce mechanical stress.
+	
+	Based on these opportunities, this work focuses on defining and justifying a
+	preliminary electronic and control architecture for the SOFIA demonstrator.
+	The main areas considered are actuator control, PWM generation, embedded
+	processing, inter-module communication, electrical compatibility, and
+	scalability. These criteria provide the basis for the selection and
+	experimental evaluation of the technologies used in the subsequent development
+	stages of the SOFIA system.
+	
+	\section{Materials and Methods}
+	\label{sec:methods}
+	
+	The SOFIA demonstrator consists of sixteen electromechanical units,
+	each with two rotational degrees of freedom. The reference architecture
+	requires thirty-two servo channels controlled by one ESP32-C3 and two
+	PCA9685 PWM drivers \cite{sofia_architecture}.
+	
+	The objective of this document is to verify the compatibility of the
+	selected components according to electrical, communication and
+	mechanical requirements.
+	The verification criteria are based on the hardware requirements and
+	checklist defined in the technical session \cite{technical_session}.
+	The document structure follows the LabDST documentation requirements for
+	technical datasheets and component verification reports \cite{labdst_deliverables}.
+	
+	
+	\begin{table}[H]
+		\centering
+		\caption{SOFIA Main Requirements}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2.1cm} P{2.1cm} Y@{}}
+			
+			\toprule
+			Requirement & Specification & Verification\\
+			\midrule
+			
+			Power &
+			5 V servo supply &
+			Compatible with MG90S range \\
+			
+			Logic voltage &
+			3.3 V MCU logic &
+			Required for ESP32-C3 GPIO \\
+			
+			Communication &
+			WiFi/Bluetooth + I2C &
+			Supported by ESP32-C3 \\
+			
+			PWM control &
+			32 servo channels, 50 Hz &
+			Two PCA9685 drivers required \\
+			
+			Mechanical &
+			16 modules, 2 DOF each &
+			32 servos required \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+	\end{table}
+	
+	
+	\subsection{ESP32-C3 Technical Analysis}
+	
+	
+	\begin{table}[H]
+		\centering
+		\caption{ESP32-C3 Main Specifications}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2cm} P{2.2cm} Y@{}}
+			
+			\toprule
+			Parameter & Value & Verification\\
+			\midrule
+			
+			Supply voltage &
+			3.0--3.6 V &
+			Requires regulated 3.3 V supply \\
+			
+			WiFi &
+			802.11 b/g/n 2.4 GHz &
+			Complies \\
+			
+			Bluetooth &
+			BLE 5 &
+			Complies \\
+			
+			Logic level &
+			3.3 V GPIO &
+			5 V cannot be applied directly \\
+			
+			Boot pins &
+			GPIO2, GPIO8, GPIO9 &
+			PCB design verification required \\
+			
+			Temperature &
+			Up to 105 $^\circ$C &
+			Suitable for laboratory operation \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+		
+	\end{table}
+	
+	
+	Source: ESP32-C3 Datasheet, Espressif Systems. \cite{esp32c3}
+	
+	
+	\subsection{PCA9685 Technical Analysis}
+	
+	
+	\begin{table}[H]
+		\centering
+		\caption{PCA9685 Main Specifications}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2cm} P{2.2cm} Y@{}}
+			
+			\toprule
+			Parameter & Value & Verification\\
+			\midrule
+			
+			Channels &
+			16 PWM channels &
+			Two devices provide 32 outputs \\
+			
+			Resolution &
+			12 bits &
+			Complies \\
+			
+			Interface &
+			I2C Fast Mode Plus &
+			Compatible with ESP32-C3 \\
+			
+			Voltage &
+			2.3--5.5 V &
+			Use 3.3 V logic \\
+			
+			Frequency &
+			24--1526 Hz &
+			Configure to 50 Hz for servos \\
+			
+			Addressing &
+			Up to 62 devices &
+			Use different addresses (0x40/0x41) \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+		
+	\end{table}
+	
+	
+	Source: PCA9685 Datasheet, NXP. \cite{pca9685}
+	
+	
+	\subsection{MG90S Servo Technical Analysis}
+	
+	
+	\begin{table}[H]
+		\centering
+		\caption{MG90S Main Specifications}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2cm} P{2.2cm} Y@{}}
+			
+			\toprule
+			Parameter & Value & Verification\\
+			\midrule
+			
+			Voltage & 4.8--6.0 V & Compatible with 5 V rail \\
+			
+			Torque & 1.8--2.2 kgf cm &  validation required \\
+			
+			Speed & 0.08--0.10 s/60$^\circ$ & Reference value \\
+			
+			Mass & 13.4 g & Must be considered in CAD \\
+			
+			PWM frequency & 50 Hz & Compatible with PCA9685 \\
+			
+			Stall current & Not reported & Measurement required \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+		
+	\end{table}
+	
+	
+	Source: TowerPro MG90S documentation. \cite{mg90s}
+	
+	\subsection{Checklist Verification}
+	
+	
+	\begin{table}[H]
+		\centering
+		\caption{Verification Summary}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2cm} P{1.7cm} Y@{}}
+			
+			\toprule
+			Component &
+			Status &
+			Comment\\
+			\midrule
+			
+			ESP32-C3 &
+			\status{Complies} &
+			Requires 3.3 V regulation and boot verification \\
+			
+			PCA9685 &
+			\status{Complies} &
+			Requires unique I2C addresses and 50 Hz configuration \\
+			
+			MG90S &
+			\status{Partial} &
+			Torque and current require validation \\
+			
+			\bottomrule
+			
+		\end{tabularx}
+		
+	\end{table}
+	
+	\subsection{Bill of Materials}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Bill of materials summary}
+		\label{tab:bom}
+		\begin{tabularx}{\columnwidth}
+			{@{}P{1.cm} P{3.5cm} P{0.5cm} Y@{} }
+			\hline
+			\textbf{Item} & \textbf{Component} & \textbf{Qty} & \textbf{Manufacturer} \\
+			\hline
+			1 & Sofia003-P001-03 & 16 & 3D Printed \\
+			2 & MG90S servo & 32 & Tower Pro \\
+			3 & Sofia003-E002-01 & 16 & 3D Printed \\
+			3.1/4.4 & Pro3 & 32 & Tower Pro\\
+			3.2 & Sofia003-P004-02 & 16 & 3D Printed \\
+			3.3 & Sofia003-P004-03 & 16 & 3D Printed \\
+			3.4/3.5/
+			\par 4.3/7/8 & M2 screws (various) & 160 & Walfront \\
+			3.6 & Axis 1 9mm x 9mm & 16 & Mae \\
+			3.7 & Sofia003-P002-02 & 16 & 3D Printed \\
+			4 & Sofia003-E003-01 & 16 & 3D Printed \\
+			4.1 & Sofia003-P005-01 & 16 & 3D Printed \\
+			4.2 & Sofia003-P005-02 & 16 & 3D Printed \\
+			5 & Sofia003-P008-01 & 16 & 3D Printed \\
+			6 & Sofia003-P009-01 & 16 & 3D Printed \\
+			9 & Inser M3x5x4 & 16 & ZWMSSLL \\
+			10 &Sofia003-P000-01 & 16 & 3D Printed \\
+			- & ESP32-C3 SuperMini & 1 & Espressif \\
+			- & PCA9685 Servo Driver & 2 & NXP \\
+			- & MAX13487E TTL485-V2.0 & 16 & Analog Devices Inc.\\
+			- & LED RGB & 1 & Mexbit \\
+			- & JST-PH Male & 1 & JTAREA \\
+			- & JST-PH Female & 1 & JTAREA \\
+			
+			\hline
+		\end{tabularx}
+	\end{table}
+	
+	\subsection{Justification of Technological Selection}
+	
+	\begin{table}[H]
+		\centering
+		\caption{Comparative Matrix of Alternatives}
+		\label{tab:comparative_matrix}
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+		
+		\begin{tabularx}{\columnwidth}
+			{@{}P{2cm} P{1.7cm} P{2cm} Y@{} }
+			
+			\toprule
+			Function & Alternatives considered & Selected & Selection criterion \\
+			\midrule
+			
+			Actuation & Servo / Stepper / DC & MG90S & Integrated angular positioning \\
+			
+			PWM generation & MCU PWM / PCA9685 / Additional MCU & PCA9685 & 16 PWM channels through I2C \\
+			
+			Processing & Arduino / STM32 / ESP32-C3 SuperMini & ESP32-C3 SuperMini & Wireless connectivity + required interfaces \\
+			
+			Inter-module communication & UART / CAN/ RS-485 & RS-485 & Differential multi-node communication \\
+			
+			
+			\bottomrule
+			
+		\end{tabularx}
+		
+	\end{table}
+	
+	As summarized in Table~\ref{tab:comparative_matrix}, the technological
+	architecture was selected according to the functional and scalability
+	requirements of the SOFIA demonstrator. MG90S servomotors were selected
+	to provide controlled angular positioning for each degree of freedom,
+	while two PCA9685 drivers provide the 32 PWM channels required by the
+	system through a shared I2C bus. The ESP32-C3 SuperMini was selected as
+	the main controller due to its integrated wireless connectivity and
+	support for the required communication interfaces. Finally, RS-485 was
+	selected for inter-module communication because its differential and
+	multi-node architecture supports the future connection of multiple
+	SOFIA modules.
+	
+	\section{Design and Implementation of the Technological Solution}
+	\label{sec:design}
+	
+	Figure~\ref{fig1} shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
+	
+	\begin{figure}[H]
+		\centering
+		\subfloat[Step 1]{\includegraphics[width=1.1in]{images/Sim_a}}
+		\hfil
+		\subfloat[Step 2]{\includegraphics[width=1.1in]{images/Sim_b}}
+		\hfil
+		\subfloat[Step 3]{\includegraphics[width=1.1in]{images/Sim_c}}
+		\hfil
+		\subfloat[Step 4]{\includegraphics[width=1.1in]{images/Sim_d}}
+		\hfil
+		\subfloat[Step 5]{\includegraphics[width=1.1in]{images/Sim_e}}
+		\hfil
+		\subfloat[Step 6]{\includegraphics[width=1.1in]{images/Sim_f}}
+		\caption{Simulation of the SOFIA module tracking a moving reference point using inverse kinematics.}
+		\label{fig1}
+	\end{figure}
+	
+	Algorithm~\ref{alg:sofia_tracking} summarizes the inverse kinematics and smoothing strategy used by each SOFIA module to orient its platform toward the moving target.
+	
+	\begin{algorithm}[H]
+		\caption{SOFIA module target tracking control}
+		\label{alg:sofia_tracking}
+		
+		\begin{algorithmic}[1]
+			
+			\Require Target position $p$, module position $r_0$, joint limits $q_{1min},q_{1max},q_{2min},q_{2max}$, smoothing gain $K$
+			\Ensure Servo angles $q_1,q_2$
+			
+			\State $v \gets p-r_0$
+			\State $\hat{v} \gets (v/\|v\|)$
+			
+			\State $q_1^* \gets atan2(-\hat{v}_y,\hat{v}_z)$
+			\State $q_2^* \gets asin(\hat{v}_x)$
+			
+			\State $q_1^* \gets Clamp(q_1^*,q_{1min},q_{1max})$
+			\State $q_2^* \gets Clamp(q_2^*,q_{2min},q_{2max})$
+			
+			\State $q_1 \gets q_{1old}+K(q_1^*-q_{1old})$
+			\State $q_2 \gets q_{2old}+K(q_2^*-q_{2old})$
+			
+			\State Apply $q_1,q_2$ to servo motors
+			
+			\State \Return $q_1,q_2$
+			
+		\end{algorithmic}
+	\end{algorithm}
+	
+	
+	
+	
+	\balance
+	
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliography}
+	
+	
+%	\begin{table*}[!t]
+%		\centering
+%		\caption{Bill of materials for one SOFIA module}
+%		\label{tab:bom_f}
+%		\begin{tabular}{p{3cm}cp{6cm}p{3cm}p{3cm}}
+%			\hline
+%			\textbf{Component} & \textbf{Qty} & \textbf{Technical description} &
+%			\textbf{Manufacturer} & \textbf{Country} \\
+%			\hline
+%%			Continuous-rotation servo, rated torque $\tau$ at $V$~V &
+%			Manufacturer Y & City, Country \\
+%			Module enclosure & 16 &
+%			3D-printed enclosure, PLA, in-house design &
+%			In-house & City, Country \\
+%			\hline
+%		\end{tabular}
+%	\end{table*}
+	
+\end{document}
