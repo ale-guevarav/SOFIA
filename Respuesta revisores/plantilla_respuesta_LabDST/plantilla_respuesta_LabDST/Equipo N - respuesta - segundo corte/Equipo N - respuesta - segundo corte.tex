@@ -1,0 +1,88 @@
+%=================================================================
+% PLANTILLA -- Respuesta a los revisores -- Segundo Corte
+% LabDST RoboCoffee, ITESO.
+%
+% Como usarla:
+%   1. Copien esta carpeta junto a la carpeta de su paper revisado
+%      (las dos carpetas deben ser HERMANAS) y cambien "N" por el
+%      numero de su equipo, en el nombre de la carpeta y del .tex.
+%   2. Ajusten la ruta de \LabDSTpaper: relativa, SIN extension,
+%      entre comillas y en UNA sola linea.
+%   3. En el paper, marquen cada cambio con \linelabel{ln:...} (texto)
+%      o \label{sec:/fig:/tab:/eq:...} (secciones, figuras, tablas,
+%      ecuaciones).
+%   4. Escriban un \LabDSTcomment por CADA clave del PDF de
+%      observaciones (R1.1, R1.2, ..., R4.n), en el mismo orden.
+%   5. Compilen primero el paper (pdflatex -> bibtex -> pdflatex ->
+%      pdflatex) y despues esta carta DOS veces (pdflatex x2).
+%      Si aparece "??", revisen la ruta o el nombre de la etiqueta.
+%
+% La carta se escribe en ingles, como el paper. El comentario del
+% revisor se copia TEXTUAL desde el PDF de observaciones.
+%
+% \LabDSTcomment{Clave}{Estado}{Ubicacion}{Comentario}{Respuesta}
+%   Estado:    A = Addressed
+%              P = Partially addressed
+%              N = Not addressed (justified)
+%   Ubicacion: \rln{x} -> "line NN"     \rlns{x}{y} -> "lines NN--MM"
+%              \Rln, \Rlns (inicio de oracion), Section~\ref{sec:...},
+%              Fig.~\ref{fig:...}, Table~\ref{tab:...}, \eqref{eq:...}
+%   \LabDSTquote{...} cita el texto NUEVO del paper.
+%
+% Borren los comentarios <...> y todo lo que este entre < >.
+%=================================================================
+\documentclass{LabDSTresponse}
+\LabDSTpaper{"../Equipo N - segundo corte/Equipo N - segundo corte"}
+
+\begin{document}
+\LabDSTtitle{Second Cut}{Team N}{<Title of the paper>}
+
+%-----------------------------------------------------------------
+\LabDSTsection{Acknowledgements}
+
+The authors thank the reviewers for their careful evaluation of the first-cut manuscript. <One sentence on how the comments improved the paper.> All comments were considered; the responses below follow the keys of the review report (R1.1, R1.2, \ldots). Line, section, figure, table, and equation numbers refer to the revised manuscript that accompanies this letter.
+
+\textbf{Main changes.} (i) <Main change 1> (Section~\ref{sec:intro}). (ii) <Main change 2>. (iii) <Main change 3>.
+
+% Matriz observacion-respuesta-cambio: se llena sola (compilar dos veces).
+\LabDSTsummary
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{1}{Format, LaTeX and template compliance}
+
+% Ejemplo de respuesta ATENDIDA (A): que se hizo y donde.
+\LabDSTcomment{R1.1}{A}{\Rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
+{<Comentario del revisor, copiado textual del PDF de observaciones.>}
+{As suggested, we <describe what was changed> (\rlns{<etiqueta-inicio>}{<etiqueta-fin>}).}
+
+\LabDSTcomment{R1.2}{A}{<Ubicacion>}
+{<Comentario textual.>}
+{<Response.>}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{2}{Writing and structure}
+
+% Ejemplo con el texto NUEVO citado con \LabDSTquote.
+\LabDSTcomment{R2.1}{A}{\Rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
+{<Comentario textual.>}
+{We rewrote <...> (\rlns{<etiqueta-inicio>}{<etiqueta-fin>}). The revised text now reads:
+\LabDSTquote{<New text of the paper.>}}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{3}{Technical content}
+
+% Ejemplo de respuesta PARCIAL (P): que se hizo, que falta, por que y cuando.
+\LabDSTcomment{R3.1}{P}{Table~\ref{tab:<...>}, \rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
+{<Comentario textual.>}
+{We agree that <...>. We added <...> (Table~\ref{tab:<...>}). This comment is only partially addressed because <reason>; <the missing part> will be reported in the next cut, and this limitation is stated in \rln{<etiqueta>}.}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{4}{D-Lab and state of the art}
+
+% Ejemplo NO ATENDIDA con justificacion (N): reconocer lo valido,
+% dar la razon tecnica y decir que se hizo a cambio y donde.
+\LabDSTcomment{R4.1}{N}{\Rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
+{<Comentario textual.>}
+{We thank the reviewer for this suggestion, and we agree that <...>. However, <technical reason: scope, cost, time, available evidence>. Instead, <what was done>, as stated in \rlns{<etiqueta-inicio>}{<etiqueta-fin>}.}
+
+\end{document}
