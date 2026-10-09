@@ -26,11 +26,12 @@
 
 \begin{document}
 	
-	\title{LAB-DST SOFIA O26}
+	\title{Servo Characterization for the SOFIA Modular Kinetic
+		Surface}
 	
 	\author{
 		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
-		Jorge A. Lizarraga and Luis E. Gonzales Jimenez 
+		Jorge A. Lizarraga, Luis E. Gonzáles Jiménez, Luis F. Luque Vega
 	}
 	
 	\markboth{Laboratory for the Development of Technological Solutions}
@@ -66,7 +67,7 @@
 	support the future integration of additional SOFIA modules without
 	significantly increasing wiring and control complexity.
 	
-		\begin{table*}[!t]
+	\begin{table*}[!t]
 		\centering
 		\caption{Comparative matrix of related shape-changing interface systems}
 		\label{tab:related_work_matrix}
@@ -167,7 +168,7 @@
 	reviewed systems, while Table~\ref{tab:benchmarking} contrasts SOFIA with the
 	reviewed solutions using the established comparison criteria.
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{Benchmarking against related shape-changing systems}
 		\label{tab:benchmarking}
@@ -177,7 +178,7 @@
 		\renewcommand{\arraystretch}{1.05}
 		
 		\begin{tabularx}{\columnwidth}
-			{@{}P{1.7cm} P{1.7cm} P{1cm} Y@{}}
+			{@{}P{1.7cm} P{1.7cm} P{1.5cm} Y@{}}
 			
 			\toprule
 			Solution & Configuration & DOF/ unit & Modularity / scalability\\
@@ -243,7 +244,7 @@
 	technical datasheets and component verification reports \cite{labdst_deliverables}.
 	
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{SOFIA Main Requirements}
 		\scriptsize
@@ -287,7 +288,7 @@
 	\subsection{ESP32-C3 Technical Analysis}
 	
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{ESP32-C3 Main Specifications}
 		\scriptsize
@@ -339,7 +340,7 @@
 	\subsection{PCA9685 Technical Analysis}
 	
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{PCA9685 Main Specifications}
 		\scriptsize
@@ -391,7 +392,7 @@
 	\subsection{MG90S Servo Technical Analysis}
 	
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{MG90S Main Specifications}
 		\scriptsize
@@ -430,7 +431,7 @@
 	\subsection{Checklist Verification}
 	
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{Verification Summary}
 		\scriptsize
@@ -467,7 +468,7 @@
 	
 	\subsection{Bill of Materials}
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{Bill of materials summary}
 		\label{tab:bom}
@@ -506,7 +507,7 @@
 	
 	\subsection{Justification of Technological Selection}
 	
-	\begin{table}[H]
+	\begin{table}[!t]
 		\centering
 		\caption{Comparative Matrix of Alternatives}
 		\label{tab:comparative_matrix}
@@ -554,7 +555,7 @@
 	
 	Figure~\ref{fig1} \linelabel{ln:sim}shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
 	
-	\begin{figure}[H]
+	\begin{figure}[!t]
 		\centering
 		\subfloat[Step 1]{\includegraphics[width=1.1in]{figures/Sim_a}}
 		\hfil
@@ -573,7 +574,7 @@
 	
 	Algorithm~\ref{alg:sofia_tracking} \linelabel{ln:alg}summarizes the inverse kinematics and smoothing strategy used by each SOFIA module to orient its platform toward the moving target.
 	
-	\begin{algorithm}[H]
+	\begin{algorithm}[!t]
 		\caption{SOFIA module target tracking control}
 		\label{alg:sofia_tracking}
 		
@@ -601,6 +602,11 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
+	\section{Results}
+	
+	\section{Discussions}
+	
+	\section{Conclusions}
 	
 	
 	
@@ -610,22 +616,22 @@
 	\bibliography{bibliography}
 	
 	
-%	\begin{table*}[!t]
-%		\centering
-%		\caption{Bill of materials for one SOFIA module}
-%		\label{tab:bom_f}
-%		\begin{tabular}{p{3cm}cp{6cm}p{3cm}p{3cm}}
-%			\hline
-%			\textbf{Component} & \textbf{Qty} & \textbf{Technical description} &
-%			\textbf{Manufacturer} & \textbf{Country} \\
-%			\hline
-%%			Continuous-rotation servo, rated torque $\tau$ at $V$~V &
-%			Manufacturer Y & City, Country \\
-%			Module enclosure & 16 &
-%			3D-printed enclosure, PLA, in-house design &
-%			In-house & City, Country \\
-%			\hline
-%		\end{tabular}
-%	\end{table*}
+	%	\begin{table*}[!t]
+		%		\centering
+		%		\caption{Bill of materials for one SOFIA module}
+		%		\label{tab:bom_f}
+		%		\begin{tabular}{p{3cm}cp{6cm}p{3cm}p{3cm}}
+			%			\hline
+			%			\textbf{Component} & \textbf{Qty} & \textbf{Technical description} &
+			%			\textbf{Manufacturer} & \textbf{Country} \\
+			%			\hline
+			%%			Continuous-rotation servo, rated torque $\tau$ at $V$~V &
+			%			Manufacturer Y & City, Country \\
+			%			Module enclosure & 16 &
+			%			3D-printed enclosure, PLA, in-house design &
+			%			In-house & City, Country \\
+			%			\hline
+			%		\end{tabular}
+		%	\end{table*}
 	
 \end{document}
