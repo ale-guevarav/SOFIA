@@ -43,11 +43,45 @@
 	
 	\maketitle
 	
+	
 	\begin{abstract}
+		The SOFIA modular kinetic surface consists of 16
+		electromechanical modules arranged in a honeycomb
+		configuration, each actuated by two servomotors,
+		requiring the coordinated control of 32 actuators.
+		Differences in the dynamic response of these
+		servomotors may affect the synchronization and
+		positioning performance of the system. This work
+		proposes an experimental methodology for
+		characterizing the dynamic response of the two
+		servomotors in a single SOFIA module, temporarily
+		removed from the complete structure for testing.
+		A removable crown-shaped measurement device
+		incorporating limit switches is proposed to
+		establish repeatable angular reference positions
+		and record the time intervals associated with
+		servo movement. The control architecture consists
+		of an ESP32-C3 microcontroller and two PCA9685
+		PWM drivers, providing independent control of
+		the 32 actuators in the complete system.
+		The proposed methodology includes repeated
+		movement tests under defined operating conditions,
+		analysis of the measured response times, and
+		evaluation of an appropriate dynamic model for
+		estimating effective servomotor time constants.
+		The experimental scope is limited to the two
+		servomotors of the selected module, with the aim
+		of establishing a measurement procedure for
+		evaluating their dynamic behavior.
 	\end{abstract}
 	
 	\begin{IEEEkeywords}
+		Servomotor characterization, dynamic response,
+		time constant estimation, limit switches,
+		modular robotics, kinetic surfaces, ESP32-C3,
+		PCA9685.
 	\end{IEEEkeywords}
+	
 	
 	\section{Introduction}
 	
@@ -627,11 +661,22 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
-	\section{Results}
 	
-	\section{Discussions}
+	\section{Results}
+	\label{sec:results}
+	
+	\subsection{Experimental Setup}
+	
+	\subsection{Servomotor Dynamic Response}
+	
+	\subsection{Time Constant Estimation}
+
+
+	\section{Discussion}
+	\label{sec:discussion}
 	
 	\section{Conclusions}
+	\label{sec:conclusions}
 	
 	
 	
