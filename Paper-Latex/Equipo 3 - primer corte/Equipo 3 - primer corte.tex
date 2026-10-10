@@ -45,41 +45,12 @@
 	
 	
 	\begin{abstract}
-		The SOFIA modular kinetic surface consists of 16
-		electromechanical modules arranged in a honeycomb
-		configuration, each actuated by two servomotors,
-		requiring the coordinated control of 32 actuators.
-		Differences in the dynamic response of these
-		servomotors may affect the synchronization and
-		positioning performance of the system. This work
-		proposes an experimental methodology for
-		characterizing the dynamic response of the two
-		servomotors in a single SOFIA module, temporarily
-		removed from the complete structure for testing.
-		A removable crown-shaped measurement device
-		incorporating limit switches is proposed to
-		establish repeatable angular reference positions
-		and record the time intervals associated with
-		servo movement. The control architecture consists
-		of an ESP32-C3 microcontroller and two PCA9685
-		PWM drivers, providing independent control of
-		the 32 actuators in the complete system.
-		The proposed methodology includes repeated
-		movement tests under defined operating conditions,
-		analysis of the measured response times, and
-		evaluation of an appropriate dynamic model for
-		estimating effective servomotor time constants.
-		The experimental scope is limited to the two
-		servomotors of the selected module, with the aim
-		of establishing a measurement procedure for
-		evaluating their dynamic behavior.
+		The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each actuated by two servomotors, requiring the coordinated control of 32 actuators. Differences in the dynamic response of these servomotors may affect the synchronization and positioning performance of the system. This work proposes an experimental methodology for characterizing the dynamic response of the two servomotors in a single SOFIA module, temporarily removed from the complete structure for testing. A removable crown-shaped measurement device incorporating limit switches is proposed to establish repeatable angular reference positions and record the time intervals associated with servo movement. The control architecture consists of an ESP32-C3 microcontroller and two PCA9685 PWM drivers, providing independent control of the 32 actuators in the complete system. The proposed methodology includes repeatedmovement tests under defined operating conditions, analysis of the measured response times, and evaluation of an appropriate dynamic model for
+		estimating effective servomotor time constants. The experimental scope is limited to the two servomotors of the selected module, with the aim of establishing a measurement procedure for evaluating their dynamic behavior.
 	\end{abstract}
 	
 	\begin{IEEEkeywords}
-		Servomotor characterization, dynamic response,
-		time constant estimation, limit switches,
-		modular robotics, kinetic surfaces, ESP32-C3,
-		PCA9685.
+		Servomotor characterization, dynamic response, time constant estimation, limit switches, modular robotics, kinetic surfaces, ESP32-C3, PCA9685.
 	\end{IEEEkeywords}
 	
 	
@@ -265,21 +236,22 @@
 	experimental evaluation of the technologies used in the subsequent development
 	stages of the SOFIA system.
 	
+	
 	\section{Materials and Methods}
 	\label{sec:methods}
 	
-	\linelabel{ln:mm}The SOFIA demonstrator consists of sixteen electromechanical units,
-	each with two rotational degrees of freedom. The reference architecture
-	requires thirty-two servo channels controlled by one ESP32-C3 and two
-	PCA9685 PWM drivers \cite{sofia_architecture}.
+	The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors \cite{sofia_architecture,mg90s}. Although the complete system incorporates 32 actuators, the experimental characterization proposed in this study is limited to the two servomotors of a single module removed from the SOFIA structure.
 	
-	\linelabel{ln:mm-doc}The objective of this document is to verify the compatibility of the
-	selected components according to electrical, communication and
-	mechanical requirements.
-	The verification criteria are based on the hardware requirements and
-	checklist defined in the technical session \cite{technical_session}.
-	\linelabel{ln:mm-labdst}The document structure follows the LabDST documentation requirements for
-	technical datasheets and component verification reports \cite{labdst_deliverables}.
+	The methodology is divided into three main stages: hardware configuration, experimental measurement, and dynamic response analysis. The first stage involves the selection and verification of the electronic components required for servomotor control, considering the established hardware requirements \cite{technical_session}. The second stage proposes the use of a removable crown-shaped measurement device equipped with limit switches to detect predefined angular positions during controlled movements. The third stage involves analyzing the recorded timing data and evaluating an appropriate dynamic model to estimate the effective time constant of each servomotor.
+	
+	The experimental procedure is intended to provide repeatable measurements under defined operating conditions. Relevant variables include the commanded angular displacement, movement direction, supply voltage, and measured time intervals.
+	These variables will be considered when evaluating differences in the dynamic response of the two servomotors.
+	
+	The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
+	However, only the two servomotors of the selected module will be evaluated experimentally in thisstudy.
+	
+	The main electrical, communication, and mechanical requirements of the SOFIA demonstrator are summarized in Table~\ref{tab:sofia_requirements}. These requirements are based on the system architecture and the established technical verification criteria \cite{sofia_architecture,technical_session}.
+	
 	
 	
 	The main electrical, communication, and mechanical
