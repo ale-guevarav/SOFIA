@@ -64,17 +64,14 @@
 	purpose, SOFIA integrates embedded control, inter-module communication, and an
 	external computer vision system for gesture recognition.
 	
-	\linelabel{ln:intro-cap}The SOFIA system integrates three main capabilities: automatic configuration
-	and communication of modules through a Modbus network, characterization of the
-	mechanical time constant of the servomotors, and recognition of static and
-	dynamic human gestures through computer vision. These capabilities require the
+	\linelabel{ln:intro-cap}The SOFIA system requires the
 	integration of mechanical actuation, servo control, embedded processing, and
 	communication subsystems. \linelabel{ln:intro-32}Since each of the 16 units uses two servomotors, the
 	complete demonstrator requires the coordinated control of 32 actuators and the
 	generation of multiple PWM signals. The embedded controller must coordinate
 	the desired actuator positions, while the communication architecture should
 	support the future integration of additional SOFIA modules without
-	significantly increasing wiring and control complexity.
+	significantly increasing wiring and control complexity. This work proposes an experimental method to estimate individual servo time constraints with a mechanical solution.
 	
 	\begin{table*}[!t]
 		\centering
@@ -573,6 +570,13 @@
 	selected for inter-module communication because its differential and
 	multi-node architecture supports the future connection of multiple
 	SOFIA modules.
+	
+	\subsection{Servo Mechanical Time Constant Estimation}
+	The first-order dynamic model for angular position response $\theta(t)$ is given by:
+	\begin{equation}
+		\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}
+	\end{equation}
+	where $\theta_0$ is the initial angle, $\theta_f$ is the commanded step target angle, and $\tau_m$ is the mechanical time constant. Tests will apply a $60^\circ$ step input and measure the response velocity.
 	
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
