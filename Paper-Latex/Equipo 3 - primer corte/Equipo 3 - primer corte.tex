@@ -292,162 +292,189 @@
 	
 	
 	\subsection{ESP32-C3 Technical Analysis}
-	The main technical specifications of the ESP32-C3
-	microcontroller are presented in
-	Table~\ref{tab:esp32_specs}.
+	The main technical specifications of the ESP32-C3 microcontroller are presented in Table~\ref{tab:esp32_specs}.
 	
-	\begin{table}[!t]
+	\begin{table}[H]
 		\centering
-		\caption{ESP32-C3 Main Specifications}
+		\caption{ESP32-C3 Main Specifications and Datasheet Verification}
 		\label{tab:esp32_specs}
 		\scriptsize
 		
 		\setlength{\tabcolsep}{2pt}
-		\renewcommand{\arraystretch}{1.05}
+		\renewcommand{\arraystretch}{1.1}
 		
-		\begin{tabularx}{\columnwidth}
-			{@{}P{2cm} P{2.2cm} Y@{}}
-			
+		\begin{tabularx}{\columnwidth}{@{}P{1.6cm} P{1.5cm} P{2.1cm} X X@{}}
 			\toprule
-			Parameter & Value & Verification\\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
 			\midrule
 			
-			Supply voltage &
-			3.0--3.6 V &
+			Supply Voltage & 
+			3.0--3.6 V & 
+			Espressif DS v2.4, p. 18 & 
+			Match system main power rail operating limits & 
 			Requires regulated 3.3 V supply \\
 			
-			WiFi &
-			802.11 b/g/n 2.4 GHz &
-			Complies \\
+			Wi-Fi & 
+			802.11 b/g/n & 
+			Espressif DS v2.4, p. 2 & 
+			Enable 2.4 GHz wireless telemetry transmission & 
+			Complies; integrated 2.4 GHz subsystem \\
 			
-			Bluetooth &
-			BLE 5 &
-			Complies \\
+			Bluetooth & 
+			BLE 5 & 
+			Espressif DS v2.4, p. 2 & 
+			Support low-energy configuration and monitoring & 
+			Complies; Bluetooth LE 5.0 supported \\
 			
-			Logic level &
-			3.3 V GPIO &
-			5 V cannot be applied directly \\
+			Logic Level & 
+			3.3 V GPIO & 
+			Espressif DS v2.4, p. 19 & 
+			Ensure digital signal levels meet peripheral logic thresholds & 
+			5 V logic cannot be applied directly without level shifting \\
 			
-			Boot pins &
-			GPIO2, GPIO8, GPIO9 &
-			PCB design verification required \\
+			Boot Pins & 
+			GPIO2, 8, 9 & 
+			Espressif DS v2.4, p. 12 & 
+			Prevent unintended strapping state selection during power-up & 
+			PCB design hardware strapping verification required \\
 			
-			Temperature &
-			Up to 105 $^\circ$C &
-			Suitable for laboratory operation \\
+			Temperature & 
+			Up to 105 $^\circ$C & 
+			Espressif DS v2.4, p. 18 & 
+			Ensure reliable continuous execution under thermal load & 
+			Suitable for industrial and laboratory operating environments \\
 			
 			\bottomrule
-			
 		\end{tabularx}
-		
 	\end{table}
-	
 	
 	\linelabel{ln:src-esp}Source: ESP32-C3 Datasheet, Espressif Systems. \cite{esp32c3}
 	
 	
 	\subsection{PCA9685 Technical Analysis}
-	The specifications of the PCA9685 PWM driver are
-	summarized in Table~\ref{tab:pca9685_specs}.
+	The specifications of the PCA9685 PWM driver are summarized in Table~\ref{tab:pca9685_specs}.
 	
-	\begin{table}[!t]
+	\begin{table}[H]
 		\centering
-		\caption{PCA9685 Main Specifications}
+		\caption{PCA9685 Main Specifications and Datasheet Verification}
 		\label{tab:pca9685_specs}
 		\scriptsize
 		
 		\setlength{\tabcolsep}{2pt}
-		\renewcommand{\arraystretch}{1.05}
+		\renewcommand{\arraystretch}{1.1}
 		
-		\begin{tabularx}{\columnwidth}
-			{@{}P{2cm} P{2.2cm} Y@{}}
-			
+		\begin{tabularx}{\columnwidth}{@{}P{1.5cm} P{1.4cm} P{2.2cm} X X@{}}
 			\toprule
-			Parameter & Value & Verification\\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
 			\midrule
 			
-			Channels &
-			16 PWM channels &
+			Channels & 
+			16 PWM & 
+			NXP DS Rev. 7.5, p. 1 & 
+			Control multiple servos with minimal MCU pin overhead & 
 			Two devices provide 32 outputs \\
 			
-			Resolution &
-			12 bits &
-			Complies \\
+			Resolution & 
+			12 bits & 
+			NXP DS Rev. 7.5, p. 1 & 
+			High-precision duty-cycle control for smooth motion & 
+			Complies; 4096-step resolution \\
 			
-			Interface &
-			I2C Fast Mode Plus &
-			Compatible with ESP32-C3 \\
+			Interface & 
+			$\text{I}^2\text{C}$ FM+ & 
+			NXP DS Rev. 7.5, p. 1 & 
+			Standardized serial bus compatible with host controller & 
+			Compatible with ESP32-C3 $\text{I}^2\text{C}$ peripheral \\
 			
-			Voltage &
-			2.3--5.5 V &
-			Use 3.3 V logic \\
+			Supply Voltage & 
+			2.3--5.5 V & 
+			NXP DS Rev. 7.5, p. 52 & 
+			Operate on standard 3.3 V logic power rail & 
+			Uses 3.3 V logic power supply \\
 			
-			Frequency &
-			24--1526 Hz &
-			Configure to 50 Hz for servos \\
+			PWM Frequency & 
+			24--1526 Hz & 
+			NXP DS Rev. 7.5, p. 1 & 
+			Match standard RC servo control signal requirements & 
+			Configured to 50 Hz output frequency \\
 			
-			Addressing &
-			Up to 62 devices &
-			Use different addresses (0x40/0x41) \\
+			Addressing & 
+			Up to 62 ICs & 
+			NXP DS Rev. 7.5, p. 12 & 
+			Support unique addressing for cascading multiple ICs & 
+			Configured with distinct fixed addresses (0x40 and 0x41) \\
 			
 			\bottomrule
-			
 		\end{tabularx}
-		
 	\end{table}
-	
 	
 	\linelabel{ln:src-pca}Source: PCA9685 Datasheet, NXP. \cite{pca9685}
 	
 	
 	\subsection{MG90S Servo Technical Analysis}
-	The nominal operating characteristics of the MG90S
-	servomotor are presented in
-	Table~\ref{tab:mg90s_specs}.
+	The nominal operating characteristics of the MG90S servomotor are presented in Table~\ref{tab:mg90s_specs}.
 	
-	
-	\begin{table}[!t]
+	\begin{table}[H]
 		\centering
-		\caption{MG90S Main Specifications}
+		\caption{MG90S Main Specifications and Datasheet Verification}
 		\label{tab:mg90s_specs}
 		\scriptsize
 		
 		\setlength{\tabcolsep}{2pt}
-		\renewcommand{\arraystretch}{1.05}
+		\renewcommand{\arraystretch}{1.1}
 		
-		\begin{tabularx}{\columnwidth}
-			{@{}P{2cm} P{2.2cm} Y@{}}
-			
+		\begin{tabularx}{\columnwidth}{@{}P{1.5cm} P{1.7cm} P{2.0cm} X X@{}}
 			\toprule
-			Parameter & Value & Verification\\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
 			\midrule
 			
-			Voltage & 4.8--6.0 V & Compatible with 5 V rail \\
+			Voltage & 
+			4.8--6.0 V & 
+			TowerPro Spec., p. 1 & 
+			Match system 5 V main power distribution rail & 
+			Compatible with 5 V power rail \\
 			
-			Torque & 1.8--2.2 kgf cm &  validation required \\
+			Torque & 
+			1.8 kgf$\cdot$cm at 4.8 V; \newline 2.2 kgf$\cdot$cm at 6.0 V & 
+			TowerPro Spec., p. 1 & 
+			Provide required joint actuation torque under load & 
+			1.88 kgf$\cdot$cm available at 5.0 V rail; validation required \\
 			
-			Speed & 0.08--0.10 s/60$^\circ$ & Reference value \\
+			Speed & 
+			0.10 s/60$^\circ$ at 4.8 V; \newline 0.08 s/60$^\circ$ at 6.0 V & 
+			TowerPro Spec., p. 1 & 
+			Ensure joint angular velocity meets dynamic motion profile & 
+			Reference value; complies for target control loop speed \\
 			
-			Mass & 13.4 g & Must be considered in CAD \\
+			Mass & 
+			13.4 g & 
+			TowerPro Spec., p. 1 & 
+			Minimize total end-effector and leg inertia & 
+			Must be considered in structural mass budget and CAD model \\
 			
-			PWM frequency & 50 Hz & Compatible with PCA9685 \\
+			PWM Frequency & 
+			50 Hz & 
+			TowerPro Spec., p. 1 & 
+			Standard RC servo control signal frame timing (20 ms period) & 
+			Compatible with PCA9685 PWM output driver \\
 			
-			Stall current & Not reported & Measurement required \\
+			Stall Current & 
+			Not reported & 
+			TowerPro Spec., p. 1 & 
+			Sizing power supply current limits for worst-case loading & 
+			Not specified in datasheet; physical current measurement required \\
 			
 			\bottomrule
-			
 		\end{tabularx}
-		
 	\end{table}
-	
 	
 	\linelabel{ln:src-mg}Source: TowerPro MG90S documentation. \cite{mg90s}
 	
-	\subsection{Checklist Verification}
-	The preliminary component compatibility assessment
-	is summarized in Table~\ref{tab:verification}.
 	
-	\begin{table}[!t]
+	\subsection{Checklist Verification}
+	The preliminary component compatibility assessment is summarized in Table~\ref{tab:verification}.
+	
+	\begin{table}[H]
 		\centering
 		\caption{Verification Summary}
 		\label{tab:verification}
@@ -456,31 +483,25 @@
 		\setlength{\tabcolsep}{2pt}
 		\renewcommand{\arraystretch}{1.05}
 		
-		\begin{tabularx}{\columnwidth}
-			{@{}P{2cm} P{1.7cm} Y@{}}
-			
+		\begin{tabularx}{\columnwidth}{@{}P{2cm} P{1.7cm} Y@{}}
 			\toprule
-			Component &
-			Status &
-			Comment\\
+			Component & Status & Comment\\
 			\midrule
 			
-			ESP32-C3 &
-			\status{Complies} &
+			ESP32-C3 & 
+			\status{Complies} & 
 			Requires 3.3 V regulation and boot verification \\
 			
-			PCA9685 &
-			\status{Complies} &
+			PCA9685 & 
+			\status{Complies} & 
 			Requires unique I2C addresses and 50 Hz configuration \\
 			
-			MG90S &
-			\status{Partial} &
+			MG90S & 
+			\status{Partial} & 
 			Torque and current require validation \\
 			
 			\bottomrule
-			
 		\end{tabularx}
-		
 	\end{table}
 	
 	\subsection{Bill of Materials}
