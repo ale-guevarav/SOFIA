@@ -641,26 +641,27 @@
 		\caption{SOFIA module target tracking control}
 		\label{alg:sofia_tracking}
 		
+		
 		\begin{algorithmic}[1]
 			
-			\Require Target position $p$, module position $r_0$, joint limits $q_{1min},q_{1max},q_{2min},q_{2max}$, smoothing gain $K$
-			\Ensure Servo angles $q_1,q_2$
+			\Require Target position $\mathbf{p}$, module base position $\mathbf{r}_{0,2}$, joint limits $[q_{1\min}, q_{1\max}]$ and $[q_{2\min}, q_{2\max}]$, EMA smoothing factor $\alpha \in (0, 1]$
+			\Ensure Servo command angles $q_1, q_2$
 			
-			\State $v \gets p-r_0$
-			\State $\hat{v} \gets (v/\|v\|)$
+			\State $\mathbf{v} \gets \mathbf{p} - \mathbf{r}_{0,2}$
+			\State $\hat{\mathbf{r}}_{2,p} \gets \frac{\mathbf{v}}{\|\mathbf{v}\|} = [u_x, u_y, u_z]^\top$ 
 			
-			\State $q_1^* \gets atan2(-\hat{v}_y,\hat{v}_z)$
-			\State $q_2^* \gets asin(\hat{v}_x)$
+			\State $q_1^* \gets \operatorname{atan2}(-u_y, u_z)$
+			\State $q_2^* \gets \arcsin(u_x)$ 
 			
-			\State $q_1^* \gets Clamp(q_1^*,q_{1min},q_{1max})$
-			\State $q_2^* \gets Clamp(q_2^*,q_{2min},q_{2max})$
+			\State $q_1^* \gets \Call{ClampAngle}{q_1^*, q_{1\min}, q_{1\max}}$
+			\State $q_2^* \gets \Call{ClampAngle}{q_2^*, q_{2\min}, q_{2\max}}$
 			
-			\State $q_1 \gets q_{1old}+K(q_1^*-q_{1old})$
-			\State $q_2 \gets q_{2old}+K(q_2^*-q_{2old})$
+			\State $q_1 \gets q_{1,\text{old}} + \alpha (q_1^* - q_{1,\text{old}})$ \Comment{First-order EMA low-pass filter update}
+			\State $q_2 \gets q_{2,\text{old}} + \alpha (q_2^* - q_{2,\text{old}})$
 			
-			\State Apply $q_1,q_2$ to servo motors
+			\State Apply $q_1, q_2$ to servo motors
 			
-			\State \Return $q_1,q_2$
+			\State \Return $q_1, q_2$
 			
 		\end{algorithmic}
 	\end{algorithm}

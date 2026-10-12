@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  12 OCT 2026 17:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  12 OCT 2026 17:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1018,9 +1018,7 @@ Underfull \hbox (badness 2142) in paragraph at lines 66--68
 con-texto,
  []
 
-) [5
-
-] (Equipo 3 - primer corte.aux)
+) [5] (Equipo 3 - primer corte.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-07-20>
@@ -1031,32 +1029,34 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6919 strings out of 467501
- 118165 string characters out of 5408550
- 587701 words of memory out of 5000000
- 36058 multiletter control sequences out of 15000+600000
- 672182 words of font info for 116 fonts, out of 8000000 for 9000
+ 6932 strings out of 467501
+ 118297 string characters out of 5408550
+ 588729 words of memory out of 5000000
+ 36066 multiletter control sequences out of 15000+600000
+ 675022 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,13n,79p,1114b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmmi10.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
-fonts/cm/cmmi5.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/pu
-blic/amsfonts/cm/cmmi7.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmr10.pfb><C:/Users/10002/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/10002/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/10002/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/10002/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/100
-02/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/U
-sers/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C
-:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C
-:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><
-C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><
-C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-
-Output written on "Equipo 3 - primer corte.pdf" (5 pages, 382918 bytes).
+cmbx10.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmbx7.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/amsfonts/cm/cmmi10.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts
+/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/10002/AppData/Local/Programs/MiKT
+eX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/10002/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/10002/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/10002/AppD
+ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/100
+02/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/
+Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.
+pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
+m/cmsy7.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helve
+tic/uhvr8a.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/ti
+mes/utmb8a.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/ti
+mes/utmbi8a.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
+imes/utmr8a.pfb><C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
+imes/utmri8a.pfb>
+Output written on "Equipo 3 - primer corte.pdf" (5 pages, 404384 bytes).
 PDF statistics:
- 98 PDF objects out of 1000 (max. 8388607)
+ 108 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
