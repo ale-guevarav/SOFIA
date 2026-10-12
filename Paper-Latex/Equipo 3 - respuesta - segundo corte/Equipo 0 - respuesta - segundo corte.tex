@@ -1,0 +1,79 @@
+%=================================================================
+% Respuesta a los revisores -- Segundo Corte -- Equipo 0 (EJEMPLO)
+% LabDST RoboCoffee, ITESO.
+%
+% Antes de compilar este documento, compilar el paper revisado:
+%   "../Equipo 0 - segundo corte/Equipo 0 - segundo corte.tex"
+%   (pdflatex -> bibtex -> pdflatex -> pdflatex)
+% Despues compilar ESTE documento dos veces (pdflatex x2).
+%
+% La carta se escribe en ingles, como el paper. El comentario del
+% revisor se copia TEXTUAL desde el PDF de observaciones (en este
+% curso las observaciones estan en espanol).
+%=================================================================
+\documentclass{LabDSTresponse}
+\LabDSTpaper{"../Equipo 0 - segundo corte/Equipo 0 - segundo corte"}
+
+\begin{document}
+\LabDSTtitle{Second Cut}{Team 0}{A Load-Cell Cup Detection Module}
+
+\LabDSTsection{Acknowledgements}
+The authors thank the reviewers for their careful evaluation. Line,
+section, and figure numbers refer to the revised manuscript.
+\textbf{Main changes:} the Introduction now states a research question
+(Section~\ref{sec:intro}), and Section~\ref{sec:methods} adds the
+module architecture (Fig.~\ref{fig:arch}).
+
+\LabDSTsummary
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{1}{Format, LaTeX and template compliance}
+
+\LabDSTcomment{R1.1}{A}{Section~\ref{sec:intro}, \rln{intro-cite}, \rln{rw-rfid}}
+{Las fuentes están escritas a mano en formato autor--año.}
+{We created one BibTeX entry per source and replaced every hand-written citation with
+\texttt{\textbackslash cite\{key\}} (Section~\ref{sec:intro}, \rln{intro-cite}, \rln{rw-rfid}).}
+
+\LabDSTcomment{R1.2}{A}{Whole manuscript}
+{Los párrafos terminan con \texttt{\textbackslash\textbackslash}.}
+{All forced line breaks were removed; paragraphs are separated by a blank line.}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{2}{Writing and structure}
+
+\LabDSTcomment{R2.1}{A}{\Rlns{rq}{contrib-end}}
+{El artículo no formula una pregunta de investigación ni declara sus contribuciones.}
+{We added a research question and three contributions at the end of the Introduction
+(\rlns{rq}{contrib-end}). The research question now reads:
+\LabDSTquote{Can a single load cell under the cup holder detect cup placement and
+removal reliably enough, and fast enough, to release the robot automatically?}}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{3}{Technical content}
+
+\LabDSTcomment{R3.1}{A}{Fig.~\ref{fig:arch}, Eq.~\eqref{eq:rule}, \rlns{mm-arch}{mm-thr-end}}
+{No se presenta la arquitectura del módulo ni la regla de detección.}
+{The architecture is shown in Fig.~\ref{fig:arch} (\rlns{mm-arch}{mm-arch-end}), and the
+detection rule with two thresholds is given in \eqref{eq:rule} (\rlns{mm-thr}{mm-thr-end}).}
+
+\LabDSTcomment{R3.2}{P}{Table~\ref{tab:protocol}, \rlns{res-trials}{res-end}}
+{No hay pruebas que respalden la confiabilidad de la detección.}
+{The test protocol was added in Table~\ref{tab:protocol}, and the first 20 cycles are
+reported in \rlns{res-trials}{res-end}. The complete campaign of 100 cycles will be
+reported in the next cut.}
+
+%-----------------------------------------------------------------
+\LabDSTreviewer{4}{D-Lab and state of the art}
+
+\LabDSTcomment{R4.1}{A}{\Rlns{rw-bench}{rw-end}}
+{No se explica por qué RFID no es adecuado para RoboCoffee.}
+{Related Work now explains that RFID needs a tag on every disposable cup
+(\rlns{rw-bench}{rw-end}).}
+
+\LabDSTcomment{R4.2}{N}{\Rlns{disc-empty}{disc-end}}
+{Implementen una segunda versión del módulo con cámara y comparen ambas.}
+{We agree that a camera could identify the cup independently of its weight. However,
+image processing and controlled lighting are outside the scope of this module. Instead,
+vision-based detection is discussed as future work in \rlns{disc-vision}{disc-end}.}
+
+\end{document}
