@@ -290,7 +290,7 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig2} \linelabel{ln:sim} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with a external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. Interconnectivity between boards is planned using JST-VH connectors. 
+	Figure~\ref{fig2} \linelabel{ln:sim} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. Interconnectivity between boards is planned using JST-VH connectors. 
 	
 	
 	\begin{figure}[!t]
@@ -519,42 +519,52 @@
 	devices, are summarized in Table~\ref{tab:bom}.
 	
 	
-	\begin{table}[!t]
+	\begin{table*}[!t]
 		\centering
-		\caption{Bill of materials summary}
+		\caption{SOFIA Demonstrator Bill of Materials (BOM) Breakdown}
 		\label{tab:bom}
-		\begin{tabularx}{\columnwidth}
-			{@{}P{1.cm} P{3.5cm} P{0.5cm} Y@{} }
-			\hline
-			\textbf{Item} & \textbf{Component} & \textbf{Qty} & \textbf{Manufacturer} \\
-			\hline
-			1 & Sofia003-P001-03 & 16 & 3D Printed \\
-			2 & MG90S servo & 32 & Tower Pro \\
-			3 & Sofia003-E002-01 & 16 & 3D Printed \\
-			3.1/4.4 & Pro3 & 32 & Tower Pro\\
-			3.2 & Sofia003-P004-02 & 16 & 3D Printed \\
-			3.3 & Sofia003-P004-03 & 16 & 3D Printed \\
-			3.4/3.5/
-			\par 4.3/7/8 & M2 screws (various) & 160 & Walfront \\
-			3.6 & Axis 1 9mm x 9mm & 16 & Mae \\
-			3.7 & Sofia003-P002-02 & 16 & 3D Printed \\
-			4 & Sofia003-E003-01 & 16 & 3D Printed \\
-			4.1 & Sofia003-P005-01 & 16 & 3D Printed \\
-			4.2 & Sofia003-P005-02 & 16 & 3D Printed \\
-			5 & Sofia003-P008-01 & 16 & 3D Printed \\
-			6 & Sofia003-P009-01 & 16 & 3D Printed \\
-			9 & Inser M3x5x4 & 16 & ZWMSSLL \\
-			10 &Sofia003-P000-01 & 16 & 3D Printed \\
-			- & ESP32-C3 SuperMini & 1 & Espressif \\
-			- & PCA9685 Servo Driver & 2 & NXP \\
-			- & MAX13487E TTL485-V2.0 & 16 & Analog Devices Inc.\\
-			- & LED RGB & 1 & Mexbit \\
-			- & JST-PH Male & 1 & JTAREA \\
-			- & JST-PH Female & 1 & JTAREA \\
+		\scriptsize
+		
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.1}
+		
+		\begin{tabularx}{\textwidth}{@{}l X c c X P{3cm} P{2cm}@{}}
+			\toprule
+			\textbf{Item} & \textbf{Part Number / Description} & \textbf{Qty / Unit} & \textbf{Qty / System} & \textbf{Technical Description} & \textbf{Manufacturer} & \textbf{Location} \\
+			\midrule
 			
-			\hline
+			1 & Sofia003-P001-03 (Module Base) & 1 & 16 & Primary structural module base housing & In-house (LabDST) & ITESO, MX \\
+			2 & SG90 / MG90S Micro Servo & 2 & 32 & Micro metal gear analog servo actuator & TowerPro & Hong Kong \\
+			3 & Sofia003-E002-01 (Lower Joint) & 1 & 16 & Lower joint subassembly housing & In-house (LabDST) & ITESO, MX \\
+			3.1 & Pro3 Servo Horn & 1 & 16 & Plastic actuation output horn linkage & TowerPro & Hong Kong \\
+			3.2 & Sofia003-P004-02 (Lower Support L) & 1 & 16 & Lower joint support bracket (left) & In-house (LabDST) & ITESO, MX \\
+			3.3 & Sofia003-P004-03 (Lower Support R) & 1 & 16 & Lower joint support bracket (right) & In-house (LabDST) & ITESO, MX \\
+			3.4 & Servo Arm Screw ($M2 \times 12$ mm) & 1 & 16 & Metric machine screw for servo arm linkage & Walfront & Shenzhen, CN \\
+			3.5 & Servo Arm Screw ($M2 \times 10$ mm) & 1 & 16 & Metric machine screw for servo arm linkage & Walfront & Shenzhen, CN \\
+			3.6 & Joint Shaft ($9 \times 9$ mm) & 1 & 16 & Rotational joint axis pin & Mae & Local Supplier \\
+			3.7 & Sofia003-P002-02 (Lower Joint Link) & 1 & 16 & Lower joint structural link component & In-house (LabDST) & ITESO, MX \\
+			4 & Sofia003-E003-01 (Upper Joint) & 1 & 16 & Upper joint subassembly housing & In-house (LabDST) & ITESO, MX \\
+			4.1 & Sofia003-P005-01 (Upper Support L) & 1 & 16 & Upper joint support bracket (left) & In-house (LabDST) & ITESO, MX \\
+			4.2 & Sofia003-P005-02 (Upper Support R) & 1 & 16 & Upper joint support bracket (right) & In-house (LabDST) & ITESO, MX \\
+			4.3 & Servo Arm Screw ($M2 \times 12$ mm) & 2 & 32 & Metric machine screw for upper joint assembly & Walfront & Shenzhen, CN \\
+			4.4 & Pro3 Servo Horn & 1 & 16 & Plastic actuation output horn linkage & TowerPro & Hong Kong \\
+			5 & Sofia003-P008-01 (Top Linkage) & 1 & 16 & Sofia top module linkage arm & In-house (LabDST) & ITESO, MX \\
+			6 & Sofia003-P009-01 (Top Platform) & 1 & 16 & Top platform support bracket & In-house (LabDST) & ITESO, MX \\
+			7 & Servo Arm Screw ($M2 \times 12$ mm) & 2 & 32 & Assembly structural fastening screw & Walfront & Shenzhen, CN \\
+			8 & Servo Arm Screw ($M2 \times 10$ mm) & 4 & 64 & Structural fastening machine screw & Walfront & Shenzhen, CN \\
+			9 & M3 Threaded Insert ($5 \times 4$ mm) & 1 & 16 & Heat-set female brass threaded insert & ZWMSSLL & Shenzhen, CN \\
+			10 & Sofia003-P000-01 (Hex Top Platform) & 1 & 16 & Sofia hexagonal top platform plate & In-house (LabDST) & ITESO, MX \\
+			\midrule
+			-- & ESP32-C3 SuperMini & -- & 1 & Central MCU board (Wi-Fi/BLE telemetry) & Espressif Systems & Shanghai, CN \\
+			-- & PCA9685 PWM Driver & -- & 2 & 16-channel 12-bit $\text{I}^2\text{C}$ servo driver board & NXP Semiconductors & Eindhoven, NL \\
+			-- & MAX13487E TTL485 Module & 1 & 16 & Half-duplex RS-485 transceiver (1 per module) & Analog Devices Inc. & Wilmington, US \\
+			-- & RGB Status LED & -- & 1 & System status indicator LED & Mexbit & Local Supplier \\
+			-- & JST-VH Connector (Male) & 1 & 16 & High-current power distribution PCB header & JTAREA & Local Supplier \\
+			-- & JST-VH Connector (Female) & 1 & 16 & High-current power distribution harness plug & JTAREA & Local Supplier \\
+			
+			\bottomrule
 		\end{tabularx}
-	\end{table}
+	\end{table*}
 	
 	\subsection{Justification of Technological Selection}
 	
