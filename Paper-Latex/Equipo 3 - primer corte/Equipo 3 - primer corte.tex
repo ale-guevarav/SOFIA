@@ -290,6 +290,15 @@
 		\end{tabularx}
 	\end{table}
 	
+	Figure~\ref{fig2} \linelabel{ln:sim} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with a external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. Interconnectivity between boards is planned using JST-VH connectors. 
+	
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=2.4in]{figures/SOFIA_DIAGRAM}
+		\caption{Block diagram describing SOFIA components and connections.}
+		\label{fig1}
+	\end{figure}
 	
 	\subsection{ESP32-C3 Technical Analysis}
 	The main technical specifications of the ESP32-C3 microcontroller are presented in Table~\ref{tab:esp32_specs}.
@@ -310,37 +319,37 @@
 			
 			Supply Voltage & 
 			3.0--3.6 V & 
-			Espressif DS v2.4, p. 18 & 
+			ESP32-C3 Datasheet v2.4, p. 18 & 
 			Match system main power operating limits & 
 			Requires regulated 3.3 V supply \\
 			
 			Wi-Fi & 
 			802.11 b/g/n & 
-			Espressif DS v2.4, p. 2 & 
+			ESP32-C3 Datasheet v2.4, p. 2 & 
 			Enable 2.4 GHz wireless transmission & 
 			Complies; integrated 2.4 GHz subsystem \\
 			
 			Bluetooth & 
 			BLE 5 & 
-			Espressif DS v2.4, p. 2 & 
+			ESP32-C3 Datasheet v2.4, p. 2 & 
 			Support low-energy configuration and monitoring & 
 			Complies; Bluetooth LE 5.0 supported \\
 			
 			Logic Level & 
 			3.3 V GPIO & 
-			Espressif DS v2.4, p. 19 & 
+			ESP32-C3 Datasheet v2.4, p. 19 & 
 			Ensure digital signal levels meet peripheral logic thresholds & 
 			5 V logic cannot be applied directly without level shifting \\
 			
 			Boot Pins & 
 			GPIO2, 8, 9 & 
-			Espressif DS v2.4, p. 12 & 
+			ESP32-C3 Datasheet v2.4, p. 12 & 
 			Prevent unintended strapping state selection during power-up & 
 			PCB design hardware strapping verification required \\
 			
 			Temperature & 
 			Up to 105 $^\circ$C & 
-			Espressif DS v2.4, p. 18 & 
+			ESP32-C3 Datasheet v2.4, p. 18 & 
 			Ensure reliable continuous execution under thermal load & 
 			Suitable for industrial and laboratory operating environments \\
 			
@@ -370,37 +379,37 @@
 			
 			Channels & 
 			16 PWM & 
-			NXP DS Rev. 7.5, p. 1 & 
+			PCA9685 Datasheet Rev. 7.5, p. 1 & 
 			Control multiple servos with minimal MCU pin overhead & 
 			Two devices provide 32 outputs \\
 			
 			Resolution & 
 			12 bits & 
-			NXP DS Rev. 7.5, p. 1 & 
+			PCA9685 Datasheet Rev. 7.5, p. 1 & 
 			High-precision duty-cycle control for smooth motion & 
 			Complies; 4096-step resolution \\
 			
 			Interface & 
 			$\text{I}^2\text{C}$ FM+ & 
-			NXP DS Rev. 7.5, p. 1 & 
+			PCA9685 Datasheet Rev. 7.5, p. 1 & 
 			Standardized serial bus compatible with host controller & 
 			Compatible with ESP32-C3 $\text{I}^2\text{C}$ peripheral \\
 			
 			Supply Voltage & 
 			2.3--5.5 V & 
-			NXP DS Rev. 7.5, p. 52 & 
+			PCA9685 Datasheet Rev. 7.5, p. 52 & 
 			Operate on standard 3.3 V logic power rail & 
 			Uses 3.3 V logic power supply \\
 			
 			PWM Frequency & 
 			24--1526 Hz & 
-			NXP DS Rev. 7.5, p. 1 & 
+			PCA9685 Datasheet Rev. 7.5, p. 1 & 
 			Match standard RC servo control signal requirements & 
 			Configured to 50 Hz output frequency \\
 			
 			Addressing & 
 			Up to 62 ICs & 
-			NXP DS Rev. 7.5, p. 12 & 
+			PCA9685 Datasheet Rev. 7.5, p. 12 & 
 			Support unique addressing for cascading multiple ICs & 
 			Configured with distinct fixed addresses (0x40 and 0x41) \\
 			
@@ -430,37 +439,37 @@
 			
 			Voltage & 
 			4.8--6.0 V & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Match system 5 V main power & 
 			Compatible with 5 V \\
 			
 			Torque & 
 			1.8 kgf$\cdot$cm at 4.8 V; \newline 2.2 kgf$\cdot$cm at 6.0 V & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Provide required joint actuation torque under load & 
 			1.88 kgf$\cdot$cm available at 5.0 V; validation required \\
 			
 			Speed & 
 			0.10 s/60$^\circ$ at 4.8 V; \newline 0.08 s/60$^\circ$ at 6.0 V & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Ensure joint angular velocity meets dynamic motion profile & 
 			Reference value; complies for target control loop speed \\
 			
 			Mass & 
 			13.4 g & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Minimize total end-effector and leg inertia & 
 			Must be considered in structural mass budget and CAD model \\
 			
 			PWM Frequency & 
 			50 Hz & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Standard RC servo control signal frame timing (20 ms period) & 
 			Compatible with PCA9685 PWM output driver \\
 			
 			Stall Current & 
 			Not reported & 
-			TowerPro Spec., p. 1 & 
+			TowerPro MG90S documentation, p. 1 & 
 			Sizing power supply current limits for worst-case loading & 
 			Not specified in datasheet; physical current measurement required \\
 			
@@ -602,7 +611,7 @@
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
 	
-	Figure~\ref{fig1} \linelabel{ln:sim}shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
+	Figure~\ref{fig2} \linelabel{ln:sim}shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
 	
 	\begin{figure}[!t]
 		\centering
@@ -618,7 +627,7 @@
 		\hfil
 		\subfloat[Step 6]{\includegraphics[width=1.1in]{figures/Sim_f}}
 		\caption{Simulation of the SOFIA module tracking a moving reference point using inverse kinematics.}
-		\label{fig1}
+		\label{fig2}
 	\end{figure}
 	
 	Algorithm~\ref{alg:sofia_tracking} \linelabel{ln:alg}summarizes the inverse kinematics and smoothing strategy used by each SOFIA module to orient its platform toward the moving target.
