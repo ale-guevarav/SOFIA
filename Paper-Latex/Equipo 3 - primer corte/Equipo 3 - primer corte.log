@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  12 OCT 2026 13:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  12 OCT 2026 13:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -517,11 +517,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 348--348
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 348--348
-\OT1/ptm/m/n/7 teleme-try
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 348--348
 []|\OT1/ptm/m/n/7 Support
  []
 
@@ -792,22 +787,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 468--468
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 power
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 dis-tri-bu-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 468--468
 []|\OT1/ptm/m/n/7 Compatible
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 with 5 V
  []
 
 
@@ -837,17 +817,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 468--468
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 avail-able at
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 5.0 V rail;
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 468--468
-\OT1/ptm/m/n/7 val-i-da-tion
+\OT1/ptm/m/n/7 V; val-i-da-tion
  []
 
 
@@ -975,7 +945,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 468--468
 \OT1/ptm/m/n/7 mea-sure-ment
  []
 
-[3]
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3]
 <figures/Sim_a.jpeg, id=21, 537.00626pt x 410.53375pt>
 File: figures/Sim_a.jpeg Graphic file (type jpg)
 <use figures/Sim_a.jpeg>
@@ -1006,9 +982,10 @@ File: figures/Sim_f.jpeg Graphic file (type jpg)
 <use figures/Sim_f.jpeg>
 Package pdftex.def Info: figures/Sim_f.jpeg  used on input line 619.
 (pdftex.def)             Requested size: 79.49744pt x 69.27922pt.
- (Equipo 3 - primer corte.bbl [4 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> 
-<./figures/Sim_c.jpeg> <./figures/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures
-/Sim_f.jpeg>]
+
+(Equipo 3 - primer corte.bbl [4 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> <
+./figures/Sim_c.jpeg> <./figures/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/
+Sim_f.jpeg>]
 Underfull \hbox (badness 2142) in paragraph at lines 66--68
 []\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - 
 con-texto,
@@ -1025,7 +1002,7 @@ L3 programming layer <2026-07-20>
 Here is how much of TeX's memory you used:
  6907 strings out of 467501
  117823 string characters out of 5408550
- 587640 words of memory out of 5000000
+ 580640 words of memory out of 5000000
  36047 multiletter control sequences out of 15000+600000
  671104 words of font info for 115 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1046,7 +1023,7 @@ sers/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C
 C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><
 C:/Users/10002/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on "Equipo 3 - primer corte.pdf" (5 pages, 361367 bytes).
+Output written on "Equipo 3 - primer corte.pdf" (5 pages, 361212 bytes).
 PDF statistics:
  95 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

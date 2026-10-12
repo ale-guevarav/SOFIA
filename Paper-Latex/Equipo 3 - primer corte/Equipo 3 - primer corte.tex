@@ -305,19 +305,19 @@
 		
 		\begin{tabularx}{\columnwidth}{@{}P{1.6cm} P{1.5cm} P{2.1cm} X X@{}}
 			\toprule
-			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Justification} & \textbf{Verification} \\
 			\midrule
 			
 			Supply Voltage & 
 			3.0--3.6 V & 
 			Espressif DS v2.4, p. 18 & 
-			Match system main power rail operating limits & 
+			Match system main power operating limits & 
 			Requires regulated 3.3 V supply \\
 			
 			Wi-Fi & 
 			802.11 b/g/n & 
 			Espressif DS v2.4, p. 2 & 
-			Enable 2.4 GHz wireless telemetry transmission & 
+			Enable 2.4 GHz wireless transmission & 
 			Complies; integrated 2.4 GHz subsystem \\
 			
 			Bluetooth & 
@@ -365,7 +365,7 @@
 		
 		\begin{tabularx}{\columnwidth}{@{}P{1.5cm} P{1.4cm} P{2.2cm} X X@{}}
 			\toprule
-			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Justification} & \textbf{Verification} \\
 			\midrule
 			
 			Channels & 
@@ -425,20 +425,20 @@
 		
 		\begin{tabularx}{\columnwidth}{@{}P{1.5cm} P{1.7cm} P{2.0cm} X X@{}}
 			\toprule
-			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Requirement / Justification} & \textbf{Verification} \\
+			\textbf{Parameter} & \textbf{Value} & \textbf{Source (Doc / Ver / Pg)} & \textbf{Justification} & \textbf{Verification} \\
 			\midrule
 			
 			Voltage & 
 			4.8--6.0 V & 
 			TowerPro Spec., p. 1 & 
-			Match system 5 V main power distribution rail & 
-			Compatible with 5 V power rail \\
+			Match system 5 V main power & 
+			Compatible with 5 V \\
 			
 			Torque & 
 			1.8 kgf$\cdot$cm at 4.8 V; \newline 2.2 kgf$\cdot$cm at 6.0 V & 
 			TowerPro Spec., p. 1 & 
 			Provide required joint actuation torque under load & 
-			1.88 kgf$\cdot$cm available at 5.0 V rail; validation required \\
+			1.88 kgf$\cdot$cm available at 5.0 V; validation required \\
 			
 			Speed & 
 			0.10 s/60$^\circ$ at 4.8 V; \newline 0.08 s/60$^\circ$ at 6.0 V & 
@@ -510,7 +510,7 @@
 	devices, are summarized in Table~\ref{tab:bom}.
 	
 	
-	\begin{table}[!t]
+	\begin{table}[H]
 		\centering
 		\caption{Bill of materials summary}
 		\label{tab:bom}
@@ -549,7 +549,7 @@
 	
 	\subsection{Justification of Technological Selection}
 	
-	\begin{table}[!t]
+	\begin{table}[H]
 		\centering
 		\caption{Comparative Matrix of Alternatives}
 		\label{tab:comparative_matrix}
