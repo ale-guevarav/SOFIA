@@ -51,14 +51,7 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 %-----------------------------------------------------------------
 \LabDSTreviewer{1}{Format, LaTeX and template compliance}
 
-% Ejemplo de respuesta ATENDIDA (A): que se hizo y donde.
-\LabDSTcomment{R1.1}{A}{\Rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
-{<Comentario del revisor, copiado textual del PDF de observaciones.>}
-{As suggested, we <describe what was changed> (\rlns{<etiqueta-inicio>}{<etiqueta-fin>}).}
 
-\LabDSTcomment{R1.2}{A}{<Ubicacion>}
-{<Comentario textual.>}
-{<Response.>}
 
 %-----------------------------------------------------------------
 \LabDSTreviewer{2}{Writing and structure}
@@ -72,22 +65,34 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 %-----------------------------------------------------------------
 \LabDSTreviewer{3}{Technical content}
 
-% Ejemplo de respuesta PARCIAL (P): que se hizo, que falta, por que y cuando.
 \LabDSTcomment{R3.1}{A}{Fig.~\ref{fig1}}
 {No hay arquitectura preliminar del sistema en figura: cómo se conectan la cámara y el PC, la ESP32-C3, los dos PCA9685, los 32 servos, los transceptores RS-485 y la alimentación}
 {Added a System Architecture Diagram Fig.~\ref{fig1} showing the host, ESP32-C3, dual PCA9685 drivers, 32 servos, RS-485 transceivers.}
 
-\LabDSTcomment{R3.3}{A}{lines 193-199}
+\LabDSTcomment{R3.3}{A}{lines 193-199, Table~\ref{tab:mg90s_specs}, \eqref{eq:servo_first_order}}
 {La “constante de máquina” o “mechanical time constant” del servo no se define: no hay modelo, variables ni ecuaciones. El diferenciador promete compararla contra el “valor teórico” del MG90S, que la hoja de datos no reporta.}
-{Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:...} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$).}
+{Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}.}
+
+\LabDSTcomment{R3.5}{A}{Table~\ref{tab:esp32_specs}, Table~\ref{tab:pca9685_specs},Table~\ref{tab:mg90s_specs}}
+{Las fichas técnicas tienen solo parámetro, valor y verificación. No indican la versión ni la página de la hoja de datos, ni justifican el parámetro frente al requerimiento. El par del MG90S aparece como “1.8–2.2 kgf cm” sin decir a qué voltaje corresponde cada valor.}
+{Added source and justifications to the datasheets and updated the MG90S table to specify torque values at both 4.8V ($1.8\text{ kgf}\cdot\text{cm}$) and 6.0V ($2.2\text{ kgf}\cdot\text{cm}$).}
+
+\LabDSTcomment{R3.6}{A}{Table~\ref{tab:bom}}
+{El BOM no distingue la cantidad por unidad de la del sistema. Lista 1 ESP32-C3 y 2 PCA9685 pero 16 transceptores RS-485, sin explicar la arquitectura que eso implica. Usa “3D Printed” como fabricante, contiene elementos poco claros (“Pro3” de Tower Pro, “Axis 1 9mm x 9mm”, “Inser M3x5x4”) y lista conectores JST-PH, cuando la arquitectura de SOFIA usa JST-VH. Tampoco tiene descripción técnica ni localidad.}
+{Updated the BOM table to distinguish unit vs. system quantities, add descriptions for the parts, set the manufacturer to "In-house (LabDST, ITESO)", and added manufacturing origin.}
+
+\LabDSTcomment{R3.8}{A}{Table~\ref{alg:sofia_tracking}}
+{El algoritmo usa r0 para la posición del módulo y ˆv para la dirección, en lugar de la notación del curso (r0,2, ˆr2,p). Además escribe atan2, asin y Clamp en itálica matemática, sin operatorname ni Call.}
+{Updated math operators to standard notation (atan2, arcsin, Clamp) and explicitly labeled the trajectory step as an Exponential Moving Average (EMA)}
 
 %-----------------------------------------------------------------
 \LabDSTreviewer{4}{D-Lab and state of the art}
 
 % Ejemplo NO ATENDIDA con justificacion (N): reconocer lo valido,
 % dar la razon tecnica y decir que se hizo a cambio y donde.
-\LabDSTcomment{R4.1}{N}{\Rlns{<etiqueta-inicio>}{<etiqueta-fin>}}
-{<Comentario textual.>}
-{We thank the reviewer for this suggestion, and we agree that <...>. However, <technical reason: scope, cost, time, available evidence>. Instead, <what was done>, as stated in \rlns{<etiqueta-inicio>}{<etiqueta-fin>}.}
+\LabDSTcomment{R4.1}{A}{lines 193-199, Table~\ref{tab:mg90s_specs}, \eqref{eq:servo_first_order}}
+{El diferenciador propone asignación automática de direcciones Modbus y caracterización de la constante de máquina de cada servo. El artículo menciona ambas en la introducción, pero se enfoca en justificar la arquitectura electrónica (Línea 83) y no desarrolla ninguna de las dos.}
+{Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}. We simplified the article to only use the servo mechanical time constant as differentiation}
+
 
 \end{document}
