@@ -25,7 +25,6 @@
 \newcommand{\status}[1]{\textbf{#1}}
 
 \begin{document}
-	
 	\title{Servo Characterization for the SOFIA Modular Kinetic
 		Surface}
 	
@@ -56,6 +55,8 @@
 	
 	\section{Introduction}
 	
+	\label{sec:intro}
+	
 	\IEEEPARstart{S}{OFIA} \linelabel{ln:intro1}is a modular robotic installation composed of 16
 	mechatronic units arranged in a \linelabel{ln:intro-4x4}two-dimensional $4 \times 4$ array, with each
 	unit providing two rotational degrees of freedom actuated by servomotors. The
@@ -74,13 +75,11 @@
 	significantly increasing wiring and control complexity. This work proposes an experimental method to estimate individual servo time constraints with a mechanical solution.
 	
 	\subsection{Problem Statement and Research Question}
-	\linelabel{ln:problem-start}Standard low-cost micro-servos (such as the MG90S) inherently exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization, surface jitter, and mechanical stress during tracking routines.
+	\linelabel{ln:problem-start}Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
 	
-	To address this limitation, this work investigates the following research question: \textit{Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?}
+	\linelabel{ln:research-question}To address this limitation, this work investigates the following research question: \textit{Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?}
 	
-	 To address this limitation, this work investigates experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller can improve dynamic positional synchronization across the 32 modules of SOFIA.
-	
-	 This encompasses three primary objectives: (1) designing a 3.3~V / 5~V compatible electronic control board integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response transient trajectories and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
+	\linelabel{ln:Objectives}This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
 	
 	\begin{table*}[!t]
 		\centering

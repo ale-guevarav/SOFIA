@@ -94,5 +94,11 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {El diferenciador propone asignación automática de direcciones Modbus y caracterización de la constante de máquina de cada servo. El artículo menciona ambas en la introducción, pero se enfoca en justificar la arquitectura electrónica (Línea 83) y no desarrolla ninguna de las dos.}
 {Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}. We simplified the article to only use the servo mechanical time constant as differentiation}
 
+\LabDSTcomment{R4.2}{A}{Section~\ref{sec:intro}}
+{No hay planteamiento formal del problema, pregunta de investigación ni objetivos.}
+{We added a formal Problem Statement, Research Question, and Objectives in natural narrative format at the end of the Introduction (Section~\ref{sec:intro}), addressing per-servo time-constant estimation and actuation synchronization. The revised text now reads:}
+\LabDSTquote{Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
+To address this limitation, this work investigates the following research question: Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?
+This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.}
 
 \end{document}
