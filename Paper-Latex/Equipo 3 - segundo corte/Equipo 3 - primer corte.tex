@@ -607,11 +607,14 @@
 	SOFIA modules.
 	
 	\subsection{Servo Mechanical Time Constant Estimation}
-	The first-order dynamic model for angular position response $\theta(t)$ is given by:
+	The first-order dynamic model for the angular position response $\theta(t)$ to a step input is defined by:
 	\begin{equation}
 		\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}
+		\label{eq:servo_first_order}
 	\end{equation}
-	where $\theta_0$ is the initial angle, $\theta_f$ is the commanded step target angle, and $\tau_m$ is the mechanical time constant. Tests will apply a $60^\circ$ step input and measure the response velocity.
+	where $\theta_0$ represents the initial angular position, $\theta_f$ denotes the commanded step target angle, and $\tau_m$ is the servo mechanical time constant. 
+	
+	To characterize $\tau_m$, no-load step responses of $60^\circ$ will be applied while measuring the transient velocity profile. As noted in Table~\ref{tab:mg90s_specs}, the manufacturer datasheet \cite{mg90s} lists nominal angular speed ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$ and $0.08\text{ s}/60^\circ$ at $6.0\text{ V}$) but omits the explicit value for $\tau_m$, necessitating experimental identification.
 	
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
