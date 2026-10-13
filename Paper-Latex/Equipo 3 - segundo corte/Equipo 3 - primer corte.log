@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  13 OCT 2026 14:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  13 OCT 2026 14:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -491,7 +491,7 @@ rrc/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ] [2]
-<figures/SOFIA_DIAGRAM.png, id=18, 432.61626pt x 378.41376pt>
+<figures/SOFIA_DIAGRAM.png, id=15, 432.61626pt x 378.41376pt>
 File: figures/SOFIA_DIAGRAM.png Graphic file (type png)
 <use figures/SOFIA_DIAGRAM.png>
 Package pdftex.def Info: figures/SOFIA_DIAGRAM.png  used on input line 307.
@@ -1017,10 +1017,10 @@ L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 6938 strings out of 467501
- 118640 string characters out of 5408550
- 589493 words of memory out of 5000000
- 36072 multiletter control sequences out of 15000+600000
+ 6937 strings out of 467501
+ 118626 string characters out of 5408550
+ 589480 words of memory out of 5000000
+ 36071 multiletter control sequences out of 15000+600000
  675022 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,13n,79p,1114b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1042,7 +1042,7 @@ mes/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/ti
 mes/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
 imes/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
 imes/utmri8a.pfb>
-Output written on "Equipo 3 - primer corte.pdf" (5 pages, 407602 bytes).
+Output written on "Equipo 3 - primer corte.pdf" (5 pages, 407173 bytes).
 PDF statistics:
  108 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

@@ -79,7 +79,7 @@
 	
 	\linelabel{ln:research-question}To address this limitation, this work investigates the following research question: \textit{Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?}
 	
-	\linelabel{ln:Objectives}This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
+	\linelabel{ln:Objectives}This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-85 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
 	
 	\begin{table*}[!t]
 		\centering
@@ -170,7 +170,7 @@
 	Table~\ref{tab:related_work_matrix}.
 	
 	\linelabel{ln:gap}In contrast to the reviewed shape-changing interfaces, SOFIA combines a
-	two-dimensional $4 \times 4$ arrangement with two rotational degrees of freedom
+	two-dimensional honeycomb arrangement with two rotational degrees of freedom
 	per unit. Unlike pin-based displays, which predominantly constrain motion to a
 	single translational axis, or line-based modular systems organized as serial
 	chains, each SOFIA unit can independently modify its orientation while
@@ -215,7 +215,7 @@
 			Low -- difficult to discretize into individually addressable nodes \\
 			
 			\textbf{SOFIA (proposed)} &
-			2D array, 4$\times$4 modules &
+			2D array, honeycomb modules &
 			\textbf{2 (rotational)} &
 			\textbf{High -- I2C bus + RS-485 designed for future module expansion} \\
 			
