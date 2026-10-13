@@ -1,11 +1,11 @@
-import cv2 
+import cv2
 import time
 
 from pose_detector import PoseDetector
 from hand_detector import HandDetector
 from gesture_detector import GestureDetector
 from smoothing import TemporalConfirmation
-from Vision.metrics_logger import PerformanceMetrics
+from metrics_logger import PerformanceMetrics
 
 
 # -----------------------------
@@ -31,6 +31,10 @@ shield_confirmation = TemporalConfirmation(
 )
 
 attack_confirmation = TemporalConfirmation(
+    required_frames=5
+)
+
+reload_confirmation = TemporalConfirmation(
     required_frames=5
 )
 
@@ -82,7 +86,6 @@ previous_time = time.time()
 
 # Tiempo hasta el que se mostrará
 # el último gesto dinámico detectado
-reload_display_until = 0
 start_display_until = 0
 end_display_until = 0
 
@@ -199,17 +202,28 @@ try:
                 )
             )
 
-            # RECARGAR
-            reload_detected = (
+            # -----------------------------
+            # RECARGAR - POSTURA ESTÁTICA
+            # -----------------------------
+
+            reload_body_detected = (
                 gesture_detector.detect_reload(
                     smoothed_landmarks
                 )
             )
 
-            if reload_detected:
-                reload_display_until = (
-                    time.time() + 0.8
+            # Si ambas manos forman pistolas,
+            # no permitir RECARGAR
+            reload_raw = (
+                reload_body_detected
+                and not gun_hands_detected
+            )
+
+            reload_detected = (
+                reload_confirmation.update(
+                    reload_raw
                 )
+            )
 
             # INICIO
             start_detected = (
@@ -241,15 +255,13 @@ try:
 
             detected_gesture = "---"
 
-            # POSTURAS ESTÁTICAS
             if shield_detected:
                 detected_gesture = "ESCUDO"
 
             elif attack_detected:
                 detected_gesture = "ATAQUE"
 
-            # POSTURAS DINÁMICAS
-            elif time.time() < reload_display_until:
+            elif reload_detected:
                 detected_gesture = "RECARGAR"
 
             elif time.time() < start_display_until:
