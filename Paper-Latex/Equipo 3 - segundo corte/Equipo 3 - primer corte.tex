@@ -574,45 +574,81 @@
 	
 	\begin{table}[!t]
 		\centering
-		\caption{Comparative Matrix of Alternatives}
-		\label{tab:comparative_matrix}
+		\caption{Trade-Off Analysis for Actuation}
+		\label{tab:alt_actuation}
 		\scriptsize
-		
-		\setlength{\tabcolsep}{2pt}
-		\renewcommand{\arraystretch}{1.05}
-		
-		\begin{tabularx}{\columnwidth}
-			{@{}P{2cm} P{1.7cm} P{2cm} Y@{} }
-			
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c c X c@{}}
 			\toprule
-			Function & Alternatives considered & Selected & Selection criterion \\
+			\textbf{Alternative} & \textbf{Torque} & \textbf{Mass} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
 			\midrule
-			
-			Actuation & Servo / Stepper / DC & MG90S & Integrated angular positioning \\
-			
-			PWM generation & MCU PWM / PCA9685 / Additional MCU & PCA9685 & 16 PWM channels through I2C \\
-			
-			Processing & Arduino / STM32 / ESP32-C3 SuperMini & ESP32-C3 SuperMini & Wireless connectivity + required interfaces \\
-			
-			Inter-module communication & UART / CAN/ RS-485 & RS-485 & Differential multi-node communication \\
-			
-			
+			MG996R \cite{mg996r} & High & $55\text{ g}$ & Excessive size and current draw & \\
+			SG90 \cite{sg90} & Low & $9\text{ g}$ & Fragile nylon gears under load & \\
+			\textbf{MG90S \cite{mg90s}*} & Medium & $13.4\text{ g}$ & Metal gears; optimal torque/size & \checkmark \\
 			\bottomrule
-			
 		\end{tabularx}
-		
 	\end{table}
 	
-	\linelabel{ln:sel}As summarized in Table~\ref{tab:comparative_matrix}, the technological
+	\begin{table}[!t]
+		\centering
+		\caption{Trade-Off Analysis for PWM Expansion}
+		\label{tab:alt_pwm}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c X c@{}}
+			\toprule
+			\textbf{Alternative} & \textbf{Channels} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
+			\midrule
+			Software PWM \cite{esp32c3} & Limited & High MCU timer overhead; Limited GPIO & \\
+			Auxiliary MCU \cite{stm32f4} & Flexible & Requires custom firmware and PCB space & \\
+			\textbf{PCA9685 \cite{pca9685}*} & 16 & Hardware 12-bit PWM over $\text{I}^2\text{C}$ bus & \checkmark \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Trade-Off Analysis for Main Controller}
+		\label{tab:alt_processing}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c X c@{}}
+			\toprule
+			\textbf{Alternative} & \textbf{Telemetry} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
+			\midrule
+			Arduino Nano \cite{atmega328p} & None & 8-bit AVR; lacks integrated wireless & \\
+			STM32F4 Core \cite{stm32f4} & External & High compute; larger board area & \\
+			\textbf{ESP32-C3 SuperMini \cite{esp32c3}*} & Native & 32-bit RISC-V with Wi-Fi/BLE & \checkmark \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Trade-Off Analysis for Inter-Module Communication}
+		\label{tab:alt_comm}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c X c@{}}
+			\toprule
+			\textbf{Alternative} & \textbf{Topology} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
+			\midrule
+			Direct UART \cite{esp32c3} & Point-to-Point & Poor multi-drop scalability & \\
+			CAN Bus \cite{sn65hvd230} & Multi-drop & High protocol/driver complexity & \\
+			\textbf{RS-485 (MAX13487E) \cite{max13487e}*} & Multi-drop & Differential noise immunity + auto direction & \checkmark \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\linelabel{ln:sel}The technological
 	architecture was selected according to the functional and scalability
-	requirements of the SOFIA demonstrator. \linelabel{ln:sel-mg}MG90S servomotors were selected
-	to provide controlled angular positioning for each degree of freedom,
-	while two PCA9685 drivers provide the 32 PWM channels required by the
-	system through a shared I2C bus. The ESP32-C3 SuperMini was selected as
-	the main controller due to its integrated wireless connectivity and
-	support for the required communication interfaces. \linelabel{ln:sel-rs485}Finally, RS-485 was
-	selected for inter-module communication because its differential and
-	multi-node architecture supports the future connection of multiple
+	requirements of the SOFIA demonstrator. 
+	\linelabel{ln:sel-mg}MG90S servomotors as stated in Table~\ref{tab:alt_actuation} were selected to provide controlled angular positioning for each degree of freedom,
+	while two PCA9685 drivers as stated in Table~\ref{tab:alt_pwm} were selected to  provide the 32 PWM channels required by the system through a shared I2C bus. The ESP32-C3 SuperMini as stated in Table~\ref{tab:alt_processing} was selected as the main controller due to its integrated wireless connectivity and support for the required communication interfaces. \linelabel{ln:sel-rs485}Finally, RS-485 as stated in Table~\ref{tab:alt_comm} was selected for inter-module communication because its differential and multi-node architecture supports the future connection of multiple
 	SOFIA modules.
 	
 	\subsection{Servo Mechanical Time Constant Estimation}
