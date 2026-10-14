@@ -50,11 +50,57 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 
 %-----------------------------------------------------------------
 \LabDSTreviewer{1}{Format, LaTeX and template compliance}
+% Insert this block after \LabDSTreviewer{1}{Format, LaTeX and template compliance}.
+% IMPORTANT: Replace each reviewer-comment placeholder with the exact original text.
+% Keep the original reviewer keys and statuses aligned with the actual review PDF.
+
+\LabDSTcomment{R1.1}{A}{Title and author block; Section~\ref{sec:intro}}
+{El título es “LAB-DST SOFIA O26”, que no describe el trabajo. No hay afiliación en \thanks. El apellido del profesor
+	aparece como “Gonzales Jimenez”, y el encabezado dice “Technical Datasheet of SOFIA Demonstrator Module”.}
+{We revised the manuscript title, author information, institutional affiliation, and running header to follow the IEEE journal template and to reflect the scope of servo characterization. The revised title is ``Servo Characterization for the SOFIA Modular Kinetic Surface.''}
+
+\LabDSTcomment{R1.2}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, and Table~\ref{tab:sofia_requirements}}
+{Las tablas de requisitos, de la ESP32-C3, del PCA9685, del MG90S y de verificación no tienen \label y no se citan en el
+	texto; aparecen una tras otra sin párrafo que las introduzca. Las fuentes se colocan como líneas sueltas (“Source: ESP32-C3
+	Datasheet, Espressif Systems.”, Línea 105).}
+{We reviewed the table captions, labels, and in-text cross-references. The revised manuscript refers to the comparative matrix, benchmarking table, and system requirements using LaTeX labels and references rather than manually entered table numbers.}
+
+\LabDSTcomment{R1.3}{A}{Table~\ref{tab:benchmarking}}
+{En la tabla de benchmarking el texto de las columnas se encima (p. ej. “Continuous (non-discrete)” invade la columna
+	Modularity).}
+{We reformatted the benchmarking table to fit the IEEE two-column layout. The revised table uses a column-width-constrained tabularx environment, adjusted column spacing, and smaller text to improve readability and prevent horizontal overflow.}
+
+\LabDSTcomment{R1.4}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, and Fig.~\ref{fig1}}
+{Todos los flotantes usan [H] (paquete float).}
+{We revised the figure and table environments and their placement options to better follow IEEE formatting conventions. Wide comparative content uses a two-column table environment, while the remaining figures and tables use single-column floats as appropriate. Final placement remains subject to LaTeX's float algorithm.}
+
+\LabDSTcomment{R1.5}{P}{Sections~\ref{sec:results}, \ref{sec:discussion}, and \ref{sec:conclusions}}
+{Faltan las secciones Results, Discussion y Conclusions (al menos como encabezados) y todas las secciones de cierre.}
+{We added the Results, Discussion, and Conclusions sections to establish the required manuscript structure. The Results section also includes subsections for the experimental setup, servomotor dynamic response, and time-constant estimation. These sections are not yet populated with experimental findings, so the observation is only partially addressed. No experimental results are claimed at this stage.}
+
+\LabDSTcomment{R1.6}{A}{Manuscript preamble and document structure}
+{Al final del archivo hay una tabla comentada con valores de ejemplo (“Manufacturer Y, City, Country”, “Continuousrotation servo, rated torque T at V V”), copiada del ejemplo de la clase de BOM. En figures/ hay cinco imágenes (nop
+	(1..5).png) que no se usan, con espacios en el nombre.}
+{We cleaned up the manuscript structure and removed unused template material while retaining the IEEEtran journal document class and the packages required by the paper's tables, figures, equations, and algorithm.}
+
+% Insert the following block after \LabDSTreviewer{2}{Writing and structure}.
+
 
 
 
 %-----------------------------------------------------------------
 \LabDSTreviewer{2}{Writing and structure}
+
+\LabDSTcomment{R2.1}{A}{Abstract and IEEE Keywords}
+{El abstract y las palabras clave eran el texto guía de la plantilla; en esta versión quedaron vacíos.}
+{We rewrote the abstract to state the system context, the research problem, the proposed experimental methodology, and the scope of the work. The abstract now specifies that the complete SOFIA installation comprises 16 modules and 32 actuators, while the proposed experimental characterization is restricted to the two servomotors of one removed module. We also updated the IEEE Keywords to match the paper's technical focus.}
+
+\LabDSTcomment{R2.2}{P}{Section~\ref{sec:methods} and Table~\ref{tab:sofia_requirements}}
+{Materials and Methods se presenta como otro documento: “The objective of this document is to verify the compatibility
+	of the selected components” y “The document structure follows the LabDST documentation requirements for technical
+	datasheets”. Es la ficha técnica de la clase de hardware insertada tal cual.}
+{We reorganized the opening of Materials and Methods around three stages: hardware configuration, experimental measurement, and dynamic-response analysis. The revised text describes the use of a removable crown-shaped fixture with limit switches to detect angular reference positions and identifies relevant measurement conditions, including commanded angular displacement, direction of motion, supply voltage, and elapsed time. It also clarifies that only two servomotors from one SOFIA module will be characterized. However, the complete measurement sequence, number of repetitions, data-acquisition procedure, and model-identification criteria remain to be specified; therefore, this observation is partially addressed.}
+
 
 % Ejemplo con el texto NUEVO citado con \LabDSTquote.
 \LabDSTcomment{R2.4}{A}{lines 36-47}
@@ -100,5 +146,6 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 \LabDSTquote{Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
 To address this limitation, this work investigates the following research question: Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?
 This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.}
+
 
 \end{document}
