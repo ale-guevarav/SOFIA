@@ -127,6 +127,10 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {El BOM no distingue la cantidad por unidad de la del sistema. Lista 1 ESP32-C3 y 2 PCA9685 pero 16 transceptores RS-485, sin explicar la arquitectura que eso implica. Usa “3D Printed” como fabricante, contiene elementos poco claros (“Pro3” de Tower Pro, “Axis 1 9mm x 9mm”, “Inser M3x5x4”) y lista conectores JST-PH, cuando la arquitectura de SOFIA usa JST-VH. Tampoco tiene descripción técnica ni localidad.}
 {Updated the BOM table to distinguish unit vs. system quantities, add descriptions for the parts, set the manufacturer to "In-house (LabDST, ITESO)", and added manufacturing origin.}
 
+\LabDSTcomment{R3.7}{A}{Table~\ref{tab:alt_actuation},Table~\ref{tab:alt_pwm},Table~\ref{tab:alt_processing}, Table~\ref{tab:alt_comm}}
+{La matriz de alternativas tiene un solo criterio por función, sin ponderación ni calificación.}
+{Updated the alternative matrix to include 1 table for every component stating features and limitations of the alternatives for the SOFIA.}
+
 \LabDSTcomment{R3.8}{A}{Table~\ref{alg:sofia_tracking}}
 {El algoritmo usa r0 para la posición del módulo y ˆv para la dirección, en lugar de la notación del curso (r0,2, ˆr2,p). Además escribe atan2, asin y Clamp en itálica matemática, sin operatorname ni Call.}
 {Updated math operators to standard notation (atan2, arcsin, Clamp) and explicitly labeled the trajectory step as an Exponential Moving Average (EMA)}
