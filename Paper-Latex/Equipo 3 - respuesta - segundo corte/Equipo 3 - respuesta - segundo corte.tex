@@ -137,6 +137,11 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {La “constante de máquina” o “mechanical time constant” del servo no se define: no hay modelo, variables ni ecuaciones. El diferenciador promete compararla contra el “valor teórico” del MG90S, que la hoja de datos no reporta.}
 {Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}.}
 
+\LabDSTcomment{R3.4}{A}
+{lines 196-222}
+{El BOM incluye 16 transceptores “MAX13487E TTL485-V2.0”. Según su hoja de datos, ese transceptor opera con alimentación de 5 V (verifíquenlo), y su salida de recepción quedaría a niveles de 5 V en una entrada de la ESP32-C3, que no tolera 5 V, como ustedes mismos anotan en la Tabla IV.}
+{We added the subsection ``RS-485 Logic-Level Compatibility''to Materials and Methods, addressing the  incompatibility between the MAX13487E and the ESP32-C3. The subsection documents the electrical verification and the voltage-divider solution incorporated into the revised PCB schematic.}
+
 \LabDSTcomment{R3.5}{A}{Table~\ref{tab:esp32_specs}, Table~\ref{tab:pca9685_specs},Table~\ref{tab:mg90s_specs}}
 {Las fichas técnicas tienen solo parámetro, valor y verificación. No indican la versión ni la página de la hoja de datos, ni justifican el parámetro frente al requerimiento. El par del MG90S aparece como “1.8–2.2 kgf cm” sin decir a qué voltaje corresponde cada valor.}
 {Added source and justifications to the datasheets and updated the MG90S table to specify torque values at both 4.8V ($1.8\text{ kgf}\cdot\text{cm}$) and 6.0V ($2.2\text{ kgf}\cdot\text{cm}$).}

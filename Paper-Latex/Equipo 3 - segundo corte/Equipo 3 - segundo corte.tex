@@ -522,6 +522,40 @@
 		\end{tabularx}
 	\end{table}
 	
+	
+	\subsection{RS-485 Logic-Level Compatibility}
+	
+	To enable communication with an additional set of 16 SOFIA
+	modules, the proposed architecture incorporates the
+	MAX13487E TTL485-V2.0 transceiver module. The MAX13487E
+	provides half-duplex RS-485 communication with automatic
+	direction control, reducing the need for additional
+	transmission-direction control signals \cite{max13487e}.
+	
+	According to the manufacturer's datasheet, the MAX13487E
+	operates with a nominal 5 V supply, whereas the ESP32-C3
+	uses 3.3 V GPIO logic \cite{max13487e,esp32c3}.
+	A preliminary electrical test identified a receiver-output
+	voltage of approximately 5.00 V at the TXD terminal of
+	the TTL485-V2.0 module. This voltage exceeds the
+	permitted input range of the ESP32-C3.
+	
+	To address this incompatibility, a resistive voltage
+	divider was incorporated into the PCB schematic between
+	the TTL485-V2.0 TXD output and the ESP32-C3 UART receive
+	input. The divider consists of a 10 kOhm series resistor
+	and an 18 kOhm resistor connected to ground, producing
+	approximately 3.21 V from a nominal 5 V input.
+	
+	The ESP32-C3 UART transmit output remains directly
+	connected to the TTL485-V2.0 RXD input, since the
+	MAX13487E specifies a minimum logic-high input voltage
+	of 2.0 V \cite{max13487e}.
+	
+	The voltage-divider circuit is included in the revised
+	PCB schematic. Experimental verification of the
+	assembled PCB remains pending.
+	
 	\subsection{Bill of Materials}
 	The components required for the SOFIA demonstrator,
 	including mechanical parts, actuators, and electronic
