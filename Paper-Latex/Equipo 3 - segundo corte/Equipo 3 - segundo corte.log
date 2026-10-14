@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 OCT 2026 13:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 OCT 2026 14:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -782,38 +782,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 426--426
  []
 
 
-Underfull \hbox (badness 6592) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Match sys-tem
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 5 V main
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 486--486
 []|\OT1/ptm/m/n/7 Compatible
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Provide
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 re-quired
- []
-
-
-Underfull \hbox (badness 2503) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 joint ac-tu-a-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 torque un-der
  []
 
 
@@ -824,26 +794,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 486--486
 
 Underfull \hbox (badness 10000) in paragraph at lines 486--486
 \OT1/ptm/m/n/7 V; val-i-da-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Ensure joint
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 an-gu-lar
- []
-
-
-Underfull \hbox (badness 1881) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 ve-loc-ity meets
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 dy-namic
  []
 
 
@@ -862,38 +812,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 486--486
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 end-effector
+Underfull \hbox (badness 3735) in paragraph at lines 486--486
+[]|\OT1/ptm/m/n/7 Must be con-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Must be
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 con-sid-ered in
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 bud-get and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Standard RC
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 servo con-trol
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 sig-nal frame
+Underfull \hbox (badness 3735) in paragraph at lines 486--486
+\OT1/ptm/m/n/7 get and CAD
  []
 
 
@@ -902,28 +827,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 486--486
  []
 
 
+Underfull \hbox (badness 2005) in paragraph at lines 486--486
+\OT1/ptm/m/n/7 with PCA9685
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 486--486
 \OT1/ptm/m/n/7 PWM out-put
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-[]|\OT1/ptm/m/n/7 Sizing power
- []
-
-
-Underfull \hbox (badness 2521) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 sup-ply cur-rent
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 lim-its for
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 worst-case
  []
 
 
@@ -938,37 +848,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 486--486
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 phys-i-cal
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
-\OT1/ptm/m/n/7 cur-rent
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 486--486
 \OT1/ptm/m/n/7 mea-sure-ment
  []
 
 [3 <./figures/SOFIA_DIAGRAM.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 570--570
-[]|\OT1/ptm/m/n/5 16-channel 12-bit $[][][]$
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 570--570
-[]|\OT1/ptm/m/n/5 Half-duplex RS-485
- []
-
-
 Overfull \hbox (2.45741pt too wide) in paragraph at lines 570--570
 []|\OT1/ptm/m/n/5 Wilmington, 
  []
 
 
-Underfull \hbox (badness 6608) in paragraph at lines 570--570
-[]|\OT1/ptm/m/n/5 High-current power PCB
+Underfull \hbox (badness 10000) in alignment at lines 570--570
+[][][][][][][] 
  []
 
 [4]
@@ -1021,7 +911,7 @@ L3 programming layer <2026-07-20>
 Here is how much of TeX's memory you used:
  6948 strings out of 467501
  118759 string characters out of 5408550
- 592608 words of memory out of 5000000
+ 598608 words of memory out of 5000000
  36082 multiletter control sequences out of 15000+600000
  675022 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1045,7 +935,7 @@ pe1/urw/helvetic/uhvr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts
 /type1/urw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/font
 s/type1/urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/font
 s/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - segundo corte.pdf" (6 pages, 420653 bytes).
+Output written on "Equipo 3 - segundo corte.pdf" (6 pages, 420582 bytes).
 PDF statistics:
  116 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

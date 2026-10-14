@@ -121,6 +121,18 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {No hay arquitectura preliminar del sistema en figura: cómo se conectan la cámara y el PC, la ESP32-C3, los dos PCA9685, los 32 servos, los transceptores RS-485 y la alimentación}
 {Added a System Architecture Diagram Fig.~\ref{fig1} showing the host, ESP32-C3, dual PCA9685 drivers, 32 servos, RS-485 transceivers. For the servo mechanical time constant an external module will be designed for measuring every servo motor.}
 
+\LabDSTcomment{R3.2}{P}
+{Section~\ref{sec:methods}}
+{No hay matriz de riesgos, micropruebas ni protocolo experimental para las dos propuestas del diferenciador: el tiempo de configuración de red y la constante de máquina de los servos.}
+{The study scope was narrowed to experimental servomotor
+	characterization. A risk assessment and a proposed step-response
+	measurement protocol were added to Materials and Methods.
+	The protocol defines the angular input, measurement approach,
+	repetitions, and model-fitting criteria. Automatic Modbus
+	addressing and its configuration-time comparison are outside
+	the revised experimental scope. Experimental validation of
+	the proposed servo protocol remains pending.}
+
 \LabDSTcomment{R3.3}{A}{lines 193-199, Table~\ref{tab:mg90s_specs}, \eqref{eq:servo_first_order}}
 {La “constante de máquina” o “mechanical time constant” del servo no se define: no hay modelo, variables ni ecuaciones. El diferenciador promete compararla contra el “valor teórico” del MG90S, que la hoja de datos no reporta.}
 {Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}.}
