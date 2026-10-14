@@ -21,6 +21,7 @@ Actualmente el sistema permite:
 * Procesar Pose y Hands simultáneamente.
 * Mostrar los FPS durante la ejecución.
 * Indicar visualmente si existe una persona detectada.
+* Registrar métricas de desempeño (tasa de acierto, tiempo de respuesta y FPS promedio) y generar reportes en Excel y Markdown.
 
 El sistema puede trabajar con hasta **75 landmarks simultáneamente**:
 
@@ -79,6 +80,13 @@ El uso de Hand Landmarker será especialmente útil para reconocer gestos donde 
 
 NumPy forma parte de las herramientas utilizadas para el procesamiento numérico y será utilizado para operaciones geométricas relacionadas con los landmarks, como cálculo de distancias, vectores y ángulos entre articulaciones.
 
+### Matplotlib y openpyxl
+
+Se utilizan para generar los reportes de métricas:
+
+* **Matplotlib** crea las gráficas en imagen (pastel, barras, líneas y matriz de confusión) para el reporte en Markdown.
+* **openpyxl** crea el archivo de Excel con tablas y gráficas nativas que se pueden editar.
+
 ---
 
 ## ¿Por qué se eligieron estas tecnologías?
@@ -107,11 +115,20 @@ sofia_pose_detection/
 │   ├── pose_landmarker.task
 │   └── hand_landmarker.task
 │
+├── metrics/                  (se crea automáticamente)
+│   ├── sesion_*.json
+│   └── reportes/
+│
 ├── main.py
 ├── pose_detector.py
 ├── pose_connections.py
 ├── hand_detector.py
 ├── hand_connections.py
+├── gesture_detector.py
+├── geometry_utils.py
+├── smoothing.py
+├── metrics_logger.py
+├── generate_report.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -129,6 +146,7 @@ Se encarga de:
 * Coordinar Pose y Hands.
 * Mostrar el resultado.
 * Calcular los FPS.
+* Registrar las métricas de desempeño.
 * Liberar los recursos al finalizar.
 
 ### `pose_detector.py`
@@ -150,6 +168,26 @@ Se encarga de detectar y dibujar las manos y sus articulaciones.
 ### `hand_connections.py`
 
 Define las conexiones entre los 21 landmarks de cada mano.
+
+### `gesture_detector.py`
+
+Contiene las reglas geométricas para reconocer los cinco gestos a partir de los landmarks.
+
+### `geometry_utils.py`
+
+Funciones de apoyo para calcular distancias, ángulos y distancias normalizadas.
+
+### `smoothing.py`
+
+Suavizado de landmarks (EMA) y confirmación temporal para evitar detecciones inestables.
+
+### `metrics_logger.py`
+
+Mide el desempeño del sistema mientras se ejecuta: FPS, latencia por frame y resultados de las pruebas. Guarda todo en un archivo JSON.
+
+### `generate_report.py`
+
+Lee el JSON de métricas y genera el reporte en Excel (`.xlsx`) y Markdown (`.md`) con tablas y gráficas.
 
 ### `models/`
 
@@ -330,7 +368,7 @@ La lógica del juego podrá administrar aspectos como munición, acciones válid
 ## 1. Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/ale-guevarav/SOFIA
 cd SOFIA
 ```
 
@@ -354,6 +392,8 @@ En Windows PowerShell:
 pip install -r requirements.txt
 ```
 
+> `requirements.txt` debe incluir `openpyxl` para poder generar el reporte en Excel.
+
 ---
 
 # Ejecución
@@ -370,6 +410,147 @@ Para cerrar el programa:
 
 ```text
 Presionar Q
+```
+
+Al cerrar se guardan automáticamente las métricas de la sesión y se genera el reporte (ver la siguiente sección).
+
+---
+
+# Pruebas y métricas de desempeño
+
+El sistema incluye un modo de pruebas para medir qué tan bien funciona. Las métricas registradas son:
+
+* **Tasa de acierto:** porcentaje de pruebas en las que el sistema reconoció el gesto correcto.
+* **Tiempo de respuesta:** cuánto tarda el sistema en reconocer un gesto.
+* **FPS promedio:** qué tan fluido corre el sistema.
+
+## Controles
+
+Las teclas solo funcionan si la **ventana de la cámara está seleccionada** (haz clic en ella antes de presionar).
+
+| Tecla | Acción |
+| --- | --- |
+| `1` | Probar **INICIO** |
+| `2` | Probar **RECARGAR** |
+| `3` | Probar **ESCUDO** |
+| `4` | Probar **ATAQUE** |
+| `5` | Probar **FIN** |
+| `0` / `x` | **Modo libre:** cancela la prueba actual, no registra nada y no muestra nada en pantalla |
+| `s` | Guardar las métricas sin cerrar el programa |
+| `q` | Salir, guardar las métricas y generar el reporte |
+
+## ¿Cómo funciona una prueba?
+
+Cada prueba pasa por cuatro fases:
+
+```text
+Presionar 1-5
+     │
+     ▼
+TESTING: <gesto>  3 → 2 → 1        (naranja)
+Preparación. Lo que se detecte aquí NO cuenta.
+     │
+     ▼
+TESTING: <gesto>  YA!              (rojo parpadeando)
+La persona hace el gesto. Tiene 6 segundos.
+Aquí empieza a medirse el tiempo de respuesta.
+     │
+     ▼
+ACIERTO (verde)  /  FALLO (rojo)
+Se muestra 1.5 segundos.
+     │
+     ▼
+Modo libre (pantalla limpia)
+```
+
+Mientras no se inicie una prueba, el sistema sigue midiendo FPS y latencia en segundo plano, pero no calcula la tasa de acierto, porque no sabe qué gesto se esperaba.
+
+## ¿Cómo se califica una prueba?
+
+El **primer gesto** que detecte el sistema después del "YA!" decide el resultado:
+
+| Resultado | Qué significa |
+| --- | --- |
+| ✅ **Acierto** | El sistema detectó el gesto que se estaba probando. |
+| ❌ **No detectado** | Pasaron los 6 segundos y el sistema no detectó nada. |
+| ❌ **Confundido** | El sistema detectó un gesto diferente al que se estaba probando. |
+
+Un gesto se cuenta solo en el momento en que **aparece** (cuando cambia la postura mostrada en pantalla). Si la persona mantiene un gesto por varios segundos, se cuenta como una sola detección.
+
+## Reglas para hacer pruebas válidas
+
+1. **Empezar en posición neutral**, con los brazos abajo. Si el gesto ya está hecho antes del "YA!", el sistema no ve un cambio y la prueba puede salir como *No detectado*.
+2. **Esperar el "YA!"** antes de hacer el gesto. Lo que ocurre durante la cuenta regresiva no se toma en cuenta.
+3. **Hacer un solo gesto por prueba.** Si se hace otro gesto primero, la prueba cuenta como *Confundido*.
+4. **No iniciar otra prueba** mientras aparezca "TESTING". Hay que esperar a que termine o cancelarla con `0`.
+5. **Mantener a la persona completa en cámara**, al menos de la cadera hacia arriba y con buena iluminación.
+6. **Dividir los roles:** lo ideal es que una persona presione las teclas y otra haga los gestos.
+
+## Protocolo recomendado
+
+Para que los resultados sean representativos:
+
+* Realizar **al menos 10 pruebas por gesto** (50 en total).
+* Alternar el orden de los gestos en lugar de hacer todos los de un mismo tipo seguidos.
+* De ser posible, repetir con **distintas personas**, distancias a la cámara y condiciones de iluminación.
+* Guardar cada sesión por separado para poder compararlas.
+
+## ¿Cómo se miden las métricas?
+
+### Tasa de acierto
+
+```text
+Tasa de acierto = aciertos / pruebas totales × 100
+```
+
+También se calcula por cada gesto, junto con:
+
+* **Precisión:** de las veces que el sistema dijo *X*, cuántas eran realmente *X*.
+* **Recall:** de las veces que la persona hizo *X*, cuántas detectó el sistema.
+* **F1:** combinación de precisión y recall en un solo valor.
+* **Matriz de confusión:** tabla que muestra qué gestos se confunden entre sí. La diagonal corresponde a los aciertos.
+
+### Tiempo de respuesta
+
+Se mide de dos maneras:
+
+* **Tiempo de reconocimiento (segundos):** tiempo desde el "YA!" hasta que el sistema reporta el gesto. Solo se calcula en los aciertos. Incluye el tiempo que tarda la persona en moverse y los 5 frames de confirmación temporal, por lo que representa lo que percibiría un jugador frente a SOFIA.
+* **Latencia por frame (milisegundos):** cuánto tarda el programa en procesar cada imagen. Se desglosa por etapa: Pose Landmarker, Hand Landmarker, lógica de gestos y dibujo. No incluye el tiempo de espera de la cámara.
+
+### FPS promedio
+
+```text
+FPS promedio = frames procesados / tiempo total
+```
+
+Se reportan además el FPS mínimo, máximo y p95, una gráfica de FPS a lo largo de la sesión y la **capacidad de procesamiento** (los FPS que se alcanzarían si la cámara no limitara la velocidad).
+
+## Resultados generados
+
+Al presionar `q` se crean los siguientes archivos:
+
+```text
+metrics/
+├── sesion_AAAAMMDD_HHMMSS.json        ← datos crudos de la sesión
+└── reportes/
+    └── sesion_AAAAMMDD_HHMMSS/
+        ├── reporte.xlsx               ← tablas y gráficas en Excel
+        ├── reporte.md                 ← reporte con tablas e imágenes
+        └── graficas/                  ← gráficas en PNG
+```
+
+El **Excel** contiene cinco hojas: Resumen, Por gesto, Rendimiento, Matriz de confusión e Intentos.
+
+El **Markdown** se puede ver en VS Code con clic derecho → *Open Preview*.
+
+Si el reporte no se generó automáticamente, o se quiere regenerar:
+
+```bash
+# Sesión más reciente
+python generate_report.py
+
+# Sesión específica
+python generate_report.py metrics/sesion_AAAAMMDD_HHMMSS.json
 ```
 
 ---
@@ -390,13 +571,21 @@ Presionar Q
 * [x] Modularización de detectores.
 * [x] Diseño de cinco posturas/gestos.
 
+### Segunda etapa
+
+* [x] Suavizado de landmarks corporales (EMA).
+* [x] Confirmación temporal de posturas estáticas (5 frames consecutivos).
+* [x] Reconocimiento automático de ESCUDO.
+* [x] Reconocimiento automático de ATAQUE (brazos + dos manos en forma de pistola).
+* [x] Reconocimiento dinámico de RECARGAR.
+* [x] Reconocimiento dinámico de INICIO (tres palmadas).
+* [x] Reconocimiento dinámico de FIN/DESPEDIDA.
+* [x] Modo de pruebas con cuenta regresiva.
+* [x] Registro de métricas de desempeño (tasa de acierto, tiempo de respuesta y FPS promedio).
+* [x] Generación de reportes en Excel y Markdown con tablas y gráficas.
+
 ### Próximas etapas
 
-* [ ] Reconocimiento automático de RECARGAR.
-* [ ] Reconocimiento automático de ESCUDO.
-* [ ] Reconocimiento automático de ATAQUE.
-* [ ] Reconocimiento dinámico de INICIO.
-* [ ] Reconocimiento dinámico de FIN/DESPEDIDA.
 * [ ] Máquina de estados para evitar detecciones repetidas.
 * [ ] Implementación de la lógica del juego.
 * [ ] Comunicación entre el sistema de visión y SOFIA.

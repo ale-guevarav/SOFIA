@@ -87,9 +87,13 @@ class GestureRecognition:
             required_frames=5
         )
 
+        # RECARGAR ahora es postura estática
+        self.reload_confirmation = TemporalConfirmation(
+            required_frames=5
+        )
+
         # Tiempo hasta el que se mostrará
         # el último gesto dinámico detectado
-        self.reload_display_until = 0
         self.start_display_until = 0
         self.end_display_until = 0
 
@@ -139,11 +143,23 @@ class GestureRecognition:
         )
 
         # -----------------------------
-        # RECARGAR
+        # RECARGAR - POSTURA ESTÁTICA
         # -----------------------------
 
-        if self.gesture_detector.detect_reload(smoothed_landmarks):
-            self.reload_display_until = now + 0.8
+        reload_body_detected = (
+            self.gesture_detector.detect_reload(
+                smoothed_landmarks
+            )
+        )
+
+        # Si ambas manos forman pistolas,
+        # no permitir RECARGAR (es ATAQUE)
+        reload_detected = (
+            self.reload_confirmation.update(
+                reload_body_detected
+                and not gun_hands_detected
+            )
+        )
 
         # -----------------------------
         # INICIO
@@ -170,10 +186,10 @@ class GestureRecognition:
         if attack_detected:
             return "ATAQUE"
 
-        # POSTURAS DINÁMICAS
-        if now < self.reload_display_until:
+        if reload_detected:
             return "RECARGAR"
 
+        # POSTURAS DINÁMICAS
         if now < self.start_display_until:
             return "INICIO"
 

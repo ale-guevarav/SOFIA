@@ -29,25 +29,12 @@ class GestureDetector:
         # CONFIGURACIÓN DE ATAQUE
         # -----------------------------
 
-        # Rango válido del ángulo proyectado del codo.
-        # En nuestras pruebas, ATAQUE estuvo
-        # aproximadamente en 48 grados.
-        self.attack_elbow_angle_min = 30
-        self.attack_elbow_angle_max = 70
-
-        # Distancia horizontal máxima del codo
-        # respecto al hombro.
-        # Se normaliza utilizando el ancho de hombros.
-        #
-        # ATAQUE correcto: ~0.12 - 0.14
-        # Codos abiertos: ~0.35
-        self.attack_elbow_horizontal_max = 0.25
+        # Rango válido del ángulo proyectado del codo..
+        self.attack_elbow_angle_min = 35
+        self.attack_elbow_angle_max = 125
 
         # Diferencia máxima de profundidad
         # entre muñeca y codo.
-        #
-        # ATAQUE correcto: ~-0.47 / -0.48
-        # Brazos normales: ~-0.15 / -0.16
         self.attack_depth_threshold = -0.30
 
 
@@ -307,7 +294,6 @@ class GestureDetector:
 
     def detect_attack_body(self, pose_result):
 
-        # Comprobar que exista una persona detectada
         landmarks = self.get_landmarks(
             pose_result
         )
@@ -344,7 +330,7 @@ class GestureDetector:
             right_wrist
         )
 
-        elbows_in_angle_range = (
+        elbows_bent = (
             self.attack_elbow_angle_min
             < left_elbow_angle
             < self.attack_elbow_angle_max
@@ -355,51 +341,13 @@ class GestureDetector:
         )
 
         # -----------------------------
-        # CODOS CERCA DEL TORSO
+        # MUÑECAS POR ENCIMA DE CODOS
         # -----------------------------
 
-        shoulder_width = abs(
-            left_shoulder.x - right_shoulder.x
-        )
-
-        # Evitar división entre cero
-        if shoulder_width <= 0:
-            return False
-
-        left_elbow_horizontal = abs(
-            left_elbow.x - left_shoulder.x
-        ) / shoulder_width
-
-        right_elbow_horizontal = abs(
-            right_elbow.x - right_shoulder.x
-        ) / shoulder_width
-
-        elbows_near_torso = (
-            left_elbow_horizontal
-            < self.attack_elbow_horizontal_max
+        wrists_above_elbows = (
+            left_wrist.y < left_elbow.y
             and
-            right_elbow_horizontal
-            < self.attack_elbow_horizontal_max
-        )
-
-        # -----------------------------
-        # PROFUNDIDAD DE LAS MUÑECAS
-        # -----------------------------
-
-        left_depth_difference = (
-            left_wrist.z - left_elbow.z
-        )
-
-        right_depth_difference = (
-            right_wrist.z - right_elbow.z
-        )
-
-        wrists_forward = (
-            left_depth_difference
-            < self.attack_depth_threshold
-            and
-            right_depth_difference
-            < self.attack_depth_threshold
+            right_wrist.y < right_elbow.y
         )
 
         # -----------------------------
@@ -407,18 +355,16 @@ class GestureDetector:
         # -----------------------------
 
         return (
-            elbows_in_angle_range
-            and elbows_near_torso
-            and wrists_forward
+            elbows_bent
+            and wrists_above_elbows
         )
 
     # =============================================
-    # RECARGAR - GESTO DINÁMICO
+    # RECARGAR - GESTO ESTÁTICO
     # =============================================
 
     def detect_reload(self, pose_result):
 
-        # Comprobar que exista una persona detectada
         landmarks = self.get_landmarks(
             pose_result
         )
@@ -433,6 +379,9 @@ class GestureDetector:
         left_shoulder = landmarks[11]
         right_shoulder = landmarks[12]
 
+        left_elbow = landmarks[13]
+        right_elbow = landmarks[14]
+
         left_wrist = landmarks[15]
         right_wrist = landmarks[16]
 
@@ -440,7 +389,7 @@ class GestureDetector:
         right_hip = landmarks[24]
 
         # -----------------------------
-        # ALTURA DEL TORSO
+        # REFERENCIAS CORPORALES
         # -----------------------------
 
         shoulder_y = (
@@ -453,128 +402,106 @@ class GestureDetector:
             + right_hip.y
         ) / 2
 
-        torso_height = (
-            hip_y - shoulder_y
+        torso_height = hip_y - shoulder_y
+
+        shoulder_width = abs(
+            left_shoulder.x
+            - right_shoulder.x
         )
 
-        if torso_height <= 0:
+        if torso_height <= 0 or shoulder_width <= 0:
             return False
 
         # -----------------------------
-        # POSICIÓN DE LAS MUÑECAS
+        # ALTURA DE LAS MUÑECAS
         # -----------------------------
 
-        left_wrist_position = (
+        left_wrist_height = (
             left_wrist.y - shoulder_y
         ) / torso_height
 
-        right_wrist_position = (
+        right_wrist_height = (
             right_wrist.y - shoulder_y
         ) / torso_height
 
-        # -----------------------------
-        # ZONA INICIAL
-        # -----------------------------
-
-        hands_down = (
-            left_wrist_position
-            > self.reload_start_threshold
+        # Permitir una pequeña variación
+        # por encima o debajo del hombro
+        hands_at_shoulder_height = (
+            -0.25 < left_wrist_height < 0.30
             and
-            right_wrist_position
-            > self.reload_start_threshold
+            -0.25 < right_wrist_height < 0.30
         )
 
-        # Si todavía no ha comenzado una recarga,
-        # esperar a que ambas manos estén abajo
-        if not self.reload_started:
-
-            if hands_down:
-                self.reload_started = True
-
-                self.reload_start_left = (
-                    left_wrist_position
-                )
-
-                self.reload_start_right = (
-                    right_wrist_position
-                )
-
-                self.reload_start_time = time.time()
-
-            return False
-
         # -----------------------------
-        # LÍMITE DE TIEMPO
+        # MUÑECAS CERCA DE SUS HOMBROS
         # -----------------------------
 
-        elapsed_time = (
-            time.time()
-            - self.reload_start_time
+        left_distance = normalized_distance(
+            left_wrist,
+            left_shoulder,
+            left_shoulder,
+            right_shoulder
         )
 
-        if elapsed_time > self.reload_max_time:
-
-            self.reload_started = False
-
-            self.reload_start_left = None
-            self.reload_start_right = None
-            self.reload_start_time = None
-
-            return False
-
-        # -----------------------------
-        # MOVIMIENTO REALIZADO
-        # -----------------------------
-
-        left_movement = (
-            self.reload_start_left
-            - left_wrist_position
+        right_distance = normalized_distance(
+            right_wrist,
+            right_shoulder,
+            left_shoulder,
+            right_shoulder
         )
 
-        right_movement = (
-            self.reload_start_right
-            - right_wrist_position
-        )
-
-        enough_movement = (
-            left_movement
-            > self.reload_min_movement
+        hands_near_shoulders = (
+            left_distance < 0.75
             and
-            right_movement
-            > self.reload_min_movement
+            right_distance < 0.75
         )
 
         # -----------------------------
-        # ZONA FINAL
+        # MUÑECAS POR ENCIMA DE CODOS
         # -----------------------------
 
-        hands_up = (
-            left_wrist_position
-            < self.reload_end_threshold
+        wrists_above_elbows = (
+            left_wrist.y < left_elbow.y
             and
-            right_wrist_position
-            < self.reload_end_threshold
+            right_wrist.y < right_elbow.y
         )
 
         # -----------------------------
-        # RECARGA COMPLETA
+        # ANTEBRAZOS CASI VERTICALES
         # -----------------------------
 
-        if (
-            hands_up
-            and enough_movement
-        ):
+        left_forearm_dx = abs(
+            left_wrist.x - left_elbow.x
+        )
 
-            # Reiniciar estado para permitir
-            # una nueva recarga posteriormente
-            self.reload_started = False
+        left_forearm_dy = abs(
+            left_wrist.y - left_elbow.y
+        )
 
-            self.reload_start_left = None
-            self.reload_start_right = None
+        right_forearm_dx = abs(
+            right_wrist.x - right_elbow.x
+        )
 
-            return True
+        right_forearm_dy = abs(
+            right_wrist.y - right_elbow.y
+        )
 
-        return False
+        forearms_vertical = (
+            left_forearm_dx < 0.45 * left_forearm_dy
+            and
+            right_forearm_dx < 0.45 * right_forearm_dy
+        )
+
+        # -----------------------------
+        # RESULTADO FINAL
+        # -----------------------------
+
+        return (
+            hands_at_shoulder_height
+            and hands_near_shoulders
+            and wrists_above_elbows
+            and forearms_vertical
+        )
 
     # =============================================
     # INICIO - TRES PALMADAS
