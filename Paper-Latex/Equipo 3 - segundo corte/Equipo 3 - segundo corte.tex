@@ -15,7 +15,7 @@
 \usepackage{ragged2e}
 \usepackage{float}
 \usepackage{algorithm}
-\usepackage{algpseudocode}
+\usepackage{algpseudocode}\usepackage{lineno}
 
 
 
@@ -30,9 +30,9 @@
 	
 	\author{
 		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
-		Jorge A. Lizarraga, Luis E. Gonzáles-Jiménez, Luis F. Luque-Vega
+		Jorge A. Lizarraga, Luis E. González-Jiménez, Luis F. Luque-Vega
 		
-	\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
+		\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
 	}
 	
 	
@@ -40,16 +40,16 @@
 	{Servo Characterization for the SOFIA Modular Kinetic
 		Surface}
 	
-	\maketitle
+	\maketitle\linenumbers\renewcommand{\makeLineNumber}{}
 	
 	
 	\begin{abstract}
-		The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each actuated by two servomotors, requiring the coordinated control of 32 actuators. Differences in the dynamic response of these servomotors may affect the synchronization and positioning performance of the system. This work proposes an experimental methodology for characterizing the dynamic response of the two servomotors in a single SOFIA module, temporarily removed from the complete structure for testing. A removable crown-shaped measurement device incorporating limit switches is proposed to establish repeatable angular reference positions and record the time intervals associated with servo movement. The control architecture consists of an ESP32-C3 microcontroller and two PCA9685 PWM drivers, providing independent control of the 32 actuators in the complete system. The proposed methodology includes repeatedmovement tests under defined operating conditions, analysis of the measured response times, and evaluation of an appropriate dynamic model for
+		\linelabel{ln:abstract}The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each actuated by two servomotors, requiring the coordinated control of 32 actuators. Differences in the dynamic response of these servomotors may affect the synchronization and positioning performance of the system. This work proposes an experimental methodology for characterizing the dynamic response of the two servomotors in a single SOFIA module, temporarily removed from the complete structure for testing. A removable crown-shaped measurement device incorporating limit switches is proposed to establish repeatable angular reference positions and record the time intervals associated with servo movement. The control architecture consists of an ESP32-C3 microcontroller and two PCA9685 PWM drivers, providing independent control of the 32 actuators in the complete system. The proposed methodology includes repeatedmovement tests under defined operating conditions, analysis of the measured response times, and evaluation of an appropriate dynamic model for
 		estimating effective servomotor time constants. The experimental scope is limited to the two servomotors of the selected module, with the aim of establishing a measurement procedure for evaluating their dynamic behavior.
 	\end{abstract}
 	
 	\begin{IEEEkeywords}
-		Servomotor characterization, dynamic response, time constant estimation, limit switches, modular robotics, kinetic surfaces, ESP32-C3, PCA9685.
+		\linelabel{ln:keywords}Servomotor characterization, dynamic response, time constant estimation, limit switches, modular robotics, kinetic surfaces.
 	\end{IEEEkeywords}
 	
 	
@@ -79,7 +79,7 @@
 	
 	\linelabel{ln:research-question}To address this limitation, this work investigates the following research question: \textit{Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?}
 	
-	\linelabel{ln:Objectives}This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-85 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
+	\linelabel{ln:Objectives}This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.
 	
 	\begin{table*}[!t]
 		\centering
@@ -234,29 +234,29 @@
 	software-defined motion limits and smoothing strategies to prevent abrupt
 	servo movements and reduce mechanical stress.
 	
-	\linelabel{ln:focus}Based on these opportunities, this work focuses on defining and justifying a
-	preliminary electronic and control architecture for the SOFIA demonstrator.
-	The main areas considered are actuator control, PWM generation, embedded
-	processing, inter-module communication, electrical compatibility, and
-	scalability. These criteria provide the basis for the selection and
-	experimental evaluation of the technologies used in the subsequent development
-	stages of the SOFIA system.
+	\linelabel{ln:focus}Based on these opportunities, this work focuses on the proposed experimental
+	characterization of servomotor dynamic response, supported by a preliminary
+	electronic and control architecture for the SOFIA demonstrator. The selected
+	hardware provides the PWM generation, embedded processing, and communication
+	interfaces required by the test system, while the main research contribution
+	is the methodology for measuring and analyzing individual actuator response.
+	Automatic Modbus address assignment is outside the experimental scope.
 	
 	
 	\section{Materials and Methods}
 	\label{sec:methods}
 	
-	The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors \cite{sofia_architecture,mg90s}. Although the complete system incorporates 32 actuators, the experimental characterization proposed in this study is limited to the two servomotors of a single module removed from the SOFIA structure.
+	\linelabel{ln:materials-intro}The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors \cite{sofia_architecture,mg90s}. Although the complete system incorporates 32 actuators, the experimental characterization proposed in this study is limited to the two servomotors of a single module removed from the SOFIA structure.
 	
-	The methodology is divided into three main stages: hardware configuration, experimental measurement, and dynamic response analysis. The first stage involves the selection and verification of the electronic components required for servomotor control, considering the established hardware requirements \cite{technical_session}. The second stage proposes the use of a removable crown-shaped measurement device equipped with limit switches to detect predefined angular positions during controlled movements. The third stage involves analyzing the recorded timing data and evaluating an appropriate dynamic model to estimate the effective time constant of each servomotor.
+	\linelabel{ln:hardware-config}The methodology is divided into three main stages: hardware configuration, experimental measurement, and dynamic response analysis. The first stage involves the selection and verification of the electronic components required for servomotor control, considering the established hardware requirements \cite{technical_session}. The second stage proposes the use of a removable crown-shaped measurement device equipped with limit switches to detect predefined angular positions during controlled movements. The third stage involves analyzing the recorded timing data and evaluating an appropriate dynamic model to estimate the effective time constant of each servomotor.
 	
-	The experimental procedure is intended to provide repeatable measurements under defined operating conditions. Relevant variables include the commanded angular displacement, movement direction, supply voltage, and measured time intervals.
+	\linelabel{ln:methods-variables}The experimental procedure is intended to provide repeatable measurements under defined operating conditions. Relevant variables include the commanded angular displacement, movement direction, supply voltage, and measured time intervals.
 	These variables will be considered when evaluating differences in the dynamic response of the two servomotors.
 	
 	The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
 	However, only the two servomotors of the selected module will be evaluated experimentally in thisstudy.
 	
-	The main electrical, communication, and mechanical requirements of the SOFIA demonstrator are summarized in Table~\ref{tab:sofia_requirements}. These requirements are based on the system architecture and the established technical verification criteria \cite{sofia_architecture,technical_session}.
+	\linelabel{ln:requirements-intro}The main electrical, communication, and mechanical requirements of the SOFIA demonstrator are summarized in Table~\ref{tab:sofia_requirements}. These requirements are based on the system architecture and the established technical verification criteria \cite{sofia_architecture,technical_session}.
 	
 	\begin{table}[!t]
 		\centering
@@ -299,7 +299,7 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig2} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. Interconnectivity between boards is planned using JST-VH connectors.
+	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. Interconnectivity between boards is planned using JST-VH connectors.
 	
 	
 	\begin{figure}[!t]
@@ -310,11 +310,11 @@
 	\end{figure}
 	
 	\subsection{ESP32-C3 Technical Analysis}
-	The main technical specifications of the ESP32-C3 microcontroller are presented in Table~\ref{tab:esp32_specs}.
+	\linelabel{ln:spec-esp-intro}The main technical specifications of the ESP32-C3 microcontroller are presented in Table~\ref{tab:esp32_specs}.
 	
 	\begin{table}[!t]
 		\centering
-		\caption{ESP32-C3 Main Specifications and Datasheet Verification}
+		\caption{ESP32-C3 Main Specifications and Datasheet Verification \cite{esp32c3}}
 		\label{tab:esp32_specs}
 		\scriptsize
 		
@@ -366,15 +366,15 @@
 		\end{tabularx}
 	\end{table}
 	
-	\linelabel{ln:src-esp}Source: ESP32-C3 Datasheet, Espressif Systems. \cite{esp32c3}
+	% Source: ESP32-C3 Datasheet, Espressif Systems. (reference included in table caption)
 	
 	
 	\subsection{PCA9685 Technical Analysis}
-	The specifications of the PCA9685 PWM driver are summarized in Table~\ref{tab:pca9685_specs}.
+	\linelabel{ln:spec-pca-intro}The specifications of the PCA9685 PWM driver are summarized in Table~\ref{tab:pca9685_specs}.
 	
 	\begin{table}[!t]
 		\centering
-		\caption{PCA9685 Main Specifications and Datasheet Verification}
+		\caption{PCA9685 Main Specifications and Datasheet Verification \cite{pca9685}}
 		\label{tab:pca9685_specs}
 		\scriptsize
 		
@@ -426,15 +426,15 @@
 		\end{tabularx}
 	\end{table}
 	
-	\linelabel{ln:src-pca}Source: PCA9685 Datasheet, NXP. \cite{pca9685}
+	% Source: PCA9685 Datasheet, NXP. (reference included in table caption)
 	
 	
 	\subsection{MG90S Servo Technical Analysis}
-	The nominal operating characteristics of the MG90S servomotor are presented in Table~\ref{tab:mg90s_specs}.
+	\linelabel{ln:spec-mg-intro}The nominal operating characteristics of the MG90S servomotor are presented in Table~\ref{tab:mg90s_specs}.
 	
 	\begin{table}[!t]
 		\centering
-		\caption{MG90S Main Specifications and Datasheet Verification}
+		\caption{MG90S Main Specifications and Datasheet Verification \cite{mg90s}}
 		\label{tab:mg90s_specs}
 		\scriptsize
 		
@@ -486,11 +486,11 @@
 		\end{tabularx}
 	\end{table}
 	
-	\linelabel{ln:src-mg}Source: TowerPro MG90S documentation. \cite{mg90s}
+	% Source: TowerPro MG90S documentation. (reference included in table caption)
 	
 	
 	\subsection{Checklist Verification}
-	The preliminary component compatibility assessment is summarized in Table~\ref{tab:verification}.
+	\linelabel{ln:verification-intro}The preliminary component compatibility assessment is summarized in Table~\ref{tab:verification}.
 	
 	\begin{table}[!t]
 		\centering
@@ -523,7 +523,7 @@
 	\end{table}
 	
 	
-	\subsection{RS-485 Logic-Level Compatibility}
+	\subsection{RS-485 Logic-Level Compatibility}\label{sec:rs485_logic}
 	
 	To enable communication with an additional set of 16 SOFIA
 	modules, the proposed architecture incorporates the
@@ -540,7 +540,7 @@
 	the TTL485-V2.0 module. This voltage exceeds the
 	permitted input range of the ESP32-C3.
 	
-	To address this incompatibility, a resistive voltage
+	\linelabel{ln:rs485-divider}To address this incompatibility, a resistive voltage
 	divider was incorporated into the PCB schematic between
 	the TTL485-V2.0 TXD output and the ESP32-C3 UART receive
 	input. The divider consists of a 10 kOhm series resistor
@@ -557,7 +557,7 @@
 	assembled PCB remains pending.
 	
 	\subsection{Bill of Materials}
-	The components required for the SOFIA demonstrator,
+	\linelabel{ln:bom-intro}The components required for the SOFIA demonstrator,
 	including mechanical parts, actuators, and electronic
 	devices, are summarized in Table~\ref{tab:bom}.
 	
@@ -595,7 +595,7 @@
 			\midrule
 			-- & ESP32-C3 SuperMini & -- & 1 & Central MCU (Wi-Fi/BLE telemetry) & Espressif & Shanghai, CN \\
 			-- & PCA9685 Servo Driver & -- & 2 & 16-channel 12-bit $\text{I}^2\text{C}$ PWM driver board & NXP Semi & Eindhoven, NL \\
-			-- & MAX13487E TTL485 & -- & 1 & Half-duplex RS-485 transceiver (1/module) & Analog Devices & Wilmington, US \\
+			-- & MAX13487E TTL485 & -- & 1 & Controller-side half-duplex RS-485 transceiver & Analog Devices & Wilmington, US \\
 			-- & LED RGB & -- & 1 & System state status indicator LED & Mexbit & Local \\
 			-- & JST-VH Male & -- & 1 & High-current power PCB header & JTAREA & Local \\
 			-- & JST-VH Female & -- & 1 & High-current power harness plug & JTAREA & Local \\
@@ -686,14 +686,14 @@
 	SOFIA modules.
 	
 	\subsection{Servo Mechanical Time Constant Estimation}
-	The first-order dynamic model for the angular position response $\theta(t)$ to a step input is defined by:
+	\linelabel{ln:servo-model}The first-order dynamic model for the angular position response $\theta(t)$ to a step input is defined by:
 	\begin{equation}
 		\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}
 		\label{eq:servo_first_order}
 	\end{equation}
 	where $\theta_0$ represents the initial angular position, $\theta_f$ denotes the commanded step target angle, and $\tau_m$ is the servo mechanical time constant. 
 	
-	To characterize $\tau_m$, no-load step responses of $60^\circ$ will be applied while measuring the transient velocity profile. As noted in Table~\ref{tab:mg90s_specs}, the manufacturer datasheet \cite{mg90s} lists nominal angular speed ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$ and $0.08\text{ s}/60^\circ$ at $6.0\text{ V}$) but omits the explicit value for $\tau_m$, necessitating experimental identification.
+	\linelabel{ln:servo-protocol}To characterize $\tau_m$, no-load step responses of $60^\circ$ will be applied while measuring the transient velocity profile. As noted in Table~\ref{tab:mg90s_specs}, the manufacturer datasheet \cite{mg90s} lists nominal angular speed ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$ and $0.08\text{ s}/60^\circ$ at $6.0\text{ V}$) but omits the explicit value for $\tau_m$, necessitating experimental identification.
 	
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
@@ -757,8 +757,8 @@
 	\subsection{Servomotor Dynamic Response}
 	
 	\subsection{Time Constant Estimation}
-
-
+	
+	
 	\section{Discussion}
 	\label{sec:discussion}
 	

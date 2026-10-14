@@ -35,144 +35,152 @@
 \LabDSTpaper{"../Equipo 3 - segundo corte/Equipo 3 - segundo corte"}
 
 \begin{document}
-\LabDSTtitle{Second Cut}{Team 3}{Servo Characterization for the SOFIA Modular Kinetic
-	Surface}
-
-%-----------------------------------------------------------------
-\LabDSTsection{Acknowledgements}
-
-The authors thank the reviewers for their careful evaluation of the first-cut manuscript. <One sentence on how the comments improved the paper.> All comments were considered; the responses below follow the keys of the review report (R1.1, R1.2, \ldots). Line, section, figure, table, and equation numbers refer to the revised manuscript that accompanies this letter.
-
-\textbf{Main changes.} (i) <Main change 1> (Section~\ref{sec:intro}). (ii) <Main change 2>. (iii) <Main change 3>.
-
-% Matriz observacion-respuesta-cambio: se llena sola (compilar dos veces).
-\LabDSTsummary
-
-%-----------------------------------------------------------------
-\LabDSTreviewer{1}{Format, LaTeX and template compliance}
-% Insert this block after \LabDSTreviewer{1}{Format, LaTeX and template compliance}.
-% IMPORTANT: Replace each reviewer-comment placeholder with the exact original text.
-% Keep the original reviewer keys and statuses aligned with the actual review PDF.
-
-\LabDSTcomment{R1.1}{A}{Title and author block; Section~\ref{sec:intro}}
-{El título es “LAB-DST SOFIA O26”, que no describe el trabajo. No hay afiliación en \thanks. El apellido del profesor
-	aparece como “Gonzales Jimenez”, y el encabezado dice “Technical Datasheet of SOFIA Demonstrator Module”.}
-{We revised the manuscript title, professor name, institutional affiliation, and running header to follow the IEEE journal template and to reflect the scope of servo characterization. The revised title is ``Servo Characterization for the SOFIA Modular Kinetic Surface.''}
-
-\LabDSTcomment{R1.2}{A}{lines 182-195}
-{Las tablas de requisitos, de la ESP32-C3, del PCA9685, del MG90S y de verificación no tienen \ label y no se citan en el
-	texto; aparecen una tras otra sin párrafo que las introduzca. Las fuentes se colocan como líneas sueltas (“Source: ESP32-C3
-	Datasheet, Espressif Systems.”, Línea 105).}
-{We reviewed the table captions, labels, and in-text cross-references. The revised manuscript refers to the ESP32-C3 MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, PCA9685 MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, MG90S MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, and VERIFICATION SUMMARY using LaTeX labels and references rather than manually entered table numbers.}
-
-\LabDSTcomment{R1.3}{A}{Table~\ref{tab:benchmarking}}
-{En la tabla de benchmarking el texto de las columnas se encima (p. ej. “Continuous (non-discrete)” invade la columna
-	Modularity).}
-{We reformatted the benchmarking table to fit the IEEE two-column layout. The revised table uses a column-width-constrained tabularx environment, adjusted column spacing, and smaller text to improve readability and prevent horizontal overflow.}
-
-\LabDSTcomment{R1.4}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, Table~\ref{tab:sofia_requirements}, Table~\ref{tab:esp32_specs}, Table~\ref{tab:pca9685_specs}, Table~\ref{tab:mg90s_specs}, Table~\ref{tab:bom}, Fig.~\ref{fig1} and Algorithm~\ref{alg:sofia_tracking}}
-{Todos los flotantes usan [H] (paquete float).}
-{We revised the figure and table environments and their placement options to better follow IEEE formatting conventions. Wide comparative content uses a two-column table environment, while the remaining figures and tables use single-column floats as appropriate. Final placement remains subject to LaTeX's float algorithm.}
-
-\LabDSTcomment{R1.5}{P}{Sections~\ref{sec:results}, \ref{sec:discussion}, and \ref{sec:conclusions}}
-{Faltan las secciones Results, Discussion y Conclusions (al menos como encabezados) y todas las secciones de cierre.}
-{We added the Results, Discussion, and Conclusions sections to establish the required manuscript structure. The Results section also includes subsections for the experimental setup, servomotor dynamic response, and time-constant estimation. These sections are not yet populated with experimental findings, so the observation is only partially addressed. No experimental results are claimed at this stage.}
-
-\LabDSTcomment{R1.6}{A}{Manuscript preamble and document structure}
-{Al final del archivo hay una tabla comentada con valores de ejemplo (“Manufacturer Y, City, Country”, “Continuousrotation servo, rated torque T at V V”), copiada del ejemplo de la clase de BOM. En figures/ hay cinco imágenes (nop
-	(1..5).png) que no se usan, con espacios en el nombre.}
-{We cleaned up the manuscript structure and removed unused template material while retaining the IEEEtran journal document class and the packages required by the paper's tables, figures, equations, and algorithm.}
-
-% Insert the following block after \LabDSTreviewer{2}{Writing and structure}.
-
-
-
-
-%-----------------------------------------------------------------
-\LabDSTreviewer{2}{Writing and structure}
-
-\LabDSTcomment{R2.1}{A}{Abstract and IEEE Keywords}
-{El abstract y las palabras clave eran el texto guía de la plantilla; en esta versión quedaron vacíos.}
-{We rewrote the abstract to state the system context, the research problem, the proposed experimental methodology, and the scope of the work. The abstract now specifies that the complete SOFIA installation comprises 16 modules and 32 actuators, while the proposed experimental characterization is restricted to the two servomotors of one removed module. We also updated the IEEE Keywords to match the paper's technical focus.}
-
-\LabDSTcomment{R2.2}{A}{Section~\ref{sec:methods} and Table~\ref{tab:sofia_requirements}}
-{Materials and Methods se presenta como otro documento: “The objective of this document is to verify the compatibility
-	of the selected components” y “The document structure follows the LabDST documentation requirements for technical
-	datasheets”. Es la ficha técnica de la clase de hardware insertada tal cual.}
-{We reorganized the opening of Materials and Methods around three stages: hardware configuration, experimental measurement, and dynamic-response analysis. The revised text describes the use of a removable crown-shaped fixture with limit switches to detect angular reference positions and identifies relevant measurement conditions, including commanded angular displacement, direction of motion, supply voltage, and elapsed time. It also clarifies that only two servomotors from one SOFIA module will be characterized. However, the complete measurement sequence, number of repetitions, data-acquisition procedure, and model-identification criteria remain to be specified; therefore, this observation is partially addressed.}
-
-
-\LabDSTcomment{R2.3}{P}
-{Section~\ref{sec:methods}, Tables~\ref{tab:esp32_specs}, \ref{tab:pca9685_specs}, \ref{tab:mg90s_specs}, and \ref{tab:verification}}
-{Salvo un párrafo final, Materials and Methods está formada solo por tablas; las subsecciones A–F no tienen texto que explique qué muestra cada tabla ni qué se concluye.}
-{We added explanatory paragraphs to introduce the technical specification tables and clarify their purpose within the component selection process. The revised manuscript also includes a methodological overview and a justification of the selected technological architecture. However, further interpretation of the individual tables is still needed to fully address the reviewer's observation.}
-
-
-\LabDSTcomment{R2.4}{A}
-{lines 45-47}
-{La introducción afirma que “The SOFIA system integrates three main capabilities: automatic configuration and communication of modules through a Modbus network, characterization of the mechanical time constant of the servomotors...” como
-	si ya existieran, cuando son la propuesta del equipo y no se desarrollan en el texto}
-{We revised the Introduction to distinguish the proposed contribution from the implemented system capabilities. The scope of the study was narrowed to the experimental characterization of servomotor dynamic response. Automatic Modbus addressing is no longer presented as an implemented capability or as an experimental contribution of this work.}
-
-%-----------------------------------------------------------------
-\LabDSTreviewer{3}{Technical content}
-
-\LabDSTcomment{R3.1}{A}{Fig.~\ref{fig1}}
-{No hay arquitectura preliminar del sistema en figura: cómo se conectan la cámara y el PC, la ESP32-C3, los dos PCA9685, los 32 servos, los transceptores RS-485 y la alimentación}
-{Added a System Architecture Diagram Fig.~\ref{fig1} showing the host, ESP32-C3, dual PCA9685 drivers, 32 servos, RS-485 transceivers. For the servo mechanical time constant an external module will be designed for measuring every servo motor.}
-
-\LabDSTcomment{R3.2}{P}
-{Section~\ref{sec:methods}}
-{No hay matriz de riesgos, micropruebas ni protocolo experimental para las dos propuestas del diferenciador: el tiempo de configuración de red y la constante de máquina de los servos.}
-{The study scope was narrowed to experimental servomotor
-	characterization. A risk assessment and a proposed step-response
-	measurement protocol were added to Materials and Methods.
-	The protocol defines the angular input, measurement approach,
-	repetitions, and model-fitting criteria. Automatic Modbus
-	addressing and its configuration-time comparison are outside
-	the revised experimental scope. Experimental validation of
-	the proposed servo protocol remains pending.}
-
-\LabDSTcomment{R3.3}{A}{lines 193-199, Table~\ref{tab:mg90s_specs}, \eqref{eq:servo_first_order}}
-{La “constante de máquina” o “mechanical time constant” del servo no se define: no hay modelo, variables ni ecuaciones. El diferenciador promete compararla contra el “valor teórico” del MG90S, que la hoja de datos no reporta.}
-{Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}.}
-
-\LabDSTcomment{R3.4}{A}
-{lines 196-222}
-{El BOM incluye 16 transceptores “MAX13487E TTL485-V2.0”. Según su hoja de datos, ese transceptor opera con alimentación de 5 V (verifíquenlo), y su salida de recepción quedaría a niveles de 5 V en una entrada de la ESP32-C3, que no tolera 5 V, como ustedes mismos anotan en la Tabla IV.}
-{We added the subsection ``RS-485 Logic-Level Compatibility''to Materials and Methods, addressing the  incompatibility between the MAX13487E and the ESP32-C3. The subsection documents the electrical verification and the voltage-divider solution incorporated into the revised PCB schematic.}
-
-\LabDSTcomment{R3.5}{A}{Table~\ref{tab:esp32_specs}, Table~\ref{tab:pca9685_specs},Table~\ref{tab:mg90s_specs}}
-{Las fichas técnicas tienen solo parámetro, valor y verificación. No indican la versión ni la página de la hoja de datos, ni justifican el parámetro frente al requerimiento. El par del MG90S aparece como “1.8–2.2 kgf cm” sin decir a qué voltaje corresponde cada valor.}
-{Added source and justifications to the datasheets and updated the MG90S table to specify torque values at both 4.8V ($1.8\text{ kgf}\cdot\text{cm}$) and 6.0V ($2.2\text{ kgf}\cdot\text{cm}$).}
-
-\LabDSTcomment{R3.6}{A}{Table~\ref{tab:bom}}
-{El BOM no distingue la cantidad por unidad de la del sistema. Lista 1 ESP32-C3 y 2 PCA9685 pero 16 transceptores RS-485, sin explicar la arquitectura que eso implica. Usa “3D Printed” como fabricante, contiene elementos poco claros (“Pro3” de Tower Pro, “Axis 1 9mm x 9mm”, “Inser M3x5x4”) y lista conectores JST-PH, cuando la arquitectura de SOFIA usa JST-VH. Tampoco tiene descripción técnica ni localidad.}
-{Updated the BOM table to distinguish unit vs. system quantities, add descriptions for the parts, set the manufacturer to "In-house (LabDST, ITESO)", and added manufacturing origin.}
-
-\LabDSTcomment{R3.7}{A}{Table~\ref{tab:alt_actuation},Table~\ref{tab:alt_pwm},Table~\ref{tab:alt_processing}, Table~\ref{tab:alt_comm}}
-{La matriz de alternativas tiene un solo criterio por función, sin ponderación ni calificación.}
-{Updated the alternative matrix to include 1 table for every component stating features and limitations of the alternatives for the SOFIA.}
-
-\LabDSTcomment{R3.8}{A}{Algorithm~\ref{alg:sofia_tracking}}
-{El algoritmo usa r0 para la posición del módulo y ˆv para la dirección, en lugar de la notación del curso (r0,2, ˆr2,p). Además escribe atan2, asin y Clamp en itálica matemática, sin operatorname ni Call.}
-{Updated math operators to standard notation (atan2, arcsin, Clamp) and explicitly labeled the trajectory step as an Exponential Moving Average (EMA)}
-
-%-----------------------------------------------------------------
-\LabDSTreviewer{4}{D-Lab and state of the art}
-
-% Ejemplo NO ATENDIDA con justificacion (N): reconocer lo valido,
-% dar la razon tecnica y decir que se hizo a cambio y donde.
-\LabDSTcomment{R4.1}{A}{lines 193-199, Table~\ref{tab:mg90s_specs}, \eqref{eq:servo_first_order}}
-{El diferenciador propone asignación automática de direcciones Modbus y caracterización de la constante de máquina de cada servo. El artículo menciona ambas en la introducción, pero se enfoca en justificar la arquitectura electrónica (Línea 83) y no desarrolla ninguna de las dos.}
-{Formulated the first-order dynamic model $\theta(t) = \theta_f + (\theta_0 - \theta_f) e^{-t / \tau_m}$ \eqref{eq:servo_first_order} and clarified that the reference baseline is derived from the manufacturer's no-load speed specification ($0.10\text{ s}/60^\circ$ at $4.8\text{ V}$) Table~\ref{tab:mg90s_specs}. We simplified the article to only use the servo mechanical time constant as differentiation}
-
-\LabDSTcomment{R4.2}{A}{Section~\ref{sec:intro}}
-{No hay planteamiento formal del problema, pregunta de investigación ni objetivos.}
-{We added a formal Problem Statement, Research Question, and Objectives in natural narrative format at the end of the Introduction (Section~\ref{sec:intro}), addressing per-servo time-constant estimation and actuation synchronization. The revised text now reads:}
-\LabDSTquote{Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
-To address this limitation, this work investigates the following research question: Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?
-This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.}
-
-
+	\LabDSTtitle{Second Cut}{Team 3}{Servo Characterization for the SOFIA Modular Kinetic
+		Surface}
+	
+	%-----------------------------------------------------------------
+	\LabDSTsection{Acknowledgements}
+	
+	The authors thank the reviewers for their careful evaluation of the first-cut manuscript. Their comments helped clarify the research scope, experimental methodology, and electrical compatibility. All comments were considered; the responses below follow the keys of the review report (R1.1, R1.2, \ldots). Line, section, figure, table, and equation numbers refer to the revised manuscript that accompanies this letter.
+	
+	\textbf{Main changes.} (i) Refined problem statement and objectives (Section~\ref{sec:intro}). (ii) Expanded characterization methodology (Section~\ref{sec:methods}). (iii) Documented RS-485 voltage-level adaptation (Section~\ref{sec:rs485_logic}).
+	
+	\LabDSTsummary
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{1}{Format, LaTeX and template compliance}
+	
+	\LabDSTcomment{R1.1}{A}{Title, author block, and running header}
+	{El título es “LAB-DST SOFIA O26”, que no describe el trabajo. No hay afiliación en \texttt{\string\thanks}. El
+		apellido del profesor aparece como “Gonzales Jimenez”, y el encabezado dice “Technical Datasheet of SOFIA Demonstrator Module”.}
+	{We revised the manuscript title, author information, institutional affiliation, and running header to reflect the servo-characterization focus and comply with the IEEE journal format.}
+	
+	\LabDSTcomment{R1.2}{A}{\rln{requirements-intro}, \rln{spec-esp-intro}, \rln{spec-pca-intro}, \rln{spec-mg-intro}, and \rln{verification-intro}}
+	{Las tablas de requisitos, de la ESP32-C3, del PCA9685, del MG90S y de verificación no tienen
+		\texttt{\string\label} y no se citan en el texto; aparecen una tras otra sin párrafo que las
+		introduzca. Las fuentes se colocan como líneas sueltas (“Source: ESP32-C3 Datasheet, Espressif Systems.”, Línea 105).}
+	{We added labels and in-text references for the requirements and technical-verification tables, introduced each table in the surrounding text, and moved the component-source citations into the corresponding captions.}
+	
+	\LabDSTcomment{R1.3}{A}{Table~\ref{tab:benchmarking}}
+	{En la tabla de benchmarking el texto de las columnas se encima
+		(p. ej. “Continuous (non-discrete)” invade la columna Modularity).}
+	{We reformatted the benchmarking table using column-width-constrained tabularx columns and smaller text to reduce column overflow.}
+	
+	\LabDSTcomment{R1.4}{A}{Tables~\ref{tab:related_work_matrix}, \ref{tab:benchmarking}, and \ref{tab:sofia_requirements}; Fig.~\ref{fig1}; Algorithm~\ref{alg:sofia_tracking}}
+	{Todos los flotantes usan [H] (paquete float).}
+	{The figures, tables, and algorithm now use IEEE-style float placement options instead of forced [H] placement.}
+	
+	\LabDSTcomment{R1.5}{P}{Sections~\ref{sec:results}, \ref{sec:discussion}, and \ref{sec:conclusions}}
+	{Faltan las secciones Results, Discussion y Conclusions (al menos como encabezados) y todas las secciones de cierre.}
+	{We added the Results, Discussion, and Conclusions headings, including preliminary experimental subsections. The experimental findings and required closing statements are not yet included.}
+	
+	\LabDSTcomment{R1.6}{P}{Table~\ref{tab:bom} and manuscript source}
+	{Al final del archivo hay una tabla comentada con valores de ejemplo (“Manufacturer Y, City, Country”, “Continuous-rotation servo, rated torque
+		$\tau$ at V V”), copiada del ejemplo de la clase de BOM. En figures/ hay cinco imágenes (nop (1..5).png) que no se usan, con espacios en el nombre.}
+	{The unused commented BOM example is absent from the revised manuscript. The separate figures directory was not available for verification, so removal of unused images remains unconfirmed.}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{2}{Writing and structure}
+	
+	\LabDSTcomment{R2.1}{A}{\rln{abstract} and \rln{keywords}}
+	{El abstract y las palabras clave eran el texto guía de la plantilla; en esta versión quedaron vacíos.}
+	{We replaced the template text with a preliminary research abstract and six IEEE keywords, focusing on servomotor dynamic-response characterization in one SOFIA module.}
+	
+	\LabDSTcomment{R2.2}{A}{Section~\ref{sec:methods}, \rln{materials-intro}, and \rln{hardware-config}}
+	{Materials and Methods se presenta como otro documento: “The objective of this document is to verify
+		the compatibility of the selected components” y “The document structure follows the LabDST
+		documentation requirements for technical datasheets”. Es la ficha técnica de la clase de hardware insertada tal cual.}
+	{We rewrote the opening of Materials and Methods as part of the SOFIA research article, presenting the system, its experimental scope, and the proposed stages of hardware configuration, measurement, and response analysis instead of a standalone technical datasheet.}
+	
+	
+	\LabDSTcomment{R2.3}{P}
+	{\rln{spec-esp-intro}, \rln{spec-pca-intro}, \rln{spec-mg-intro}, and \rln{verification-intro}}
+	{Salvo un párrafo final, Materials and Methods está formada solo por tablas; las subsecciones A–F no tienen texto que explique qué muestra cada tabla ni qué se concluye.}
+	{Explanatory paragraphs now introduce the main specification and verification tables in Materials and Methods. Further interpretation of individual compliance findings is still needed.}
+	
+	
+	\LabDSTcomment{R2.4}{A}{\rln{intro-cap} and \rln{focus}}
+	{La introducción afirma que “The SOFIA system integrates three main capabilities: automatic configuration and communication of modules through a Modbus network,
+		characterization of the mechanical time constant of the servomotors...” como si ya existieran, cuando son la propuesta del equipo y no se desarrollan en el texto.}
+	{We revised the Introduction to distinguish proposed research from implemented system functions. The scope is now focused on servomotor dynamic-response characterization, while automatic Modbus addressing is not claimed as a research contribution.}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{3}{Technical content}
+	
+	\LabDSTcomment{R3.1}{A}{Fig.~\ref{fig1} and \rln{sim_architecture}}
+	{No hay arquitectura preliminar del sistema en figura: cómo se conectan la cámara y el PC, la ESP32-C3, los dos PCA9685, los 32 servos, los transceptores RS-485 y la alimentación.}
+	{We added a preliminary SOFIA system architecture diagram and linked its description to Fig.~\ref{fig1}, covering the host, embedded controller, PWM drivers, and servomotor connections.}
+	
+	\LabDSTcomment{R3.2}{P}{\rln{hardware-config}, \rln{methods-variables}, and \eqref{eq:servo_first_order}}
+	{No hay matriz de riesgos, micropruebas ni protocolo experimental para las dos propuestas del diferenciador: el tiempo de configuración de red y la constante de máquina de los servos.}
+	{We narrowed the experimental scope to
+		servomotor characterization and
+		described the proposed fixture,
+		measured variables, and first-order
+		response model. A complete risk matrix,
+		detailed micro-test protocol, and
+		experimental validation remain pending;
+		automatic Modbus addressing is outside the revised scope.}
+	
+	\LabDSTcomment{R3.3}{A}{\rln{servo-model}, Table~\ref{tab:mg90s_specs}, and \eqref{eq:servo_first_order}}
+	{La “constante de máquina” o “mechanical time constant” del servo no se define: no hay modelo, variables ni ecuaciones. El diferenciador promete compararla contra el “valor teórico” del MG90S, que la hoja de datos no reporta.}
+	{We introduced a first-order position-response model defining $\theta_0$, $\theta_f$, and $\tau_m$. The MG90S datasheet provides no-load angular-speed specifications, not a manufacturer-reported mechanical time constant; experimental estimation remains necessary.}
+	
+	\LabDSTcomment{R3.4}{A}
+	{Section~\ref{sec:rs485_logic} and \rln{rs485-divider}}
+	{El BOM incluye 16 transceptores “MAX13487E TTL485-V2.0”. Según su hoja de datos, ese transceptor opera con alimentación de 5 V (verifíquenlo), y su salida de recepción quedaría a niveles de 5 V en una entrada de la ESP32-C3, que no tolera 5 V, como ustedes mismos anotan en la Tabla IV.}
+	{We added the subsection ``RS-485 Logic-Level Compatibility'' to Materials and Methods, documenting the measured logic-level incompatibility and the resistive voltage divider incorporated into the revised PCB schematic. Validation of the assembled PCB remains pending.}
+	
+	\LabDSTcomment{R3.5}{A}{Tables~\ref{tab:esp32_specs}, \ref{tab:pca9685_specs}, and \ref{tab:mg90s_specs}}
+	{Las fichas técnicas tienen solo parámetro, valor y verificación. No indican la versión ni la página de la hoja de datos, ni justifican el parámetro frente al requerimiento. El par del MG90S aparece como “1.8–2.2 kgf cm” sin decir a qué voltaje corresponde cada valor.}
+	{We expanded the ESP32-C3, PCA9685, and MG90S specification tables with source information and parameter justifications, and specified the MG90S torque values at their corresponding supply voltages.}
+	
+	\LabDSTcomment{R3.6}{P}{Table~\ref{tab:bom} and \rln{bom-intro}}
+	{El BOM no distingue la cantidad por unidad de la del sistema. Lista 1 ESP32-C3 y 2 PCA9685 pero 16 transceptores RS-485, sin explicar la arquitectura que eso implica. Usa “3D Printed” como fabricante, contiene elementos poco claros (“Pro3” de Tower Pro, “Axis 1 9mm x 9mm”, “Inser M3x5x4”) y lista conectores JST-PH, cuando la arquitectura de SOFIA usa JST-VH. Tampoco tiene descripción técnica ni localidad.}
+	{We revised the BOM to distinguish quantities per unit and per system and to include technical descriptions, manufacturers, and origins. The listed transceiver is identified as controller-side; a complete count for future distributed modules and some component descriptions still require clarification.}
+	
+	\LabDSTcomment{R3.7}{P}{Tables~\ref{tab:alt_actuation}, \ref{tab:alt_pwm}, \ref{tab:alt_processing}, and \ref{tab:alt_comm}}
+	{La matriz de alternativas tiene un solo criterio por función, sin ponderación ni calificación.}
+	{We expanded the alternative comparison into separate tables for actuation, PWM generation, processing, and communication. Weighted criteria and numerical ratings have not yet been included.}
+	
+	\LabDSTcomment{R3.8}{P}{Algorithm~\ref{alg:sofia_tracking} and \rln{alg}}
+	{El algoritmo usa $r_0$ para la posición del módulo y $\hat{v}$ para la dirección, en lugar de la notación del curso ($r_{0,2}$ , $\hat{r}_{2,p}$ ). Además escribe atan2, asin y Clamp en itálica matemática, sin \texttt{\string\operatorname} ni \texttt{\string\Call}.}
+	{We updated the pseudocode to use the course coordinate notation, standard mathematical operators, and the ClampAngle call, and identified the smoothing update as an EMA. A specific numerical smoothing-factor setting is not yet reported.}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{4}{D-Lab and state of the art}
+	
+	\LabDSTcomment{R4.1}{P}{\rln{focus}, \rln{hardware-config}, and \eqref{eq:servo_first_order}}
+	{El diferenciador propone asignación automática de direcciones Modbus y caracterización de la constante de máquina de cada servo. El artículo menciona ambas en la introducción, pero se enfoca en justificar la arquitectura electrónica (Línea 83) y no desarrolla ninguna de las dos.}
+	{We narrowed the research contribution
+		to experimental servomotor
+		characterization and documented a
+		proposed first-order model and
+		methodology. Automatic Modbus
+		addressing is outside the revised
+		scope; experimental time-constant identification has not yet been completed.}
+	
+	\LabDSTcomment{R4.2}{A}{Section~\ref{sec:intro} and \rlns{problem-start}{Objectives}}
+	{No hay planteamiento formal del problema, pregunta de investigación ni objetivos.}
+	{We added a problem statement, research question, and three objectives to the Introduction, addressing individual servomotor characterization and the proposed evaluation of actuator synchronization.}
+	\LabDSTquote{Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
+		To address this limitation, this work investigates the following research question: Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?
+		This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.}
+	
+	
+	\LabDSTcomment{R4.3}{P}
+	{\rln{opp} and \rln{gap}}
+	{El demostrador se describe por su composición (16 unidades, 32 servos, una ESP32-C3 y dos PCA9685), pero no hay despiece funcional, diagrama de contexto, árbol de problemas ni bitácora de observaciones. Las oportunidades se derivan de la literatura, no de observar el demostrador.}
+	{We expanded the description of SOFIA and the functional opportunities identified in the Introduction. A functional breakdown matrix, an observation log, and an evidence-based Discover analysis of the physical demonstrator are still pending.}
+	
+	\LabDSTcomment{R4.4}{P}
+	{\rln{intro1} and Fig.~\ref{fig2}}
+	{Se describe un arreglo “two-dimensional 4 $\times$ 4”; la simulación muestra columnas escalonadas.}
+	{We replaced the earlier 4-by-4 wording with a two-dimensional honeycomb description and included a simulation figure. The precise stepped arrangement and center-to-center dimensions still require verification against the Sofia003 CAD model.}
+	
+	\LabDSTcomment{R4.5}{P}
+	{Table~\ref{tab:benchmarking}}
+	{El benchmarking usa criterios cualitativos, y la fila de SOFIA se califica “High” en modularidad sin distinguir entre meta de diseño y resultado medido.}
+	{We explicitly identify the SOFIA benchmarking entry as proposed rather than measured. However, quantitative benchmarking criteria and measured values have not yet been added.}
+	
 \end{document}
