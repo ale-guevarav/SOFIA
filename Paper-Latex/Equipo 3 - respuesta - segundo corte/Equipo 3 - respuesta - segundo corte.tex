@@ -32,7 +32,7 @@
 % Borren los comentarios <...> y todo lo que este entre < >.
 %=================================================================
 \documentclass{LabDSTresponse}
-\LabDSTpaper{"../Equipo 3 - segundo corte/Equipo 3 - primer corte"}
+\LabDSTpaper{"../Equipo 3 - segundo corte/Equipo 3 - segundo corte"}
 
 \begin{document}
 \LabDSTtitle{Second Cut}{Team 3}{Servo Characterization for the SOFIA Modular Kinetic
@@ -57,20 +57,20 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 \LabDSTcomment{R1.1}{A}{Title and author block; Section~\ref{sec:intro}}
 {El título es “LAB-DST SOFIA O26”, que no describe el trabajo. No hay afiliación en \thanks. El apellido del profesor
 	aparece como “Gonzales Jimenez”, y el encabezado dice “Technical Datasheet of SOFIA Demonstrator Module”.}
-{We revised the manuscript title, author information, institutional affiliation, and running header to follow the IEEE journal template and to reflect the scope of servo characterization. The revised title is ``Servo Characterization for the SOFIA Modular Kinetic Surface.''}
+{We revised the manuscript title, professor name, institutional affiliation, and running header to follow the IEEE journal template and to reflect the scope of servo characterization. The revised title is ``Servo Characterization for the SOFIA Modular Kinetic Surface.''}
 
-\LabDSTcomment{R1.2}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, and Table~\ref{tab:sofia_requirements}}
-{Las tablas de requisitos, de la ESP32-C3, del PCA9685, del MG90S y de verificación no tienen \label y no se citan en el
+\LabDSTcomment{R1.2}{A}{lines 182-195}
+{Las tablas de requisitos, de la ESP32-C3, del PCA9685, del MG90S y de verificación no tienen \ label y no se citan en el
 	texto; aparecen una tras otra sin párrafo que las introduzca. Las fuentes se colocan como líneas sueltas (“Source: ESP32-C3
 	Datasheet, Espressif Systems.”, Línea 105).}
-{We reviewed the table captions, labels, and in-text cross-references. The revised manuscript refers to the comparative matrix, benchmarking table, and system requirements using LaTeX labels and references rather than manually entered table numbers.}
+{We reviewed the table captions, labels, and in-text cross-references. The revised manuscript refers to the ESP32-C3 MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, PCA9685 MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, MG90S MAIN SPECIFICATIONS AND DATASHEET VERIFICATION, and VERIFICATION SUMMARY using LaTeX labels and references rather than manually entered table numbers.}
 
 \LabDSTcomment{R1.3}{A}{Table~\ref{tab:benchmarking}}
 {En la tabla de benchmarking el texto de las columnas se encima (p. ej. “Continuous (non-discrete)” invade la columna
 	Modularity).}
 {We reformatted the benchmarking table to fit the IEEE two-column layout. The revised table uses a column-width-constrained tabularx environment, adjusted column spacing, and smaller text to improve readability and prevent horizontal overflow.}
 
-\LabDSTcomment{R1.4}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, and Fig.~\ref{fig1}}
+\LabDSTcomment{R1.4}{A}{Table~\ref{tab:related_work_matrix}, Table~\ref{tab:benchmarking}, Table~\ref{tab:sofia_requirements}, Table~\ref{tab:esp32_specs}, Table~\ref{tab:pca9685_specs}, Table~\ref{tab:mg90s_specs}, Table~\ref{tab:bom}, Fig.~\ref{fig1} and Algorithm~\ref{alg:sofia_tracking}}
 {Todos los flotantes usan [H] (paquete float).}
 {We revised the figure and table environments and their placement options to better follow IEEE formatting conventions. Wide comparative content uses a two-column table environment, while the remaining figures and tables use single-column floats as appropriate. Final placement remains subject to LaTeX's float algorithm.}
 
@@ -95,18 +95,24 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {El abstract y las palabras clave eran el texto guía de la plantilla; en esta versión quedaron vacíos.}
 {We rewrote the abstract to state the system context, the research problem, the proposed experimental methodology, and the scope of the work. The abstract now specifies that the complete SOFIA installation comprises 16 modules and 32 actuators, while the proposed experimental characterization is restricted to the two servomotors of one removed module. We also updated the IEEE Keywords to match the paper's technical focus.}
 
-\LabDSTcomment{R2.2}{P}{Section~\ref{sec:methods} and Table~\ref{tab:sofia_requirements}}
+\LabDSTcomment{R2.2}{A}{Section~\ref{sec:methods} and Table~\ref{tab:sofia_requirements}}
 {Materials and Methods se presenta como otro documento: “The objective of this document is to verify the compatibility
 	of the selected components” y “The document structure follows the LabDST documentation requirements for technical
 	datasheets”. Es la ficha técnica de la clase de hardware insertada tal cual.}
 {We reorganized the opening of Materials and Methods around three stages: hardware configuration, experimental measurement, and dynamic-response analysis. The revised text describes the use of a removable crown-shaped fixture with limit switches to detect angular reference positions and identifies relevant measurement conditions, including commanded angular displacement, direction of motion, supply voltage, and elapsed time. It also clarifies that only two servomotors from one SOFIA module will be characterized. However, the complete measurement sequence, number of repetitions, data-acquisition procedure, and model-identification criteria remain to be specified; therefore, this observation is partially addressed.}
 
 
-% Ejemplo con el texto NUEVO citado con \LabDSTquote.
-\LabDSTcomment{R2.4}{A}{lines 36-47}
+\LabDSTcomment{R2.3}{P}
+{Section~\ref{sec:methods}, Tables~\ref{tab:esp32_specs}, \ref{tab:pca9685_specs}, \ref{tab:mg90s_specs}, and \ref{tab:verification}}
 {Salvo un párrafo final, Materials and Methods está formada solo por tablas; las subsecciones A–F no tienen texto que explique qué muestra cada tabla ni qué se concluye.}
-{We rewrote the introduction and all mentions of servo characterization to explicitly state that it is the proposed contribution of this work. We simplified the work to only have the servo characterization as our only differentiation. (lines 36-47). The revised text now reads:
-\LabDSTquote{This work proposes an experimental method to estimate individual servo time constraints with a mechanical solution}}
+{We added explanatory paragraphs to introduce the technical specification tables and clarify their purpose within the component selection process. The revised manuscript also includes a methodological overview and a justification of the selected technological architecture. However, further interpretation of the individual tables is still needed to fully address the reviewer's observation.}
+
+
+\LabDSTcomment{R2.4}{A}
+{lines 45-47}
+{La introducción afirma que “The SOFIA system integrates three main capabilities: automatic configuration and communication of modules through a Modbus network, characterization of the mechanical time constant of the servomotors...” como
+	si ya existieran, cuando son la propuesta del equipo y no se desarrollan en el texto}
+{We revised the Introduction to distinguish the proposed contribution from the implemented system capabilities. The scope of the study was narrowed to the experimental characterization of servomotor dynamic response. Automatic Modbus addressing is no longer presented as an implemented capability or as an experimental contribution of this work.}
 
 %-----------------------------------------------------------------
 \LabDSTreviewer{3}{Technical content}
@@ -131,7 +137,7 @@ The authors thank the reviewers for their careful evaluation of the first-cut ma
 {La matriz de alternativas tiene un solo criterio por función, sin ponderación ni calificación.}
 {Updated the alternative matrix to include 1 table for every component stating features and limitations of the alternatives for the SOFIA.}
 
-\LabDSTcomment{R3.8}{A}{Table~\ref{alg:sofia_tracking}}
+\LabDSTcomment{R3.8}{A}{Algorithm~\ref{alg:sofia_tracking}}
 {El algoritmo usa r0 para la posición del módulo y ˆv para la dirección, en lugar de la notación del curso (r0,2, ˆr2,p). Además escribe atan2, asin y Clamp en itálica matemática, sin operatorname ni Call.}
 {Updated math operators to standard notation (atan2, arcsin, Clamp) and explicitly labeled the trajectory step as an Exponential Moving Average (EMA)}
 
