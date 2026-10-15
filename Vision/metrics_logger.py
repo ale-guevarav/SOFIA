@@ -27,6 +27,10 @@ Controles en la ventana de OpenCV:
 
 Mientras una prueba está activa aparece "TESTING: <gesto>"
 en rojo parpadeando del lado izquierdo.
+
+Con pause() / resume() el registro se detiene y se reanuda.
+main.py solo lo mantiene activo en modo TEST, así las métricas
+no se mezclan con los modos JUEGO y TRACKING.
 """
 
 import json
@@ -136,6 +140,7 @@ class PerformanceMetrics:
         trial_timeout=6.0,
         countdown=2.0,
         result_display_time=1.5,
+        start_active=True,
     ):
 
         # -----------------------------
@@ -163,6 +168,12 @@ class PerformanceMetrics:
 
         self.session_start_dt = datetime.now()
         self.session_start = time.perf_counter()
+
+        # Solo se mide mientras el registro está activo
+        # (en main.py: solo en modo TEST)
+        self._active = start_active
+        self._active_since = self.session_start if start_active else None
+        self._active_time = 0.0
 
         # -----------------------------
         # MÉTRICAS POR FRAME
@@ -231,11 +242,74 @@ class PerformanceMetrics:
 
 
     # =============================================
+    # PAUSAR / REANUDAR (cambio de modo)
+    # =============================================
+
+    def pause(self):
+        """
+        Detiene el registro. Cancela la prueba en curso sin
+        guardarla y evita que el tiempo pasado en otros modos
+        cuente como un frame lento.
+        """
+
+        if not self._active:
+            return
+
+        now = time.perf_counter()
+
+        self._active_time += now - self._active_since
+        self._active = False
+        self._active_since = None
+
+        if self.state in ("countdown", "active"):
+            print("[METRICAS] Prueba cancelada (cambio de modo)")
+
+        self.state = "idle"
+        self.current_expected = None
+
+        self._frame_start = None
+        self._last_frame_end = None
+        self._previous_gesture = NO_DETECTION
+
+
+    def resume(self):
+        """Reanuda el registro (al entrar a modo TEST)."""
+
+        if self._active:
+            return
+
+        now = time.perf_counter()
+
+        self._active = True
+        self._active_since = now
+
+        # Empezar la línea de tiempo desde cero
+        # para no mezclar el tiempo en pausa
+        self._bucket_start = now
+        self._bucket_frames = 0
+        self._bucket_processing = []
+        self._last_frame_end = None
+
+
+    def active_duration(self):
+        """Segundos totales que el registro estuvo activo."""
+
+        if self._active:
+            return self._active_time + (time.perf_counter() - self._active_since)
+
+        return self._active_time
+
+
+    # =============================================
     # MEDICIÓN POR FRAME
     # =============================================
 
     def begin_frame(self):
         """Llamar justo después de leer el frame de la cámara."""
+
+        if not self._active:
+            self._frame_start = None
+            return
 
         self._frame_start = time.perf_counter()
         self._current_stages = {}
@@ -542,7 +616,8 @@ class PerformanceMetrics:
 
     def build_summary(self):
 
-        duration = time.perf_counter() - self.session_start
+        # Solo el tiempo en que el registro estuvo activo
+        duration = self.active_duration()
 
         # -----------------------------
         # FPS

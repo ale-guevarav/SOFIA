@@ -599,6 +599,7 @@
 			-- & LED RGB & -- & 1 & System state status indicator LED & Mexbit & Local \\
 			-- & JST-VH Male & -- & 1 & High-current power PCB header & JTAREA & Local \\
 			-- & JST-VH Female & -- & 1 & High-current power harness plug & JTAREA & Local \\
+			-- & R1--R5 (Resistors) & -- & 5 & RGB LED: 470 $\Omega$ (R1), 330 $\Omega$ (R2--R3); RS-485 divider: 10 k$\Omega$ (R4), 18 k$\Omega$ (R5) & Mexbit & Local \\
 			
 			\bottomrule
 		\end{tabularx}
@@ -842,6 +843,82 @@
 	\linelabel{ln:chal-ataque-new}The gesture was consequently redefined using an approximately W-shaped arm configuration, with elbow angles between 35$^\circ$ and 125$^\circ$ and both wrists positioned above their respective elbows. The depth restriction and the requirement to keep the elbows close to the torso were removed. Additionally, the hands were oriented outward rather than directly toward the camera, making the pistol-shaped finger configurations easier to observe. Qualitative testing of this revised gesture produced satisfactory recognition, although its performance across different users has not been quantitatively evaluated.
 	
 	\linelabel{ln:chal-software}Finally, software organization introduced additional integration challenges. During development, the computer vision files were reorganized into a dedicated \texttt{Vision/} directory to improve modularity and maintainability. This change produced an import error involving the local performance metrics module. The import path was corrected, and successful execution of the application was subsequently confirmed. The final availability and integration of the metrics logging files, however, still require verification.
+	
+	\subsection{PCB Design and Electronic Integration}
+	\label{subsec:pcb_design}
+	
+	A custom printed circuit board (PCB) was designed
+	to integrate the electronic control and communication
+	modules of the SOFIA kinetic surface. The PCB
+	functions as a carrier board, providing mechanical
+	mounting and electrical interconnections for the
+	ESP32-C3 SuperMini microcontroller, two PCA9685
+	PWM driver modules, and the MAX13487E RS-485
+	transceiver interfaces.
+	
+	The ESP32-C3 serves as the main controller,
+	communicating with the PCA9685 modules through
+	the I2C interface. Each PCA9685 provides 16 PWM
+	channels, allowing the proposed architecture to
+	control up to 32 servomotors. The RS-485 interfaces
+	enable differential serial communication with
+	additional SOFIA modules.
+	
+	The PCB incorporates JST-PH connectors with a
+	2.0 mm pitch, selected to meet the physical
+	interconnection requirements of the system.
+	Dedicated mounting positions and electrical
+	connections are also provided for the control
+	modules, communication interfaces, and an RGB LED.
+	
+	To address the logic-level incompatibility between
+	the 5 V MAX13487E transceiver and the 3.3 V
+	ESP32-C3 microcontroller, a resistive voltage
+	divider was incorporated into the PCB schematic.
+	The circuit consists of a 10 kOhm resistor (R4)
+	and an 18 kOhm resistor (R5), reducing a nominal
+	5 V receiver-output signal to approximately
+	3.21 V at the ESP32-C3 UART input. The electrical
+	compatibility analysis is detailed in the
+	RS-485 Logic-Level Compatibility subsection
+	of Materials and Methods.
+	
+	The electronic schematic is presented in
+	Fig.~\ref{fig:sofia_schematic}, illustrating the
+	connections between the microcontroller, PWM
+	drivers, communication interfaces, and peripheral
+	components.
+	
+	\begin{figure*}[!t]
+		\centering
+		\includegraphics[width=0.95\textwidth]{figures/sofia_pcb_schematic.png}
+		\caption{Electronic schematic of the SOFIA carrier PCB,
+			showing the ESP32-C3 microcontroller, PCA9685 PWM
+			driver interfaces, MAX13487E RS-485 connections,
+			and peripheral circuitry.}
+		\label{fig:sofia_schematic}
+	\end{figure*}
+	
+	Based on the electronic schematic, a two-layer PCB
+	layout was developed to organize component
+	placement and signal routing. The resulting
+	design, shown in Fig.~\ref{fig:sofia_pcb},
+	provides a compact integration platform for
+	the electronic modules and their connections.
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=\columnwidth]{figures/sofia_pcb.png}
+		\caption{Completed two-layer PCB layout developed for the SOFIA electronic control system.}
+		\label{fig:sofia_pcb}
+	\end{figure}
+	
+	The PCB schematic and layout have been completed
+	and are ready for the manufacturing stage.
+	However, fabrication, assembly, and experimental
+	validation of the PCB remain pending.
+	
+	
 	
 	\section{Results}
 	\label{sec:results}
