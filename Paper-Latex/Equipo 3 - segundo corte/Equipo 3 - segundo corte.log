@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 OCT 2026 22:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  15 OCT 2026 17:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -922,45 +922,50 @@ LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 7
 (C:\Users\10002\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 3179) in paragraph at lines 758--759
-\OT1/ptm/m/n/10 ages cam-era cap-ture, model ex-e-cu-tion, ges-ture eval-u-a-
+Underfull \hbox (badness 1783) in paragraph at lines 758--759
+[]  \OT1/ptm/m/n/10 Or-ga-nized within the \OT1/pcr/m/n/10 Vision/ \OT1/ptm/m/n
+/10 di-rec-tory, the mod-u-
  []
 
 
-Underfull \hbox (badness 5022) in paragraph at lines 758--759
-\OT1/pcr/m/n/10 geometry_utils.py \OT1/ptm/m/n/10 for ge-o-met-ric cal-cu-la-ti
-ons and
+Underfull \hbox (badness 4013) in paragraph at lines 758--759
+\OT1/pcr/m/n/10 hand_detector.py\OT1/ptm/m/n/10 , while \OT1/pcr/m/n/10 gesture
+_detector.py
  []
 
 [5 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> <./figures/Sim_c.jpeg> <./figu
-res/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/Sim_f.jpeg>] [6] [7]
-<figures/sofia_pcb_schematic.png, id=53, 966.61125pt x 517.935pt>
+res/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/Sim_f.jpeg>]
+Underfull \hbox (badness 2057) in paragraph at lines 819--820
+[]  \OT1/ptm/m/n/10 Dur-ing de-vel-op-ment, chal-lenges in land-mark sta-bil-it
+y,
+ []
+
+
+Underfull \hbox (badness 2401) in paragraph at lines 819--820
+\OT1/ptm/m/n/10 ges-ture over-lap, and soft-ware in-te-gra-tion prompted tar-
+ []
+
+[6]
+<figures/sofia_pcb_schematic.png, id=49, 966.61125pt x 517.935pt>
 File: figures/sofia_pcb_schematic.png Graphic file (type png)
 <use figures/sofia_pcb_schematic.png>
-Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 89
-4.
+Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 87
+1.
 (pdftex.def)             Requested size: 490.19843pt x 262.65758pt.
-<figures/sofia_pcb.png, id=54, 640.64343pt x 578.16pt>
+<figures/sofia_pcb.png, id=50, 640.64343pt x 578.16pt>
 File: figures/sofia_pcb.png Graphic file (type png)
 <use figures/sofia_pcb.png>
-Package pdftex.def Info: figures/sofia_pcb.png  used on input line 911.
+Package pdftex.def Info: figures/sofia_pcb.png  used on input line 888.
 (pdftex.def)             Requested size: 252.0pt x 227.4135pt.
-
-Underfull \hbox (badness 1596) in paragraph at lines 938--939
+ [7 <./figures/sofia_pcb_schematic.png> <./figures/sofia_pcb.png>]
+Underfull \hbox (badness 1596) in paragraph at lines 915--916
 []  \OT1/ptm/m/n/10 Func-tional tests con-firmed the recog-ni-tion of INI-CIO
  []
 
 
-Underfull \hbox (badness 10000) in alignment at lines 966--966
+Underfull \hbox (badness 10000) in alignment at lines 943--943
 [][][][][] 
  []
-
-[8]
-Underfull \vbox (badness 1454) has occurred while \output is active []
-
-
-Underfull \vbox (badness 1454) has occurred while \output is active []
-
 
 (Equipo 3 - segundo corte.bbl
 Underfull \hbox (badness 2142) in paragraph at lines 66--68
@@ -968,20 +973,17 @@ Underfull \hbox (badness 2142) in paragraph at lines 66--68
 con-texto,
  []
 
-[9 <./figures/sofia_pcb_schematic.png> <./figures/sofia_pcb.png>]) [10
-
-]
-(Equipo 3 - segundo corte.aux)
+) [8] (Equipo 3 - segundo corte.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7039 strings out of 467501
- 120534 string characters out of 5408550
- 598193 words of memory out of 5000000
- 36168 multiletter control sequences out of 15000+600000
+ 7025 strings out of 467501
+ 120280 string characters out of 5408550
+ 598009 words of memory out of 5000000
+ 36154 multiletter control sequences out of 15000+600000
  674884 words of font info for 124 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,13n,79p,1154b,514s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1007,9 +1009,9 @@ ograms/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/10002/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/10002/AppData/Local/P
 rograms/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/10002/AppData/Local/P
 rograms/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - segundo corte.pdf" (10 pages, 725436 bytes).
+Output written on "Equipo 3 - segundo corte.pdf" (8 pages, 718043 bytes).
 PDF statistics:
- 149 PDF objects out of 1000 (max. 8388607)
+ 143 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
