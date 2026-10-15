@@ -90,6 +90,14 @@ J.~A. Lizárraga, ``Sesión técnica 1 - análisis de componentes de hardware y
   Available: \url{https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf}
 \BIBentrySTDinterwordspacing
 
+\bibitem{max13487e}
+\BIBentryALTinterwordspacing
+{Analog Devices}, ``{MAX13487E/MAX13488E - Half-Duplex RS-485/RS-422
+  Transceivers, Rev. 3},'' Sep. 2020, accessed: 13 Oct. 2026. [Online].
+  Available:
+  \url{https://www.analog.com/media/en/technical-documentation/data-sheets/MAX13487E-MAX13488E.pdf}
+\BIBentrySTDinterwordspacing
+
 \bibitem{mg996r}
 \BIBentryALTinterwordspacing
 {Tower Pro Hong Kong}, ``{MG996R High Torque Metal Gear Servo Specification},''
@@ -124,14 +132,6 @@ J.~A. Lizárraga, ``Sesión técnica 1 - análisis de componentes de hardware y
 {Texas Instruments}, ``{SN65HVD230 3.3-V CAN Bus Transceivers Datasheet,
   SLLS688G},'' Aug. 2021, accessed: 13 Oct. 2026. [Online]. Available:
   \url{https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf}
-\BIBentrySTDinterwordspacing
-
-\bibitem{max13487e}
-\BIBentryALTinterwordspacing
-{Analog Devices}, ``{MAX13487E/MAX13488E - Half-Duplex RS-485/RS-422
-  Transceivers, Rev. 3},'' Sep. 2020, accessed: 13 Oct. 2026. [Online].
-  Available:
-  \url{https://www.analog.com/media/en/technical-documentation/data-sheets/MAX13487E-MAX13488E.pdf}
 \BIBentrySTDinterwordspacing
 
 \end{thebibliography}

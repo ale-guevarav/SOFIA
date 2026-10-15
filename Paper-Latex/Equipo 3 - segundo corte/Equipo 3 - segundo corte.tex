@@ -748,6 +748,100 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
+	\subsection{Computer Vision System Architecture}
+	
+	\linelabel{ln:intro-vis}The computer vision subsystem of SOFIA was developed to recognize human gestures in real time and translate them into discrete action labels. The system uses a webcam to capture the user's movements and processes the images through a modular Python application. Its main purpose is to provide a gesture-based interaction method that can later be connected to the robot's control and actuation systems.
+	
+	\linelabel{ln:explain-vis}The implementation combines OpenCV for image acquisition and visualization with MediaPipe Tasks for human pose and hand landmark detection. Two pretrained models are used: Pose Landmarker, which identifies 33 body landmarks for one person, and Hand Landmarker, which detects up to two hands with 21 landmarks each. This approach avoids the need to train a custom neural network for gesture classification, since the detected landmarks are processed using predefined geometric rules.
+	
+	\linelabel{ln:model-vis}The software follows a modular architecture organized within the \texttt{Vision/} directory. The \texttt{main.py} file manages camera capture, model execution, gesture evaluation, and real-time visualization. The \texttt{pose\_detector.py} and \texttt{hand\_detector.py} modules handle body and hand landmark detection, respectively. Gesture classification is implemented in \texttt{gesture\_detector.py}, supported by \texttt{geometry\_utils.py} for geometric calculations and \texttt{smoothing.py} for temporal stabilization. Additional modules define the connections used to visualize body and hand landmarks.
+	
+	\linelabel{ln:model-vis2}During execution, each frame is captured in BGR format and converted to RGB before being processed by MediaPipe. The detected body landmarks are smoothed using an Exponential Moving Average (EMA) filter to reduce fluctuations between consecutive frames. The system then calculates geometric features, including normalized distances, joint angles, and relative positions, to evaluate the conditions associated with each gesture. Hand landmarks are also analyzed to identify specific finger configurations required for some interactions.
+	
+	\linelabel{ln:model-vis3}The recognition system supports five gestures: INICIO (Start), FIN (End), RECARGAR (Reload), ESCUDO (Shield), and ATAQUE (Attack). INICIO and FIN are classified as dynamic gestures because they require a sequence of movements over time, while RECARGAR, ESCUDO, and ATAQUE are static gestures identified through specific body and hand configurations. Once a gesture satisfies its recognition conditions, the system displays the corresponding label alongside the detected landmarks and an approximate frames-per-second (FPS) indicator.
+	
+	\linelabel{ln:model-vis4}At the current development stage, the computer vision subsystem operates as an independent perception prototype. Although its output is designed to support SOFIA's human-robot interaction, direct communication with the ESP32-C3 controller and physical actuation of the robotic modules have not yet been experimentally verified.
+	
+	\subsection{Geometric Gesture Recognition}
+	
+	\linelabel{ln:Geo-ges-rec-intro}The gesture recognition system was designed to identify five predefined human gestures through geometric analysis of body and hand landmarks. Instead of training a custom classification model, the implementation uses deterministic rules based on normalized distances, joint angles, relative positions, and movement sequences. This approach allows each gesture to be defined through specific conditions while keeping the recognition process modular and interpretable.
+	
+	\linelabel{ln:Geo-ges-rec2}To reduce the influence of the user's distance from the camera, several geometric measurements are normalized using anatomical references, such as shoulder width and torso height. The normalized distance between two landmarks is calculated as:
+	\begin{equation}
+		D_{\text{norm}} = \frac{\sqrt{(x_A - x_B)^2 + (y_A - y_B)^2}}{d_{\text{ref}}}
+	\end{equation}
+	where $A$ and $B$ represent the selected landmarks, and $d_{\text{ref}}$ is the distance between two anatomical reference points.
+	
+	\linelabel{ln:Geo-ges-rec3}For gestures involving arm positioning, joint angles are calculated using three landmarks. The angle between two vectors, with the elbow as the central point, is defined as:
+	\begin{equation}
+		\theta = \cos^{-1}\left( \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} \right)
+	\end{equation}
+	\linelabel{ln:Geo-ges-rec4}These angles are calculated from the two-dimensional projection of the detected landmarks and are used to evaluate arm configurations.
+	
+	\linelabel{ln:Geo-ges-rec5}The five gestures are divided into two dynamic gestures and three static gestures, depending on whether recognition requires a movement sequence or a specific body configuration described in Table~\ref{tab:gesture_conditions}.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Summary of Gesture Recognition Conditions}
+		\label{tab:gesture_conditions}
+		\vspace{0.5em}
+		\begin{tabularx}{\columnwidth}{@{}c l X@{}}
+			\toprule
+			\textbf{Gesture} & \textbf{Type} & \textbf{Main recognition conditions} \\
+			\midrule
+			INICIO & Dynamic & Three wrist-to-hip contacts within 3s \\
+			FIN & Dynamic & One raised hand and two horizontal direction changes \\
+			RECARGAR & Static & Wrists near shoulders, approximately vertical forearms, no two recognized pistol hands \\
+			ESCUDO & Static & Crossed arms, wrists near opposite shoulders, elbow below shoulders \\
+			ATAQUE & Static & Elbow angles of 35$^\circ$--125$^\circ$ and two pistol-shaped hands \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\linelabel{ln:vision-evaluation}The system evaluates these conditions using the body landmarks estimated by MediaPipe Pose Landmarker and the finger landmarks provided by MediaPipe Hand Landmarker. The resulting geometric conditions are used to determine the recognized gesture, while temporal confirmation mechanisms are applied to improve the stability of static gesture classification.
+	
+	\subsection{Temporal Filtering and Gesture Validation}
+	
+	\linelabel{ln:val-intro}To improve the stability of gesture recognition, the computer vision subsystem incorporates temporal filtering and validation mechanisms. These techniques were introduced to reduce fluctuations in detected body landmarks, prevent unintended gesture activations, and distinguish between temporary movements and intentional user actions.
+	
+	\linelabel{ln:val-ema-math}An Exponential Moving Average (EMA) filter is applied to the body landmarks detected by MediaPipe Pose Landmarker. This filter reduces variations between consecutive frames by combining the current landmark coordinates with their previously filtered values. The smoothing process is defined as:
+	\begin{equation}
+		S_t = \alpha X_t + (1 - \alpha) S_{t-1}
+	\end{equation}
+	where $S_t$ represents the smoothed landmark coordinate at time $t$, $X_t$ is the current detected coordinate, $S_{t-1}$ is the previous smoothed value, and $\alpha$ is the smoothing coefficient. The implemented system uses $\alpha = 0.3$, resulting in:
+	\begin{equation}
+		S_t = 0.3 X_t + 0.7 S_{t-1}
+	\end{equation}
+	
+	\linelabel{ln:val-ema-proc}This operation is applied independently to the $x$, $y$, and $z$ coordinates of each body landmark. The filtered coordinates are then used by the geometric recognition algorithms, while the original landmarks remain available for visualization. When no body pose is detected, the smoothing state is reset to avoid reusing outdated coordinates. The hand landmarks used for finger classification are processed separately, without a confirmed implementation of the same EMA filter.
+	
+	\linelabel{ln:val-static-confirm}In addition to spatial smoothing, the system implements temporal confirmation for static gestures. Instead of accepting a gesture immediately after its geometric conditions are satisfied, the algorithm maintains a counter of consecutive valid frames. A static gesture is confirmed when its conditions remain satisfied for five consecutive frames. If any frame fails the required conditions, the counter returns to zero. This mechanism is implemented through the \texttt{TemporalConfirmation} class and helps prevent brief or unstable landmark configurations from being interpreted as intentional gestures.
+	
+	\linelabel{ln:val-dyn-inicio}Dynamic gestures require a different validation strategy because their recognition depends on movement sequences rather than maintaining a fixed posture. For INICIO, the algorithm uses a state-based counter to track three consecutive hand-to-thigh contact events. Hysteresis is introduced through separate contact and separation thresholds of 0.35 and 0.42, respectively. This prevents a single sustained contact from generating multiple detections. The complete sequence must occur within three seconds; otherwise, the accumulated contact count is reset.
+	
+	\linelabel{ln:val-dyn-fin}For FIN, the system tracks the horizontal movement of one raised hand. After selecting the active hand, the algorithm evaluates changes in its horizontal position and ignores displacements smaller than 0.12 in normalized coordinates. The first significant displacement establishes the initial movement direction, and subsequent direction reversals are counted. FIN is recognized after two valid reversals. If the active hand is lowered before completing the sequence, the tracking state is reset.
+	
+	\linelabel{ln:val-priority}Finally, the subsystem establishes a gesture display priority to manage situations in which multiple recognition conditions are satisfied simultaneously. The priority order is ESCUDO, ATAQUE, RECARGAR, INICIO, and FIN. This determines which label is displayed when different gesture detectors produce positive results, although the internal tracking states of other gestures may continue updating.
+	
+	\linelabel{ln:val-summary}Together, these mechanisms provide a structured approach to gesture stabilization and temporal validation. EMA filtering addresses frame-to-frame variations in body landmark positions, consecutive-frame confirmation reduces temporary static detections, and movement tracking allows dynamic gestures to be recognized through defined sequences. Although these techniques were functionally tested during development, their quantitative impact on recognition accuracy and response time has not yet been established through a complete experimental evaluation.
+	
+	\subsection{Integration Challenges and Design Refinements}
+	
+	\linelabel{ln:chal-intro}During the development of SOFIA's computer vision subsystem, several challenges were identified related to landmark stability, gesture recognition, software compatibility, and similarities between body configurations. These issues led to modifications in the recognition algorithms and software architecture to improve the functionality and usability of the prototype.
+	
+	\linelabel{ln:chal-mediapipe}One of the first challenges involved the compatibility and handling of MediaPipe detection results. The implementation uses the MediaPipe Tasks API for body and hand landmark estimation. During testing, the application encountered an \texttt{AttributeError} when the user temporarily disappeared from the camera's field of view. This occurred because the gesture detection module attempted to access pose landmarks when no valid detection was available. The issue was corrected by introducing validation for missing landmark data before processing the results, allowing the application to continue operating when the user was no longer visible.
+	
+	\linelabel{ln:chal-fluctuation}Another challenge was the fluctuation of body landmark coordinates between consecutive frames. Small variations in detected joint positions could affect geometric comparisons, particularly when the measurements were close to predefined recognition thresholds. To address this, an Exponential Moving Average filter with a smoothing coefficient of 0.3 was incorporated into the body landmark processing stage. Temporal confirmation requiring five consecutive valid frames was also introduced for static gesture recognition. Subsequent functional tests showed that the gesture recognition system continued operating with these mechanisms, although their quantitative effect on false positives and recognition accuracy was not measured.
+	
+	\linelabel{ln:chal-recargar}Significant changes were also made to the RECARGAR gesture. The initial implementation treated RECARGAR as a dynamic movement in which both hands moved upward from a lower position toward the shoulders within a limited time interval. However, the gesture specifications were later revised to require two dynamic gestures and three static gestures. As a result, RECARGAR was redesigned as a static configuration involving bent arms and hands positioned near shoulder height. Early versions of this new approach produced unintended detections when the user raised their arms during other gestures. To improve discrimination, additional geometric conditions were defined, including wrist proximity to the shoulders, bounded vertical positioning, and approximately vertical forearm orientation.
+	
+	\linelabel{ln:chal-overlap}A related problem involved the similarity between RECARGAR and ATAQUE. Certain arm positions could satisfy the geometric conditions of both gestures, particularly when the hands were close to shoulder level. To address this overlap, the final classification logic was designed to prevent RECARGAR from being recognized when both hands were identified as forming pistols. This introduced an additional distinction based on hand landmarks rather than body geometry alone. However, the effectiveness of this modification has not yet been established through a complete evaluation of the final implementation.
+	
+	\linelabel{ln:chal-ataque-old}The ATAQUE gesture required a substantial redesign to improve its recognition and make the movement more comfortable for different body configurations. The original algorithm required the elbows to remain close to the torso and included a depth-based condition to identify the forward orientation of the wrists. During development, these restrictions made the gesture difficult to perform consistently. An intermediate version using a wider elbow angle range of 90$^\circ$ to 165$^\circ$ was also tested but did not produce the expected recognition behavior.
+	
+	\linelabel{ln:chal-ataque-new}The gesture was consequently redefined using an approximately W-shaped arm configuration, with elbow angles between 35$^\circ$ and 125$^\circ$ and both wrists positioned above their respective elbows. The depth restriction and the requirement to keep the elbows close to the torso were removed. Additionally, the hands were oriented outward rather than directly toward the camera, making the pistol-shaped finger configurations easier to observe. Qualitative testing of this revised gesture produced satisfactory recognition, although its performance across different users has not been quantitatively evaluated.
+	
+	\linelabel{ln:chal-software}Finally, software organization introduced additional integration challenges. During development, the computer vision files were reorganized into a dedicated \texttt{Vision/} directory to improve modularity and maintainability. This change produced an import error involving the local performance metrics module. The import path was corrected, and successful execution of the application was subsequently confirmed. The final availability and integration of the metrics logging files, however, still require verification.
 	
 	\section{Results}
 	\label{sec:results}
@@ -758,6 +852,48 @@
 	
 	\subsection{Time Constant Estimation}
 	
+	\subsection{Functional Validation of the Vision Subsystem}
+	
+	\linelabel{ln:res-func-intro}The computer vision subsystem was tested through real-time webcam experiments to verify its ability to recognize the five predefined gestures. The tests focused on body and hand landmark detection, geometric gesture classification, and temporal validation.
+	
+	\linelabel{ln:vision-vis}The system successfully captured and processed video frames using OpenCV and MediaPipe, displaying the detected landmarks, recognized gesture labels, and approximate FPS in real time.
+	
+	\linelabel{ln:vision-func-tests}Functional tests confirmed the recognition of INICIO through three consecutive hand-to-thigh movements and FIN through two horizontal direction changes of a raised hand. For static gestures, ESCUDO was recognized through crossed-arm positioning, RECARGAR through the defined arm configuration near shoulder height, and ATAQUE through the combination of W-shaped arms and two pistol-shaped hands.
+	
+	\linelabel{ln:vision-func-ema}The implementation of EMA filtering and five-frame temporal confirmation maintained the functionality of the recognition system while providing mechanisms to reduce unstable detections. Additionally, the final adjustments to RECARGAR and ATAQUE were verified, confirming that the updated gesture definitions could be recognized during functional testing.
+	
+	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem as an independent software prototype. However, recognition accuracy, average response time, and robustness under different environmental conditions still require quantitative evaluation.
+	
+	\subsection{Gesture Recognition Performance Evaluation}
+	
+	\linelabel{ln:res-vision-intro}Preliminary performance tests were conducted to evaluate gesture recognition and identify classification errors. These tests recorded the expected gesture, detected gesture, response time, and instantaneous frames per second (FPS).
+	
+	\linelabel{ln:vision-escudo}During the initial evaluation of ESCUDO, four attempts were recorded. Two were correctly classified, while the other two were incorrectly identified as RECARGAR.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Preliminary Performance Evaluation for ESCUDO Gesture}
+		\label{tab:escudo_performance}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c c c c@{}}
+			\toprule
+			\textbf{Attempt} & \textbf{Expected} & \textbf{Detected} & \textbf{Time (ms)} & \textbf{FPS} \\
+			\midrule
+			Initial & ESCUDO & RECARGAR & 1841.65 & 26.62 \\
+			1       & ESCUDO & ESCUDO   & 2072.08 & 21.95 \\
+			2       & ESCUDO & ESCUDO   & 2306.67 & 20.27 \\
+			3       & ESCUDO & RECARGAR & 2410.98 & 27.05 \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\linelabel{ln:vision-overlap}These preliminary measurements helped identify overlapping recognition conditions between gestures, leading to refinements in the geometric classification rules.
+	
+	\linelabel{ln-vision-latency}The recorded response times included user reaction and gesture execution, as well as software processing. Therefore, they do not represent the algorithm's computational latency.
+	
+	\linelabel{ln:vision-adjustments}Following these observations, the recognition conditions for RECARGAR and ATAQUE were adjusted and their final functionality was verified. However, the preliminary measurements correspond to an earlier implementation and cannot be used to calculate the final system's accuracy.
 	
 	\section{Discussion}
 	\label{sec:discussion}
