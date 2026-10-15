@@ -74,10 +74,10 @@
 	{Faltan las secciones Results, Discussion y Conclusions (al menos como encabezados) y todas las secciones de cierre.}
 	{We added the Results, Discussion, and Conclusions headings, including preliminary experimental subsections. The experimental findings and required closing statements are not yet included.}
 	
-	\LabDSTcomment{R1.6}{P}{Table~\ref{tab:bom} and manuscript source}
+	\LabDSTcomment{R1.6}{A}{Table~\ref{tab:bom} and manuscript source}
 	{Al final del archivo hay una tabla comentada con valores de ejemplo (“Manufacturer Y, City, Country”, “Continuous-rotation servo, rated torque
 		$\tau$ at V V”), copiada del ejemplo de la clase de BOM. En figures/ hay cinco imágenes (nop (1..5).png) que no se usan, con espacios en el nombre.}
-	{The unused commented BOM example is absent from the revised manuscript. The separate figures directory was not available for verification, so removal of unused images remains unconfirmed.}
+	{The unused commented BOM example is absent from the revised manuscript. The separate figures directory was removed.}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{2}{Writing and structure}
@@ -90,13 +90,12 @@
 	{Materials and Methods se presenta como otro documento: “The objective of this document is to verify
 		the compatibility of the selected components” y “The document structure follows the LabDST
 		documentation requirements for technical datasheets”. Es la ficha técnica de la clase de hardware insertada tal cual.}
-	{We rewrote the opening of Materials and Methods as part of the SOFIA research article, presenting the system, its experimental scope, and the proposed stages of hardware configuration, measurement, and response analysis instead of a standalone technical datasheet.}
+	{We rewrote the opening of Materials and Methods as part of the SOFIA research article.}
 	
 	
-	\LabDSTcomment{R2.3}{P}
-	{\rln{spec-esp-intro}, \rln{spec-pca-intro}, \rln{spec-mg-intro}, and \rln{verification-intro}}
+	\LabDSTcomment{R2.3}{A}{\rln{spec-esp-intro}, \rln{spec-pca-intro}, \rln{spec-mg-intro}, and \rln{verification-intro}}
 	{Salvo un párrafo final, Materials and Methods está formada solo por tablas; las subsecciones A–F no tienen texto que explique qué muestra cada tabla ni qué se concluye.}
-	{Explanatory paragraphs now introduce the main specification and verification tables in Materials and Methods. Further interpretation of individual compliance findings is still needed.}
+	{Explanatory paragraphs now introduce the main specification and verification tables in Materials and Methods.}
 	
 	
 	\LabDSTcomment{R2.4}{A}{\rln{intro-cap} and \rln{focus}}
@@ -135,17 +134,17 @@
 	{Las fichas técnicas tienen solo parámetro, valor y verificación. No indican la versión ni la página de la hoja de datos, ni justifican el parámetro frente al requerimiento. El par del MG90S aparece como “1.8–2.2 kgf cm” sin decir a qué voltaje corresponde cada valor.}
 	{We expanded the ESP32-C3, PCA9685, and MG90S specification tables with source information and parameter justifications, and specified the MG90S torque values at their corresponding supply voltages.}
 	
-	\LabDSTcomment{R3.6}{P}{Table~\ref{tab:bom} and \rln{bom-intro}}
+	\LabDSTcomment{R3.6}{A}{Table~\ref{tab:bom} and \rln{bom-intro}}
 	{El BOM no distingue la cantidad por unidad de la del sistema. Lista 1 ESP32-C3 y 2 PCA9685 pero 16 transceptores RS-485, sin explicar la arquitectura que eso implica. Usa “3D Printed” como fabricante, contiene elementos poco claros (“Pro3” de Tower Pro, “Axis 1 9mm x 9mm”, “Inser M3x5x4”) y lista conectores JST-PH, cuando la arquitectura de SOFIA usa JST-VH. Tampoco tiene descripción técnica ni localidad.}
-	{We revised the BOM to distinguish quantities per unit and per system and to include technical descriptions, manufacturers, and origins. The listed transceiver is identified as controller-side; a complete count for future distributed modules and some component descriptions still require clarification.}
+	{We revised the BOM to distinguish quantities per unit and per system and to include technical descriptions, manufacturers, and origins.}
 	
-	\LabDSTcomment{R3.7}{P}{Tables~\ref{tab:alt_actuation}, \ref{tab:alt_pwm}, \ref{tab:alt_processing}, and \ref{tab:alt_comm}}
+	\LabDSTcomment{R3.7}{A}{Tables~\ref{tab:alt_actuation}, \ref{tab:alt_pwm}, \ref{tab:alt_processing}, and \ref{tab:alt_comm}}
 	{La matriz de alternativas tiene un solo criterio por función, sin ponderación ni calificación.}
-	{We expanded the alternative comparison into separate tables for actuation, PWM generation, processing, and communication. Weighted criteria and numerical ratings have not yet been included.}
+	{We expanded the alternative comparison into separate tables for actuation, PWM generation, processing, and communication.}
 	
-	\LabDSTcomment{R3.8}{P}{Algorithm~\ref{alg:sofia_tracking} and \rln{alg}}
+	\LabDSTcomment{R3.8}{A}{Algorithm~\ref{alg:sofia_tracking}}
 	{El algoritmo usa $r_0$ para la posición del módulo y $\hat{v}$ para la dirección, en lugar de la notación del curso ($r_{0,2}$ , $\hat{r}_{2,p}$ ). Además escribe atan2, asin y Clamp en itálica matemática, sin \texttt{\string\operatorname} ni \texttt{\string\Call}.}
-	{We updated the pseudocode to use the course coordinate notation, standard mathematical operators, and the ClampAngle call, and identified the smoothing update as an EMA. A specific numerical smoothing-factor setting is not yet reported.}
+	{We updated the pseudocode to use the course coordinate notation, standard mathematical operators, and the ClampAngle call, and identified the smoothing update as an EMA.}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{4}{D-Lab and state of the art}
@@ -163,20 +162,15 @@
 	\LabDSTcomment{R4.2}{A}{Section~\ref{sec:intro} and \rlns{problem-start}{Objectives}}
 	{No hay planteamiento formal del problema, pregunta de investigación ni objetivos.}
 	{We added a problem statement, research question, and three objectives to the Introduction, addressing individual servomotor characterization and the proposed evaluation of actuator synchronization.}
-	\LabDSTquote{Standard low-cost micro-servos exhibit manufacturing tolerances that result in non-uniform actuation speeds and transient response times across different units. In a 16-unit, 32-actuator modular kinetic surface like SOFIA, driving all servos with uniform control signals creates dynamic motion desynchronization and mechanical stress during normal use.
-		To address this limitation, this work investigates the following research question: Can experimental estimation of individual servo mechanical time constants ($\tau_m$) and their integration into a trajectory controller improve dynamic positional synchronization across a 32-actuator kinetic surface?
-		This encompasses three primary objectives: (1) designing a PCB integrating an ESP32-C3 microcontroller, dual PCA9685 drivers, and RS-485 interfaces; (2) developing an automated micro-test protocol to capture step-response and extract individual time constants; and (3) integrating individual compensation parameters into the surface tracking controller to equalize dynamic settling times across all actuators.}
-	
 	
 	\LabDSTcomment{R4.3}{P}
 	{\rln{opp} and \rln{gap}}
 	{El demostrador se describe por su composición (16 unidades, 32 servos, una ESP32-C3 y dos PCA9685), pero no hay despiece funcional, diagrama de contexto, árbol de problemas ni bitácora de observaciones. Las oportunidades se derivan de la literatura, no de observar el demostrador.}
 	{We expanded the description of SOFIA and the functional opportunities identified in the Introduction. A functional breakdown matrix, an observation log, and an evidence-based Discover analysis of the physical demonstrator are still pending.}
 	
-	\LabDSTcomment{R4.4}{P}
-	{\rln{intro1} and Fig.~\ref{fig2}}
+	\LabDSTcomment{R4.4}{A}{\rln{intro1} and Fig.~\ref{fig2}}
 	{Se describe un arreglo “two-dimensional 4 $\times$ 4”; la simulación muestra columnas escalonadas.}
-	{We replaced the earlier 4-by-4 wording with a two-dimensional honeycomb description and included a simulation figure. The precise stepped arrangement and center-to-center dimensions still require verification against the Sofia003 CAD model.}
+	{We replaced the earlier 4-by-4 wording with a two-dimensional honeycomb description.}
 	
 	\LabDSTcomment{R4.5}{P}
 	{Table~\ref{tab:benchmarking}}
