@@ -599,6 +599,7 @@
 			-- & LED RGB & -- & 1 & System state status indicator LED & Mexbit & Local \\
 			-- & JST-VH Male & -- & 1 & High-current power PCB header & JTAREA & Local \\
 			-- & JST-VH Female & -- & 1 & High-current power harness plug & JTAREA & Local \\
+			-- & R1--R5 (Resistors) & -- & 5 & RGB LED: 470 $\Omega$ (R1), 330 $\Omega$ (R2--R3); RS-485 divider: 10 k$\Omega$ (R4), 18 k$\Omega$ (R5) & Mexbit & Local \\
 			
 			\bottomrule
 		\end{tabularx}
@@ -797,11 +798,10 @@
 	\begin{figure*}[!t]
 		\centering
 		\includegraphics[width=0.95\textwidth]{figures/sofia_pcb_schematic.png}
-		\caption{Electronic schematic of the SOFIA
-			carrier PCB, showing the ESP32-C3
-			microcontroller, PCA9685 PWM driver interfaces,
-			MAX13487E RS-485 connections, and peripheral
-			circuitry.}
+		\caption{Electronic schematic of the SOFIA carrier PCB,
+			showing the ESP32-C3 microcontroller, PCA9685 PWM
+			driver interfaces, MAX13487E RS-485 connections,
+			and peripheral circuitry.}
 		\label{fig:sofia_schematic}
 	\end{figure*}
 	
@@ -814,8 +814,8 @@
 	
 	\begin{figure}[!t]
 		\centering
-		\includegraphics[width=0.4\textwidth]{figures/sofia_pcb.png}
-		\caption{Completed two-layer PCB layout developed for the SOFIA electronic control system, including the ESP32-C3 footprint, PCA9685 driver connectors, RS-485 interfaces, JST-PH connectors, and signal-conditioning components.}
+		\includegraphics[width=\columnwidth]{figures/sofia_pcb.png}
+		\caption{Completed two-layer PCB layout developed for the SOFIA electronic control system.}
 		\label{fig:sofia_pcb}
 	\end{figure}
 	

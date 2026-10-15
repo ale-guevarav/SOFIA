@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 OCT 2026 18:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 OCT 2026 19:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -871,12 +871,12 @@ Underfull \hbox (badness 3281) in paragraph at lines 550--554
  []
 
 
-Overfull \hbox (2.45741pt too wide) in paragraph at lines 604--604
+Overfull \hbox (2.45741pt too wide) in paragraph at lines 605--605
 []|\OT1/ptm/m/n/5 Wilmington, 
  []
 
 
-Underfull \hbox (badness 10000) in alignment at lines 604--604
+Underfull \hbox (badness 10000) in alignment at lines 605--605
 [][][][][][][] 
  []
 
@@ -884,37 +884,37 @@ Underfull \hbox (badness 10000) in alignment at lines 604--604
 <figures/Sim_a.jpeg, id=29, 537.00626pt x 410.53375pt>
 File: figures/Sim_a.jpeg Graphic file (type jpg)
 <use figures/Sim_a.jpeg>
-Package pdftex.def Info: figures/Sim_a.jpeg  used on input line 705.
+Package pdftex.def Info: figures/Sim_a.jpeg  used on input line 706.
 (pdftex.def)             Requested size: 79.49744pt x 60.76932pt.
 LaTeX Font Info:    Trying to load font information for OT1+phv on input line 7
-05.
+06.
  (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1phv.fd
 File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
 )
 <figures/Sim_b.jpeg, id=30, 556.0775pt x 439.6425pt>
 File: figures/Sim_b.jpeg Graphic file (type jpg)
 <use figures/Sim_b.jpeg>
-Package pdftex.def Info: figures/Sim_b.jpeg  used on input line 707.
+Package pdftex.def Info: figures/Sim_b.jpeg  used on input line 708.
 (pdftex.def)             Requested size: 79.49744pt x 62.85095pt.
 <figures/Sim_c.jpeg, id=31, 549.05125pt x 422.57875pt>
 File: figures/Sim_c.jpeg Graphic file (type jpg)
 <use figures/Sim_c.jpeg>
-Package pdftex.def Info: figures/Sim_c.jpeg  used on input line 709.
+Package pdftex.def Info: figures/Sim_c.jpeg  used on input line 710.
 (pdftex.def)             Requested size: 79.49744pt x 61.18529pt.
 <figures/Sim_d.jpeg, id=32, 509.905pt x 422.57875pt>
 File: figures/Sim_d.jpeg Graphic file (type jpg)
 <use figures/Sim_d.jpeg>
-Package pdftex.def Info: figures/Sim_d.jpeg  used on input line 711.
+Package pdftex.def Info: figures/Sim_d.jpeg  used on input line 712.
 (pdftex.def)             Requested size: 79.49744pt x 65.87946pt.
 <figures/Sim_e.jpeg, id=33, 499.8675pt x 441.65pt>
 File: figures/Sim_e.jpeg Graphic file (type jpg)
 <use figures/Sim_e.jpeg>
-Package pdftex.def Info: figures/Sim_e.jpeg  used on input line 713.
+Package pdftex.def Info: figures/Sim_e.jpeg  used on input line 714.
 (pdftex.def)             Requested size: 79.49744pt x 70.23413pt.
 <figures/Sim_f.jpeg, id=34, 530.98375pt x 462.72874pt>
 File: figures/Sim_f.jpeg Graphic file (type jpg)
 <use figures/Sim_f.jpeg>
-Package pdftex.def Info: figures/Sim_f.jpeg  used on input line 715.
+Package pdftex.def Info: figures/Sim_f.jpeg  used on input line 716.
 (pdftex.def)             Requested size: 79.49744pt x 69.27922pt.
 
 [5 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> <./figures/Sim_c.jpeg> <./figu
@@ -922,14 +922,14 @@ res/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/Sim_f.jpeg>]
 <figures/sofia_pcb_schematic.png, id=43, 966.61125pt x 517.935pt>
 File: figures/sofia_pcb_schematic.png Graphic file (type png)
 <use figures/sofia_pcb_schematic.png>
-Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 79
-9.
+Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 80
+0.
 (pdftex.def)             Requested size: 490.19843pt x 262.65758pt.
 <figures/sofia_pcb.png, id=44, 640.64343pt x 578.16pt>
 File: figures/sofia_pcb.png Graphic file (type png)
 <use figures/sofia_pcb.png>
 Package pdftex.def Info: figures/sofia_pcb.png  used on input line 817.
-(pdftex.def)             Requested size: 206.39685pt x 186.25888pt.
+(pdftex.def)             Requested size: 252.0pt x 227.4135pt.
 
 (Equipo 3 - segundo corte.bbl [6 <./figures/sofia_pcb_schematic.png> <./figures
 /sofia_pcb.png>]
@@ -949,7 +949,7 @@ L3 programming layer <2026-07-20>
 Here is how much of TeX's memory you used:
  6960 strings out of 467501
  119439 string characters out of 5408550
- 596279 words of memory out of 5000000
+ 597648 words of memory out of 5000000
  36095 multiletter control sequences out of 15000+600000
  673262 words of font info for 121 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -973,7 +973,7 @@ pe1/urw/helvetic/uhvr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts
 /type1/urw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/font
 s/type1/urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/font
 s/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - segundo corte.pdf" (7 pages, 674717 bytes).
+Output written on "Equipo 3 - segundo corte.pdf" (7 pages, 675226 bytes).
 PDF statistics:
  125 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
