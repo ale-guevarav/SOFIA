@@ -609,15 +609,15 @@
 		\caption{Trade-Off Analysis for Actuation}
 		\label{tab:alt_actuation}
 		\scriptsize
-		\setlength{\tabcolsep}{3pt}
+		\setlength{\tabcolsep}{2.5pt}
 		\renewcommand{\arraystretch}{1.1}
 		\begin{tabularx}{\columnwidth}{@{}l c c X c@{}}
 			\toprule
-			\textbf{Alternative} & \textbf{Torque} & \textbf{Mass} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
+			\textbf{Alternative} & \textbf{Stall Torque} & \textbf{Mass} & \textbf{Key Limitation / Feature} & \textbf{Sel.} \\
 			\midrule
-			MG996R \cite{mg996r} & High & $55\text{ g}$ & Excessive size and current draw & \\
-			SG90 \cite{sg90} & Low & $9\text{ g}$ & Fragile nylon gears under load & \\
-			\textbf{MG90S \cite{mg90s}*} & Medium & $13.4\text{ g}$ & Metal gears; optimal torque/size & \checkmark \\
+			MG996R \cite{mg996r} & $9.4$--$11.0\text{ kgf}\cdot\text{cm}$ & $55\text{ g}$ & Excessive size and high current draw & \\
+			SG90 \cite{sg90} & $1.8\text{ kgf}\cdot\text{cm}$ & $9\text{ g}$ & Fragile nylon gears wear out under load & \\
+			\textbf{MG90S \cite{mg90s}*} & $1.8$--$2.2\text{ kgf}\cdot\text{cm}$ & $13.4\text{ g}$ & Metal gears; optimal torque/size ratio & \checkmark \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
