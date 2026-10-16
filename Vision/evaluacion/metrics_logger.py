@@ -425,27 +425,45 @@ class PerformanceMetrics:
     # INTENTOS DE EVALUACIÓN
     # =============================================
 
+    def start_trial(self, gesture):
+        """
+        Inicia una prueba del gesto indicado ("INICIO", ..., "FIN").
+        Regresa True si se pudo iniciar (no hay otra en curso).
+        La usan las teclas de main.py y los botones de la GUI.
+        """
+
+        if gesture not in GESTURES or self.state not in ("idle", "result"):
+            return False
+
+        self.current_expected = gesture
+        self.state = "countdown"
+        self._countdown_until = time.perf_counter() + self.countdown
+
+        print(f"[METRICAS] Prueba de {self.current_expected}: preparate...")
+        return True
+
+
+    def cancel_trial(self):
+        """Cancela la prueba en curso sin registrar ningún resultado."""
+
+        if self.state in ("countdown", "active"):
+            print("[METRICAS] Prueba cancelada (modo libre)")
+
+        self.state = "idle"
+        self.current_expected = None
+
+
     def handle_key(self, key):
         """Procesa teclas de evaluación. Regresa True si la usó."""
 
-        if key in KEY_TO_GESTURE and self.state in ("idle", "result"):
-
-            self.current_expected = KEY_TO_GESTURE[key]
-            self.state = "countdown"
-            self._countdown_until = time.perf_counter() + self.countdown
-
-            print(f"[METRICAS] Prueba de {self.current_expected}: preparate...")
+        if key in KEY_TO_GESTURE:
+            self.start_trial(KEY_TO_GESTURE[key])
             return True
 
         # 0 / x: modo libre. Cancela la prueba en curso
         # sin registrar ningún resultado.
         if key in FREE_MODE_KEYS:
-
-            if self.state in ("countdown", "active"):
-                print("[METRICAS] Prueba cancelada (modo libre)")
-
-            self.state = "idle"
-            self.current_expected = None
+            self.cancel_trial()
             return True
 
         if key == ord("s"):
@@ -453,6 +471,35 @@ class PerformanceMetrics:
             return True
 
         return False
+
+
+    def get_status(self):
+        """
+        Estado actual de las pruebas, para mostrarlo en la GUI
+        (en lugar de dibujarlo sobre el video con draw_overlay).
+        """
+
+        now = time.perf_counter()
+
+        remaining = None
+        if self.state == "countdown":
+            remaining = max(0.0, self._countdown_until - now)
+        elif self.state == "active":
+            remaining = max(0.0, self.trial_timeout - (now - self._trial_start))
+
+        total = len(self.trials)
+        hits = sum(1 for t in self.trials if t["correcto"])
+
+        return {
+            "state": self.state,                 # idle, countdown, active, result
+            "expected": self.current_expected,   # gesto en prueba
+            "remaining": remaining,              # segundos de la fase actual
+            "last_result": self._last_result if self.state == "result" else None,
+            "total": total,
+            "hits": hits,
+            "rate": hits / total * 100 if total else None,
+            "fps": self._live_fps,
+        }
 
 
     def _update_trial(self, event):

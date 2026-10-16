@@ -6,6 +6,8 @@ Interfaz gráfica (PySide6 / Qt) que:
     - Muestra el video en vivo con la detección dibujada.
     - Muestra el resultado: postura (JUEGO) o posición de la
       mano en el plano cartesiano (TRACKING).
+    - Modo TEST: pruebas por gesto con cuenta regresiva y métricas;
+      el estado se muestra en el panel "Pruebas", no sobre el video.
     - Permite INICIAR, PAUSAR, REANUDAR y DETENER el procesamiento.
     - Se conecta por Bluetooth (BLE) al ESP32 maestro y le envía
       las posturas y la posición de la mano.
@@ -20,6 +22,7 @@ Uso (dentro de Vision/, con el venv activo):
     python gui_app.py
 """
 
+import math
 import os
 import sys
 
@@ -48,7 +51,7 @@ from PySide6.QtWidgets import (
 
 from comunicacion.ble_link import BleLink
 from deteccion.gesture_recognition import GESTURE_IDS, NO_GESTURE
-from deteccion.vision_pipeline import MODE_GAME, MODE_TRACKING
+from deteccion.vision_pipeline import MODE_GAME, MODE_TEST, MODE_TRACKING
 from interfaz.vision_worker import (
     VisionWorker,
     STATE_LOADING,
@@ -94,7 +97,19 @@ QPlainTextEdit {
 QLabel#video { background: #0b0d10; border: 1px solid #2b3038; border-radius: 8px; color: #5c636d; }
 QLabel#bigValue { font-size: 30px; font-weight: 700; color: #58a6ff; }
 QLabel#muted { color: #9aa4b2; }
+QLabel#testBig { padding: 4px 0; }
 """
+
+# Gestos que se pueden probar en modo TEST (en orden de su número)
+TEST_GESTURES = ["INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN"]
+
+TEST_COLORS = {
+    "idle": "#9aa4b2",
+    "countdown": "#e0b341",
+    "active": "#ff7b72",
+    "ok": "#3fb950",
+    "fail": "#ff7b72",
+}
 
 
 def dot(color):
@@ -163,6 +178,7 @@ class MainWindow(QMainWindow):
         side.addWidget(self._build_control_group())
         side.addWidget(self._build_mode_group())
         side.addWidget(self._build_result_group())
+        side.addWidget(self._build_test_group())
         side.addWidget(self._build_ble_group())
         side.addWidget(self._build_log_group(), stretch=1)
 
@@ -209,16 +225,19 @@ class MainWindow(QMainWindow):
         group = QGroupBox("Modo")
         row = QHBoxLayout(group)
 
-        self.radio_game = QRadioButton("Juego (posturas)")
-        self.radio_tracking = QRadioButton("Tracking (mano)")
+        self.radio_game = QRadioButton("Juego")
+        self.radio_test = QRadioButton("Test")
+        self.radio_tracking = QRadioButton("Tracking")
         self.radio_game.setChecked(True)
 
         self.mode_group = QButtonGroup(self)
         self.mode_group.addButton(self.radio_game)
+        self.mode_group.addButton(self.radio_test)
         self.mode_group.addButton(self.radio_tracking)
         self.mode_group.buttonClicked.connect(self.on_mode_clicked)
 
         row.addWidget(self.radio_game)
+        row.addWidget(self.radio_test)
         row.addWidget(self.radio_tracking)
 
         return group
@@ -247,6 +266,47 @@ class MainWindow(QMainWindow):
         box.addWidget(self.result_value)
         box.addWidget(self.result_detail)
         box.addWidget(self.stats_label)
+
+        return group
+
+
+    def _build_test_group(self):
+
+        # Solo visible en modo TEST
+        group = QGroupBox("Pruebas")
+        box = QVBoxLayout(group)
+
+        self.test_label = QLabel()
+        self.test_label.setObjectName("testBig")
+        self.test_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.test_label.setTextFormat(Qt.TextFormat.RichText)
+        self.test_label.setWordWrap(True)
+        # Altura fija: el panel no "brinca" entre fases
+        self.test_label.setFixedHeight(72)
+
+        grid = QGridLayout()
+        self.test_buttons = []
+
+        for index, name in enumerate(TEST_GESTURES):
+            button = QPushButton(name)
+            button.clicked.connect(lambda _=False, n=name: self.start_trial(n))
+            grid.addWidget(button, index // 3, index % 3)
+            self.test_buttons.append(button)
+
+        self.btn_cancel_trial = QPushButton("Cancelar")
+        self.btn_cancel_trial.clicked.connect(self.cancel_trial)
+        grid.addWidget(self.btn_cancel_trial, 1, 2)
+
+        self.test_counts = QLabel()
+        self.test_counts.setObjectName("muted")
+
+        box.addWidget(self.test_label)
+        box.addLayout(grid)
+        box.addWidget(self.test_counts)
+
+        self.test_group = group
+        self.test_group.setVisible(False)
+        self._set_test_idle()
 
         return group
 
@@ -307,6 +367,8 @@ class MainWindow(QMainWindow):
         self.worker.stats_ready.connect(self.show_stats)
         self.worker.state_changed.connect(self.on_worker_state)
         self.worker.error.connect(self.on_worker_error)
+        self.worker.test_status.connect(self.show_test_status)
+        self.worker.report_ready.connect(self.on_report_ready)
         self.worker.finished.connect(self.on_worker_finished)
 
         self.worker.start()
@@ -352,6 +414,8 @@ class MainWindow(QMainWindow):
 
         self.state_label.setText(f"{dot(COLORS[state])}  Estado: <b>{state}</b>")
 
+        self._update_test_buttons()
+
 
     # =============================================
     # EVENTOS DEL HILO DE VISIÓN
@@ -386,6 +450,8 @@ class MainWindow(QMainWindow):
         self.video_label.clear()
         self.video_label.setText("Detección detenida")
         self.append_log("Detección detenida")
+
+        self._set_test_idle()
 
 
     @Slot(QImage)
@@ -479,13 +545,21 @@ class MainWindow(QMainWindow):
 
     def on_mode_clicked(self, _button=None):
 
-        mode = MODE_TRACKING if self.radio_tracking.isChecked() else MODE_GAME
+        if self.radio_tracking.isChecked():
+            mode = MODE_TRACKING
+        elif self.radio_test.isChecked():
+            mode = MODE_TEST
+        else:
+            mode = MODE_GAME
 
         if mode == self.mode:
             return
 
         self.mode = mode
         self.last_sent_gesture = NO_GESTURE
+
+        self.test_group.setVisible(mode == MODE_TEST)
+        self._set_test_idle()
 
         if self.worker is not None:
             self.worker.set_mode(mode)
@@ -496,6 +570,119 @@ class MainWindow(QMainWindow):
 
         if self._can_send():
             self.ble.send_mode(mode)
+
+
+    # =============================================
+    # PRUEBAS (MODO TEST)
+    # =============================================
+
+    def start_trial(self, gesture):
+        if self.worker is not None and self.mode == MODE_TEST:
+            self.worker.start_trial(gesture)
+            self.append_log(f"Prueba de {gesture}")
+
+
+    @Slot()
+    def cancel_trial(self):
+        if self.worker is not None:
+            self.worker.cancel_trial()
+            self.append_log("Prueba cancelada")
+
+
+    def _set_test_idle(self):
+        self._test_state = "idle"
+        self._show_test_text("Listo", "Elige un gesto para probar", "idle")
+        self.test_counts.setText("Intentos: 0   Aciertos: 0")
+        self._update_test_buttons()
+
+
+    def _show_test_text(self, main, detail, color_key):
+        # Línea principal grande + detalle en letra chica
+        color = TEST_COLORS[color_key]
+        self.test_label.setText(
+            f'<div style="color:{color}; font-size:24px; font-weight:700;">{main}</div>'
+            f'<div style="color:{color}; font-size:12px;">{detail}</div>'
+        )
+
+
+    def _update_test_buttons(self):
+
+        running = self.worker_state == STATE_RUNNING
+        free = self._test_state in ("idle", "result")
+
+        for button in self.test_buttons:
+            button.setEnabled(running and free)
+
+        self.btn_cancel_trial.setEnabled(running and not free)
+
+
+    @Slot(object)
+    def show_test_status(self, status):
+
+        state = status["state"]
+        expected = status["expected"]
+        remaining = status["remaining"]
+
+        # -----------------------------
+        # LETRERO PRINCIPAL
+        # -----------------------------
+
+        if state == "countdown":
+            # Cuenta regresiva 3, 2, 1
+            self._show_test_text(
+                f"{max(1, math.ceil(remaining))}",
+                f"Prepárate: {expected}",
+                "countdown",
+            )
+
+        elif state == "active":
+            self._show_test_text(
+                f"¡YA!  {expected}",
+                f"Quedan {remaining:.1f} s",
+                "active",
+            )
+
+        elif state == "result" and status["last_result"]:
+            result = status["last_result"]
+            if result["correcto"]:
+                self._show_test_text(
+                    "ACIERTO",
+                    f"{result['detectado']} en {result['tiempo_respuesta_s']:.2f} s",
+                    "ok",
+                )
+            else:
+                detected = "nada" if result["detectado"] == "NINGUNO" else result["detectado"]
+                self._show_test_text(
+                    "FALLO",
+                    f"Esperado {result['esperado']} · detectó {detected}",
+                    "fail",
+                )
+
+        else:
+            self._show_test_text("Listo", "Elige un gesto para probar", "idle")
+
+        # -----------------------------
+        # CONTADORES
+        # -----------------------------
+
+        counts = f"Intentos: {status['total']}   Aciertos: {status['hits']}"
+        if status["rate"] is not None:
+            counts += f" ({status['rate']:.0f}%)"
+        if status["fps"]:
+            counts += f"   FPS prom.: {status['fps']:.1f}"
+        self.test_counts.setText(counts)
+
+        if state != self._test_state:
+            self._test_state = state
+            self._update_test_buttons()
+
+
+    @Slot(str)
+    def on_report_ready(self, json_path):
+        name = os.path.splitext(os.path.basename(json_path))[0]
+        self.append_log(f"Métricas guardadas: {json_path}")
+        self.append_log(f"Reporte: metrics/reportes/{name}/")
+        self.statusBar().showMessage(f"Reporte generado: metrics/reportes/{name}/")
 
 
     # =============================================

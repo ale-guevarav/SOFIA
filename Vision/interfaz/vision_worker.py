@@ -7,11 +7,18 @@ MediaPipe tarde varios milisegundos por frame.
 
 Comunicación con la GUI (thread-safe):
 
-    GUI -> hilo:  pause(), resume(), stop(), set_mode()
+    GUI -> hilo:  pause(), resume(), stop(), set_mode(),
+                  start_trial(), cancel_trial()
                   (protegidos con QMutex + QWaitCondition)
 
-    hilo -> GUI:  señales de Qt (frame_ready, result_ready, ...)
-                  que Qt entrega en el hilo de la GUI.
+    hilo -> GUI:  señales de Qt (frame_ready, result_ready,
+                  test_status, ...) que Qt entrega en el hilo
+                  de la GUI.
+
+Modo TEST: el hilo registra las métricas (metrics_logger) igual
+que main.py, pero el estado de la prueba (cuenta regresiva, YA,
+acierto/fallo) se manda a la GUI en lugar de dibujarse en el video.
+Al detener se guarda el JSON y se genera el reporte.
 
 Estados del hilo:
 
@@ -27,7 +34,8 @@ import cv2
 from PySide6.QtCore import QMutex, QThread, QWaitCondition, Signal
 from PySide6.QtGui import QImage
 
-from deteccion.vision_pipeline import VisionPipeline, MODE_GAME
+from deteccion.vision_pipeline import VisionPipeline, MODE_GAME, MODE_TEST
+from evaluacion.metrics_logger import PerformanceMetrics
 
 
 # Estados que se reportan a la GUI
@@ -54,6 +62,12 @@ class VisionWorker(QThread):
     # Mensaje de error (ej. no hay cámara)
     error = Signal(str)
 
+    # Estado de las pruebas en modo TEST (dict de get_status())
+    test_status = Signal(object)
+
+    # Ruta del reporte generado al detener (modo TEST)
+    report_ready = Signal(str)
+
 
     def __init__(self, camera_index=0, mode=MODE_GAME, parent=None):
 
@@ -67,6 +81,9 @@ class VisionWorker(QThread):
         self._running = True
         self._paused = False
         self._requested_mode = mode
+
+        # Órdenes de prueba pendientes: ("start", gesto) / ("cancel", None)
+        self._test_commands = []
 
 
     @contextmanager
@@ -109,6 +126,18 @@ class VisionWorker(QThread):
             self._requested_mode = mode
 
 
+    def start_trial(self, gesture):
+        """Pide iniciar la prueba de un gesto (solo en modo TEST)."""
+        with self._locked():
+            self._test_commands.append(("start", gesture))
+
+
+    def cancel_trial(self):
+        """Pide cancelar la prueba en curso."""
+        with self._locked():
+            self._test_commands.append(("cancel", None))
+
+
     # =============================================
     # BUCLE DEL HILO
     # =============================================
@@ -133,6 +162,22 @@ class VisionWorker(QThread):
             self.state_changed.emit(STATE_STOPPED)
             return
 
+        # Métricas del modo TEST (solo se usan en este hilo)
+        metrics = PerformanceMetrics(
+            output_dir="metrics",
+            trial_timeout=6.0,   # segundos para hacer el gesto
+            countdown=3.0,       # cuenta regresiva antes de cada prueba
+            start_active=False,
+        )
+        metrics.set_info(
+            resolucion_camara=(
+                f"{int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))}x"
+                f"{int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}"
+            )
+        )
+
+        mode = None   # se aplica el modo pedido en la primera vuelta
+
         self.state_changed.emit(STATE_RUNNING)
 
         fps = 0.0
@@ -150,12 +195,21 @@ class VisionWorker(QThread):
                     if self._paused and self._running:
                         self.state_changed.emit(STATE_PAUSED)
 
+                        # En TEST se pausan las métricas: una prueba
+                        # en curso se cancela y el tiempo en pausa
+                        # no cuenta como un frame lento
+                        if mode == MODE_TEST:
+                            metrics.pause()
+                            self.test_status.emit(metrics.get_status())
+
                         # El hilo se BLOQUEA aquí sin consumir CPU
                         # hasta que resume() o stop() lo despierten
                         while self._paused and self._running:
                             self._resume_condition.wait(self._mutex)
 
                         if self._running:
+                            if mode == MODE_TEST:
+                                metrics.resume()
                             self.state_changed.emit(STATE_RUNNING)
                             previous_time = time.perf_counter()
 
@@ -163,9 +217,38 @@ class VisionWorker(QThread):
                         break
 
                     requested_mode = self._requested_mode
+                    commands = self._test_commands
+                    self._test_commands = []
 
-                if requested_mode != pipeline.mode:
+                # -----------------------------
+                # CAMBIO DE MODO
+                # -----------------------------
+
+                if requested_mode != mode:
+
+                    # Las métricas solo corren en TEST
+                    if mode == MODE_TEST:
+                        metrics.pause()
+                    if requested_mode == MODE_TEST:
+                        metrics.resume()
+
                     pipeline.set_mode(requested_mode)
+                    mode = requested_mode
+
+                    if mode == MODE_TEST:
+                        self.test_status.emit(metrics.get_status())
+
+                # -----------------------------
+                # ÓRDENES DE PRUEBA (botones)
+                # -----------------------------
+
+                for command, gesture in commands:
+                    if mode != MODE_TEST:
+                        continue
+                    if command == "start":
+                        metrics.start_trial(gesture)
+                    else:
+                        metrics.cancel_trial()
 
                 # -----------------------------
                 # CAPTURA + PROCESAMIENTO
@@ -177,9 +260,21 @@ class VisionWorker(QThread):
                     self.error.emit("Se perdió la señal de la cámara")
                     break
 
+                in_test = mode == MODE_TEST
+
+                if in_test:
+                    metrics.begin_frame()
+
                 # El panel de texto lo muestra la GUI,
                 # no se dibuja sobre el video
-                result = pipeline.process(frame, draw_panel=False)
+                result = pipeline.process(
+                    frame,
+                    measure=metrics.measure if in_test else None,
+                    draw_panel=False,
+                )
+
+                if in_test:
+                    metrics.end_frame(result.gesture, result.person_detected)
 
                 # -----------------------------
                 # FPS (promedio móvil)
@@ -210,7 +305,25 @@ class VisionWorker(QThread):
                 self.result_ready.emit(result)
                 self.stats_ready.emit(fps, result.processing_ms)
 
+                if in_test:
+                    self.test_status.emit(metrics.get_status())
+
         finally:
             cap.release()
             pipeline.close()
+
+            # Guardar métricas y reporte si se usó el modo TEST
+            # (en este hilo: la GUI no se congela mientras tanto)
+            if metrics.frame_count > 0:
+                try:
+                    metrics.pause()
+                    json_path = metrics.save()
+
+                    from evaluacion.generate_report import generate
+                    generate(json_path)
+
+                    self.report_ready.emit(json_path)
+                except Exception as error:
+                    self.error.emit(f"No se pudo guardar el reporte: {error}")
+
             self.state_changed.emit(STATE_STOPPED)
