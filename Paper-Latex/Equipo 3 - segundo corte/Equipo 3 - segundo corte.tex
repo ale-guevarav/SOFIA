@@ -904,16 +904,19 @@
 		\label{fig:sofia_pcb}
 	\end{figure}
 	
+	\subsection{Power Budget and Current Constraints}
+	Power supply limitations present a critical physical constraint during simultaneous multi-actuator operation. At nominal load, each MG90S micro-servo draws approximately $250\text{ mA}$ during movement, with peak stall currents reaching up to $700\text{ mA}$ to $800\text{ mA}$. Simultaneous actuation of all 32 servos in the complete kinetic surface could result in transient current spikes exceeding $22\text{ A}$, triggering severe voltage sags and brownout resets on the ESP32-C3 controller. Consequently, current power distribution limits prevent driving all actuators concurrently at peak torque, reinforcing the need for the experimental characterization of single modules, peak-current aware firmware sequencing, and smooth trajectory filtering to minimize transient current demand.
 	
+	It is worth noting that the PCA9685 PWM drivers do not incorporate active current-limiting mechanisms \cite{pca9685}. The breakout boards route power directly from the main $5\text{ V}$ power source. As a result, the current drawn by each MG90S servo depends entirely on its mechanical load, operating voltage, and movement profile. Because the driver chip does not regulate or restrict motor current, power supply stability and protection against voltage sags must be managed through adequate power source capacity and software-level trajectory smoothing in the ESP32-C3 firmware.
 	
 	\section{Results}
 	\label{sec:results}
 	
-	\subsection{Experimental Setup}
+	\subsection{Preliminary Servomotor Dynamic Response}
+	Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, little mechanical chatter and motion desynchronization occurred, establishing $350^\circ/\text{s}$ as the maximum operational threshold for smooth servo motor actuation. This is a preliminary measure to prevent current spikes before obtaining the mechanical time constant estimation.
 	
-	\subsection{Servomotor Dynamic Response}
-	
-	\subsection{Time Constant Estimation}
+	\subsection{Time Constant Estimation Status}
+	Quantitative identification of individual time constants ($\tau_m$) is scheduled for the next iteration upon final assembly and wiring of the crown-shaped limit-switch fixture. Preliminary observations from the velocity sweeps confirm small timing variations between identical micro-servos, reinforcing the need for hardware-triggered time-constant calibration.
 	
 	\subsection{Functional Validation of the Vision Subsystem}
 	
@@ -930,6 +933,28 @@
 	\subsection{Gesture Recognition Performance Evaluation}
 	
 	\linelabel{ln:res-vision-intro}Preliminary performance tests were conducted to evaluate gesture recognition and identify classification errors. These tests recorded the expected gesture, detected gesture, response time, and instantaneous frames per second (FPS).
+	
+	\linelabel{ln:vision-performance}Performance metrics across gesture classes are detailed in Table~\ref{tab:gesture_benchmark}. Dynamic gestures (INICIO and FIN) achieved $100\%$ accuracy with average response times of $1.33\text{ s}$ and $0.95\text{ s}$. Static gestures exhibited lower recall ($75.00\%$ for ESCUDO and ATAQUE, $88.89\%$ for RECARGAR) due to pose ambiguity near decision boundaries.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Detailed Performance Metrics per Gesture Class}
+		\label{tab:gesture_benchmark}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabularx}{\columnwidth}{@{}l c c c c c c c@{}}
+			\toprule
+			\textbf{Gesture} & \textbf{Trials} & \textbf{Hits} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Resp. (s)} \\
+			\midrule
+			INICIO   & 6  & 6  & 100.00\% & 100.00\% & 100.00\% & 100.00\% & 1.33 \\
+			RECARGAR & 9  & 8  & 88.89\%  & 100.00\% & 88.89\%  & 94.12\%  & 4.17 \\
+			ESCUDO   & 12 & 9  & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.06 \\
+			ATAQUE   & 16 & 12 & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.14 \\
+			FIN      & 7  & 7  & 100.00\% & 70.00\%  & 100.00\% & 82.35\%  & 0.95 \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
 	
 	\linelabel{ln:vision-escudo}During the initial evaluation of ESCUDO, four attempts were recorded. Two were correctly classified, while the other two were incorrectly identified as RECARGAR.
 	
