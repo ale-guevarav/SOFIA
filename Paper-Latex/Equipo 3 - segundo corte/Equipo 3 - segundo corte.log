@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  15 OCT 2026 18:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  15 OCT 2026 19:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -951,13 +951,13 @@ File: figures/sofia_pcb_schematic.png Graphic file (type png)
 <use figures/sofia_pcb_schematic.png>
 Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 86
 8.
-(pdftex.def)             Requested size: 490.19843pt x 262.65758pt.
-<figures/sofia_pcb.png, id=50, 640.64343pt x 578.16pt>
+(pdftex.def)             Requested size: 252.0pt x 135.02345pt.
+<figures/sofia_pcb.png, id=50, 680.5425pt x 607.51968pt>
 File: figures/sofia_pcb.png Graphic file (type png)
 <use figures/sofia_pcb.png>
 Package pdftex.def Info: figures/sofia_pcb.png  used on input line 885.
-(pdftex.def)             Requested size: 252.0pt x 227.4135pt.
- [7 <./figures/sofia_pcb_schematic.png> <./figures/sofia_pcb.png>]
+(pdftex.def)             Requested size: 252.0pt x 224.95488pt.
+
 Underfull \hbox (badness 1596) in paragraph at lines 912--913
 []  \OT1/ptm/m/n/10 Func-tional tests con-firmed the recog-ni-tion of INI-CIO
  []
@@ -967,6 +967,7 @@ Underfull \hbox (badness 10000) in alignment at lines 940--940
 [][][][][] 
  []
 
+[7 <./figures/sofia_pcb_schematic.png> <./figures/sofia_pcb.png>]
 (Equipo 3 - segundo corte.bbl
 Underfull \hbox (badness 2142) in paragraph at lines 66--68
 []\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - 
@@ -980,10 +981,10 @@ L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7051 strings out of 467501
- 120687 string characters out of 5408550
+ 7049 strings out of 467501
+ 120629 string characters out of 5408550
  601467 words of memory out of 5000000
- 36179 multiletter control sequences out of 15000+600000
+ 36177 multiletter control sequences out of 15000+600000
  676644 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,13n,79p,1154b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1009,7 +1010,7 @@ ograms/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/P
 rograms/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/P
 rograms/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - segundo corte.pdf" (8 pages, 721758 bytes).
+Output written on "Equipo 3 - segundo corte.pdf" (8 pages, 722523 bytes).
 PDF statistics:
  143 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
