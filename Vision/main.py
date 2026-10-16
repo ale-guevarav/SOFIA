@@ -7,12 +7,14 @@ import time
 # sin importar desde dónde se ejecute (ej. botón ▶ de VS Code)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-from pose_detector import PoseDetector
-from hand_detector import HandDetector
-from gesture_detector import GestureDetector
-from smoothing import TemporalConfirmation
-from metrics_logger import PerformanceMetrics
-from hand_tracker import HandTracker
+from evaluacion.metrics_logger import PerformanceMetrics
+from deteccion.vision_pipeline import (
+    VisionPipeline,
+    MODES,
+    MODE_GAME,
+    MODE_TEST,
+    MODE_TRACKING,
+)
 
 
 # =============================================
@@ -27,12 +29,9 @@ from hand_tracker import HandTracker
 # Teclas para cambiar de modo:
 #   J = JUEGO   T = TEST   K = TRACKING   M = siguiente modo
 #   Q = salir
-
-MODE_GAME = "JUEGO"
-MODE_TEST = "TEST"
-MODE_TRACKING = "TRACKING"
-
-MODES = [MODE_GAME, MODE_TEST, MODE_TRACKING]
+#
+# Toda la detección vive en deteccion/vision_pipeline.py
+# (la misma que usa la GUI: gui_app.py).
 
 MODE_KEYS = {
     ord("j"): MODE_GAME,
@@ -51,152 +50,6 @@ MODE_COLORS = {
 
 # Modo con el que arranca el programa
 INITIAL_MODE = MODE_GAME
-
-
-# =============================================
-# RECONOCIMIENTO DE POSTURAS
-# =============================================
-
-class GestureRecognition:
-    """
-    Agrupa la lógica de reconocimiento de posturas
-    para poder reiniciarla al cambiar de modo.
-    """
-
-    def __init__(self, hand_detector):
-
-        self.hand_detector = hand_detector
-        self.reset()
-
-
-    def reset(self):
-
-        # Detector nuevo = estados internos limpios
-        # (palmadas, recarga, saludo, etc.)
-        self.gesture_detector = GestureDetector()
-
-        # -----------------------------
-        # CONFIRMACIÓN TEMPORAL
-        # -----------------------------
-
-        self.shield_confirmation = TemporalConfirmation(
-            required_frames=5
-        )
-
-        self.attack_confirmation = TemporalConfirmation(
-            required_frames=5
-        )
-
-        # RECARGAR ahora es postura estática
-        self.reload_confirmation = TemporalConfirmation(
-            required_frames=5
-        )
-
-        # Tiempo hasta el que se mostrará
-        # el último gesto dinámico detectado
-        self.start_display_until = 0
-        self.end_display_until = 0
-
-
-    def update(self, smoothed_landmarks, hand_result):
-        """Regresa el nombre de la postura detectada o '---'."""
-
-        now = time.time()
-
-        # -----------------------------
-        # ESCUDO
-        # -----------------------------
-
-        shield_raw = (
-            self.gesture_detector.detect_shield(
-                smoothed_landmarks
-            )
-        )
-
-        shield_detected = (
-            self.shield_confirmation.update(
-                shield_raw
-            )
-        )
-
-        # -----------------------------
-        # ATAQUE: cuerpo + dos pistolas
-        # -----------------------------
-
-        attack_body_detected = (
-            self.gesture_detector.detect_attack_body(
-                smoothed_landmarks
-            )
-        )
-
-        gun_hands_detected = (
-            self.hand_detector.detect_gun_hands(
-                hand_result
-            )
-        )
-
-        attack_detected = (
-            self.attack_confirmation.update(
-                attack_body_detected
-                and gun_hands_detected
-            )
-        )
-
-        # -----------------------------
-        # RECARGAR - POSTURA ESTÁTICA
-        # -----------------------------
-
-        reload_body_detected = (
-            self.gesture_detector.detect_reload(
-                smoothed_landmarks
-            )
-        )
-
-        # Si ambas manos forman pistolas,
-        # no permitir RECARGAR (es ATAQUE)
-        reload_detected = (
-            self.reload_confirmation.update(
-                reload_body_detected
-                and not gun_hands_detected
-            )
-        )
-
-        # -----------------------------
-        # INICIO
-        # -----------------------------
-
-        if self.gesture_detector.detect_start(smoothed_landmarks):
-            self.start_display_until = now + 0.8
-
-        # -----------------------------
-        # FIN
-        # -----------------------------
-
-        if self.gesture_detector.detect_end(smoothed_landmarks):
-            self.end_display_until = now + 0.8
-
-        # -----------------------------
-        # POSTURA DETECTADA
-        # -----------------------------
-
-        # POSTURAS ESTÁTICAS
-        if shield_detected:
-            return "ESCUDO"
-
-        if attack_detected:
-            return "ATAQUE"
-
-        if reload_detected:
-            return "RECARGAR"
-
-        # POSTURAS DINÁMICAS
-        if now < self.start_display_until:
-            return "INICIO"
-
-        if now < self.end_display_until:
-            return "FIN"
-
-        return "---"
 
 
 # =============================================
@@ -255,21 +108,7 @@ def draw_mode_label(frame, mode):
 # CONFIGURACIÓN
 # =============================================
 
-# -----------------------------
-# MEDIAPIPE
-# -----------------------------
-
-pose_detector = PoseDetector()
-hand_detector = HandDetector()
-
-gesture_recognition = GestureRecognition(hand_detector)
-
-hand_tracker = HandTracker(alpha=0.5)
-
-
-# -----------------------------
-# REGISTRO DE MÉTRICAS
-# -----------------------------
+pipeline = VisionPipeline()
 
 # Arranca en pausa: solo mide en modo TEST
 metrics = PerformanceMetrics(
@@ -288,8 +127,7 @@ cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("Error: No se pudo abrir la cámara")
-    pose_detector.close()
-    hand_detector.close()
+    pipeline.close()
     exit()
 
 metrics.set_info(
@@ -308,52 +146,32 @@ print("En TEST: 1-5 probar gesto | 0 modo libre | s guardar")
 # CAMBIO DE MODO
 # =============================================
 
-mode = INITIAL_MODE
-
-if mode == MODE_TEST:
-    metrics.resume()
-
-
 def change_mode(current_mode, new_mode):
 
     if new_mode == current_mode:
         return current_mode
 
-    # -----------------------------
-    # SALIR DEL MODO ACTUAL
-    # -----------------------------
-
+    # Las métricas solo corren en TEST
     if current_mode == MODE_TEST:
         metrics.pause()
-
-    # -----------------------------
-    # ENTRAR AL NUEVO MODO
-    # -----------------------------
 
     if new_mode == MODE_TEST:
         metrics.resume()
 
-    if new_mode == MODE_TRACKING:
-        hand_tracker.reset()
-
-    # Al volver de TRACKING, los landmarks del cuerpo
-    # y los gestos dinámicos tienen datos viejos:
-    # se reinician para evitar detecciones falsas
-    if current_mode == MODE_TRACKING:
-        pose_detector.smoother.reset()
-        gesture_recognition.reset()
+    pipeline.set_mode(new_mode)
 
     print(f"[MODO] {current_mode} -> {new_mode}")
 
     return new_mode
 
 
+mode = MODE_GAME
+mode = change_mode(mode, INITIAL_MODE)
+
+
 # =============================================
 # WHILE PRINCIPAL
 # =============================================
-
-# MediaPipe (timestamp creciente)
-frame_timestamp_ms = 0
 
 previous_time = time.time()
 
@@ -375,149 +193,55 @@ try:
         # (solo hace algo en modo TEST)
         metrics.begin_frame()
 
-        # OpenCV trabaja en BGR
-        # MediaPipe trabaja en RGB
-        frame_rgb = cv2.cvtColor(
+        # -----------------------------
+        # DETECCIÓN
+        # -----------------------------
+
+        result = pipeline.process(
             frame,
-            cv2.COLOR_BGR2RGB
+            measure=metrics.measure
         )
 
-        # =============================================
-        # MODO TRACKING
-        # =============================================
+        hand_positions = result.hand_positions
 
-        if mode == MODE_TRACKING:
+        # -----------------------------
+        # TEXTOS DE JUEGO / TEST
+        # -----------------------------
 
-            # Solo manos: NO se analiza la postura
-            # ni se reconocen gestos
-            hand_result = hand_detector.detect(
-                frame_rgb,
-                frame_timestamp_ms
-            )
-
-            frame_timestamp_ms += 33
-
-            # Posición de cada mano en el plano cartesiano
-            hand_positions = hand_tracker.update(
-                hand_result,
-                frame.shape
-            )
-
-            # Plano -> esqueleto de la mano -> vectores
-            hand_tracker.draw_plane(frame)
-
-            hand_detector.draw(
-                frame,
-                hand_result
-            )
-
-            hand_tracker.draw_positions(
-                frame,
-                hand_positions
-            )
-
-        # =============================================
-        # MODOS JUEGO Y TEST
-        # =============================================
-
-        else:
-
-            # -----------------------------
-            # DETECCIÓN CON MEDIAPIPE
-            # -----------------------------
-
-            with metrics.measure("pose"):
-
-                pose_result = pose_detector.detect(
-                    frame_rgb,
-                    frame_timestamp_ms
-                )
-
-                # Aplicar EMA a los landmarks corporales
-                smoothed_landmarks = (
-                    pose_detector.get_smoothed_landmarks(
-                        pose_result
-                    )
-                )
-
-            with metrics.measure("manos"):
-
-                hand_result = hand_detector.detect(
-                    frame_rgb,
-                    frame_timestamp_ms
-                )
-
-            # Aumentar timestamp después de analizar
-            # postura y manos en el mismo frame
-            frame_timestamp_ms += 33
-
-            # -----------------------------
-            # DIBUJAR LANDMARKS
-            # -----------------------------
-
-            with metrics.measure("dibujo"):
-
-                person_detected = pose_detector.draw(
-                    frame,
-                    pose_result
-                )
-
-                hand_detector.draw(
-                    frame,
-                    hand_result
-                )
-
-            # -----------------------------
-            # DETECCIÓN DE GESTOS
-            # -----------------------------
-
-            with metrics.measure("gestos"):
-
-                detected_gesture = gesture_recognition.update(
-                    smoothed_landmarks,
-                    hand_result
-                )
-
-            # -----------------------------
-            # TEXTOS EN PANTALLA
-            # -----------------------------
+        if mode != MODE_TRACKING:
 
             with metrics.measure("dibujo"):
 
                 put_text(
                     frame,
-                    f"Postura: {detected_gesture}",
+                    f"Postura: {result.gesture}",
                     (30, 130),
                     (0, 255, 255),
                     0.9
                 )
 
-                if person_detected:
+                if result.person_detected:
                     put_text(frame, "Persona detectada",
                              (30, 50), (0, 255, 0), 1)
                 else:
                     put_text(frame, "Persona no detectada",
                              (30, 50), (0, 0, 255), 1)
 
-            # -----------------------------
-            # MÉTRICAS (solo TEST)
-            # -----------------------------
+        # -----------------------------
+        # MÉTRICAS (solo TEST)
+        # -----------------------------
 
-            if mode == MODE_TEST:
+        if mode == MODE_TEST:
 
-                metrics.end_frame(
-                    detected_gesture,
-                    person_detected
-                )
+            metrics.end_frame(
+                result.gesture,
+                result.person_detected
+            )
 
-                metrics.draw_overlay(frame)
-
-        # =============================================
-        # COMÚN A TODOS LOS MODOS
-        # =============================================
+            metrics.draw_overlay(frame)
 
         # -----------------------------
-        # FPS
+        # FPS (todos los modos)
         # -----------------------------
 
         current_time = time.time()
@@ -571,8 +295,7 @@ finally:
     cap.release()
     cv2.destroyAllWindows()
 
-    pose_detector.close()
-    hand_detector.close()
+    pipeline.close()
 
     # -----------------------------
     # GUARDAR MÉTRICAS Y REPORTE
@@ -585,11 +308,11 @@ finally:
         json_path = metrics.save()
 
         try:
-            from generate_report import generate
+            from evaluacion.generate_report import generate
             generate(json_path)
         except Exception as error:
             print(
                 "No se pudo generar el reporte automáticamente: "
                 f"{error}"
             )
-            print("Puedes generarlo con: python generate_report.py")
+            print("Puedes generarlo con: python -m evaluacion.generate_report")

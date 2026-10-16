@@ -22,6 +22,10 @@ Actualmente el sistema permite:
 * Mostrar los FPS durante la ejecución.
 * Indicar visualmente si existe una persona detectada.
 * Registrar métricas de desempeño (tasa de acierto, tiempo de respuesta y FPS promedio) y generar reportes en Excel y Markdown.
+* Reconocer automáticamente las cinco posturas del juego.
+* Seguir la posición de la mano en un plano cartesiano (modo TRACKING).
+* Operar el sistema desde una **interfaz gráfica (GUI)** con video en vivo y botones para iniciar, pausar, reanudar y detener la detección.
+* Enviar las posturas y la posición de la mano al **ESP32 maestro por Bluetooth Low Energy (BLE)**.
 
 El sistema puede trabajar con hasta **75 landmarks simultáneamente**:
 
@@ -87,6 +91,20 @@ Se utilizan para generar los reportes de métricas:
 * **Matplotlib** crea las gráficas en imagen (pastel, barras, líneas y matriz de confusión) para el reporte en Markdown.
 * **openpyxl** crea el archivo de Excel con tablas y gráficas nativas que se pueden editar.
 
+### PySide6 (Qt)
+
+Se utiliza para la interfaz gráfica. Se eligió porque incluye lo necesario para que el procesamiento de video no congele la ventana:
+
+* `QThread` para correr la cámara y MediaPipe en un hilo aparte.
+* Señales y slots para pasar datos entre hilos de forma segura.
+* `QMutex` y `QWaitCondition` para pausar el hilo sin consumir CPU.
+
+> Se usa la versión **6.11.2**. La 6.12.0 tiene un error que cierra el programa.
+
+### Bleak
+
+Librería para **Bluetooth Low Energy** desde Python. Se usa porque el ESP32-C3 solo tiene BLE (no tiene Bluetooth clásico), así que no aparece como puerto COM.
+
 ---
 
 ## ¿Por qué se eligieron estas tecnologías?
@@ -109,83 +127,142 @@ Las principales ventajas para este proyecto son:
 ## Estructura del proyecto
 
 ```text
-sofia_pose_detection/
+SOFIA/
+├── Vision/                       ← este proyecto
+│   │
+│   │   # Programas que se ejecutan
+│   ├── main.py                   ← ventana de OpenCV con teclado (y métricas)
+│   ├── gui_app.py                ← interfaz gráfica
+│   ├── ble_test.py               ← prueba de comunicación con el ESP32
+│   │
+│   ├── deteccion/                ← cámara → postura / posición de la mano
+│   │   ├── vision_pipeline.py
+│   │   ├── gesture_recognition.py
+│   │   ├── gesture_detector.py
+│   │   ├── hand_tracker.py
+│   │   ├── pose_detector.py
+│   │   ├── hand_detector.py
+│   │   ├── pose_connections.py
+│   │   ├── hand_connections.py
+│   │   ├── geometry_utils.py
+│   │   └── smoothing.py
+│   │
+│   ├── interfaz/                 ← piezas de la GUI
+│   │   └── vision_worker.py
+│   │
+│   ├── comunicacion/             ← Bluetooth con el ESP32
+│   │   ├── protocol.py
+│   │   └── ble_link.py
+│   │
+│   ├── evaluacion/               ← métricas del modo TEST
+│   │   ├── metrics_logger.py
+│   │   └── generate_report.py
+│   │
+│   ├── docs/                     ← explicación del código
+│   │   ├── ARQUITECTURA_GUI.md
+│   │   └── PROTOCOLO_COMUNICACION.md
+│   │
+│   ├── models/
+│   │   ├── pose_landmarker.task
+│   │   └── hand_landmarker.task
+│   │
+│   ├── metrics/                  (se crea automáticamente; no se sube a git)
+│   ├── requirements.txt
+│   ├── .gitignore
+│   └── README.md
 │
-├── models/
-│   ├── pose_landmarker.task
-│   └── hand_landmarker.task
-│
-├── metrics/                  (se crea automáticamente)
-│   ├── sesion_*.json
-│   └── reportes/
-│
-├── main.py
-├── pose_detector.py
-├── pose_connections.py
-├── hand_detector.py
-├── hand_connections.py
-├── gesture_detector.py
-├── geometry_utils.py
-├── smoothing.py
-├── metrics_logger.py
-├── generate_report.py
-├── requirements.txt
-├── .gitignore
-└── README.md
+├── ESP32/                        ← firmware del ESP32 maestro (ver ESP32/README.md)
+└── Paper-Latex/                  ← documentos formales
 ```
+
+Cada carpeta agrupa una parte del sistema, y en la raíz de `Vision/` solo quedan los tres programas que se ejecutan. Cada carpeta tiene un `__init__.py` que describe lo que contiene.
 
 ### `main.py`
 
-Es el punto principal de ejecución del programa.
+Programa con ventana de OpenCV controlado con el teclado.
 
 Se encarga de:
 
 * Inicializar la cámara.
-* Obtener los frames.
-* Enviar las imágenes a los detectores.
-* Coordinar Pose y Hands.
-* Mostrar el resultado.
-* Calcular los FPS.
-* Registrar las métricas de desempeño.
+* Cambiar entre los modos JUEGO, TEST y TRACKING.
+* Mostrar el resultado y los FPS.
+* Registrar las métricas de desempeño (solo en modo TEST).
 * Liberar los recursos al finalizar.
 
-### `pose_detector.py`
+La detección en sí está en `vision_pipeline.py`, que es el mismo código que usa la GUI.
+
+### `gui_app.py`
+
+Interfaz gráfica. Muestra el video, el resultado, los botones de control, el selector de modo, la conexión con el ESP32 y una bitácora. **No procesa video**: eso lo hace `vision_worker.py` en otro hilo.
+
+### `interfaz/vision_worker.py`
+
+Hilo (`QThread`) que lee la cámara y ejecuta el pipeline. Implementa pausar, reanudar y detener, y manda cada frame y su resultado a la GUI mediante señales.
+
+### `deteccion/vision_pipeline.py`
+
+Procesa **un frame** según el modo activo:
+
+* **JUEGO / TEST:** Pose + Manos + reconocimiento de posturas.
+* **TRACKING:** solo Manos; Pose se usa únicamente como respaldo si la mano se pierde.
+
+### `deteccion/gesture_recognition.py`
+
+Decide qué postura se está haciendo a partir de los landmarks, usando las reglas de `gesture_detector.py` y la confirmación temporal de 5 frames.
+
+### `deteccion/hand_tracker.py`
+
+Calcula la posición de la mano en un plano cartesiano con el origen en el centro de la imagen y el vector desde el origen hasta la mano.
+
+### `comunicacion/protocol.py`
+
+Arma y valida las tramas del protocolo de comunicación con el ESP32 (ver `docs/PROTOCOLO_COMUNICACION.md`).
+
+### `comunicacion/ble_link.py`
+
+Conexión Bluetooth con el ESP32: busca el dispositivo, envía las tramas, espera la confirmación (ACK) y reintenta si no llega. Corre en su propio hilo.
+
+### `ble_test.py`
+
+Prueba de comunicación sin GUI: envía un PING, una postura, un TRACK y una trama dañada, y muestra si cada una tuvo la respuesta esperada.
+
+### `deteccion/pose_detector.py`
 
 Contiene la lógica relacionada con MediaPipe Pose Landmarker.
 
 Se encarga de detectar y dibujar la estructura corporal.
 
-### `pose_connections.py`
+### `deteccion/pose_connections.py`
 
 Define las conexiones utilizadas para representar gráficamente el esqueleto corporal.
 
-### `hand_detector.py`
+### `deteccion/hand_detector.py`
 
 Contiene la lógica relacionada con MediaPipe Hand Landmarker.
 
-Se encarga de detectar y dibujar las manos y sus articulaciones.
+Se encarga de detectar y dibujar las manos y sus articulaciones. Los umbrales de confianza se pueden configurar: el modo TRACKING usa umbrales más bajos para no perder la mano tan fácilmente.
 
-### `hand_connections.py`
+### `deteccion/hand_connections.py`
 
 Define las conexiones entre los 21 landmarks de cada mano.
 
-### `gesture_detector.py`
+### `deteccion/gesture_detector.py`
 
 Contiene las reglas geométricas para reconocer los cinco gestos a partir de los landmarks.
 
-### `geometry_utils.py`
+### `deteccion/geometry_utils.py`
 
 Funciones de apoyo para calcular distancias, ángulos y distancias normalizadas.
 
-### `smoothing.py`
+### `deteccion/smoothing.py`
 
 Suavizado de landmarks (EMA) y confirmación temporal para evitar detecciones inestables.
 
-### `metrics_logger.py`
+### `evaluacion/metrics_logger.py`
 
 Mide el desempeño del sistema mientras se ejecuta: FPS, latencia por frame y resultados de las pruebas. Guarda todo en un archivo JSON.
 
-### `generate_report.py`
+### `evaluacion/generate_report.py`
 
 Lee el JSON de métricas y genera el reporte en Excel (`.xlsx`) y Markdown (`.md`) con tablas y gráficas.
 
@@ -200,11 +277,21 @@ hand_landmarker.task
 
 ---
 
-# Posturas y gestos propuestos
+# Posturas y gestos
 
 Para la interacción con SOFIA se diseñaron cinco gestos inspirados en la dinámica del juego **Vaqueritos**.
 
-En esta primera etapa los gestos se encuentran diseñados conceptualmente. Su reconocimiento automático será implementado en una etapa posterior utilizando los landmarks obtenidos por Pose Landmarker y Hand Landmarker.
+Los cinco se reconocen automáticamente mediante reglas geométricas sobre los landmarks de Pose Landmarker y Hand Landmarker. Cada postura tiene un número que se usa en las pruebas (teclas 1-5) y en la comunicación con el ESP32:
+
+| # | Postura | Tipo | Condiciones principales |
+| --- | --- | --- | --- |
+| 1 | INICIO | Dinámica | Tres contactos muñeca-cadera en menos de 3 s |
+| 2 | RECARGAR | Estática | Muñecas cerca de los hombros, antebrazos casi verticales, sin dos manos en pistola |
+| 3 | ESCUDO | Estática | Brazos cruzados, muñecas cerca del hombro contrario, codos debajo de los hombros |
+| 4 | ATAQUE | Estática | Ángulo de codos entre 35° y 125°, muñecas arriba de los codos y dos manos en pistola |
+| 5 | FIN | Dinámica | Una mano levantada con dos cambios de dirección horizontales |
+
+Las posturas estáticas deben mantenerse 5 frames seguidos para confirmarse.
 
 ## 1. INICIO - Tres palmadas
 
@@ -216,7 +303,7 @@ La persona coloca las manos cerca de los muslos y realiza tres palmadas consecut
 
 Indicar el inicio de la partida o una transición hacia el modo de juego.
 
-**Detección propuesta:**
+**Detección (diseño original; ver la tabla de condiciones actuales arriba):**
 
 Se analizará la distancia entre las muñecas/manos y la zona de los muslos a través de varios frames, utilizando un contador para reconocer tres movimientos consecutivos.
 
@@ -226,13 +313,13 @@ Se analizará la distancia entre las muñecas/manos y la zona de los muslos a tr
 
 **Tipo:** Postura estática.
 
-La persona flexiona ambos brazos y coloca las manos aproximadamente a la altura de los hombros.
+La persona flexiona ambos brazos y coloca las manos aproximadamente a la altura de los hombros, con los antebrazos casi verticales.
 
 **Función:**
 
 Recargar munición dentro del juego.
 
-**Detección propuesta:**
+**Detección (diseño original; ver la tabla de condiciones actuales arriba):**
 
 Se utilizarán las posiciones de:
 
@@ -254,7 +341,7 @@ La persona cruza los brazos frente al pecho.
 
 Protegerse de un ataque.
 
-**Detección propuesta:**
+**Detección (diseño original; ver la tabla de condiciones actuales arriba):**
 
 Se analizará la posición relativa de:
 
@@ -271,13 +358,13 @@ Las muñecas deberán encontrarse cruzadas o posicionadas hacia lados opuestos d
 
 **Tipo:** Postura principalmente estática.
 
-La persona dirige los brazos hacia el frente y realiza con las manos un gesto similar a una pistola.
+La persona flexiona los brazos en forma de "W" (muñecas por encima de los codos) y realiza con ambas manos un gesto similar a una pistola.
 
 **Función:**
 
 Realizar un ataque contra SOFIA.
 
-**Detección propuesta:**
+**Detección (diseño original; ver la tabla de condiciones actuales arriba):**
 
 Pose Landmarker permitirá analizar la extensión y dirección de los brazos.
 
@@ -293,13 +380,13 @@ Hand Landmarker permitirá analizar individualmente los dedos para identificar u
 
 **Tipo:** Gesto dinámico.
 
-La persona levanta ambas manos y realiza un movimiento lateral de despedida.
+La persona levanta una mano y realiza un movimiento lateral de despedida.
 
 **Función:**
 
 Finalizar la interacción o indicar el término de la partida.
 
-**Detección propuesta:**
+**Detección (diseño original; ver la tabla de condiciones actuales arriba):**
 
 Se analizará la posición de las manos durante varios frames para detectar cambios repetidos de dirección de izquierda a derecha.
 
@@ -311,52 +398,33 @@ Se analizará la posición de las manos durante varios frames para detectar camb
 Cámara
    │
    ▼
-OpenCV
+Hilo de visión (vision_worker.py)
    │
-   ├───────────────┐
-   ▼               ▼
-Pose Landmarker   Hand Landmarker
-   │               │
-   ▼               ▼
-33 landmarks      21 landmarks por mano
-   │               │
-   └───────┬───────┘
-           ▼
-Representación visual
-           │
-           ▼
-Esqueleto + manos + FPS
+   ▼
+VisionPipeline ── modo JUEGO ───► Pose + Hands ► posturas
+   │                                              (INICIO, RECARGAR, ESCUDO, ATAQUE, FIN)
+   └──────────── modo TRACKING ─► Hands ► posición de la mano (x, y, vector)
+   │
+   ▼
+GUI (gui_app.py): video + resultado + controles
+   │
+   ▼
+Hilo BLE (ble_link.py) ── trama + CRC ──► ESP32 maestro ──► PCA9685 ──► 2 servos
+                       ◄── ACK / NACK ───
 ```
 
 ---
 
 # Flujo futuro
 
-El sistema está diseñado para evolucionar hacia:
-
 ```text
-Cámara
-   │
-   ▼
-Pose + Hands
-   │
-   ▼
-Landmarks
-   │
-   ▼
-Detector de gestos
-   │
-   ├── INICIO
-   ├── RECARGAR
-   ├── ESCUDO
-   ├── ATAQUE
-   └── FIN
+Posturas / posición de la mano
    │
    ▼
 Lógica del juego
    │
    ▼
-SOFIA
+ESP32 maestro ──► 16 módulos de SOFIA
 ```
 
 La lógica del juego podrá administrar aspectos como munición, acciones válidas, selección de acciones de SOFIA y condiciones de victoria o derrota.
@@ -388,37 +456,113 @@ En Windows PowerShell:
 
 ## 4. Instalar dependencias
 
+Desde la carpeta `SOFIA`:
+
 ```bash
-pip install -r requirements.txt
+pip install -r Vision/requirements.txt
 ```
 
-> `requirements.txt` debe incluir `openpyxl` para poder generar el reporte en Excel.
+Incluye OpenCV, MediaPipe, las librerías de reportes (Matplotlib, openpyxl), la GUI (PySide6) y Bluetooth (bleak).
 
 ---
 
 # Ejecución
 
-Con el entorno virtual activado:
+Con el entorno virtual activado, desde la carpeta `SOFIA` (o desde `Vision/`; los programas encuentran los modelos en cualquier caso):
+
+| Programa | Para qué |
+| --- | --- |
+| `python Vision/gui_app.py` | **Interfaz gráfica**: uso normal y conexión con el ESP32 |
+| `python Vision/main.py` | Ventana de OpenCV con teclado; aquí está el **modo TEST** con métricas |
+| `python Vision/ble_test.py` | Probar la comunicación con el ESP32 sin GUI |
+
+## Modos
+
+| Modo | Qué hace |
+| --- | --- |
+| **JUEGO** | Reconoce las cinco posturas. |
+| **TEST** | Igual que JUEGO, más pruebas y métricas (solo en `main.py`). |
+| **TRACKING** | **No reconoce posturas.** Sigue la mano y la ubica en un plano cartesiano con el (0, 0) en el centro de la imagen. |
+
+## Teclas en `main.py`
+
+Haz clic en la ventana de la cámara antes de presionar:
+
+| Tecla | Acción |
+| --- | --- |
+| `J` | Modo JUEGO |
+| `T` | Modo TEST |
+| `K` | Modo TRACKING |
+| `M` | Siguiente modo |
+| `Q` | Salir (y generar el reporte si se usó TEST) |
+
+---
+
+# Interfaz gráfica (GUI)
 
 ```bash
-python main.py
+python Vision/gui_app.py
 ```
-
-Se abrirá una ventana con la imagen de la cámara y la detección en tiempo real.
-
-Para cerrar el programa:
 
 ```text
-Presionar Q
+┌──────────────────────────────────────┬──────────────────────────┐
+│                                      │ Control de detección     │
+│                                      │ [Iniciar]  [Pausar]      │
+│                                      │ [Reanudar] [Detener]     │
+│           VIDEO EN VIVO              │ Modo: (•) Juego ( ) Track│
+│                                      │ Resultado: ESCUDO        │
+│                                      │ ESP32: ● Conectado       │
+│                                      │ Bitácora                 │
+└──────────────────────────────────────┴──────────────────────────┘
 ```
 
-Al cerrar se guardan automáticamente las métricas de la sesión y se genera el reporte (ver la siguiente sección).
+| Botón | Qué hace |
+| --- | --- |
+| **Iniciar** | Crea el hilo de visión, abre la cámara y carga los modelos. |
+| **Pausar** | El hilo se detiene sin consumir CPU (el video se congela). |
+| **Reanudar** | El hilo continúa donde se quedó. |
+| **Detener** | Termina el hilo, libera la cámara y manda STOP al ESP32. |
+
+La ventana nunca se congela porque la cámara y MediaPipe corren en un hilo y el Bluetooth en otro. La arquitectura completa, los wireframes y la justificación están en `docs/ARQUITECTURA_GUI.md`.
+
+---
+
+# Modo TRACKING
+
+El origen (0, 0) está en el centro de la imagen, con `+x` a la derecha y `+y` hacia arriba. Para cada mano se calcula:
+
+* Coordenadas en píxeles y normalizadas de -1 a 1.
+* Vector desde el origen: magnitud y ángulo (0° = derecha, sentido antihorario).
+
+Para que la mano no se pierda cuando la palma se inclina, se usan tres niveles:
+
+1. **Hand Landmarker** (lo más preciso).
+2. Si la mano se pierde, la **muñeca de Pose Landmarker**, que no necesita ver la palma.
+3. Si tampoco hay pose, se mantiene la **última posición** 0.35 s.
+
+---
+
+# Comunicación con el ESP32 (BLE)
+
+La PC envía al ESP32 maestro las posturas y la posición de la mano por **Bluetooth Low Energy**. Cada mensaje es una trama con número de secuencia y CRC-8; el ESP32 responde **ACK** si la recibió bien o **NACK** con un código de error.
+
+| Comando | Cuándo se envía |
+| --- | --- |
+| POSE (1-5) | Cuando aparece una postura nueva |
+| TRACK (x, y, vector) | Continuamente en modo TRACKING (máx. 20 por segundo) |
+| PING | Comando de prueba y latido cada segundo sin tráfico |
+| MODE | Al conectar y al cambiar de modo |
+| STOP | Al detener la detección |
+
+**Para conectar desde la GUI:** encender el Bluetooth de la laptop, encender el ESP32 y presionar **Conectar**. No es necesario (ni recomendable) emparejarlo desde la configuración de Windows.
+
+El estándar completo (trama, comandos, códigos de error y reglas) está en `docs/PROTOCOLO_COMUNICACION.md`. El firmware del ESP32 está en la carpeta `ESP32/` de la raíz del repositorio.
 
 ---
 
 # Pruebas y métricas de desempeño
 
-El sistema incluye un modo de pruebas para medir qué tan bien funciona. Las métricas registradas son:
+El modo **TEST** de `main.py` (tecla `T`) permite medir qué tan bien funciona el sistema. Las métricas solo se registran mientras se está en este modo. Las métricas registradas son:
 
 * **Tasa de acierto:** porcentaje de pruebas en las que el sistema reconoció el gesto correcto.
 * **Tiempo de respuesta:** cuánto tarda el sistema en reconocer un gesto.
@@ -527,7 +671,7 @@ Se reportan además el FPS mínimo, máximo y p95, una gráfica de FPS a lo larg
 
 ## Resultados generados
 
-Al presionar `q` se crean los siguientes archivos:
+Al presionar `q` (si se usó el modo TEST) se crean los siguientes archivos:
 
 ```text
 metrics/
@@ -546,11 +690,13 @@ El **Markdown** se puede ver en VS Code con clic derecho → *Open Preview*.
 Si el reporte no se generó automáticamente, o se quiere regenerar:
 
 ```bash
+cd Vision
+
 # Sesión más reciente
-python generate_report.py
+python -m evaluacion.generate_report
 
 # Sesión específica
-python generate_report.py metrics/sesion_AAAAMMDD_HHMMSS.json
+python -m evaluacion.generate_report metrics/sesion_AAAAMMDD_HHMMSS.json
 ```
 
 ---
@@ -577,19 +723,30 @@ python generate_report.py metrics/sesion_AAAAMMDD_HHMMSS.json
 * [x] Confirmación temporal de posturas estáticas (5 frames consecutivos).
 * [x] Reconocimiento automático de ESCUDO.
 * [x] Reconocimiento automático de ATAQUE (brazos + dos manos en forma de pistola).
-* [x] Reconocimiento dinámico de RECARGAR.
+* [x] Reconocimiento de RECARGAR (primero dinámico, después redefinido como postura estática).
 * [x] Reconocimiento dinámico de INICIO (tres palmadas).
 * [x] Reconocimiento dinámico de FIN/DESPEDIDA.
 * [x] Modo de pruebas con cuenta regresiva.
 * [x] Registro de métricas de desempeño (tasa de acierto, tiempo de respuesta y FPS promedio).
 * [x] Generación de reportes en Excel y Markdown con tablas y gráficas.
 
+### Tercera etapa
+
+* [x] Selector de modos (JUEGO / TEST / TRACKING).
+* [x] Modo TRACKING con plano cartesiano y respaldo con Pose.
+* [x] Interfaz gráfica con PySide6 y procesamiento en hilos.
+* [x] Controles para iniciar, pausar, reanudar y detener la detección.
+* [x] Estándar de comunicación PC-ESP32 por BLE (tramas, CRC, ACK/NACK y códigos de error).
+* [x] Envío de posturas y posición de la mano desde la GUI.
+* [x] Firmware del ESP32 con un patrón de movimiento por postura (carpeta `ESP32/`).
+* [ ] Validación de la comunicación y del movimiento en el hardware real.
+
 ### Próximas etapas
 
 * [ ] Máquina de estados para evitar detecciones repetidas.
 * [ ] Implementación de la lógica del juego.
-* [ ] Comunicación entre el sistema de visión y SOFIA.
-* [ ] Respuestas físicas del robot según las acciones del juego.
+* [ ] Medición de la latencia completa (gesto → movimiento).
+* [ ] Respuestas físicas de los 16 módulos según las acciones del juego.
 
 ---
 

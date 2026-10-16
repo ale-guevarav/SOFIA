@@ -4,22 +4,31 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-from hand_connections import HAND_CONNECTIONS
+from .hand_connections import HAND_CONNECTIONS
 
 
 class HandDetector:
-    def __init__(self, model_path="models/hand_landmarker.task"):
+    def __init__(
+        self,
+        model_path="models/hand_landmarker.task",
+        min_detection_confidence=0.5,
+        min_presence_confidence=0.5,
+        min_tracking_confidence=0.5,
+    ):
         base_options = python.BaseOptions(
             model_asset_path=model_path
         )
 
+        # Umbrales de confianza. Valores más bajos hacen que
+        # la mano no se pierda tan fácil (por ejemplo, con la
+        # palma inclinada), a cambio de algún falso positivo.
         options = vision.HandLandmarkerOptions(
             base_options=base_options,
             running_mode=vision.RunningMode.VIDEO,
             num_hands=2,
-            min_hand_detection_confidence=0.5,
-            min_hand_presence_confidence=0.5,
-            min_tracking_confidence=0.5
+            min_hand_detection_confidence=min_detection_confidence,
+            min_hand_presence_confidence=min_presence_confidence,
+            min_tracking_confidence=min_tracking_confidence
         )
 
         self.detector = vision.HandLandmarker.create_from_options(options)

@@ -8,9 +8,9 @@ Lee el JSON que genera metrics_logger.py y crea:
         reporte.md        -> Markdown con tablas e imágenes
         graficas/*.png    -> Gráficas hechas con matplotlib
 
-Uso:
-    python generate_report.py                       (sesión más reciente)
-    python generate_report.py metrics/sesion_X.json (sesión específica)
+Uso (desde la carpeta Vision):
+    python -m evaluacion.generate_report                          (sesión más reciente)
+    python -m evaluacion.generate_report metrics/sesion_X.json    (sesión específica)
 """
 
 import glob
@@ -77,7 +77,13 @@ def stage_name(key):
     return STAGE_LABELS.get(key, key)
 
 
-def latest_session(folder="metrics"):
+# Carpeta metrics/ dentro de Vision, sin importar desde dónde se ejecute
+DEFAULT_METRICS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "metrics"
+)
+
+
+def latest_session(folder=DEFAULT_METRICS_DIR):
     files = glob.glob(os.path.join(folder, "sesion_*.json"))
     if not files:
         return None
