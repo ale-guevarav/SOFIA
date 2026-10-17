@@ -4,8 +4,8 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-from smoothing import LandmarkSmoother
-from pose_connections import POSE_CONNECTIONS
+from .smoothing import LandmarkSmoother
+from .pose_connections import POSE_CONNECTIONS
 
 
 class PoseDetector:

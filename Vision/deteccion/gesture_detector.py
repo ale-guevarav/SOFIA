@@ -1,6 +1,6 @@
 import time
 
-from geometry_utils import normalized_distance, angle
+from .geometry_utils import normalized_distance, angle
 
 
 class GestureDetector:
