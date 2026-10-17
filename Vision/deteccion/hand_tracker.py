@@ -63,9 +63,9 @@ POSE_HAND_POINTS = {
 
 # MediaPipe Hands decide izquierda/derecha suponiendo
 # que la imagen está en espejo (como una selfie).
-# La cámara NO se voltea, por eso se invierte.
-# Así coincide con Pose, que usa la mano real de la persona.
-SWAP_HANDEDNESS = True
+# main.py y la GUI ya voltean la imagen (cv2.flip),
+# así que no hace falta invertir.
+SWAP_HANDEDNESS = False
 
 HAND_LABELS = {
     "Left": "IZQUIERDA",

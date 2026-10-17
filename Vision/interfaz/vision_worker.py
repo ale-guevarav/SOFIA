@@ -265,6 +265,9 @@ class VisionWorker(QThread):
                 if in_test:
                     metrics.begin_frame()
 
+                # Imagen en espejo (como selfie)
+                frame = cv2.flip(frame, 1)
+
                 # El panel de texto lo muestra la GUI,
                 # no se dibuja sobre el video
                 result = pipeline.process(

@@ -189,6 +189,9 @@ try:
             print("Error: No se pudo capturar el frame")
             break
 
+        # Imagen en espejo (como selfie)
+        frame = cv2.flip(frame, 1)
+
         # Empieza a medir el procesamiento
         # (solo hace algo en modo TEST)
         metrics.begin_frame()
