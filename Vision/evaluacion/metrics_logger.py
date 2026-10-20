@@ -12,6 +12,10 @@ Mide, mientras el sistema está corriendo:
      pose, manos, gestos y dibujo.
    - Tiempo de reconocimiento por intento (s): desde la señal "YA"
      hasta que el sistema reporta el gesto.
+   - Frames hasta la respuesta: cuántos frames se procesaron
+     desde "YA" hasta el reconocimiento.
+   - Tiempo de procesamiento por intento (ms): suma de la latencia
+     de esos frames, es decir, cuánto de ese tiempo fue cómputo.
 
 3. Tasa de acierto
    - Mediante "intentos" etiquetados: el evaluador presiona una tecla
@@ -232,6 +236,11 @@ class PerformanceMetrics:
         self._result_until = 0
         self._last_result = None
 
+        # Frames y procesamiento acumulados
+        # desde "YA" (se reinician en cada intento)
+        self._trial_frames = 0
+        self._trial_processing_ms = 0.0
+
 
     # =============================================
     # INFORMACIÓN EXTRA (cámara, modelo, etc.)
@@ -418,7 +427,7 @@ class PerformanceMetrics:
 
         self._previous_gesture = detected_gesture
 
-        self._update_trial(event)
+        self._update_trial(event, processing_ms)
 
 
     # =============================================
@@ -502,7 +511,7 @@ class PerformanceMetrics:
         }
 
 
-    def _update_trial(self, event):
+    def _update_trial(self, event, processing_ms=0.0):
 
         now = time.perf_counter()
 
@@ -514,6 +523,8 @@ class PerformanceMetrics:
             if now >= self._countdown_until:
                 self.state = "active"
                 self._trial_start = now
+                self._trial_frames = 0
+                self._trial_processing_ms = 0.0
                 print("[METRICAS] YA!")
 
             return
@@ -521,6 +532,10 @@ class PerformanceMetrics:
         if self.state == "active":
 
             elapsed = now - self._trial_start
+
+            # Este frame cuenta para el intento
+            self._trial_frames += 1
+            self._trial_processing_ms += processing_ms
 
             if event is not None:
                 self._finish_trial(event, elapsed)
@@ -573,6 +588,20 @@ class PerformanceMetrics:
                 if response_time is not None
                 else None
             ),
+            # Frames procesados desde "YA" hasta la detección
+            # (incluye los 5 de confirmación de las posturas estáticas)
+            "frames_hasta_respuesta": (
+                self._trial_frames
+                if response_time is not None
+                else None
+            ),
+            # Suma de la latencia de esos frames: cuánto del
+            # tiempo de respuesta fue procesamiento de la PC
+            "tiempo_procesamiento_ms": (
+                round(self._trial_processing_ms, 1)
+                if response_time is not None
+                else None
+            ),
         }
 
         self.trials.append(trial)
@@ -586,7 +615,8 @@ class PerformanceMetrics:
             f"[METRICAS] Intento {trial['id']}: esperado={trial['esperado']} "
             f"detectado={trial['detectado']} -> {outcome.upper()}"
             + (
-                f" ({response_time:.2f}s)"
+                f" ({response_time:.2f}s, {trial['frames_hasta_respuesta']} frames,"
+                f" {trial['tiempo_procesamiento_ms']:.0f} ms de procesamiento)"
                 if response_time is not None
                 else ""
             )
@@ -772,6 +802,18 @@ class PerformanceMetrics:
                 if t["correcto"] and t["tiempo_respuesta_s"] is not None
             ]
 
+            frames_to_response = [
+                t["frames_hasta_respuesta"]
+                for t in subset
+                if t["correcto"] and t.get("frames_hasta_respuesta") is not None
+            ]
+
+            processing_per_trial = [
+                t["tiempo_procesamiento_ms"]
+                for t in subset
+                if t["correcto"] and t.get("tiempo_procesamiento_ms") is not None
+            ]
+
             per_gesture[label] = {
                 "intentos": actual_total,
                 "aciertos": hits(subset),
@@ -783,6 +825,8 @@ class PerformanceMetrics:
                 "recall": round(recall * 100, 2) if recall is not None else None,
                 "f1": round(f1 * 100, 2) if f1 is not None else None,
                 "tiempo_respuesta_s": describe(response_times),
+                "frames_hasta_respuesta": describe(frames_to_response, 1),
+                "tiempo_procesamiento_ms": describe(processing_per_trial, 1),
             }
 
         # Tiempo de respuesta global (solo aciertos de gestos reales)
@@ -793,6 +837,18 @@ class PerformanceMetrics:
         ]
 
         response_summary = describe(all_response_times)
+
+        frames_summary = describe([
+            t["frames_hasta_respuesta"]
+            for t in gesture_trials
+            if t["correcto"] and t.get("frames_hasta_respuesta") is not None
+        ], 1)
+
+        trial_processing_summary = describe([
+            t["tiempo_procesamiento_ms"]
+            for t in gesture_trials
+            if t["correcto"] and t.get("tiempo_procesamiento_ms") is not None
+        ], 1)
 
         return {
             "resumen": {
@@ -809,6 +865,14 @@ class PerformanceMetrics:
                 "tiempo_respuesta_promedio_s": (
                     response_summary["promedio"] if response_summary["n"] else None
                 ),
+                "frames_hasta_respuesta_promedio": (
+                    frames_summary["promedio"] if frames_summary["n"] else None
+                ),
+                "tiempo_procesamiento_promedio_ms": (
+                    trial_processing_summary["promedio"]
+                    if trial_processing_summary["n"]
+                    else None
+                ),
             },
             "fps": {
                 "promedio_real": round(fps_average, 2),
@@ -818,6 +882,8 @@ class PerformanceMetrics:
             "latencia_procesamiento_ms": processing,
             "etapas_ms": stages,
             "tiempo_respuesta_s": response_summary,
+            "frames_hasta_respuesta": frames_summary,
+            "tiempo_procesamiento_intento_ms": trial_processing_summary,
             "resultados": outcome_counts,
             "por_gesto": per_gesture,
             "matriz_confusion": {
