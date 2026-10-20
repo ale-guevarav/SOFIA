@@ -53,6 +53,10 @@ class FrameResult:
     # Si Pose detectó a una persona (JUEGO / TEST)
     person_detected: bool = False
 
+    # Posturas vistas en este frame antes de la confirmación
+    # temporal (JUEGO / TEST). Las usan las métricas.
+    candidates: set = field(default_factory=set)
+
     # Manos en el plano cartesiano (TRACKING)
     hand_positions: list = field(default_factory=list)
 
@@ -268,6 +272,7 @@ class VisionPipeline:
             mode=self.mode,
             gesture=gesture,
             person_detected=person_detected,
+            candidates=set(self.gesture_recognition.candidates),
         )
 
 

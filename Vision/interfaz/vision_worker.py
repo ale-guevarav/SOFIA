@@ -277,7 +277,9 @@ class VisionWorker(QThread):
                 )
 
                 if in_test:
-                    metrics.end_frame(result.gesture, result.person_detected)
+                    metrics.end_frame(
+                        result.gesture, result.person_detected, result.candidates
+                    )
 
                 # -----------------------------
                 # FPS (promedio móvil)

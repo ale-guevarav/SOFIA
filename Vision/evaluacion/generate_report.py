@@ -73,6 +73,20 @@ def fmt(value, suffix="", decimals=2):
     return f"{value}{suffix}"
 
 
+def _avg(info):
+    """Promedio de un describe() o None (también para JSON viejos sin el dato)."""
+    if not info or not info.get("n"):
+        return None
+    return info["promedio"]
+
+
+def pair(part, total, suffix="", decimals=1):
+    """'parte / total' para las columnas del desglose."""
+    if part is None and total is None:
+        return "—"
+    return f"{fmt(part, decimals=decimals)} / {fmt(total, decimals=decimals)}{suffix}"
+
+
 def stage_name(key):
     return STAGE_LABELS.get(key, key)
 
@@ -251,11 +265,30 @@ def make_charts(data, charts_dir):
         means = [data["por_gesto"][g]["tiempo_respuesta_s"]["promedio"] for g in rt_labels]
         stds = [data["por_gesto"][g]["tiempo_respuesta_s"]["desv_std"] for g in rt_labels]
 
+        proc = [
+            _avg(data["por_gesto"][g].get("desglose", {}).get("tiempo_reconocimiento_s"))
+            for g in rt_labels
+        ]
+
         fig, ax = plt.subplots(figsize=(8, 4.5))
-        bars = ax.bar(rt_labels, means, yerr=stds, capsize=6, color="#1ABC9C")
+        xs = range(len(rt_labels))
+
+        if any(p is not None for p in proc):
+            width = 0.38
+            bars = ax.bar([x - width / 2 for x in xs], means, width, yerr=stds,
+                          capsize=5, color="#1ABC9C", label="Prueba (total)")
+            bars2 = ax.bar([x + width / 2 for x in xs], [p or 0 for p in proc], width,
+                           color="#2E86C1", label="Procesado (sistema)")
+            ax.bar_label(bars2, labels=[f"{p:.2f}s" if p is not None else "" for p in proc],
+                         padding=3)
+            ax.legend(frameon=False)
+        else:
+            bars = ax.bar(xs, means, yerr=stds, capsize=6, color="#1ABC9C")
+
         ax.bar_label(bars, labels=[f"{m:.2f}s" for m in means], padding=3)
+        ax.set_xticks(list(xs), rt_labels)
         ax.set_ylabel("Segundos")
-        ax.set_title("Tiempo de reconocimiento promedio (± desv. std)",
+        ax.set_title("Tiempo de prueba y de procesado promedio",
                      fontweight="bold")
         charts["tiempo_respuesta"] = _save_figure(fig, charts_dir, "tiempo_respuesta.png")
 
@@ -336,7 +369,7 @@ def build_excel(data, path):
         ("Tasa de acierto global (%)", summary["tasa_acierto_global"]),
         ("Reconocimiento de gestos (%)", summary["tasa_reconocimiento_gestos"]),
         ("Rechazo correcto - NINGUNO (%)", summary["tasa_rechazo_correcto"]),
-        ("Tiempo de respuesta promedio (s)", summary["tiempo_respuesta_promedio_s"]),
+        ("Tiempo de prueba promedio (s)", summary["tiempo_respuesta_promedio_s"]),
         ("FPS promedio (real)", summary["fps_promedio"]),
         ("Capacidad de procesamiento (FPS)", data["fps"]["capacidad_procesamiento"]),
         ("Latencia promedio por frame (ms)", summary["latencia_promedio_ms"]),
@@ -346,6 +379,12 @@ def build_excel(data, path):
         ("Frames procesados", summary["frames_procesados"]),
         ("Frames con persona (%)", summary["porcentaje_frames_con_persona"]),
         ("Duración de la sesión (s)", summary["duracion_s"]),
+        ("Frames hasta la respuesta (prom)", summary.get("frames_hasta_respuesta_promedio")),
+        ("Procesamiento por intento (ms prom)", summary.get("tiempo_procesamiento_promedio_ms")),
+        ("Tiempo de reacción promedio (s)", summary.get("tiempo_reaccion_promedio_s")),
+        ("Tiempo de procesado promedio (s)", summary.get("tiempo_reconocimiento_promedio_s")),
+        ("Frames del procesado (prom)", summary.get("frames_reconocimiento_promedio")),
+        ("Cómputo del procesado (ms prom)", summary.get("procesamiento_reconocimiento_promedio_ms")),
     ]
 
     write_table(ws, 4, 1, ["Métrica", "Valor"], kpis)
@@ -401,8 +440,11 @@ def build_excel(data, path):
 
     headers = ["Gesto", "Intentos", "Aciertos", "No detectado", "Confundido",
                "Falso positivo", "Tasa acierto (%)", "Precisión (%)",
-               "Recall (%)", "F1 (%)", "T. respuesta prom (s)",
-               "T. respuesta p95 (s)"]
+               "Recall (%)", "F1 (%)", "T. prueba prom (s)",
+               "T. prueba p95 (s)", "Frames hasta respuesta (prom)",
+               "Procesamiento por intento (ms)", "Reacción (s)",
+               "T. procesado (s)", "Frames procesado",
+               "Cómputo procesado (ms)"]
 
     rows = []
     for label, info in data["por_gesto"].items():
@@ -413,6 +455,12 @@ def build_excel(data, path):
             info["precision"], info["recall"], info["f1"],
             rt["promedio"] if rt["n"] else None,
             rt["p95"] if rt["n"] else None,
+            _avg(info.get("frames_hasta_respuesta")),
+            _avg(info.get("tiempo_procesamiento_ms")),
+            _avg(info.get("desglose", {}).get("tiempo_reaccion_s")),
+            _avg(info.get("desglose", {}).get("tiempo_reconocimiento_s")),
+            _avg(info.get("desglose", {}).get("frames_reconocimiento")),
+            _avg(info.get("desglose", {}).get("procesamiento_reconocimiento_ms")),
         ])
 
     header, last = write_table(ws, 3, 1, headers, rows)
@@ -434,7 +482,7 @@ def build_excel(data, path):
 
     bar2 = BarChart()
     bar2.type = "col"
-    bar2.title = "Tiempo de respuesta promedio (s)"
+    bar2.title = "Tiempo de prueba promedio (s)"
     bar2.add_data(Reference(ws, min_col=11, min_row=header, max_row=last), titles_from_data=True)
     bar2.set_categories(Reference(ws, min_col=1, min_row=header + 1, max_row=last))
     bar2.dataLabels = DataLabelList()
@@ -544,11 +592,17 @@ def build_excel(data, path):
     trial_rows = [
         [t["id"], t["momento_s"], t["esperado"], t["detectado"],
          OUTCOME_LABELS[t["resultado"]], "Sí" if t["correcto"] else "No",
-         t["tiempo_respuesta_s"]]
+         t["tiempo_respuesta_s"], t.get("frames_hasta_respuesta"),
+         t.get("tiempo_procesamiento_ms"), t.get("tiempo_reaccion_s"),
+         t.get("tiempo_reconocimiento_s"), t.get("frames_reconocimiento"),
+         t.get("procesamiento_reconocimiento_ms")]
         for t in data["intentos"]
     ]
     write_table(ws, 3, 1, ["#", "Momento (s)", "Esperado", "Detectado",
-                           "Resultado", "Correcto", "T. respuesta (s)"], trial_rows)
+                           "Resultado", "Correcto", "T. prueba (s)",
+                           "Frames", "Procesamiento (ms)", "Reacción (s)",
+                           "T. procesado (s)", "Frames procesado",
+                           "Cómputo procesado (ms)"], trial_rows)
 
     # Colorear columna de resultado
     for r in range(4, 4 + len(trial_rows)):
@@ -594,7 +648,11 @@ def build_markdown(data, charts, path):
         ["🎯 **Tasa de acierto global**", f"**{fmt(s['tasa_acierto_global'], '%')}**"],
         ["Reconocimiento de gestos", fmt(s["tasa_reconocimiento_gestos"], "%")],
         ["Rechazo correcto (NINGUNO)", fmt(s["tasa_rechazo_correcto"], "%")],
-        ["⏱️ **Tiempo de respuesta promedio**", f"**{fmt(s['tiempo_respuesta_promedio_s'], ' s')}**"],
+        ["⏱️ **Tiempo de procesado promedio**", f"**{fmt(s.get('tiempo_reconocimiento_promedio_s'), ' s')}**"
+         + (f" ({fmt(s.get('frames_reconocimiento_promedio'), decimals=1)} frames, "
+            f"{fmt(s.get('procesamiento_reconocimiento_promedio_ms'), ' ms', 1)} de cómputo)"
+            if s.get("tiempo_reconocimiento_promedio_s") is not None else "")],
+        ["Tiempo de prueba promedio", fmt(s["tiempo_respuesta_promedio_s"], " s")],
         ["🎞️ **FPS promedio**", f"**{fmt(s['fps_promedio'])}**"],
         ["Capacidad de procesamiento", fmt(data["fps"]["capacidad_procesamiento"], " FPS")],
         ["Latencia promedio por frame", fmt(s["latencia_promedio_ms"], " ms")],
@@ -618,17 +676,46 @@ def build_markdown(data, charts, path):
             f"**{label}**", info["intentos"], info["aciertos"],
             fmt(info["tasa_acierto"], "%"), fmt(info["precision"], "%"),
             fmt(info["recall"], "%"), fmt(info["f1"], "%"),
+            fmt(_avg(info.get("desglose", {}).get("tiempo_reconocimiento_s")), " s"),
+            fmt(_avg(info.get("desglose", {}).get("frames_reconocimiento")), decimals=1),
             fmt(rt["promedio"], " s") if rt["n"] else "—",
         ])
     out.append(md_table(["Gesto", "Intentos", "Aciertos", "Acierto", "Precisión",
-                         "Recall", "F1", "T. respuesta"], rows))
+                         "Recall", "F1", "T. procesado", "Frames", "T. prueba"], rows))
     out.append("")
 
     for key, title in (("acierto_por_gesto", "Acierto por gesto"),
-                       ("tiempo_respuesta", "Tiempo de respuesta"),
+                       ("tiempo_respuesta", "Tiempo de procesado y de prueba"),
                        ("matriz", "Matriz de confusión")):
         if key in charts:
             out.append(f"![{title}]({charts[key]})\n")
+
+    # Desglose del tiempo de respuesta
+    def breakdown_row(name, b):
+        return [
+            name,
+            fmt(_avg(b["tiempo_reaccion_s"]), " s"),
+            fmt(_avg(b["tiempo_reconocimiento_s"]), " s"),
+            fmt(_avg(b["tiempo_respuesta_s"]), " s"),
+            pair(_avg(b["frames_reconocimiento"]), _avg(b["frames_hasta_respuesta"])),
+            pair(_avg(b["procesamiento_reconocimiento_ms"]),
+                 _avg(b["tiempo_procesamiento_ms"]), " ms"),
+        ]
+
+    if data.get("desglose_respuesta", {}).get("tiempo_reaccion_s", {}).get("n"):
+        out.append("## Desglose del tiempo de respuesta\n")
+        out.append("**Tiempo de prueba = reacción + procesado.** "
+                   "*Reacción*: desde *YA* hasta el primer frame en que se ve la postura (la persona). "
+                   "*Procesado*: desde ese frame hasta que el sistema la confirma (el sistema). "
+                   "Frames y cómputo se muestran como *procesado / total de la prueba*.\n")
+        rows = [breakdown_row("**Promedio global**", data["desglose_respuesta"])]
+        for label, info in data["por_gesto"].items():
+            b = info.get("desglose")
+            if b and b["tiempo_reaccion_s"]["n"]:
+                rows.append(breakdown_row(f"**{label}**", b))
+        out.append(md_table(["Gesto", "Reacción", "Procesado", "Prueba (total)",
+                             "Frames (procesado / total)", "Cómputo (procesado / total)"], rows))
+        out.append("")
 
     # Rendimiento
     out.append("## Rendimiento (FPS y latencia)\n")
@@ -656,10 +743,16 @@ def build_markdown(data, charts, path):
     # Intentos
     out.append("## Registro de intentos\n")
     if data["intentos"]:
-        out.append(md_table(["#", "Esperado", "Detectado", "Resultado", "T. respuesta"], [
+        out.append(md_table(["#", "Esperado", "Detectado", "Resultado", "Reacción",
+                             "Procesado", "T. prueba", "Frames (procesado / total)",
+                             "Cómputo (procesado / total)"], [
             [t["id"], t["esperado"], t["detectado"],
              ("✅ " if t["correcto"] else "❌ ") + OUTCOME_LABELS[t["resultado"]],
-             fmt(t["tiempo_respuesta_s"], " s")]
+             fmt(t.get("tiempo_reaccion_s"), " s"),
+             fmt(t.get("tiempo_reconocimiento_s"), " s"),
+             fmt(t["tiempo_respuesta_s"], " s"),
+             pair(t.get("frames_reconocimiento"), t.get("frames_hasta_respuesta"), decimals=0),
+             pair(t.get("procesamiento_reconocimiento_ms"), t.get("tiempo_procesamiento_ms"), " ms")]
             for t in data["intentos"]
         ]))
     else:
@@ -671,7 +764,11 @@ def build_markdown(data, charts, path):
     out.append("- **Tasa de acierto:** intentos correctos / intentos totales × 100.")
     out.append("- **Precisión:** de las veces que el sistema dijo *X*, cuántas eran realmente *X*.")
     out.append("- **Recall:** de las veces que la persona hizo *X*, cuántas detectó el sistema.")
-    out.append("- **Tiempo de respuesta:** segundos desde la señal *YA* hasta que el sistema reporta el gesto (solo aciertos).")
+    out.append("- **Tiempo de prueba:** segundos desde la señal *YA* hasta que el sistema reporta el gesto (solo aciertos). Es reacción + procesado.")
+    out.append("- **Frames hasta la respuesta:** frames procesados desde *YA* hasta reconocer el gesto (incluye los 5 de confirmación).")
+    out.append("- **Reacción:** segundos desde *YA* hasta el primer frame en que el sistema ve la postura (antes de confirmarla). En INICIO es la primera palmada y en FIN cuando se levanta la mano.")
+    out.append("- **Procesado:** segundos desde ese primer frame hasta que la postura se confirma (incluye los 5 frames de confirmación). Es lo que tarda el sistema; *cómputo* es la parte de ese tiempo en que la PC estuvo procesando.")
+    out.append("- **Procesamiento durante la respuesta:** suma de la latencia de esos frames; cuánto del tiempo de respuesta fue cómputo de la PC (el resto es la persona haciendo la postura y la espera de la cámara).")
     out.append("- **FPS promedio:** frames totales / tiempo total del ciclo.")
     out.append("- **Latencia por frame:** tiempo de procesamiento (pose + manos + gestos + dibujo), sin contar la espera de la cámara.")
 

@@ -238,7 +238,8 @@ try:
 
             metrics.end_frame(
                 result.gesture,
-                result.person_detected
+                result.person_detected,
+                result.candidates
             )
 
             metrics.draw_overlay(frame)
