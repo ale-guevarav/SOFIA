@@ -718,9 +718,9 @@ class PerformanceMetrics:
 
         if reaction is not None:
             print(
-                f"[METRICAS]   reaccion {reaction:.2f}s + reconocimiento "
+                f"[METRICAS]   reaccion {reaction:.2f}s + procesado "
                 f"{recognition:.2f}s ({recognition_frames} frames, "
-                f"{recognition_ms:.0f} ms de procesamiento)"
+                f"{recognition_ms:.0f} ms de computo)"
             )
 
 

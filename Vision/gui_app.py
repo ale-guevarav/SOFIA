@@ -649,9 +649,9 @@ class MainWindow(QMainWindow):
                 if result.get("tiempo_reaccion_s") is not None:
                     detail += (
                         f"<br>Reacción {result['tiempo_reaccion_s']:.2f} s · "
-                        f"Reconocimiento {result['tiempo_reconocimiento_s']:.2f} s"
+                        f"Procesado {result['tiempo_reconocimiento_s']:.2f} s"
                         f"<br>{result['frames_reconocimiento']} frames · "
-                        f"{result['procesamiento_reconocimiento_ms']:.0f} ms de procesamiento"
+                        f"{result['procesamiento_reconocimiento_ms']:.0f} ms de cómputo"
                     )
                 elif result.get("frames_hasta_respuesta") is not None:
                     detail += (
