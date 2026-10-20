@@ -74,6 +74,11 @@ class GestureRecognition:
         self.start_display_until = 0
         self.end_display_until = 0
 
+        # Posturas que se están viendo en este frame ANTES de la
+        # confirmación temporal (para medir el tiempo de reacción
+        # y el de reconocimiento en el modo TEST)
+        self.candidates = set()
+
 
     def update(self, smoothed_landmarks, hand_result):
         """Regresa el nombre de la postura detectada o '---'."""
@@ -84,9 +89,9 @@ class GestureRecognition:
         # ESCUDO
         # -----------------------------
 
-        shield_detected = self.shield_confirmation.update(
-            self.gesture_detector.detect_shield(smoothed_landmarks)
-        )
+        shield_raw = self.gesture_detector.detect_shield(smoothed_landmarks)
+
+        shield_detected = self.shield_confirmation.update(shield_raw)
 
         # -----------------------------
         # ATAQUE: cuerpo + dos pistolas
@@ -110,10 +115,12 @@ class GestureRecognition:
 
         # Si ambas manos forman pistolas,
         # no permitir RECARGAR (es ATAQUE)
-        reload_detected = self.reload_confirmation.update(
+        reload_raw = (
             self.gesture_detector.detect_reload(smoothed_landmarks)
             and not gun_hands_detected
         )
+
+        reload_detected = self.reload_confirmation.update(reload_raw)
 
         # -----------------------------
         # INICIO / FIN (dinámicos)
@@ -126,22 +133,46 @@ class GestureRecognition:
             self.end_display_until = now + self.dynamic_display_time
 
         # -----------------------------
+        # CANDIDATAS (antes de confirmar)
+        # -----------------------------
+
+        # Estáticas: la regla se cumple en este frame.
+        # Dinámicas: el movimiento ya empezó (primera palmada
+        # para INICIO, mano levantada para FIN).
+        candidates = set()
+
+        if shield_raw:
+            candidates.add("ESCUDO")
+        if attack_body_detected and gun_hands_detected:
+            candidates.add("ATAQUE")
+        if reload_raw:
+            candidates.add("RECARGAR")
+        if self.gesture_detector.start_tap_count > 0:
+            candidates.add("INICIO")
+        if self.gesture_detector.end_active_hand is not None:
+            candidates.add("FIN")
+
+        # -----------------------------
         # POSTURA DETECTADA (prioridad)
         # -----------------------------
 
+        gesture = NO_GESTURE
+
         if shield_detected:
-            return "ESCUDO"
+            gesture = "ESCUDO"
+        elif attack_detected:
+            gesture = "ATAQUE"
+        elif reload_detected:
+            gesture = "RECARGAR"
+        elif now < self.start_display_until:
+            gesture = "INICIO"
+        elif now < self.end_display_until:
+            gesture = "FIN"
 
-        if attack_detected:
-            return "ATAQUE"
+        # La postura confirmada también cuenta como candidata
+        if gesture != NO_GESTURE:
+            candidates.add(gesture)
 
-        if reload_detected:
-            return "RECARGAR"
+        self.candidates = candidates
 
-        if now < self.start_display_until:
-            return "INICIO"
-
-        if now < self.end_display_until:
-            return "FIN"
-
-        return NO_GESTURE
+        return gesture

@@ -282,7 +282,7 @@ class MainWindow(QMainWindow):
         self.test_label.setTextFormat(Qt.TextFormat.RichText)
         self.test_label.setWordWrap(True)
         # Altura fija: el panel no "brinca" entre fases
-        self.test_label.setFixedHeight(84)
+        self.test_label.setFixedHeight(100)
 
         grid = QGridLayout()
         self.test_buttons = []
@@ -646,7 +646,14 @@ class MainWindow(QMainWindow):
             result = status["last_result"]
             if result["correcto"]:
                 detail = f"{result['detectado']} en {result['tiempo_respuesta_s']:.2f} s"
-                if result.get("frames_hasta_respuesta") is not None:
+                if result.get("tiempo_reaccion_s") is not None:
+                    detail += (
+                        f"<br>Reacción {result['tiempo_reaccion_s']:.2f} s · "
+                        f"Reconocimiento {result['tiempo_reconocimiento_s']:.2f} s"
+                        f"<br>{result['frames_reconocimiento']} frames · "
+                        f"{result['procesamiento_reconocimiento_ms']:.0f} ms de procesamiento"
+                    )
+                elif result.get("frames_hasta_respuesta") is not None:
                     detail += (
                         f"<br>{result['frames_hasta_respuesta']} frames · "
                         f"{result['tiempo_procesamiento_ms']:.0f} ms de procesamiento"

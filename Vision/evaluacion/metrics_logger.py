@@ -16,6 +16,12 @@ Mide, mientras el sistema está corriendo:
      desde "YA" hasta el reconocimiento.
    - Tiempo de procesamiento por intento (ms): suma de la latencia
      de esos frames, es decir, cuánto de ese tiempo fue cómputo.
+   - Desglose del tiempo de respuesta:
+       tiempo de respuesta = reacción + reconocimiento
+       * Reacción: desde "YA" hasta el primer frame en que se ve
+         la postura (la persona la está haciendo).
+       * Reconocimiento: desde ese frame hasta que el sistema la
+         confirma, con sus frames y su procesamiento.
 
 3. Tasa de acierto
    - Mediante "intentos" etiquetados: el evaluador presiona una tecla
@@ -123,6 +129,36 @@ def describe(values, decimals=3):
         "maximo": round(max(values), decimals),
         "p95": round(percentile(values, 95), decimals),
         "desv_std": round(statistics.pstdev(values), decimals),
+    }
+
+
+BREAKDOWN_KEYS = {
+    # clave del intento: decimales
+    "tiempo_reaccion_s": 3,
+    "tiempo_reconocimiento_s": 3,
+    "tiempo_respuesta_s": 3,
+    "frames_reconocimiento": 1,
+    "frames_hasta_respuesta": 1,
+    "procesamiento_reconocimiento_ms": 1,
+    "tiempo_procesamiento_ms": 1,
+}
+
+
+def response_breakdown(trials):
+    """
+    Desglose del tiempo de respuesta (solo aciertos que tienen
+    reacción y reconocimiento), todo sobre los MISMOS intentos
+    para que reacción + reconocimiento = total.
+    """
+
+    rows = [
+        t for t in trials
+        if t["correcto"] and t.get("tiempo_reaccion_s") is not None
+    ]
+
+    return {
+        key: describe([t[key] for t in rows], decimals)
+        for key, decimals in BREAKDOWN_KEYS.items()
     }
 
 
@@ -241,6 +277,10 @@ class PerformanceMetrics:
         self._trial_frames = 0
         self._trial_processing_ms = 0.0
 
+        # Racha actual de cada postura candidata dentro del intento:
+        # {postura: [t_captura_primer_frame, frames, ms]}
+        self._candidate_runs = {}
+
 
     # =============================================
     # INFORMACIÓN EXTRA (cámara, modelo, etc.)
@@ -347,15 +387,20 @@ class PerformanceMetrics:
             )
 
 
-    def end_frame(self, detected_gesture, person_detected):
+    def end_frame(self, detected_gesture, person_detected, candidates=None):
         """
         Llamar al final del procesamiento de cada frame
         (antes de cv2.imshow).
+
+        candidates: posturas vistas en este frame antes de la
+        confirmación (FrameResult.candidates). Si no se pasan,
+        no se calcula el desglose reacción / reconocimiento.
         """
 
         if self._frame_start is None:
             return
 
+        frame_start = self._frame_start
         now = time.perf_counter()
 
         # -----------------------------
@@ -427,7 +472,7 @@ class PerformanceMetrics:
 
         self._previous_gesture = detected_gesture
 
-        self._update_trial(event, processing_ms)
+        self._update_trial(event, processing_ms, candidates, frame_start)
 
 
     # =============================================
@@ -511,7 +556,7 @@ class PerformanceMetrics:
         }
 
 
-    def _update_trial(self, event, processing_ms=0.0):
+    def _update_trial(self, event, processing_ms=0.0, candidates=None, frame_start=None):
 
         now = time.perf_counter()
 
@@ -525,6 +570,7 @@ class PerformanceMetrics:
                 self._trial_start = now
                 self._trial_frames = 0
                 self._trial_processing_ms = 0.0
+                self._candidate_runs = {} if candidates is not None else None
                 print("[METRICAS] YA!")
 
             return
@@ -536,6 +582,21 @@ class PerformanceMetrics:
             # Este frame cuenta para el intento
             self._trial_frames += 1
             self._trial_processing_ms += processing_ms
+
+            # Rachas de cada postura candidata: empiezan en el
+            # primer frame en que se ve y se cortan si deja de verse
+            if candidates is not None and self._candidate_runs is not None:
+
+                for gesture in list(self._candidate_runs):
+                    if gesture not in candidates:
+                        del self._candidate_runs[gesture]
+
+                for gesture in candidates:
+                    run = self._candidate_runs.setdefault(
+                        gesture, [frame_start or now, 0, 0.0]
+                    )
+                    run[1] += 1
+                    run[2] += processing_ms
 
             if event is not None:
                 self._finish_trial(event, elapsed)
@@ -556,6 +617,28 @@ class PerformanceMetrics:
     def _finish_trial(self, detected, response_time):
 
         expected = self.current_expected
+
+        # -----------------------------
+        # DESGLOSE: REACCIÓN + RECONOCIMIENTO
+        # -----------------------------
+
+        reaction = recognition = None
+        recognition_frames = recognition_ms = None
+
+        run = (
+            self._candidate_runs.get(detected)
+            if detected is not None and self._candidate_runs
+            else None
+        )
+
+        if run is not None and response_time is not None:
+            run_start, recognition_frames, recognition_ms = run
+
+            # Desde "YA" hasta el primer frame con la postura
+            reaction = max(0.0, run_start - self._trial_start)
+
+            # El resto del tiempo de respuesta es reconocimiento
+            recognition = max(0.0, response_time - reaction)
 
         # -----------------------------
         # CLASIFICAR RESULTADO
@@ -602,6 +685,17 @@ class PerformanceMetrics:
                 if response_time is not None
                 else None
             ),
+            # tiempo_respuesta_s = tiempo_reaccion_s + tiempo_reconocimiento_s
+            "tiempo_reaccion_s": (
+                round(reaction, 3) if reaction is not None else None
+            ),
+            "tiempo_reconocimiento_s": (
+                round(recognition, 3) if recognition is not None else None
+            ),
+            "frames_reconocimiento": recognition_frames,
+            "procesamiento_reconocimiento_ms": (
+                round(recognition_ms, 1) if recognition_ms is not None else None
+            ),
         }
 
         self.trials.append(trial)
@@ -621,6 +715,13 @@ class PerformanceMetrics:
                 else ""
             )
         )
+
+        if reaction is not None:
+            print(
+                f"[METRICAS]   reaccion {reaction:.2f}s + reconocimiento "
+                f"{recognition:.2f}s ({recognition_frames} frames, "
+                f"{recognition_ms:.0f} ms de procesamiento)"
+            )
 
 
     # =============================================
@@ -827,6 +928,7 @@ class PerformanceMetrics:
                 "tiempo_respuesta_s": describe(response_times),
                 "frames_hasta_respuesta": describe(frames_to_response, 1),
                 "tiempo_procesamiento_ms": describe(processing_per_trial, 1),
+                "desglose": response_breakdown(subset),
             }
 
         # Tiempo de respuesta global (solo aciertos de gestos reales)
@@ -843,6 +945,11 @@ class PerformanceMetrics:
             for t in gesture_trials
             if t["correcto"] and t.get("frames_hasta_respuesta") is not None
         ], 1)
+
+        breakdown = response_breakdown(gesture_trials)
+
+        def avg(info):
+            return info["promedio"] if info["n"] else None
 
         trial_processing_summary = describe([
             t["tiempo_procesamiento_ms"]
@@ -873,6 +980,12 @@ class PerformanceMetrics:
                     if trial_processing_summary["n"]
                     else None
                 ),
+                "tiempo_reaccion_promedio_s": avg(breakdown["tiempo_reaccion_s"]),
+                "tiempo_reconocimiento_promedio_s": avg(breakdown["tiempo_reconocimiento_s"]),
+                "frames_reconocimiento_promedio": avg(breakdown["frames_reconocimiento"]),
+                "procesamiento_reconocimiento_promedio_ms": avg(
+                    breakdown["procesamiento_reconocimiento_ms"]
+                ),
             },
             "fps": {
                 "promedio_real": round(fps_average, 2),
@@ -884,6 +997,7 @@ class PerformanceMetrics:
             "tiempo_respuesta_s": response_summary,
             "frames_hasta_respuesta": frames_summary,
             "tiempo_procesamiento_intento_ms": trial_processing_summary,
+            "desglose_respuesta": breakdown,
             "resultados": outcome_counts,
             "por_gesto": per_gesture,
             "matriz_confusion": {
