@@ -1,0 +1,142 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+  basicTimeStep 8
+  coordinateSystem "ENU"
+}
+
+Viewpoint {
+  position 0.6 0.6 0.5
+  orientation -0.35 0.65 0.7 1.5
+  fieldOfView 0.9
+}
+
+TexturedBackground {}
+TexturedBackgroundLight {}
+
+Solid {
+  translation 0 0 -0.005
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 0.7 0.7 0.7 roughness 1 }
+      geometry Box { size 1 1 0.01 }
+    }
+  ]
+  name "Suelo"
+  boundingObject Box { size 1 1 0.01 }
+}
+
+Robot {
+  translation -0.225 -0.210 0.025
+  name "Panel_0_0"
+  controller "tracker_esfera_cpp"
+  supervisor TRUE
+  children [
+    DEF B_S Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.2 roughness 0.5 } geometry Cylinder { radius 0.025 height 0.05 } }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 }
+      device [
+        RotationalMotor {
+          name "motor_gdl1"
+          minPosition -0.5235
+          maxPosition 0.5235
+          maxTorque 3
+        }
+      ]
+      endPoint Solid {
+        translation 0 0 0.025
+        children [
+          HingeJoint {
+            jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 }
+            device [
+              RotationalMotor {
+                name "motor_gdl2"
+                minPosition -0.5235
+                maxPosition 0.5235
+                maxTorque 3
+              }
+            ]
+            endPoint Solid {
+              translation 0 0 0
+              children [
+                DEF P_G Group {
+                  children [
+                    Transform {
+                      translation 0 0 0.0275
+                      children [
+                        Shape { appearance PBRAppearance { baseColor 0.15 0.15 0.15 roughness 0.5 } geometry Cylinder { radius 0.006 height 0.055 } }
+                        Transform {
+                          translation 0 0 0.0275
+                          children [
+                            Shape { appearance PBRAppearance { baseColor 0.8 0.8 0.8 roughness 0.6 } geometry IndexedFaceSet { coord Coordinate { point [ 0 0 0.003 0.069282 0 0.003 0.034641 0.06 0.003 -0.034641 0.06 0.003 -0.069282 0 0.003 -0.034641 -0.06 0.003 0.034641 -0.06 0.003 ] } coordIndex [ 0 1 2 -1 0 2 3 -1 0 3 4 -1 0 4 5 -1 0 5 6 -1 0 6 1 -1 ] } }
+                            Shape { appearance Appearance { material Material { emissiveColor 0.1 0.1 0.1 } } geometry IndexedLineSet { coord Coordinate { point [ 0.069282 0 0.004 0.034641 0.06 0.004 -0.034641 0.06 0.004 -0.069282 0 0.004 -0.034641 -0.06 0.004 0.034641 -0.06 0.004 0.069282 0 0.004 ] } coordIndex [ 0 1 2 3 4 5 6 -1 ] } }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+              name "Palo" boundingObject DEF P_B Group { children [ Transform { translation 0 0 0.0275 children [ Cylinder { radius 0.006 height 0.055 } ] } ] } physics DEF PHYS Physics { density -1 mass 0.1 }
+            }
+          }
+        ]
+        name "Eslabon" boundingObject DEF E_B Sphere { radius 0.01 } physics USE PHYS
+      }
+    }
+  ]
+  boundingObject DEF B_B Cylinder { radius 0.023 height 0.05 }
+}
+
+Robot { translation -0.225 -0.070 0.025 name "Panel_0_1" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.225 0.070 0.025 name "Panel_0_2" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.225 0.210 0.025 name "Panel_0_3" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.075 -0.140 0.025 name "Panel_1_0" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.075 0.000 0.025 name "Panel_1_1" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.075 0.140 0.025 name "Panel_1_2" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation -0.075 0.280 0.025 name "Panel_1_3" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.075 -0.210 0.025 name "Panel_2_0" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.075 -0.070 0.025 name "Panel_2_1" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.075 0.070 0.025 name "Panel_2_2" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.075 0.210 0.025 name "Panel_2_3" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.225 -0.140 0.025 name "Panel_3_0" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.225 0.000 0.025 name "Panel_3_1" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.225 0.140 0.025 name "Panel_3_2" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+Robot { translation 0.225 0.280 0.025 name "Panel_3_3" controller "tracker_esfera_cpp" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+
+DEF ESFERA_TARGET Robot {
+  translation 0 0 0.25
+  name "esfera"
+  controller "sofia_maestro_sim"
+  customData "IDLE"
+  supervisor TRUE
+  children [
+    Shape {
+      appearance PBRAppearance { baseColor 1 0 0 roughness 0.2 }
+      geometry Sphere { radius 0.006 }
+    }
+  ]
+}
+
+# Camara cenital: nodo propio que solo manda imagenes a la GUI (puerto 5556).
+# Mira hacia abajo: arriba de la imagen = +X del mundo, derecha = -Y.
+Robot {
+  translation 0 0.035 0.85
+  rotation 0 1 0 1.5708
+  name "camara_cenital"
+  controller "camara_sim"
+  children [
+    Camera {
+      name "camara"
+      fieldOfView 0.9
+      width 320
+      height 320
+    }
+  ]
+}
+
+PointLight { location 0.3 0.3 0.5 intensity 2 attenuation 0 0 1 }
+DirectionalLight { direction -1 -1 -1 intensity 1 }
