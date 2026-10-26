@@ -1,4 +1,4 @@
-# SOFIA - Simulación en Webots (clon citual)
+# SOFIA - Simulación en Webots (clon virtual)
 
 Simulación del arreglo de **16 paneles de 2 grados de libertad** (`motor_gdl1` y `motor_gdl2`, ±30°) que apuntan a una esfera. La GUI de visión se conecta a la simulación con **el mismo protocolo** que usa con el ESP32 por Bluetooth, así se prueba todo sin hardware.
 
