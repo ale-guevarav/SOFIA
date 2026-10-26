@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.16)  16 OCT 2026 03:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.16)  25 OCT 2026 23:24
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -621,33 +621,40 @@ File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
 
 
 ]
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 217.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 221.
  (O:\MikTex\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-) [2] [3] [4]
-<figures/pattern_trajectories.png, id=30, 758.835pt x 505.89pt>
+) [2] [3] [4] [5] [6]
+<figures/pattern_trajectories.png, id=38, 758.835pt x 505.89pt>
 File: figures/pattern_trajectories.png Graphic file (type png)
 <use figures/pattern_trajectories.png>
-Package pdftex.def Info: figures/pattern_trajectories.png  used on input line 667.
+Package pdftex.def Info: figures/pattern_trajectories.png  used on input line 835.
 (pdftex.def)             Requested size: 438.60315pt x 292.40517pt.
- [5] (Equipo 3 - GUI y protocolo.bbl) [6 <./figures/pattern_trajectories.png>] (Equipo 3 - GUI y protocolo.aux)
+ (Equipo 3 - GUI y protocolo.bbl
+Underfull \hbox (badness 2142) in paragraph at lines 25--27
+[]\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - con-texto,
+ []
+
+[7]) [8
+
+ <./figures/pattern_trajectories.png>] (Equipo 3 - GUI y protocolo.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 18995 strings out of 467871
- 378143 string characters out of 5435219
- 814651 words of memory out of 5000000
- 47516 multiletter control sequences out of 15000+600000
- 672011 words of font info for 120 fonts, out of 8000000 for 9000
+ 19065 strings out of 467871
+ 379132 string characters out of 5435219
+ 820812 words of memory out of 5000000
+ 47580 multiletter control sequences out of 15000+600000
+ 673858 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 88i,14n,94p,1295b,781s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy7.pfb><O:/MikTex/fonts/type1/public/amsfonts/symbols/msam7.pfb><O:/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><O:/MikTex/fonts/type1/urw/helvetic/uhvr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmb8a.pfb><O:/MikTex/fonts/type1/urw/times/utmbi8a.pfb><O:/MikTex/fonts/type1/urw/times/utmr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - GUI y protocolo.pdf" (6 pages, 289040 bytes).
+ 88i,14n,94p,1973b,781s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<O:/MikTex/fonts/type1/public/amsfonts/cm/cmbx10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy7.pfb><O:/MikTex/fonts/type1/public/amsfonts/symbols/msam7.pfb><O:/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><O:/MikTex/fonts/type1/urw/helvetic/uhvr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmb8a.pfb><O:/MikTex/fonts/type1/urw/times/utmbi8a.pfb><O:/MikTex/fonts/type1/urw/times/utmr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmri8a.pfb>
+Output written on "Equipo 3 - GUI y protocolo.pdf" (8 pages, 317033 bytes).
 PDF statistics:
- 98 PDF objects out of 1000 (max. 8388607)
+ 111 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  18 words of extra memory for PDF output out of 10000 (max. 10000000)
 

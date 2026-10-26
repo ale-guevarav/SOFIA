@@ -1,3 +1,8 @@
 # Imágenes y etiquetas generadas (pesan mucho; no se suben)
 datos/
 __pycache__/
+
+# Pesos entrenados (se regeneran con pytorch/entrenar.py)
+*.pt
+*.pth
+*.npz

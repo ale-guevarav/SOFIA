@@ -44,11 +44,11 @@
 
 
 	\begin{abstract}
-		The SOFIA modular kinetic surface uses an external computer vision system that recognizes five human gestures to drive its actuators. This work presents the graphical user interface (GUI) that displays the live video and the detection result, and the wireless communication standard that transmits the recognized gestures from the host PC to the ESP32 master controller. The GUI was implemented with PySide6 and separates the interface, the video processing, and the Bluetooth Low Energy (BLE) link into independent threads, so that the detection can be started, paused, resumed, and stopped without blocking user interaction. The communication standard defines a frame of 5 to 19 bytes with a sequence number and a CRC-8 checksum, five commands, positive and negative acknowledgements, six error codes, and rules for retransmission, duplicate rejection, and link supervision. An ESP32 firmware was developed to receive, validate, and acknowledge the frames, and to map each gesture to a distinct motion pattern on one two-degree-of-freedom SOFIA unit. The implementation was verified through software tests and a simulation of the firmware; validation on the physical hardware remains as the next step.
+		The SOFIA modular kinetic surface uses an external computer vision system that recognizes five human gestures to drive its actuators. This work presents the graphical user interface (GUI) that displays the live video and the detection result, and the wireless communication standard that transmits the recognized gestures from the host PC to the ESP32 master controller. The GUI was implemented with PySide6 and separates the interface, the video processing, and the Bluetooth Low Energy (BLE) link into independent threads, so that the detection can be started, paused, resumed, and stopped without blocking user interaction. The communication standard defines a frame of 5 to 19 bytes with a sequence number and a CRC-8 checksum, five commands, positive and negative acknowledgements, six error codes, and rules for retransmission, duplicate rejection, and link supervision. An ESP32 firmware was developed to receive, validate, and acknowledge the frames, and to map each gesture to a distinct motion pattern on one two-degree-of-freedom SOFIA unit. In addition, a Webots simulation of the complete 16-unit array was integrated with the GUI: a simulated master controller receives the same frames over a local TCP socket, validates and acknowledges them with the same rules as the firmware, and drives the 16 simulated units, while an overhead virtual camera streams its images to the GUI through an independent channel. The GUI can send its results to the simulation, to the physical ESP32, or to both at the same time, operating the simulation as a digital twin of the robot. The implementation was verified through software tests, a simulation of the firmware, and the Webots simulation, and a preliminary functional test on the physical ESP32 and one unit confirmed the BLE link and the servo motion; a quantitative characterization of the hardware remains as the next step.
 	\end{abstract}
 
 	\begin{IEEEkeywords}
-		Graphical user interface, multithreading, Bluetooth Low Energy, communication protocol, ESP32, gesture recognition, modular robotics.
+		Graphical user interface, multithreading, Bluetooth Low Energy, communication protocol, ESP32, gesture recognition, modular robotics, Webots, digital twin.
 	\end{IEEEkeywords}
 
 
@@ -59,7 +59,9 @@
 
 	Before this work, the vision system operated as an independent prototype: the result was shown in an OpenCV window controlled through the keyboard, and the recognized gestures were not transmitted to the embedded controller. Integrating the vision system with the robot requires two elements. First, a GUI that allows an operator to visualize the detection and control the processing without freezing the interface, since landmark detection takes tens of milliseconds per frame. Second, a communication standard that delivers the recognized gestures to the ESP32 master controller \cite{esp32c3} reliably over a wireless link.
 
-	This work addresses four activities: (i) the design of the GUI architecture and wireframes, including the justification of the framework; (ii) the integration of the detection result into the GUI using threads; (iii) the implementation of controls to start, stop, and resume the detection; and (iv) the design and implementation of the PC--ESP32 communication standard. The remainder of this paper is organized as follows. Section~\ref{sec:gui} presents the GUI design, Section~\ref{sec:impl} describes its implementation, Section~\ref{sec:protocol} defines the communication standard, Section~\ref{sec:esp32} presents the ESP32 firmware, Section~\ref{sec:verification} reports the verification, and Section~\ref{sec:conclusions} concludes the work.
+	Testing these elements on the robot requires the complete array of 16 units, which is not always available, and a fault in the communication or in a motion pattern can only be observed after loading the firmware. For this reason, a simulation of SOFIA in Webots \cite{webots} was also connected to the GUI, using the same communication standard as the physical robot.
+
+This work addresses five activities: (i) the design of the GUI architecture and wireframes, including the justification of the framework; (ii) the integration of the detection result into the GUI using threads; (iii) the implementation of controls to start, stop, and resume the detection; (iv) the design and implementation of the PC--ESP32 communication standard; and (v) the integration of a Webots simulation of the 16-unit array that receives the same frames and can run alongside the physical robot as a digital twin. The remainder of this paper is organized as follows. Section~\ref{sec:gui} presents the GUI design, Section~\ref{sec:impl} describes its implementation, Section~\ref{sec:protocol} defines the communication standard, Section~\ref{sec:esp32} presents the ESP32 firmware, Section~\ref{sec:webots} describes the Webots simulation and the digital twin, Section~\ref{sec:verification} reports the verification, and Section~\ref{sec:conclusions} concludes the work.
 
 
 	\section{GUI Architecture and Design}
@@ -157,6 +159,8 @@
 			\texttt{hand\_tracker.py} & Hand position in a Cartesian plane centered on the image\\
 			\texttt{ble\_link.py} & BLE connection, transmission with acknowledgement, and retransmission\\
 			\texttt{protocol.py} & Construction and validation of frames\\
+			\texttt{sim\_link.py} & Same logic as \texttt{ble\_link.py} over a TCP socket to the Webots simulation\\
+			\texttt{sim\_camera.py} & Thread that receives the images of the virtual camera of Webots\\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
@@ -628,10 +632,169 @@
 	Each pattern is defined as a list of waypoints in normalized coordinates that is scaled to $\pm35^\circ$. Every 20~ms the controller advances the commanded position toward the next waypoint at a constant speed of $120^\circ$/s, converts each angle to PWM counts, and updates the PCA9685 only when the change exceeds $0.1^\circ$. Every pattern ends at the center, and a new gesture interrupts the current pattern. In the safe state, a pattern in progress is allowed to finish, since it ends at the center, while any other motion returns immediately to the center.
 
 
+	\section{Webots Simulation and Digital Twin}
+	\label{sec:webots}
+
+	\subsection{Purpose and Architecture}
+
+	The firmware of Section~\ref{sec:esp32} drives a single unit, while SOFIA is composed of 16. To test the GUI and the communication standard with the complete array, and without depending on the availability of the hardware, a simulation of SOFIA was built in Webots \cite{webots}. Two principles guided its integration. First, the simulation receives \emph{exactly} the same frames as the ESP32, so it also tests the communication standard and not only the motion. Second, the vision processing is not moved to the simulator: the physical camera and MediaPipe remain in the GUI, and the simulation only replaces the robot.
+
+	The resulting architecture is shown in Fig.~\ref{fig:webots}. A new link, \texttt{WebotsLink}, inherits the logic of \texttt{BleLink} (stop-and-wait, retransmission with the same SEQ, TRACK at 20~Hz, and heartbeat) and only replaces the transport. It runs in its own thread, like the BLE link. The overhead virtual camera uses a separate controller and a separate socket, so a failure of the camera channel does not affect the commands.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[
+			font=\scriptsize,
+			box/.style={draw, rounded corners=2pt, align=center, minimum width=2.3cm, minimum height=0.62cm, fill=white},
+			grp/.style={draw, dashed, rounded corners=3pt, inner sep=4pt},
+			arr/.style={-{Stealth[length=1.8mm]}, thick},
+			lbl/.style={font=\tiny, align=center, fill=white, inner sep=1pt}
+			]
+			% GUI side
+			\node[box, fill=blue!8, minimum width=7.4cm] (gui) at (0,0) {MainWindow: results sent to every connected target};
+			\node[box, fill=orange!12] (ble) at (-2.55,-1.35) {BleLink\\(BLE)};
+			\node[box, fill=orange!12] (sim) at (0,-1.35) {WebotsLink\\(TCP :5555)};
+			\node[box, fill=green!8] (cam) at (2.55,-1.35) {SimCameraClient\\(TCP :5556)};
+			% Targets
+			\node[box, fill=gray!12] (esp) at (-2.55,-3.0) {ESP32 master\\+ PCA9685};
+			\node[box, fill=gray!12] (mae) at (0,-3.0) {Master\\(sphere, supervisor)};
+			\node[box, fill=gray!12] (ccam) at (2.55,-3.0) {Overhead\\camera};
+			\node[box, fill=gray!12, minimum width=4.9cm] (pan) at (1.275,-4.35) {16 unit controllers (C++)};
+
+			\node[grp, fit=(mae)(ccam)(pan), label={[font=\scriptsize\itshape]right:\rotatebox{-90}{Webots}}] {};
+
+			\draw[arr] (gui) -- (ble);
+			\draw[arr] (gui) -- (sim);
+			\draw[arr] (cam) -- node[lbl]{frames} (gui);
+			\draw[{Stealth[length=1.8mm]}-{Stealth[length=1.8mm]}, thick] (ble) -- node[lbl]{frames,\\ACK/NACK} (esp);
+			\draw[{Stealth[length=1.8mm]}-{Stealth[length=1.8mm]}, thick] (sim) -- node[lbl]{same frames\\in packets} (mae);
+			\draw[arr] (ccam) -- node[lbl]{BGRA} (cam);
+			\draw[arr] (mae) -- node[lbl, left=1pt]{\texttt{customData}} (mae |- pan.north);
+		\end{tikzpicture}
+		\caption{Integration of the Webots simulation with the GUI. The command link and the camera stream use independent threads and sockets; when both the ESP32 and Webots are connected, every command is sent to both (digital twin).}
+		\label{fig:webots}
+	\end{figure}
+
+	\subsection{Transport over TCP}
+
+	BLE transfers packets, whereas TCP transfers a stream of bytes. To preserve the rule that one BLE write carries exactly one frame, each frame is sent over TCP preceded by one byte with its length, $[N][\text{frame of } N \text{ bytes}]$. The master extracts the frame and validates it with the same procedure as Algorithm~\ref{alg:frame}. The PC side of \texttt{protocol.py} is reused without changes: the simulated master loads the same file, so the frame format, the CRC-8, and the error codes cannot diverge between the robot and the simulation.
+
+	A local socket delivers every frame in less than 1~ms and without errors, which would hide the retransmission rules. Therefore, the GUI includes an optional channel emulator for the Webots link, with the parameters of Table~\ref{tab:channel}. With it, the retransmissions, the duplicate rejection, and the NACK with \texttt{ERR\_CRC} appear in the event log as they would over BLE.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Parameters of the Optional Channel Emulator}
+		\label{tab:channel}
+		\scriptsize
+
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+
+		\begin{tabularx}{\columnwidth}{@{}P{3.0cm} Y@{}}
+			\toprule
+			Parameter & Value\\
+			\midrule
+			Delay per direction & $30 \pm 10$~ms\\
+			Frame loss & 3\,\%\\
+			Corrupted byte (detected by CRC) & 2\,\%\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subsection{Simulated Master Controller}
+
+	The master is a Python supervisor controller attached to a sphere that represents the target of the array. It reproduces the behavior of the firmware: it answers ACK or NACK, does not execute a repeated command with the same TYPE and SEQ within 1~s (rule R4), and enters the safe state after 3~s without valid frames or when the GUI disconnects (rule R8). Its response to each command is summarized in Table~\ref{tab:simcommands}.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Response of the Simulation to Each Command}
+		\label{tab:simcommands}
+		\scriptsize
+
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+
+		\begin{tabularx}{\columnwidth}{@{}P{1.9cm} Y@{}}
+			\toprule
+			Command & Effect in the simulation\\
+			\midrule
+			TRACK (tracking) & The sphere moves to the hand position, up to 0.30~m from the center, and the 16 units point at it\\
+			POSE & The 16 units execute the pattern of the gesture (Table~\ref{tab:simpatterns})\\
+			MODE & Forwarded to the units; entering or leaving tracking resets the sphere\\
+			STOP / safe state & Units return to the center; any pattern is canceled\\
+			No GUI connected & Game mode; units remain at the center\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	The master does not move the units directly. It writes a short text command into its own \texttt{customData} field, \texttt{M<mode> IDLE}, \texttt{M<mode> TRACK}, or \texttt{M<mode> POSE <id> <t\textsubscript{0}>}, and the 16 unit controllers read it at every simulation step. The field $t_0$ is the simulation time at which the gesture was received; since all the units compute their pattern from the same $t_0$, the 16 units move in synchronism without additional messages. The units follow the sphere only in tracking mode; in game and test modes the sphere is hidden and the units stay at the center, except while executing a pattern.
+
+	\subsection{Unit Controllers}
+
+	Each simulated unit has two rotational joints with mechanical limits of $\pm30^\circ$, and its controller is written in C++. In tracking mode, the controller computes the unit vector $\mathbf{v}=(v_x,v_y,v_z)$ from the pivot of the unit to the sphere and obtains the joint angles as
+	\begin{equation}
+		\theta_1 = \operatorname{atan2}(-v_y,\, v_z), \qquad \theta_2 = \arcsin(v_x).
+		\label{eq:ik}
+	\end{equation}
+	Every step of 8~ms, the commanded angles are limited to $\pm27.5^\circ$ and approached gradually, advancing 15\,\% of the remaining error with a maximum of $0.15$~rad per step, which avoids abrupt jumps of the physics engine.
+
+	The patterns of the simulation (Table~\ref{tab:simpatterns}) were designed to be recognizable on the array of 16 units when observed from the overhead camera, so they differ from the single-unit patterns of Table~\ref{tab:patterns}. Each pattern is a list of waypoints scaled to an amplitude of $0.35$~rad ($\approx20^\circ$) and traversed at constant speed; RECARGAR is the only pattern in which the units do not move in unison.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Motion Patterns of the 16-Unit Simulation}
+		\label{tab:simpatterns}
+		\scriptsize
+
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+
+		\begin{tabularx}{\columnwidth}{@{}P{1.7cm} Y P{0.9cm}@{}}
+			\toprule
+			Gesture & Motion (seen from the overhead camera) & Duration\\
+			\midrule
+			1 INICIO & Up and down, all units in unison & 1.6~s\\
+			2 RECARGAR & Loading circle: the 12 border units tilt outward one after another, 2 clockwise turns & 2.4~s\\
+			3 ESCUDO & Rhombus, all units in unison & 3.1~s\\
+			4 ATAQUE & L shape, all units in unison & 1.9~s\\
+			5 FIN & Left and right (farewell), all units in unison & 2.3~s\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subsection{Virtual Camera}
+
+	An overhead camera of $320\times320$ pixels captures the array every 64~ms ($\approx15$~frames per second). Its controller only transmits images: each one is preceded by a header with the identifier \texttt{SOFC}, the width and height (16 bits each), and the size (32 bits), followed by the BGRA pixels. In the GUI, a dedicated \texttt{QThread} receives the images and displays them next to the live video, so the operator can see, in the same window, the gesture performed in front of the physical camera and the response of the simulated array.
+
+	\subsection{Operating Configurations and Digital Twin}
+
+	The GUI sends each result to every connected target, which yields the three configurations of Table~\ref{tab:configs}. When both are connected, every POSE, TRACK, MODE, and STOP frame is transmitted to the physical robot and to the simulation at the same time, and the simulation operates as a digital twin. The event log labels each message with its target, \texttt{[ESP32]} or \texttt{[Webots]}, together with the time of its acknowledgement, so the responses of both can be compared.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Operating Configurations}
+		\label{tab:configs}
+		\scriptsize
+
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.05}
+
+		\begin{tabularx}{\columnwidth}{@{}P{1.9cm} Y@{}}
+			\toprule
+			Connected & Use\\
+			\midrule
+			Webots only & Development and testing of the GUI, the protocol, and the patterns without hardware\\
+			ESP32 only & Operation of the physical robot\\
+			ESP32 and Webots & Digital twin: the same commands drive the robot and the simulation\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+
 	\section{Verification}
 	\label{sec:verification}
 
-	The implementation was verified at the software level; the tests are summarized in Table~\ref{tab:verification}. The GUI was executed with the camera and the detection pipeline replaced by stubs, and the controls were applied in sequence. The BLE link was tested against a simulated ESP32 that reproduces the validation and duplicate-rejection rules of the firmware. The CRC-8 of the firmware was compiled and compared with the PC implementation, and the complete firmware was compiled on a PC with simulated Arduino, BLE, and PCA9685 interfaces, injecting the same frames that the PC sends and recording the PWM commands of each servo.
+	The implementation was verified at the software level and in the Webots simulation; the tests are summarized in Table~\ref{tab:verification}. The GUI was executed with the camera and the detection pipeline replaced by stubs, and the controls were applied in sequence. The BLE link was tested against a simulated ESP32 that reproduces the validation and duplicate-rejection rules of the firmware. The CRC-8 of the firmware was compiled and compared with the PC implementation, and the complete firmware was compiled on a PC with simulated Arduino, BLE, and PCA9685 interfaces, injecting the same frames that the PC sends and recording the PWM commands of each servo.
 
 	\begin{table}[!t]
 		\centering
@@ -655,7 +818,12 @@
 			TRACK rate (R6) & 10 frames in 0.5~s (20~Hz) & \status{Passed}\\
 			Heartbeat (R7) & PING sent after 1~s without traffic & \status{Passed}\\
 			Motion patterns & Five distinct trajectories, all ending at the center (Fig.~\ref{fig:trajectories}) & \status{Passed}\\
-			Physical hardware & BLE link and servo motion on the ESP32-C3 & \status{Pending}\\
+			Webots link & Frames acknowledged by the simulated master; each gesture executes its pattern on the 16 units & \status{Passed}\\
+			Modes in Webots & Units follow the sphere only in tracking mode and stay at the center in game and test modes & \status{Passed}\\
+			Virtual camera & Overhead view displayed in the GUI next to the live video & \status{Passed}\\
+			Digital twin & Same commands sent to the ESP32 and to Webots & \status{Pending}\\
+			Physical hardware & BLE link established; frames acknowledged and the unit moved as expected (visual inspection, no measurements) & \status{Passed}\\
+			Hardware metrics & Latency and positioning accuracy on the real unit & \status{Pending}\\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
@@ -669,13 +837,13 @@
 		\label{fig:trajectories}
 	\end{figure*}
 
-	The procedure to validate the system on the physical hardware consists of loading the firmware on the ESP32-C3, running the test script on the PC, which sends a PING, a POSE, a TRACK, and a frame with a corrupted CRC, and verifying that the PC receives an ACK, an ACK, no response, and a NACK with \texttt{ERR\_CRC}, respectively, while the unit draws the X pattern associated with ESCUDO.
+	Finally, a preliminary functional test was performed on the physical hardware. The firmware was loaded on the ESP32-C3, which was connected to one unit through the PCA9685, and the PC established the BLE link with it. The commands sent from the PC were acknowledged, and the unit executed the expected motions within the expected parameters. This test was based on visual inspection; no quantitative measurements of latency or positioning accuracy were taken, so the characterization of the hardware remains pending.
 
 
 	\section{Conclusions}
 	\label{sec:conclusions}
 
-	A GUI was developed for the SOFIA vision system using PySide6. Separating the interface, the video processing, and the BLE communication into three threads keeps the interface responsive, and the start, pause, resume, and stop controls act directly on the processing thread through a mutex and a wait condition. A communication standard was defined to transmit the recognized gestures and the hand position from the PC to the ESP32 master; its frame structure, CRC-8 checksum, acknowledgements, error codes, and retransmission and supervision rules address lost frames, corrupted frames, and loss of the link. An ESP32 firmware that receives, validates, and acknowledges the frames was implemented and associated with five distinct motion patterns of a two-degree-of-freedom unit. The software verification confirmed the expected behavior of the controls, the protocol rules, and the motion patterns. Future work includes the validation on the physical hardware, the measurement of the end-to-end latency from gesture to motion, and the extension of the motion commands to the 16 modules of SOFIA.
+	A GUI was developed for the SOFIA vision system using PySide6. Separating the interface, the video processing, and the BLE communication into three threads keeps the interface responsive, and the start, pause, resume, and stop controls act directly on the processing thread through a mutex and a wait condition. A communication standard was defined to transmit the recognized gestures and the hand position from the PC to the ESP32 master; its frame structure, CRC-8 checksum, acknowledgements, error codes, and retransmission and supervision rules address lost frames, corrupted frames, and loss of the link. An ESP32 firmware that receives, validates, and acknowledges the frames was implemented and associated with five distinct motion patterns of a two-degree-of-freedom unit. In addition, a Webots simulation of the 16-unit array was integrated with the GUI through a simulated master that receives the same frames and applies the same rules as the firmware, so the communication standard, the modes, and the motion patterns can be tested on the complete array without hardware, and the simulation can run alongside the physical robot as a digital twin. The software verification confirmed the expected behavior of the controls, the protocol rules, and the motion patterns, and a preliminary test on the physical ESP32 and one unit confirmed the BLE link and the servo motion. Future work includes the quantitative characterization of the hardware, the measurement of the end-to-end latency from gesture to motion and of the delay between the robot and its digital twin, and the extension of the motion commands of the firmware to the 16 modules of SOFIA, using the patterns validated in the simulation.
 
 
 

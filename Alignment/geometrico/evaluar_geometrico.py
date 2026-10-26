@@ -9,9 +9,9 @@ ya preparada (preparar_dataset.py) y guarda métricas, gráficas y reporte en:
 La foto 0 (todo en 0,0) se usa como referencia del cero.
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/herramientas/evaluar_geometrico.py                 (última sesión, test)
-    python Alignment/herramientas/evaluar_geometrico.py --conjunto val
-    python Alignment/herramientas/evaluar_geometrico.py <carpeta de la sesión> --conjunto todos
+    python Alignment/geometrico/evaluar_geometrico.py                 (última sesión, test)
+    python Alignment/geometrico/evaluar_geometrico.py --conjunto val
+    python Alignment/geometrico/evaluar_geometrico.py <carpeta de la sesión> --conjunto todos
 """
 
 import argparse
@@ -25,6 +25,7 @@ import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 ALIGNMENT = os.path.dirname(AQUI)
+sys.path.insert(0, os.path.join(ALIGNMENT, "herramientas"))
 sys.path.insert(0, ALIGNMENT)
 sys.path.insert(0, AQUI)
 

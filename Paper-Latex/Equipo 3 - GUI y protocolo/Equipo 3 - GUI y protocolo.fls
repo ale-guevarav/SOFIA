@@ -302,8 +302,6 @@ INPUT O:\MikTex\fonts\vf\adobe\courier\pcrr7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
-INPUT O:\MikTex\fonts\vf\adobe\courier\pcrr7t.vf
-INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT O:\MikTex\tex\latex\psnfss\ts1ptm.fd
 INPUT O:\MikTex\tex\latex\psnfss\ts1ptm.fd
 INPUT O:\MikTex\tex\latex\psnfss\ts1ptm.fd
@@ -314,10 +312,17 @@ INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\courier\pcrr7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmr8c.vf
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmb7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmb8r.tfm
 INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr7t.tfm
-INPUT O:\MikTex\fonts\vf\adobe\times\ptmr8c.vf
+INPUT O:\MikTex\fonts\tfm\public\cm\cmbx10.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmbx7.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmbx5.tfm
+INPUT O:\MikTex\fonts\vf\adobe\courier\pcrr7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT .\figures\pattern_trajectories.png
 INPUT .\figures\pattern_trajectories.png
 INPUT .\figures\pattern_trajectories.png
@@ -335,6 +340,8 @@ INPUT O:\MikTex\fonts\tfm\public\cm\cmsy8.tfm
 INPUT O:\MikTex\fonts\tfm\public\cm\cmsy6.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmbx8.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmbx6.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam10.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam7.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
@@ -343,6 +350,8 @@ INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr7t.tfm
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
 INPUT Equipo 3 - GUI y protocolo.aux
+INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi7.pfb
