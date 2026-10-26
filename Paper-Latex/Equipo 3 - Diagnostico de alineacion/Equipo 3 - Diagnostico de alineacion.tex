@@ -1,0 +1,138 @@
+\documentclass[lettersize,journal]{IEEEtran}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\begin{document}
+	\title{Vision-Based Misalignment Diagnosis of the SOFIA Hexagonal Units: Geometric and Learned Estimators}
+
+	\author{
+		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
+		Jorge A. Lizarraga, Luis E. González-Jiménez, Luis F. Luque-Vega
+
+		\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
+	}
+
+	\markboth{Laboratory for the Development of Technological Solutions}
+	{Vision-Based Misalignment Diagnosis of the SOFIA Units}
+
+	\maketitle
+
+	\begin{abstract}
+		Each SOFIA module carries 16 hexagonal plates, each tilted by two servomotors \cite{sofia_architecture}. A plate that does not return to its zero position after a motion is difficult to notice by eye, so this work estimates the two joint angles of every plate from a single overhead photograph and classifies each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Four ArUco markers placed at the height of the plates rectify the photograph, and three estimators are compared on 2000 images rendered in Webots: a training-free geometric method, a small convolutional neural network (CNN), and a pretrained ResNet18. On 300 test images (4800 plates), the CNN reduces the mean absolute error from $0.54^\circ$ to $0.25^\circ$ and the maximum error from $74^\circ$ to $4.4^\circ$, while the geometric method remains the most accurate below $5^\circ$. A hybrid rule that selects, for each plate, between both estimators achieves the best results, with a mean error of $0.22^\circ$, a maximum error of $4.4^\circ$, and a state accuracy of 97.2\,\%.
+	\end{abstract}
+
+	\begin{IEEEkeywords}
+		Misalignment diagnosis, fiducial markers, homography, convolutional neural networks, Webots, synthetic data.
+	\end{IEEEkeywords}
+
+
+	\section{Method}
+
+	\subsection{Setup and Synthetic Dataset}
+
+	The module was reproduced in Webots \cite{webots} with the real panel layout: 16 plates in four staggered rows, a plate radius of 69~mm, and both joint axes at $L=58$~mm below the plate. A frame with four ArUco markers \cite{aruco} (60~mm, dictionary 4$\times$4) surrounds the array, with their centers on a 0.76~m square at the height of the plates. A generator controller set random joint angles, rendered one photograph, and stored the 32 angles as labels. To mimic a hand-placed camera, each image used a camera height of 1.30--1.40~m, tilts of up to $\pm4^\circ$, a yaw of up to $\pm8^\circ$, and an offset of up to $\pm4$~cm. Joint angles were drawn as 5\,\% at zero, 50\,\% within $\pm3^\circ$ (the region of the thresholds), and the rest within $\pm27^\circ$ (the mechanical limit is $\pm30^\circ$). Image~0, with every plate at zero, is the reference. The other 1999 images were split \emph{by image} into 1399 for training, 300 for validation, and 300 for testing, so the 16 plates of a photograph never fall in different subsets.
+
+	\subsection{Rectification and Crops}
+
+	The pipeline is shown in Fig.~\ref{fig:pipeline}. Since the markers lie in the plane of the plates, the homography computed from their four centers maps that plane exactly to a top view at 1~px/mm ($860\times860$ px), independently of the camera pose. In the rectified image, every plate at zero falls on a known pixel, and a crop of $218\times218$~mm around it is resized to $128\times128$~px. The same rectified image and crops feed all the estimators.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[
+			font=\scriptsize,
+			box/.style={draw, rounded corners=2pt, align=center, minimum height=0.62cm, inner sep=2pt, fill=white},
+			arr/.style={-{Stealth[length=1.6mm]}, thick}
+			]
+			\node[box, fill=gray!12, minimum width=1.1cm] (foto) at (0,0) {Photo};
+			\node[box, minimum width=1.5cm] (aruco) at (2.05,0) {4 ArUco\\centers};
+			\node[box, minimum width=1.5cm] (rect) at (4.45,0) {Rectified\\1 px/mm};
+			\node[box, minimum width=1.5cm] (crop) at (6.75,0) {16 crops\\$128\times128$};
+			\node[box, fill=blue!8, minimum width=2.6cm] (geo) at (3.2,-1.3) {Geometric:\\plate shift $\rightarrow$ IK};
+			\node[box, fill=green!10, minimum width=2.6cm] (cnn) at (6.4,-1.3) {CNN:\\crop $\rightarrow (\theta_1,\theta_2)$};
+			\node[box, fill=orange!12, minimum width=5.6cm] (hib) at (4.8,-2.45) {Hybrid rule $\rightarrow$ state of each plate};
+			\draw[arr] (foto) -- (aruco);
+			\draw[arr] (aruco) -- node[above, font=\tiny]{$H$} (rect);
+			\draw[arr] (rect) -- (crop);
+			\draw[arr] (rect.south) -- (rect.south |- geo.north);
+			\draw[arr] (crop.south) -- (crop.south |- cnn.north);
+			\draw[arr] (geo.south) -- (geo.south |- hib.north);
+			\draw[arr] (cnn.south) -- (cnn.south |- hib.north);
+		\end{tikzpicture}
+		\caption{Diagnosis pipeline. The homography $H$ maps the plane of the plates to a fixed top view, so every plate appears at a known position.}
+		\label{fig:pipeline}
+	\end{figure}
+
+	\subsection{Geometric Estimator}
+
+	The plate orientation is $R_x(\theta_1)R_y(\theta_2)(0,0,L)^\top$, so its center moves in the top view by
+	\begin{equation}
+		\Delta v = L\sin\theta_2, \qquad \Delta u = L\cos\theta_2\sin\theta_1,
+	\end{equation}
+	which is inverted as $\theta_2=\arcsin(\Delta v/L)$ and $\theta_1=\arcsin\!\big(\Delta u/(L\cos\theta_2)\big)$. In a window around each zero position, the image is binarized with Otsu's method \cite{otsu}, a hexagonal template locates the plate by normalized cross-correlation with sub-pixel refinement, and the centroid of the connected bright region replaces that estimate when its area and solidity match a plate. Displacements are measured with respect to the plates in the reference image, which absorbs small assembly errors. The method needs no training; its known limitation is that a tilted plate also drops by up to 1~cm, which perspective converts into a bias at large angles.
+
+	\subsection{Learned Estimators}
+
+	Two regressors map a crop to $(\theta_1,\theta_2)/30^\circ$ in PyTorch \cite{pytorch}: a small CNN trained from scratch (five blocks of two $3\times3$ convolutions with batch normalization and max pooling, 32--128 channels, 1.28~M parameters) and a ResNet18 \cite{resnet} pretrained on ImageNet (13.3~M parameters). Since the answer is \emph{where} the plate lies in the crop, both omit the global average pooling and flatten the final $4\times4$ feature map into the fully connected head. Training used a smooth-L1 loss, AdamW \cite{adamw} with a one-cycle schedule \cite{onecycle}, mixed precision, and batches of 128, for 40 epochs (CNN) or 25 epochs (ResNet18); the epoch with the lowest validation error was kept. Augmentation applied horizontal and vertical flips, changing the sign of $\theta_1$ or $\theta_2$, respectively, and random gain, gamma, blur, and noise. Translations, rotations, and scaling were excluded because they would change the answer.
+
+	\subsection{Hybrid Rule}
+
+	The two families fail in different ways (Section~\ref{sec:results}), so both are executed and a per-plate rule selects the result: if the geometric and CNN estimates differ by more than $2^\circ$ on either axis, the CNN value is used and the plate is flagged for inspection; otherwise, the geometric value is used when the CNN places the plate within $6^\circ$ of zero, and the CNN value elsewhere.
+
+
+	\section{Results}
+	\label{sec:results}
+
+	Table~\ref{tab:results} reports the test results on a desktop PC with an AMD Ryzen CPU and an NVIDIA RTX~3060 GPU. The time per photograph includes the marker detection, the rectification, and the estimation of the 16 plates.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Test Results (300 Images, 4800 Plates)}
+		\label{tab:results}
+		\scriptsize
+		\setlength{\tabcolsep}{2.2pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c c c c c c@{}}
+			\toprule
+			& \multicolumn{3}{c}{Error ($^\circ$)} & \multicolumn{2}{c}{MAE by $|\theta|$ ($^\circ$)} & State & Time\\
+			\cmidrule(lr){2-4}\cmidrule(lr){5-6}
+			Method & MAE & RMSE & Max & $0$--$5^\circ$ & $>15^\circ$ & acc. & (ms)\\
+			\midrule
+			Geometric & 0.539 & 1.927 & 74.0 & \textbf{0.13--0.15} & 1.301 & \textbf{97.2\,\%} & 32\textsuperscript{a}\\
+			Small CNN & 0.248 & 0.347 & 4.4 & 0.18--0.19 & \textbf{0.363} & 96.3\,\% & \textbf{12}\textsuperscript{b}\\
+			ResNet18 & 0.293 & 0.409 & \textbf{4.1} & 0.20--0.23 & 0.433 & 95.9\,\% & 16\textsuperscript{b}\\
+			\midrule
+			Hybrid & \textbf{0.223} & \textbf{0.324} & 4.4 & \textbf{0.13--0.15} & \textbf{0.363} & \textbf{97.2\,\%} & 32\textsuperscript{b}\\
+			\bottomrule
+			\multicolumn{8}{@{}l}{\textsuperscript{a}CPU only. \textsuperscript{b}Pre-processing on CPU, network on GPU.}
+		\end{tabularx}
+	\end{table}
+
+	Among the individual estimators, the small CNN obtains the lowest overall error, less than half that of the geometric method, and removes its catastrophic failures: the largest error drops from $74^\circ$ to $4.4^\circ$. These failures occur above $23^\circ$, when a strongly tilted plate is confused with the gap next to it. Conversely, the geometric method is the most accurate below $5^\circ$, where the state thresholds lie, which explains its slightly higher state accuracy (97.2\,\% versus 96.3\,\%). The pretrained ResNet18, ten times larger, does not outperform the small CNN: features learned for object recognition offer little advantage for measuring a shift of a few pixels, although its validation error was still decreasing in the last epoch. All the estimators are more accurate in $\theta_2$ than in $\theta_1$ (CNN: $0.21^\circ$ versus $0.28^\circ$). The hybrid rule exploits these complementary behaviors: it matches the geometric method below $5^\circ$ and the CNN above $15^\circ$, reaching the lowest mean error ($0.223^\circ$) and the state accuracy of the geometric method, without its catastrophic failures, since its maximum error equals that of the CNN. The geometric value was selected for 2792 of the 4800 plates (58\,\%). Of the 286 plates flagged for disagreement, 250 (87\,\%) corresponded to a geometric error above $2^\circ$, so the flag is a useful indicator for inspection. Its cost is time: both estimators run sequentially, for 32~ms per photograph.
+
+
+	\section{Conclusions}
+
+	A single overhead photograph with four fiducial markers is sufficient to estimate the 32 joint angles of a SOFIA module: rectification removes the effect of the camera pose, and the resulting top view allows both a training-free geometric estimator and learned regressors. On synthetic data, a small CNN achieves a mean error of $0.25^\circ$ without large failures, the geometric method is the most accurate near the state thresholds, and a hybrid rule that combines them achieves $0.22^\circ$ and flags doubtful plates for inspection. The geometric method remains a fallback when no GPU or training data are available. Future work includes validating the estimators on photographs of the physical $4\times4$ module, including fine-tuning the CNN with real images to close the gap between simulation and reality.
+
+	\balance
+
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliography}
+
+\end{document}

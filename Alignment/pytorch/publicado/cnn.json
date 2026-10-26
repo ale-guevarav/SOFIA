@@ -1,0 +1,8 @@
+{
+  "modelo": "cnn",
+  "sesion": "sesion_20261025_205140",
+  "epoca": 38,
+  "mae_val_grados": 0.2491,
+  "publicado": "2026-10-26T00:12:26",
+  "origen": "pytorch\\entrenados\\cnn_sesion_20261025_205140\\modelo.pt"
+}
