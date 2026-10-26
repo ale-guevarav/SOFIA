@@ -2,7 +2,7 @@
 
 - **sesión:** sesion_20261025_205140
 - **conjunto:** test
-- **Tiempo por foto (16 hexágonos):** 28.11 ms (p95 34.36 ms)
+- **Tiempo por foto (16 hexágonos):** 31.98 ms (p95 52.16 ms)
 - **fotos:** 300
 
 ## Ángulos

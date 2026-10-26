@@ -92,8 +92,8 @@
       }
     },
     "tiempo_ms_por_foto": {
-      "promedio": 28.11,
-      "p95": 34.36,
+      "promedio": 31.98,
+      "p95": 52.16,
       "fotos": 300
     }
   }
