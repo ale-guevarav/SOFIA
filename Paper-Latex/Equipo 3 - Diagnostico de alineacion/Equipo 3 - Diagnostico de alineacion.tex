@@ -34,11 +34,11 @@
 	\maketitle
 
 	\begin{abstract}
-		Each SOFIA module carries 16 hexagonal plates, each tilted by two servomotors \cite{sofia_architecture}. A plate that does not return to its zero position after a motion is difficult to notice by eye, so this work estimates the two joint angles of every plate from a single overhead photograph and classifies each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Four ArUco markers placed at the height of the plates rectify the photograph, and three estimators are compared on 2000 images rendered in Webots: a training-free geometric method, a small convolutional neural network (CNN), and a pretrained ResNet18. On 300 test images (4800 plates), the CNN reduces the mean absolute error from $0.54^\circ$ to $0.25^\circ$ and the maximum error from $74^\circ$ to $4.4^\circ$, while the geometric method remains the most accurate below $5^\circ$. A hybrid rule that selects, for each plate, between both estimators achieves the best results, with a mean error of $0.22^\circ$, a maximum error of $4.4^\circ$, and a state accuracy of 97.2\,\%.
+		Each SOFIA module carries 16 hexagonal plates, each tilted by two servomotors \cite{sofia_architecture}. A plate that does not return to its zero position after a motion is difficult to notice by eye, so this work estimates the two joint angles of every plate from a single overhead photograph and classifies each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Four ArUco markers placed at the height of the plates rectify the photograph, and three estimators are compared on 2000 images rendered in Webots: a training-free geometric method, a small convolutional neural network (CNN), and a pretrained ResNet18. On 300 test images (4800 plates), the CNN reduces the mean absolute error from $0.54^\circ$ to $0.25^\circ$ and the maximum error from $74^\circ$ to $4.4^\circ$, while the geometric method remains the most accurate below $5^\circ$. A hybrid rule that selects, for each plate, between both estimators achieves the best results, with a mean error of $0.22^\circ$, a maximum error of $4.4^\circ$, and a state accuracy of 97.2\,\%. The estimators are integrated in a diagnosis application with a dedicated processing thread, which can also be connected to a live Webots simulation to misalign the plates interactively and compare each diagnosis with the angles measured in the simulation.
 	\end{abstract}
 
 	\begin{IEEEkeywords}
-		Misalignment diagnosis, fiducial markers, homography, convolutional neural networks, Webots, synthetic data.
+		Misalignment diagnosis, fiducial markers, homography, convolutional neural networks, Webots, synthetic data, multithreading.
 	\end{IEEEkeywords}
 
 
@@ -126,9 +126,65 @@
 	Among the individual estimators, the small CNN obtains the lowest overall error, less than half that of the geometric method, and removes its catastrophic failures: the largest error drops from $74^\circ$ to $4.4^\circ$. These failures occur above $23^\circ$, when a strongly tilted plate is confused with the gap next to it. Conversely, the geometric method is the most accurate below $5^\circ$, where the state thresholds lie, which explains its slightly higher state accuracy (97.2\,\% versus 96.3\,\%). The pretrained ResNet18, ten times larger, does not outperform the small CNN: features learned for object recognition offer little advantage for measuring a shift of a few pixels, although its validation error was still decreasing in the last epoch. All the estimators are more accurate in $\theta_2$ than in $\theta_1$ (CNN: $0.21^\circ$ versus $0.28^\circ$). The hybrid rule exploits these complementary behaviors: it matches the geometric method below $5^\circ$ and the CNN above $15^\circ$, reaching the lowest mean error ($0.223^\circ$) and the state accuracy of the geometric method, without its catastrophic failures, since its maximum error equals that of the CNN. The geometric value was selected for 2792 of the 4800 plates (58\,\%). Of the 286 plates flagged for disagreement, 250 (87\,\%) corresponded to a geometric error above $2^\circ$, so the flag is a useful indicator for inspection. Its cost is time: both estimators run sequentially, for 32~ms per photograph.
 
 
+	\section{Diagnosis Application and Live Testing}
+	\label{sec:app}
+
+	\subsection{Software Organization}
+
+	The project is divided into three parts. The \emph{application} contains the diagnosis core (geometry of the module, rectification, the three estimators, and the hybrid rule) and the user interface. The \emph{build} part generates and prepares the dataset, trains and evaluates the models, and publishes the selected one. The \emph{results} part stores what the build produces and the application consumes: the published CNN (5~MB), the evaluation reports, and the printable marker sheet. Since the training scripts import the same core as the application, the rectification, the crops, and the input normalization are identical in both, which avoids a mismatch between the evaluated model and the deployed one. When PyTorch or the published model is not available, the application reports it and falls back to the geometric method, which requires only OpenCV.
+
+	\subsection{Application}
+
+	The application was implemented in PySide6 following the same threading model as the gesture-recognition interface of SOFIA: a \texttt{QThread} reads the image source, loads the model, runs the diagnosis, and draws the result, while the interface thread only displays what it receives through Qt signals, and commands from the interface are queued under a mutex. Three sources are supported: a camera, recorded images, and a live Webots simulation. When the recorded images belong to a Webots session, the stored joint angles are also displayed as ground truth. For each plate, the application draws an arrow whose direction and length follow $(\theta_1,\theta_2)$ and whose color indicates the state, marks the plates flagged by the hybrid rule, and fills a $4\times4$ map arranged as in the image. The estimator can be changed at run time, the reference image at zero can be captured from the current source, and each diagnosis can be saved as an image and a CSV file.
+
+	\subsection{Live Testing with Webots}
+
+	To test the complete chain without the physical module, a second world reuses the dataset world (same plates, markers, and camera) with a supervisor that connects to the application through a local TCP socket (Fig.~\ref{fig:live}). The application sends commands as JSON lines (Table~\ref{tab:live}), and the supervisor forwards the requested angles to the 16 plate controllers, which reach them and report the angles measured by their position sensors. The supervisor transmits two packet types: the state of the plates, with the measured angles, and the $1280\times1280$ camera images at about five per second.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[
+			font=\scriptsize,
+			box/.style={draw, rounded corners=2pt, align=center, minimum height=0.62cm, inner sep=2pt, fill=white},
+			arr/.style={-{Stealth[length=1.6mm]}, thick}
+			]
+			\node[box, fill=blue!8, minimum width=2.5cm] (app) at (0,0) {Application\\(diagnosis thread)};
+			\node[box, fill=gray!12, minimum width=2.4cm] (sup) at (4.6,0) {Webots supervisor\\camera $1280^2$};
+			\node[box, fill=gray!12, minimum width=2.4cm] (pan) at (4.6,-1.45) {16 plate controllers\\motors + sensors};
+			\draw[arr] ([yshift=1.5mm]app.east) -- node[above, font=\tiny]{commands (JSON)} ([yshift=1.5mm]sup.west);
+			\draw[arr] ([yshift=-1.5mm]sup.west) -- node[below, font=\tiny]{state + images (version)} ([yshift=-1.5mm]app.west -| app.east);
+			\draw[arr] ([xshift=-3mm]sup.south) -- node[left, font=\tiny]{target angles} ([xshift=-3mm]pan.north);
+			\draw[arr] ([xshift=3mm]pan.north) -- node[right, font=\tiny]{measured} ([xshift=3mm]sup.south);
+		\end{tikzpicture}
+		\caption{Live testing loop. The application misaligns the simulated plates and compares each diagnosis with the angles measured in the simulation.}
+		\label{fig:live}
+	\end{figure}
+
+	\begin{table}[!t]
+		\centering
+		\caption{Commands of the Live Testing Mode}
+		\label{tab:live}
+		\scriptsize
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}P{1.5cm} Y@{}}
+			\toprule
+			Command & Effect\\
+			\midrule
+			Zero & All plates to $(0,0)$; the next stable image becomes the reference\\
+			Random & $N$ random plates to random angles up to a given limit; the rest to zero\\
+			Plate & One plate to a given $(\theta_1,\theta_2)$\\
+			Scene & Camera pose and lights randomized as in the dataset, or restored\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	A diagnosis is only meaningful if the image was taken with the plates at rest in the configuration whose angles are reported. For this reason, every command increments a version number, and an image carries that version only when all the plates have reported being at their target for several consecutive steps; otherwise, it carries zero. The application analyzes automatically, exactly once per version, the first image whose version matches that of a stable state, and displays the measured angles as ground truth together with the error of each plate. In this way, each command produces one diagnosis that can be compared directly with the simulation, and changing the scene tests the robustness to the camera pose without moving the plates. The communication and the automatic analysis were verified against an emulated supervisor; a systematic evaluation in this mode is part of the future work.
+
+
 	\section{Conclusions}
 
-	A single overhead photograph with four fiducial markers is sufficient to estimate the 32 joint angles of a SOFIA module: rectification removes the effect of the camera pose, and the resulting top view allows both a training-free geometric estimator and learned regressors. On synthetic data, a small CNN achieves a mean error of $0.25^\circ$ without large failures, the geometric method is the most accurate near the state thresholds, and a hybrid rule that combines them achieves $0.22^\circ$ and flags doubtful plates for inspection. The geometric method remains a fallback when no GPU or training data are available. Future work includes validating the estimators on photographs of the physical $4\times4$ module, including fine-tuning the CNN with real images to close the gap between simulation and reality.
+	A single overhead photograph with four fiducial markers is sufficient to estimate the 32 joint angles of a SOFIA module: rectification removes the effect of the camera pose, and the resulting top view allows both a training-free geometric estimator and learned regressors. On synthetic data, a small CNN achieves a mean error of $0.25^\circ$ without large failures, the geometric method is the most accurate near the state thresholds, and a hybrid rule that combines them achieves $0.22^\circ$ and flags doubtful plates for inspection. The geometric method remains a fallback when no GPU or training data are available. The estimators were integrated in a threaded diagnosis application that also connects to a live Webots simulation, which allows the complete chain, from misalignment to diagnosis, to be tested without the physical module. Future work includes a systematic evaluation in the live mode, the integration of the application as a diagnosis mode of the main SOFIA interface, and validating the estimators on photographs of the physical $4\times4$ module, including fine-tuning the CNN with real images to close the gap between simulation and reality.
 
 	\balance
 
