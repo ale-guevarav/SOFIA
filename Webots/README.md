@@ -25,6 +25,9 @@ GUI (Vision/gui_app.py)
 | `controllers/tracker_esfera_cpp/` | **Paneles** (C++). Apuntan a la esfera; si llega una postura, dibujan su patrón (`patrones.hpp`). |
 | `controllers/camara_sim/` | **Cámara cenital** (Python). Solo manda imágenes a la GUI. |
 | `controllers/esfera_control/` | Controlador original (la esfera se mueve sola). Ya no lo usa el mundo; se deja como referencia. |
+| `Sofia/worlds/sofia_dataset.wbt` | Mundo para el **dataset del diagnóstico de alineación** (lo genera `Alignment/herramientas/crear_mundo_dataset.py`; ver `Alignment/README.md`) |
+| `controllers/panel_dataset/` | Paneles del dataset (C++): ángulo exacto + lectura de su sensor de posición |
+| `controllers/dataset_generator/` | Supervisor del dataset (Python): ángulos y escena al azar, fotos y etiquetas |
 
 ## Qué hace cada comando
 
@@ -32,9 +35,9 @@ GUI (Vision/gui_app.py)
 | --- | --- |
 | `TRACK` (modo TRACKING) | La esfera va a la posición de tu mano y los 16 paneles la siguen |
 | `POSE` | Los paneles dibujan el patrón de la postura (ver abajo) |
-| `MODE` | Al entrar o salir de TRACKING, la esfera vuelve al centro |
-| `STOP` / estado seguro | Esfera al centro, sin patrón (3 s sin tramas o al desconectar) |
-| Sin GUI | La esfera se queda quieta en el centro |
+| `MODE` | En **TRACKING** los paneles siguen la esfera; en **JUEGO / TEST** la ignoran, se quedan en 0,0 y la esfera se esconde bajo el piso |
+| `STOP` / estado seguro | Sin patrón: paneles en 0,0 (o apuntando a la esfera centrada en TRACKING) |
+| Sin GUI / al desconectar | Modo JUEGO: paneles en 0,0 |
 
 ### Patrones por postura
 
