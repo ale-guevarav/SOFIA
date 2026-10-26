@@ -1,0 +1,382 @@
+diff --git a/Alignment/herramientas/preparar_dataset.py b/Alignment/herramientas/preparar_dataset.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..21d7973fbd9ab1bb350f56cafaac15ecdcaaecd1
+--- /dev/null
++++ b/Alignment/herramientas/preparar_dataset.py
+@@ -0,0 +1,181 @@
++"""
++PREPARAR EL DATASET - SOFIA (diagnóstico de alineación)
++
++Toma una sesión generada en Webots (Alignment/datos/webots/<sesión>/)
++y produce lo que usan los modelos:
++
++    <sesión>/recortes/00012_05.png   recorte del hexágono 5 de la foto 12
++    <sesión>/recortes.csv            una fila por recorte, con sus ángulos
++                                     y a qué conjunto pertenece (train/val/test)
++    <sesión>/referencia_enderezada.png   foto 0 (todo en 0,0) ya enderezada
++    <sesión>/revision/               algunas fotos enderezadas con la guía
++                                     dibujada, para revisarlas a ojo
++    <sesión>/descartadas.txt         fotos donde no se vieron los 4 marcadores
++
++La división train / val / test (70 / 15 / 15 %) es POR FOTO: los 16
++recortes de una misma foto quedan juntos, para no hacer trampa.
++
++Uso (desde la carpeta SOFIA, con el entorno activado):
++    python Alignment/herramientas/preparar_dataset.py                (última sesión)
++    python Alignment/herramientas/preparar_dataset.py <carpeta de la sesión>
++"""
++
++import argparse
++import csv
++import glob
++import os
++import random
++import sys
++import time
++
++import cv2
++
++AQUI = os.path.dirname(os.path.abspath(__file__))
++ALIGNMENT = os.path.dirname(AQUI)
++sys.path.insert(0, ALIGNMENT)
++
++import geometria as g  # noqa: E402
++import preprocesamiento as pp  # noqa: E402
++
++
++PROPORCION = {"train": 0.70, "val": 0.15, "test": 0.15}
++SEMILLA_DIVISION = 2026
++FOTOS_REVISION = 8
++
++
++def ultima_sesion():
++    sesiones = sorted(glob.glob(os.path.join(ALIGNMENT, "datos", "webots", "sesion_*")))
++    if not sesiones:
++        sys.exit("No hay sesiones en Alignment/datos/webots/. Genera una en Webots primero.")
++    return sesiones[-1]
++
++
++def dividir(muestras):
++    """Asigna cada foto (salvo la referencia) a train, val o test."""
++
++    fotos = sorted(m for m in muestras if m != 0)
++    random.Random(SEMILLA_DIVISION).shuffle(fotos)
++
++    n = len(fotos)
++    n_train = round(n * PROPORCION["train"])
++    n_val = round(n * PROPORCION["val"])
++
++    conjunto = {0: "referencia"}
++    for i, m in enumerate(fotos):
++        conjunto[m] = "train" if i < n_train else "val" if i < n_train + n_val else "test"
++
++    return conjunto
++
++
++def main():
++
++    parser = argparse.ArgumentParser(description=__doc__.split("\n")[1])
++    parser.add_argument("sesion", nargs="?", help="carpeta de la sesión (por defecto, la última)")
++    args = parser.parse_args()
++
++    sesion = os.path.abspath(args.sesion) if args.sesion else ultima_sesion()
++    print(f"Sesión: {sesion}")
++
++    # -----------------------------
++    # ETIQUETAS (agrupadas por foto)
++    # -----------------------------
++
++    with open(os.path.join(sesion, "etiquetas.csv"), newline="") as archivo:
++        etiquetas = list(csv.DictReader(archivo))
++
++    por_foto = {}
++    for fila in etiquetas:
++        por_foto.setdefault(int(fila["muestra"]), {})[int(fila["panel"])] = fila
++
++    conjunto = dividir(por_foto)
++
++    carpeta_recortes = os.path.join(sesion, "recortes")
++    carpeta_revision = os.path.join(sesion, "revision")
++    os.makedirs(carpeta_recortes, exist_ok=True)
++    os.makedirs(carpeta_revision, exist_ok=True)
++
++    # -----------------------------
++    # PROCESAR CADA FOTO
++    # -----------------------------
++
++    salida = []
++    descartadas = []
++    inicio = time.time()
++
++    for k, (muestra, paneles) in enumerate(sorted(por_foto.items())):
++
++        nombre = next(iter(paneles.values()))["imagen"]
++        imagen = cv2.imread(os.path.join(sesion, "imagenes", nombre))
++
++        if imagen is None:
++            descartadas.append(f"{nombre}: no se pudo leer")
++            continue
++
++        resultado = pp.procesar(imagen)
++
++        if not resultado.ok:
++            descartadas.append(f"{nombre}: {resultado.motivo}")
++            continue
++
++        if muestra == 0:
++            cv2.imwrite(os.path.join(sesion, "referencia_enderezada.png"), resultado.enderezada)
++
++        if k < FOTOS_REVISION:
++            cv2.imwrite(os.path.join(carpeta_revision, nombre.replace(".jpg", ".png")),
++                        pp.dibujar_guia(resultado.enderezada))
++
++        for panel, recorte in enumerate(resultado.recortes):
++            fila = paneles[panel]
++            archivo = f"{muestra:05d}_{panel:02d}.png"
++            cv2.imwrite(os.path.join(carpeta_recortes, archivo), recorte)
++
++            t1, t2 = float(fila["theta1_deg"]), float(fila["theta2_deg"])
++            magnitud, porcentaje, estado = g.desalineacion(t1, t2)
++
++            salida.append({
++                "archivo": archivo,
++                "muestra": muestra,
++                "panel": panel,
++                "fila": fila["fila"],
++                "columna": fila["columna"],
++                "theta1_deg": f"{t1:.4f}",
++                "theta2_deg": f"{t2:.4f}",
++                "magnitud_deg": f"{magnitud:.4f}",
++                "porcentaje": f"{porcentaje:.2f}",
++                "estado": estado,
++                "conjunto": conjunto[muestra],
++            })
++
++        if (k + 1) % 200 == 0:
++            print(f"  {k + 1}/{len(por_foto)} fotos ({time.time() - inicio:.0f} s)")
++
++    # -----------------------------
++    # GUARDAR
++    # -----------------------------
++
++    with open(os.path.join(sesion, "recortes.csv"), "w", newline="") as archivo:
++        escritor = csv.DictWriter(archivo, fieldnames=list(salida[0]))
++        escritor.writeheader()
++        escritor.writerows(salida)
++
++    with open(os.path.join(sesion, "descartadas.txt"), "w") as archivo:
++        archivo.write("\n".join(descartadas))
++
++    resumen = {}
++    for fila in salida:
++        clave = (fila["conjunto"], fila["estado"])
++        resumen[clave] = resumen.get(clave, 0) + 1
++
++    print(f"\nListo en {time.time() - inicio:.0f} s: {len(salida)} recortes de "
++          f"{len(por_foto) - len(descartadas)} fotos ({len(descartadas)} descartadas)")
++
++    for nombre_conjunto in ("train", "val", "test", "referencia"):
++        partes = [f"{e} {resumen.get((nombre_conjunto, e), 0)}" for e in ("OK", "REVISAR", "DESALINEADO")]
++        total = sum(resumen.get((nombre_conjunto, e), 0) for e in ("OK", "REVISAR", "DESALINEADO"))
++        print(f"  {nombre_conjunto:<10} {total:>6} recortes   ({', '.join(partes)})")
++
++    print(f"\nRevisa a ojo las fotos de {carpeta_revision}")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/Alignment/preprocesamiento.py b/Alignment/preprocesamiento.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..c25a514ba8dc730cbd290d9beab1d6519e54af05
+--- /dev/null
++++ b/Alignment/preprocesamiento.py
+@@ -0,0 +1,189 @@
++"""
++PREPROCESAMIENTO - SOFIA (diagnóstico de alineación)
++
++De una foto del módulo (de Webots o de la cámara real) obtiene:
++
++    1. Los 4 marcadores ArUco del marco (su centro en la foto).
++    2. La foto ENDEREZADA: vista desde arriba, siempre del mismo tamaño
++       y con cada hexágono en el mismo lugar (homografía con los 4 centros).
++    3. Los 16 RECORTES, uno por hexágono, que recibe el modelo.
++
++    foto ──► marcadores ──► homografía ──► enderezada ──► 16 recortes
++
++Como el marco está a la altura de las placas, la homografía es exacta
++en ese plano: no importa dónde esté la cámara ni qué tan inclinada.
++
++Uso como módulo:
++    from preprocesamiento import procesar
++    resultado = procesar(imagen_bgr)
++    resultado.recortes[indice]     # 128 x 128, escala de grises
++
++Todas las medidas salen de geometria.py.
++"""
++
++from dataclasses import dataclass, field
++
++import cv2
++import numpy as np
++
++import geometria as g
++
++
++# =============================================
++# MARCADORES
++# =============================================
++
++_detector = None
++
++
++def detector():
++    """Detector de ArUco (se crea una sola vez)."""
++
++    global _detector
++
++    if _detector is None:
++        diccionario = cv2.aruco.getPredefinedDictionary(
++            getattr(cv2.aruco, g.ARUCO_DICCIONARIO)
++        )
++        parametros = cv2.aruco.DetectorParameters()
++        # Esquinas con precisión subpíxel
++        parametros.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
++        _detector = cv2.aruco.ArucoDetector(diccionario, parametros)
++
++    return _detector
++
++
++def detectar_marcadores(gris):
++    """
++    Regresa {id: (x, y)} con el centro de cada marcador del marco
++    encontrado en la foto (solo los ids de geometria.ESQUINAS_UV).
++    """
++
++    esquinas, ids, _ = detector().detectMarkers(gris)
++
++    if ids is None:
++        return {}
++
++    centros = {}
++
++    for marcador, id_ in zip(esquinas, ids.flatten()):
++        id_ = int(id_)
++        if id_ in g.ESQUINAS_UV:
++            centros[id_] = tuple(marcador[0].mean(axis=0))
++
++    return centros
++
++
++# =============================================
++# HOMOGRAFÍA Y RECORTES
++# =============================================
++
++def homografia(centros):
++    """Matriz 3x3: pixel de la foto -> pixel de la imagen enderezada."""
++
++    ids = sorted(g.ESQUINAS_UV)
++    origen = np.float32([centros[i] for i in ids])
++    destino = np.float32([g.uv_a_pixel(*g.ESQUINAS_UV[i]) for i in ids])
++
++    return cv2.getPerspectiveTransform(origen, destino)
++
++
++def centro_panel_px(fila, columna):
++    """Centro del hexágono (en 0,0) en la imagen enderezada."""
++    return g.uv_a_pixel(*g.mundo_a_imagen(*g.panel_xy(fila, columna)))
++
++
++def recortar(enderezada):
++    """Los 16 recortes (índice = fila * 4 + columna), de LADO_RECORTE_PX."""
++
++    lado = g.LADO_RECORTE_M * g.PIXELES_POR_METRO
++    salida = g.LADO_RECORTE_PX
++    escala = salida / lado
++
++    recortes = []
++
++    for _, fila, columna, _ in g.paneles():
++        cx, cy = centro_panel_px(fila, columna)
++
++        # Transformación afín: el centro del hexágono queda en el centro
++        # del recorte (con precisión subpíxel, sin redondear)
++        matriz = np.float32([
++            [escala, 0, salida / 2 - cx * escala],
++            [0, escala, salida / 2 - cy * escala],
++        ])
++
++        recortes.append(cv2.warpAffine(
++            enderezada, matriz, (salida, salida),
++            flags=cv2.INTER_AREA, borderMode=cv2.BORDER_REPLICATE,
++        ))
++
++    return recortes
++
++
++# =============================================
++# TODO JUNTO
++# =============================================
++
++@dataclass
++class Resultado:
++    ok: bool
++    motivo: str = ""
++    marcadores: dict = field(default_factory=dict)
++    homografia: np.ndarray = None
++    enderezada: np.ndarray = None
++    recortes: list = field(default_factory=list)
++
++
++def procesar(imagen, gris_salida=True):
++    """
++    Procesa una foto (BGR o gris). Si falta algún marcador regresa
++    ok=False con el motivo (la foto no sirve para el diagnóstico).
++    """
++
++    gris = imagen if imagen.ndim == 2 else cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
++
++    centros = detectar_marcadores(gris)
++    faltan = sorted(set(g.ESQUINAS_UV) - set(centros))
++
++    if faltan:
++        return Resultado(False, f"no se encontraron los marcadores {faltan}", centros)
++
++    matriz = homografia(centros)
++    lado = g.LADO_ENDEREZADA_PX
++
++    fuente = gris if gris_salida else imagen
++    enderezada = cv2.warpPerspective(
++        fuente, matriz, (lado, lado),
++        flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE,
++    )
++
++    return Resultado(
++        ok=True,
++        marcadores=centros,
++        homografia=matriz,
++        enderezada=enderezada,
++        recortes=recortar(enderezada),
++    )
++
++
++def dibujar_guia(enderezada):
++    """Copia a color con el centro esperado y el recorte de cada hexágono."""
++
++    vista = enderezada if enderezada.ndim == 3 else cv2.cvtColor(enderezada, cv2.COLOR_GRAY2BGR)
++    vista = vista.copy()
++    mitad = g.LADO_RECORTE_M * g.PIXELES_POR_METRO / 2
++
++    for indice, fila, columna, _ in g.paneles():
++        cx, cy = centro_panel_px(fila, columna)
++        p1 = (int(cx - mitad), int(cy - mitad))
++        p2 = (int(cx + mitad), int(cy + mitad))
++        cv2.rectangle(vista, p1, p2, (0, 200, 255), 1)
++        cv2.drawMarker(vista, (int(cx), int(cy)), (0, 0, 255), cv2.MARKER_CROSS, 14, 2)
++        cv2.putText(vista, str(indice), (p1[0] + 4, p1[1] + 18),
++                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 200, 255), 2)
++
++    for u, v in g.ESQUINAS_UV.values():
++        x, y = g.uv_a_pixel(u, v)
++        cv2.circle(vista, (int(x), int(y)), 6, (0, 255, 0), 2)
++
++    return vista
