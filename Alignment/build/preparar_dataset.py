@@ -1,7 +1,7 @@
 """
 PREPARAR EL DATASET - SOFIA (diagnóstico de alineación)
 
-Toma una sesión generada en Webots (Alignment/datos/webots/<sesión>/)
+Toma una sesión generada en Webots (Alignment/build/datos/webots/<sesión>/)
 y produce lo que usan los modelos:
 
     <sesión>/recortes/00012_05.png   recorte del hexágono 5 de la foto 12
@@ -16,13 +16,12 @@ La división train / val / test (70 / 15 / 15 %) es POR FOTO: los 16
 recortes de una misma foto quedan juntos, para no hacer trampa.
 
 Uso (desde la carpeta SOFIA, con el entorno activado):
-    python Alignment/herramientas/preparar_dataset.py                (última sesión)
-    python Alignment/herramientas/preparar_dataset.py <carpeta de la sesión>
+    python Alignment/build/preparar_dataset.py                (última sesión)
+    python Alignment/build/preparar_dataset.py <carpeta de la sesión>
 """
 
 import argparse
 import csv
-import glob
 import os
 import random
 import sys
@@ -31,23 +30,18 @@ import time
 import cv2
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, ALIGNMENT)
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
+sys.path.insert(0, AQUI)
 
 import geometria as g  # noqa: E402
 import preprocesamiento as pp  # noqa: E402
+import rutas  # noqa: E402
+from rutas import ultima_sesion  # noqa: E402,F401  (antes vivía aquí)
 
 
 PROPORCION = {"train": 0.70, "val": 0.15, "test": 0.15}
 SEMILLA_DIVISION = 2026
 FOTOS_REVISION = 8
-
-
-def ultima_sesion():
-    sesiones = sorted(glob.glob(os.path.join(ALIGNMENT, "datos", "webots", "sesion_*")))
-    if not sesiones:
-        sys.exit("No hay sesiones en Alignment/datos/webots/. Genera una en Webots primero.")
-    return sesiones[-1]
 
 
 def dividir(muestras):

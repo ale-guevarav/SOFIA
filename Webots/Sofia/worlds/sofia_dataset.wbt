@@ -110,7 +110,7 @@ DEF PANEL_3_3 Robot { translation 0.225 0.280 0.025 name "Panel_3_3" controller 
 
 # =============================================
 # DATASET DEL DIAGNÓSTICO DE ALINEACIÓN
-# (generado por Diagnostico/herramientas/crear_mundo_dataset.py)
+# (generado por Alignment/build/herramientas/crear_mundo_dataset.py)
 # =============================================
 
 DEF LUZ_DIRECCIONAL DirectionalLight {

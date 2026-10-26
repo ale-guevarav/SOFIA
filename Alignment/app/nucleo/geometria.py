@@ -2,8 +2,8 @@
 GEOMETRÍA DEL MÓDULO Y DEL MARCO - SOFIA (diagnóstico de alineación)
 
 Fuente ÚNICA de las medidas. La usan:
-    - herramientas/crear_mundo_dataset.py  (arma el mundo de Webots)
-    - herramientas/generar_marcadores.py   (texturas e impresión de ArUco)
+    - build/herramientas/crear_mundo_dataset.py  (arma los mundos de Webots)
+    - build/herramientas/generar_marcadores.py   (texturas e impresión de ArUco)
     - el preprocesamiento (enderezar la foto y recortar los hexágonos)
 
 Cuando llegue el módulo real, se cambian aquí las medidas y se

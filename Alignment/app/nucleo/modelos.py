@@ -19,7 +19,11 @@ pasa completo a la capa densa: el modelo conserva la posición.
 import torch
 from torch import nn
 
-from datos import DESVIACION, MEDIA
+import geometria as g
+
+# Normalización compartida por el entrenamiento (build/) y la app
+ESCALA_ANGULO = g.LIMITE_GRADOS      # salida del modelo = ángulo / 30°
+MEDIA, DESVIACION = 0.5, 0.25        # imagen 0-1 -> (x - MEDIA) / DESVIACION
 
 
 def _bloque(entrada, salida):

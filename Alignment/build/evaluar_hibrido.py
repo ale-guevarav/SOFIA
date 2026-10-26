@@ -4,15 +4,15 @@ EVALUAR EL MÉTODO HÍBRIDO - SOFIA (diagnóstico de alineación)
 Corre geométrico + CNN sobre las MISMAS fotos, aplica la regla del
 híbrido y guarda métricas, gráficas y reporte igual que los otros:
 
-    Alignment/resultados/hibrido_<sesión>_<conjunto>/
+    Alignment/results/evaluaciones/hibrido_<sesión>_<conjunto>/
 
 Además dice qué tan útil fue la marca de "desacuerdo": de los
 hexágonos marcados, cuántos eran de verdad un error grande del geométrico.
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/hibrido/evaluar_hibrido.py                       (última sesión, test)
-    python Alignment/hibrido/evaluar_hibrido.py --conjunto val
-    python Alignment/hibrido/evaluar_hibrido.py --modelo <modelo.pt>
+    python Alignment/build/evaluar_hibrido.py                       (última sesión, test)
+    python Alignment/build/evaluar_hibrido.py --conjunto val
+    python Alignment/build/evaluar_hibrido.py --modelo <modelo.pt>
 """
 
 import argparse
@@ -24,14 +24,12 @@ import cv2
 import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, os.path.join(ALIGNMENT, "herramientas"))
-sys.path.insert(0, ALIGNMENT)
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
 sys.path.insert(0, AQUI)
 
+import diagnosticador as mh  # noqa: E402
 import evaluacion  # noqa: E402
-import metodo_hibrido as mh  # noqa: E402
-from preparar_dataset import ultima_sesion  # noqa: E402
+import rutas  # noqa: E402
 
 
 def main():
@@ -42,7 +40,7 @@ def main():
     parser.add_argument("--modelo", help="modelo.pt de la CNN (por defecto, el publicado o el último)")
     args = parser.parse_args()
 
-    sesion = os.path.abspath(args.sesion) if args.sesion else ultima_sesion()
+    sesion = os.path.abspath(args.sesion) if args.sesion else rutas.ultima_sesion()
     ruta_csv = os.path.join(sesion, "recortes.csv")
     if not os.path.isfile(ruta_csv):
         sys.exit(f"Falta {ruta_csv}: corre primero preparar_dataset.py")
@@ -115,7 +113,7 @@ def main():
         "zona del geométrico (°)": mh.ZONA_GEOMETRICO_GRADOS,
     }
 
-    carpeta = os.path.join(ALIGNMENT, "resultados", f"hibrido_{os.path.basename(sesion)}_{args.conjunto}")
+    carpeta = os.path.join(rutas.EVALUACIONES, f"hibrido_{os.path.basename(sesion)}_{args.conjunto}")
     titulo = "Método híbrido"
 
     evaluacion.graficas(reales, hibrido, carpeta, titulo)
@@ -123,7 +121,7 @@ def main():
         "sesión": os.path.basename(sesion),
         "conjunto": args.conjunto,
         "fotos": len(tiempos),
-        "modelo": os.path.relpath(diag.ruta_modelo, ALIGNMENT),
+        "modelo": os.path.relpath(diag.ruta_modelo, rutas.ALIGNMENT),
         "dispositivo": diag.dispositivo,
         **extra,
     })

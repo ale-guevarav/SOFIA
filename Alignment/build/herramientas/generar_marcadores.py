@@ -4,11 +4,11 @@ MARCADORES ARUCO DEL MARCO - SOFIA
 Genera:
     1. Las texturas para Webots (Webots/Sofia/worlds/textures/aruco_N.png).
     2. Una hoja para IMPRIMIR los 4 marcadores a tamaño real
-       (Alignment/marcadores_imprimir.png, a 300 dpi), para el marco
+       (Alignment/results/marcadores_imprimir.png, a 300 dpi), para el marco
        del módulo físico.
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/herramientas/generar_marcadores.py
+    python Alignment/build/herramientas/generar_marcadores.py
 
 Al imprimir: escala 100 % (sin "ajustar a la página") y medir que el
 cuadro negro mida exactamente LADO_MARCADOR (geometria.py).
@@ -21,14 +21,13 @@ import cv2
 import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DIAGNOSTICO = os.path.dirname(AQUI)
-RAIZ = os.path.dirname(DIAGNOSTICO)
-sys.path.insert(0, DIAGNOSTICO)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(AQUI)), "app", "nucleo"))
 
 import geometria as g  # noqa: E402
+import rutas  # noqa: E402
 
 
-TEXTURAS = os.path.join(RAIZ, "Webots", "Sofia", "worlds", "textures")
+TEXTURAS = os.path.join(rutas.RAIZ, "Webots", "Sofia", "worlds", "textures")
 TEXTURA_PX = 400            # resolución de cada textura en Webots
 DPI = 300
 
@@ -83,7 +82,7 @@ def generar_hoja_impresion():
              f"Centros en un cuadrado de {g.LADO_MARCO * 1000:.0f} mm, a la altura de las placas.")
     cv2.putText(hoja, texto, (150, alto - 200), cv2.FONT_HERSHEY_SIMPLEX, 1.1, 0, 3)
 
-    ruta = os.path.join(DIAGNOSTICO, "marcadores_imprimir.png")
+    ruta = os.path.join(rutas.RESULTS, "marcadores_imprimir.png")
     cv2.imwrite(ruta, hoja)
     print(f"Hoja para imprimir: {ruta}")
 

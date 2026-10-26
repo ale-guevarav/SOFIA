@@ -1,8 +1,14 @@
 """
 CREA EL MUNDO DE WEBOTS PARA EL DATASET - SOFIA
 
-Toma el mundo normal (Webots/Sofia/worlds/sofia.wbt) y genera
-sofia_dataset.wbt con lo necesario para el diagnóstico de alineación:
+Toma el mundo normal (Webots/Sofia/worlds/sofia.wbt) y genera dos mundos
+para el diagnóstico de alineación:
+
+    sofia_dataset.wbt            genera las fotos del dataset (dataset_generator)
+    sofia_diagnostico_vivo.wbt   el mismo mundo, pero la cámara se conecta
+                                 a la app para probar en vivo (diagnostico_vivo)
+
+Los dos tienen:
 
     - Los 16 paneles con un controlador propio (panel_dataset) que pone
       ángulos EXACTOS y reporta lo que mide un PositionSensor.
@@ -14,8 +20,8 @@ sofia_dataset.wbt con lo necesario para el diagnóstico de alineación:
 El mundo normal NO se modifica.
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/herramientas/generar_marcadores.py   (texturas)
-    python Alignment/herramientas/crear_mundo_dataset.py
+    python Alignment/build/herramientas/generar_marcadores.py   (texturas)
+    python Alignment/build/herramientas/crear_mundo_dataset.py
 """
 
 import os
@@ -23,16 +29,16 @@ import re
 import sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DIAGNOSTICO = os.path.dirname(AQUI)
-RAIZ = os.path.dirname(DIAGNOSTICO)
-sys.path.insert(0, DIAGNOSTICO)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(AQUI)), "app", "nucleo"))
 
 import geometria as g  # noqa: E402
+import rutas  # noqa: E402
 
 
-MUNDOS = os.path.join(RAIZ, "Webots", "Sofia", "worlds")
+MUNDOS = os.path.join(rutas.RAIZ, "Webots", "Sofia", "worlds")
 ORIGEN = os.path.join(MUNDOS, "sofia.wbt")
 DESTINO = os.path.join(MUNDOS, "sofia_dataset.wbt")
+DESTINO_VIVO = os.path.join(MUNDOS, "sofia_diagnostico_vivo.wbt")
 
 # Cámara del dataset (se mueve un poco en cada foto)
 CAMARA_ALTURA = 1.35        # m sobre el piso
@@ -132,7 +138,7 @@ def resto_del_mundo():
     return f'''
 # =============================================
 # DATASET DEL DIAGNÓSTICO DE ALINEACIÓN
-# (generado por Alignment/herramientas/crear_mundo_dataset.py)
+# (generado por Alignment/build/herramientas/crear_mundo_dataset.py)
 # =============================================
 
 DEF LUZ_DIRECCIONAL DirectionalLight {{
@@ -169,6 +175,14 @@ DEF GENERADOR Robot {{
 '''
 
 
+def mundo_vivo(texto):
+    """El mundo del dataset con la cámara conectada a la app (diagnostico_vivo)."""
+    texto = texto.replace('name "generador_dataset"', 'name "diagnostico_vivo"')
+    texto = texto.replace('controller "dataset_generator"', 'controller "diagnostico_vivo"')
+    assert 'controller "diagnostico_vivo"' in texto
+    return texto
+
+
 def main():
 
     with open(ORIGEN, encoding="utf-8") as archivo:
@@ -185,8 +199,11 @@ def main():
 
     with open(DESTINO, "w", encoding="utf-8", newline="\n") as archivo:
         archivo.write(texto)
-
     print(f"Mundo creado: {DESTINO}")
+
+    with open(DESTINO_VIVO, "w", encoding="utf-8", newline="\n") as archivo:
+        archivo.write(mundo_vivo(texto))
+    print(f"Mundo creado: {DESTINO_VIVO}")
 
 
 if __name__ == "__main__":

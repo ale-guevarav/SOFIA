@@ -1,8 +1,11 @@
-# Imágenes y etiquetas generadas (pesan mucho; no se suben)
-datos/
-__pycache__/
-
-# Pesos entrenados (se regeneran con pytorch/entrenar.py)
+# Generado en build/ (pesa mucho; no se sube)
+build/datos/
 *.pt
 *.pth
 *.npz
+# (excepción: results/modelo/ sí sube su cnn.pt, ver su .gitignore)
+
+# Reportes guardados desde la app
+results/diagnosticos/
+
+__pycache__/

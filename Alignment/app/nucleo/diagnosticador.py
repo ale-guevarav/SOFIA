@@ -1,8 +1,8 @@
 """
-MÉTODO HÍBRIDO Y DIAGNOSTICADOR - SOFIA (diagnóstico de alineación)
+DIAGNOSTICADOR Y MÉTODO HÍBRIDO - SOFIA (diagnóstico de alineación)
 
 Junta los dos métodos para quedarse con lo mejor de cada uno
-(ver COMPARACION.md):
+(ver results/COMPARACION.md):
 
     - El GEOMÉTRICO es el más preciso con ángulos chicos (0-5°), justo
       donde están los umbrales OK / REVISAR / DESALINEADO.
@@ -34,23 +34,16 @@ regresan al geométrico y lo avisan en `aviso` (así el equipo puede
 usarlo sin GPU).
 """
 
-import glob
 import os
-import sys
 import time
 from dataclasses import dataclass, field
 
 import numpy as np
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-for carpeta in (os.path.join(ALIGNMENT, "pytorch"), os.path.join(ALIGNMENT, "geometrico"), ALIGNMENT):
-    if carpeta not in sys.path:
-        sys.path.insert(0, carpeta)
-
-import geometria as g  # noqa: E402
-import preprocesamiento as pp  # noqa: E402
-from metodo_geometrico import MetodoGeometrico  # noqa: E402
+import geometria as g
+import preprocesamiento as pp
+import rutas
+from metodo_geometrico import MetodoGeometrico
 
 
 DESACUERDO_GRADOS = 2.0
@@ -62,17 +55,11 @@ METODOS = {
     "hibrido": "Híbrido",
 }
 
-# Modelo que se sube al repo para el equipo (ver pytorch/publicado/LEEME.md)
-MODELO_PUBLICADO = os.path.join(ALIGNMENT, "pytorch", "publicado", "cnn.pt")
-
-
 def buscar_modelo():
-    """El modelo publicado; si no está, el último entrenado en esta PC."""
-    if os.path.isfile(MODELO_PUBLICADO):
-        return MODELO_PUBLICADO
-    entrenados = sorted(glob.glob(os.path.join(ALIGNMENT, "pytorch", "entrenados", "cnn_*", "modelo.pt")),
-                        key=os.path.getmtime)
-    return entrenados[-1] if entrenados else None
+    """El modelo publicado (results/modelo/cnn.pt); si no está, el último entrenado en esta PC."""
+    if os.path.isfile(rutas.MODELO_PUBLICADO):
+        return rutas.MODELO_PUBLICADO
+    return rutas.ultima_cnn_entrenada()
 
 
 # =============================================
@@ -146,7 +133,7 @@ class Diagnosticador:
 
     def _cargar_cnn(self, ruta):
         if not ruta or not os.path.isfile(ruta):
-            self._sin_cnn("no hay modelo entrenado (pytorch/publicado/cnn.pt)")
+            self._sin_cnn("no hay modelo (results/modelo/cnn.pt)")
             return
         try:
             from inferencia import ModeloAlineacion

@@ -4,14 +4,14 @@ EVALUAR EL MÉTODO GEOMÉTRICO - SOFIA (diagnóstico de alineación)
 Corre el método geométrico (línea base) sobre las fotos de una sesión
 ya preparada (preparar_dataset.py) y guarda métricas, gráficas y reporte en:
 
-    Alignment/resultados/geometrico_<sesión>_<conjunto>/
+    Alignment/results/evaluaciones/geometrico_<sesión>_<conjunto>/
 
 La foto 0 (todo en 0,0) se usa como referencia del cero.
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/geometrico/evaluar_geometrico.py                 (última sesión, test)
-    python Alignment/geometrico/evaluar_geometrico.py --conjunto val
-    python Alignment/geometrico/evaluar_geometrico.py <carpeta de la sesión> --conjunto todos
+    python Alignment/build/evaluar_geometrico.py                 (última sesión, test)
+    python Alignment/build/evaluar_geometrico.py --conjunto val
+    python Alignment/build/evaluar_geometrico.py <carpeta de la sesión> --conjunto todos
 """
 
 import argparse
@@ -24,15 +24,13 @@ import cv2
 import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, os.path.join(ALIGNMENT, "herramientas"))
-sys.path.insert(0, ALIGNMENT)
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
 sys.path.insert(0, AQUI)
 
 import evaluacion  # noqa: E402
 import preprocesamiento as pp  # noqa: E402
+import rutas  # noqa: E402
 from metodo_geometrico import MetodoGeometrico  # noqa: E402
-from preparar_dataset import ultima_sesion  # noqa: E402
 
 
 def main():
@@ -42,7 +40,7 @@ def main():
     parser.add_argument("--conjunto", default="test", choices=["train", "val", "test", "todos"])
     args = parser.parse_args()
 
-    sesion = os.path.abspath(args.sesion) if args.sesion else ultima_sesion()
+    sesion = os.path.abspath(args.sesion) if args.sesion else rutas.ultima_sesion()
     ruta_csv = os.path.join(sesion, "recortes.csv")
 
     if not os.path.isfile(ruta_csv):
@@ -94,7 +92,7 @@ def main():
     metricas = evaluacion.calcular(reales, estimados, tiempos)
 
     nombre = f"geometrico_{os.path.basename(sesion)}_{args.conjunto}"
-    carpeta = os.path.join(ALIGNMENT, "resultados", nombre)
+    carpeta = os.path.join(rutas.EVALUACIONES, nombre)
     titulo = "Método geométrico"
 
     evaluacion.graficas(reales, estimados, carpeta, titulo)

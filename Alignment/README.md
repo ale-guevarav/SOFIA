@@ -8,54 +8,112 @@ Una cámara ve el módulo de 16 hexágonos y estima, para cada uno, sus dos áng
 | REVISAR | de 2° a 5° |
 | DESALINEADO | más de 5° |
 
-Porcentaje = \|θ\| / 30° × 100 (30° es el tope mecánico).
-
-## Cómo funciona
+Porcentaje = eje más desviado / 30° × 100 (30° es el tope mecánico).
 
 ```
 Foto ──► 4 marcadores ArUco del marco ──► foto enderezada (vista desde arriba)
-     ──► 16 recortes, uno por hexágono ──► modelo ──► (θ1, θ2) de cada hexágono
+     ──► 16 recortes, uno por hexágono ──► geométrico + CNN (híbrido) ──► (θ1, θ2) y estado
 ```
 
-Se comparan tres métodos:
-
-| Método | Idea |
-| --- | --- |
-| Geométrico (línea base) | Cuánto se corrió el centro de cada placa respecto a la foto de referencia en 0,0: θ ≈ asin(d / L) |
-| CNN pequeña | Red entrenada desde cero con los recortes |
-| ResNet18 | Red preentrenada, ajustada con los recortes |
-
-Se entrena con imágenes de **Webots** (ángulos exactos) y se ajusta y evalúa con fotos del **módulo real**.
+Comparación de los métodos y resultados: [`results/COMPARACION.md`](results/COMPARACION.md).
 
 ## Estructura
 
+```
+Alignment/
+├── app/        LA APP: lo que corre para diagnosticar
+│   ├── app_diagnostico.py      ventana
+│   ├── diagnostico_worker.py   hilo (QThread) que lee la fuente y analiza
+│   ├── webots_vivo.py          conexión con Webots en vivo
+│   └── nucleo/                 lógica del diagnóstico (también la usa build/)
+│       ├── geometria.py            TODAS las medidas del módulo y del marco
+│       ├── preprocesamiento.py     ArUco -> foto enderezada -> 16 recortes
+│       ├── metodo_geometrico.py    método sin entrenamiento
+│       ├── modelos.py, inferencia.py   CNN / ResNet18 y cómo usarlas
+│       ├── diagnosticador.py       híbrido + lo que llama la app
+│       └── rutas.py                dónde está cada carpeta
+│
+├── build/      DONDE SE ENTRENA (o reentrena)
+│   ├── preparar_dataset.py     sesión de Webots -> recortes etiquetados
+│   ├── dataset_torch.py        recortes -> PyTorch (aumentos)
+│   ├── entrenar.py             entrena la CNN o la ResNet18
+│   ├── evaluacion.py           métricas iguales para todos los métodos
+│   ├── evaluar_geometrico.py, evaluar_modelo.py, evaluar_hibrido.py
+│   ├── comparar_resultados.py  tabla de todos los métodos
+│   ├── publicar_modelo.py      copia el modelo bueno a results/modelo/
+│   ├── herramientas/           marcadores ArUco y mundos de Webots
+│   ├── datos/webots/<sesión>/  fotos de Webots              (no se sube)
+│   └── entrenados/<modelo>_<sesión>/  pesos (no se suben), historial y curvas
+│
+├── results/    LO QUE SALE DEL BUILD Y USA LA APP
+│   ├── modelo/cnn.pt           modelo publicado (sí se sube, ~5 MB)
+│   ├── evaluaciones/           métricas, gráficas y comparacion.md de cada método
+│   ├── COMPARACION.md          geométrico vs PyTorch vs híbrido
+│   ├── marcadores_imprimir.png hoja para el marco del módulo real
+│   └── diagnosticos/           reportes guardados desde la app (no se suben)
+│
+└── requirements.txt
+```
+
+En Webots (`Webots/Sofia/`):
+
 | Archivo | Qué hace |
 | --- | --- |
-| `geometria.py` | **Todas las medidas** (posición de los hexágonos, marco, alturas, resolución, umbrales). Si cambia el módulo, se cambia aquí. |
-| `herramientas/generar_marcadores.py` | Texturas ArUco para Webots y hoja para imprimir (`marcadores_imprimir.png`) |
-| `herramientas/crear_mundo_dataset.py` | Crea `Webots/Sofia/worlds/sofia_dataset.wbt` a partir del mundo normal |
-| `datos/` | Imágenes y etiquetas generadas (no se suben a git) |
+| `worlds/sofia_dataset.wbt` + `controllers/dataset_generator/` | Genera el dataset |
+| `worlds/sofia_diagnostico_vivo.wbt` + `controllers/diagnostico_vivo/` | Conecta la cámara con la app para probar en vivo |
+| `controllers/panel_dataset/` | Pone cada panel en un ángulo exacto y lo mide con un sensor (los dos mundos) |
 
-En Webots: `controllers/panel_dataset/` pone cada panel en un ángulo exacto y lo mide con un sensor; `controllers/dataset_generator/` cambia la escena, toma las fotos y guarda las etiquetas.
+Todo se corre **desde la carpeta `SOFIA`** con el entorno activado.
 
-## Paso 1: generar el dataset en Webots
+---
 
-1. *(Solo si cambiaste `geometria.py`)* desde la carpeta `SOFIA`, con el entorno activado:
+## App
+
+```
+python Alignment/app/app_diagnostico.py
+```
+
+Usa `results/modelo/cnn.pt` con el método **híbrido**. Sin PyTorch o sin modelo, avisa y usa el geométrico.
+
+| Fuente | Cómo |
+| --- | --- |
+| **Cámara** | *Abrir cámara*. Con todo en 0,0, *Tomar referencia 0,0*; luego *Analizar* o *Continuo* |
+| **Fotos / sesión de Webots** | *Abrir carpeta / sesión…* Con una sesión (`build/datos/webots/sesion_…`) también dibuja el valor real (flecha blanca) y el error |
+| **Webots en vivo** | Ver abajo |
+
+*■ Cerrar fuente* cierra la cámara o la conexión con Webots. *Guardar reporte* deja imagen + CSV en `results/diagnosticos/`.
+
+### Webots en vivo
+
+1. En Webots abre `Webots/Sofia/worlds/sofia_diagnostico_vivo.wbt` y dale ▶. En la consola:
    ```
-   python Alignment/herramientas/generar_marcadores.py
-   python Alignment/herramientas/crear_mundo_dataset.py
+   [VIVO] Esperando la app en 127.0.0.1:5557 (cámara 1280x1280)
    ```
+   *(La primera vez compila `panel_dataset` si no lo has hecho: abre `panel_dataset.cpp` y **Build**.)*
+2. En la app: **Webots en vivo**. La primera imagen con todo en 0,0 se toma sola como referencia.
+3. Mueve los paneles desde el grupo **Webots en vivo**:
+   * **Desalinear al azar**: N paneles hasta X°.
+   * **Mover panel**: un panel a (θ1, θ2) exactos.
+   * **Todo a 0,0**: regresa todo (y vuelve a tomar la referencia).
+   * **Cámara y luz al azar / Escena normal**: mueve la cámara y cambia la luz como en el dataset.
+4. Cada vez que los paneles se quedan quietos, la app analiza sola y compara contra los ángulos **medidos** en la simulación.
+
+---
+
+## Build
+
+### 1. Dataset en Webots
+
+1. *(Solo si cambiaste `app/nucleo/geometria.py`)*:
+   ```
+   python Alignment/build/herramientas/generar_marcadores.py
+   python Alignment/build/herramientas/crear_mundo_dataset.py
+   ```
+   (regenera las texturas, `results/marcadores_imprimir.png` y los dos mundos)
 2. Abre en Webots `Webots/Sofia/worlds/sofia_dataset.wbt`.
 3. Compila los paneles **una vez**: abre `controllers/panel_dataset/panel_dataset.cpp` y presiona **Build**.
-4. Cuántas fotos: en `controllers/dataset_generator/runtime.ini`, `DATASET_MUESTRAS`. Viene en **20** para probar; para el dataset completo pon **2000**.
-5. Dale ▶. Webots se pone en modo rápido y en la consola va saliendo:
-   ```
-   [DATASET] 20 muestras -> ...\Diagnostico\datos\webots\sesion_...
-   [DATASET] 1/20 (1 guardadas, 0 s)
-   ...
-   [DATASET] Listo: 20 imágenes en ...
-   ```
-6. El resultado queda en `Alignment/datos/webots/sesion_<fecha>/`:
+4. Cuántas fotos: `DATASET_MUESTRAS` en `controllers/dataset_generator/runtime.ini` (20 para probar, 2000 para el dataset completo).
+5. Dale ▶. Sale en `Alignment/build/datos/webots/sesion_<fecha>/`:
 
 | Archivo | Contenido |
 | --- | --- |
@@ -65,16 +123,33 @@ En Webots: `controllers/panel_dataset/` pone cada panel en un ángulo exacto y l
 | `escenas.csv` | Posición de la cámara, luces y piso de cada foto |
 | `config.json` | Geometría y cámara usadas |
 
-### Qué cambia en cada foto
+En cada foto cambian: **ángulos** (5 % en 0,0, 50 % casi alineados ±3°, el resto ±27°), **cámara** (±4 cm, 1.30–1.40 m de altura, ±4° de inclinación, ±8° de giro), **luces** y **tono del piso**.
 
-* **Ángulos**: 5 % de los paneles exactamente en 0,0, 50 % casi alineados (±3°) y el resto en todo el rango (±27°).
-* **Cámara**: ±4 cm de desplazamiento, 1.30–1.40 m de altura, ±4° de inclinación y ±8° de giro (el marco siempre queda completo en la foto).
-* **Luces**: intensidad y dirección al azar.
-* **Piso**: tono de gris al azar.
+### 2. Preparar, entrenar, evaluar y publicar
+
+```
+python Alignment/build/preparar_dataset.py               recortes + división train/val/test (por foto)
+python Alignment/build/entrenar.py --modelo cnn          (~85 min en una RTX 3060; también evalúa en test)
+python Alignment/build/entrenar.py --modelo resnet18     (opcional, ~25 min)
+python Alignment/build/evaluar_geometrico.py
+python Alignment/build/evaluar_hibrido.py
+python Alignment/build/comparar_resultados.py            tabla en results/evaluaciones/comparacion.md
+python Alignment/build/publicar_modelo.py                copia la última CNN a results/modelo/cnn.pt
+```
+
+Todos usan la **última sesión** si no se les pasa otra. Publica (y sube con `git add Alignment/results/modelo`) solo cuando el modelo mejore: cada versión subida se queda en el historial de git.
+
+PyTorch con CUDA:
+```
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+pip install -r Alignment/requirements.txt
+```
+
+---
 
 ## El marco del módulo real
 
-Imprime `marcadores_imprimir.png` **al 100 %** (sin "ajustar a la página") y comprueba con regla que el cuadro negro mida 60 mm. Los centros de los 4 marcadores van en un cuadrado de `LADO_MARCO` (geometria.py), **a la altura de las placas** con el módulo en 0,0:
+Imprime `results/marcadores_imprimir.png` **al 100 %** (sin "ajustar a la página") y comprueba con regla que el cuadro negro mida 60 mm. Los centros de los 4 marcadores van en un cuadrado de `LADO_MARCO` (`app/nucleo/geometria.py`), **a la altura de las placas** con el módulo en 0,0:
 
 ```
   ID 0 ─────────── ID 1        (vista desde arriba, como la cámara)
@@ -84,12 +159,10 @@ Imprime `marcadores_imprimir.png` **al 100 %** (sin "ajustar a la página") y co
   ID 3 ─────────── ID 2
 ```
 
-Cuando el módulo esté listo hay que medir y actualizar en `geometria.py`: posición de los hexágonos, radio de la placa, altura de las placas, brazo de los ejes y lado del marco. Después se regeneran el mundo y el dataset.
+Cuando el módulo esté listo hay que medir y actualizar en `geometria.py`: posición de los hexágonos, radio de la placa, altura de las placas, brazo de los ejes y lado del marco. Después se regeneran los mundos y el dataset (Build).
 
 ## Siguientes pasos
 
-2. Preprocesamiento: detectar los ArUco, enderezar y recortar.
-3. Método geométrico y su evaluación.
-4. Entrenamiento de la CNN pequeña y la ResNet18 (PyTorch con CUDA).
-5. Fotos reales: ajuste fino y evaluación.
-6. Modo Diagnóstico en la GUI y comparación con el gemelo digital.
+1. Fotos del módulo real: ajuste fino de la CNN y evaluación.
+2. Meter la app como modo **Diagnóstico** en la GUI principal (el hilo ya está hecho igual que el de la GUI).
+3. Comparación con el gemelo digital.

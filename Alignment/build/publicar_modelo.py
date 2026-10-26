@@ -1,16 +1,16 @@
 """
 PUBLICAR EL MODELO - SOFIA (diagnóstico de alineación)
 
-Copia un modelo entrenado a Alignment/pytorch/publicado/, que SÍ se sube
-al repositorio (la carpeta entrenados/ no). Así el equipo lo tiene al
-clonar, sin entrenar, y la app y el híbrido lo usan por defecto.
+Copia un modelo entrenado (build/entrenados/) a Alignment/results/modelo/,
+que SÍ se sube al repositorio. Así el equipo lo tiene al clonar, sin
+entrenar, y la app y el híbrido lo usan por defecto.
 
-    publicado/cnn.pt          los pesos (~5 MB)
-    publicado/cnn.json        de dónde salió: sesión, época, MAE en val
+    results/modelo/cnn.pt     los pesos (~5 MB)
+    results/modelo/cnn.json   de dónde salió: sesión, época, MAE en val
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/pytorch/publicar_modelo.py                (la última CNN entrenada)
-    python Alignment/pytorch/publicar_modelo.py <modelo.pt>
+    python Alignment/build/publicar_modelo.py                (la última CNN entrenada)
+    python Alignment/build/publicar_modelo.py <modelo.pt>
 
 Publica solo cuando el modelo mejore: cada versión que se sube se
 queda para siempre en el historial de git.
@@ -18,14 +18,18 @@ queda para siempre en el historial de git.
 
 import argparse
 import datetime
-import glob
 import json
 import os
 import shutil
 import sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DESTINO = os.path.join(AQUI, "publicado")
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
+sys.path.insert(0, AQUI)
+
+import rutas  # noqa: E402
+
+DESTINO = rutas.CARPETA_MODELO
 
 
 def main():
@@ -36,11 +40,9 @@ def main():
     if args.modelo:
         origen = os.path.abspath(args.modelo)
     else:
-        candidatos = sorted(glob.glob(os.path.join(AQUI, "entrenados", "cnn_*", "modelo.pt")),
-                            key=os.path.getmtime)
-        if not candidatos:
-            sys.exit("No hay CNN entrenadas: corre primero entrenar.py --modelo cnn")
-        origen = candidatos[-1]
+        origen = rutas.ultima_cnn_entrenada()
+        if origen is None:
+            sys.exit("No hay CNN entrenadas: corre primero build/entrenar.py --modelo cnn")
 
     import torch
     punto = torch.load(origen, map_location="cpu", weights_only=True)
@@ -56,14 +58,14 @@ def main():
         "epoca": punto.get("epoca"),
         "mae_val_grados": round(float(punto.get("mae_val", float("nan"))), 4),
         "publicado": datetime.datetime.now().isoformat(timespec="seconds"),
-        "origen": os.path.relpath(origen, os.path.dirname(AQUI)),
+        "origen": os.path.relpath(origen, rutas.ALIGNMENT),
     }
     with open(os.path.join(DESTINO, f"{nombre}.json"), "w", encoding="utf-8") as archivo:
         json.dump(info, archivo, indent=2, ensure_ascii=False)
 
     print(f"Publicado: {destino} ({os.path.getsize(destino) / 1e6:.1f} MB)")
     print(json.dumps(info, indent=2, ensure_ascii=False))
-    print("\nSúbelo con:  git add Alignment/pytorch/publicado")
+    print("\nSúbelo con:  git add Alignment/results/modelo")
 
 
 if __name__ == "__main__":

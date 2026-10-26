@@ -14,7 +14,7 @@ La muestra 0 es la REFERENCIA: todos los paneles en 0,0 con la escena
 por defecto (la usa el método geométrico).
 
 Salida (en la carpeta SOFIA):
-    Diagnostico/datos/webots/<sesión>/
+    Alignment/build/datos/webots/<sesión>/
         imagenes/00000.jpg ...
         etiquetas.csv      una fila por panel y muestra
         escenas.csv        parámetros de la escena de cada muestra
@@ -36,24 +36,25 @@ from controller import Supervisor
 
 
 # =============================================
-# RUTAS Y GEOMETRÍA (Alignment/geometria.py)
+# RUTAS Y GEOMETRÍA (Alignment/app/nucleo/)
 # =============================================
 
-def buscar_diagnostico():
+def buscar_nucleo():
+    """Alignment/app/nucleo/ subiendo carpetas desde este controlador."""
     carpeta = os.path.dirname(os.path.abspath(__file__))
     for _ in range(7):
-        candidato = os.path.join(carpeta, "Alignment")
+        candidato = os.path.join(carpeta, "Alignment", "app", "nucleo")
         if os.path.isfile(os.path.join(candidato, "geometria.py")):
             return candidato
         carpeta = os.path.dirname(carpeta)
-    print("[DATASET] ERROR: no se encontró la carpeta Alignment/ del repositorio")
+    print("[DATASET] ERROR: no se encontró Alignment/app/nucleo/ del repositorio")
     sys.exit(1)
 
 
-DIAGNOSTICO = buscar_diagnostico()
-sys.path.insert(0, DIAGNOSTICO)
+sys.path.insert(0, buscar_nucleo())
 
 import geometria as g  # noqa: E402
+import rutas  # noqa: E402
 
 
 # =============================================
@@ -167,7 +168,7 @@ class Generador:
         # -----------------------------
 
         sesion = datetime.now().strftime("sesion_%Y%m%d_%H%M%S")
-        self.salida = os.path.join(DIAGNOSTICO, "datos", "webots", sesion)
+        self.salida = os.path.join(rutas.DATOS_WEBOTS, sesion)
         os.makedirs(os.path.join(self.salida, "imagenes"), exist_ok=True)
 
         self._guardar_config()

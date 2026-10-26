@@ -1,7 +1,11 @@
+# Diagnóstico de alineación (app y build)
+#
 # PyTorch con CUDA 12.8 (RTX 3060). Instalar ANTES que lo demás:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# Sin PyTorch la app funciona igual, solo con el método geométrico.
 torch>=2.6
 torchvision>=0.21
 numpy
 opencv-contrib-python
 matplotlib
+PySide6

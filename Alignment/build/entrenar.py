@@ -9,15 +9,15 @@ final la evalúa en test (igual que el método geométrico).
     - Pérdida SmoothL1 sobre ángulo / 30°.
     - Cada época se mide el MAE en val (grados) y se guarda el MEJOR.
 
-Sale en Alignment/pytorch/entrenados/<modelo>_<sesión>/:
+Sale en Alignment/build/entrenados/<modelo>_<sesión>/:
     modelo.pt       pesos + datos para usarlo (inferencia.py)
     historial.csv   pérdida y MAE por época
     curvas.png      gráfica del historial
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/pytorch/entrenar.py --modelo cnn
-    python Alignment/pytorch/entrenar.py --modelo resnet18
-    python Alignment/pytorch/entrenar.py --modelo cnn --epocas 60 --lote 256
+    python Alignment/build/entrenar.py --modelo cnn
+    python Alignment/build/entrenar.py --modelo resnet18
+    python Alignment/build/entrenar.py --modelo cnn --epocas 60 --lote 256
 """
 
 import argparse
@@ -32,15 +32,13 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, os.path.join(ALIGNMENT, "herramientas"))
-sys.path.insert(0, ALIGNMENT)
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
 sys.path.insert(0, AQUI)
 
 import geometria as g  # noqa: E402
-from datos import ESCALA_ANGULO, MEDIA, DESVIACION, DatasetRecortes, cargar_recortes, seleccionar  # noqa: E402
-from modelos import MODELOS, contar_parametros, crear_modelo  # noqa: E402
-from preparar_dataset import ultima_sesion  # noqa: E402
+import rutas  # noqa: E402
+from dataset_torch import DatasetRecortes, cargar_recortes, seleccionar  # noqa: E402
+from modelos import DESVIACION, ESCALA_ANGULO, MEDIA, MODELOS, contar_parametros, crear_modelo  # noqa: E402
 
 POR_DEFECTO = {
     "cnn": {"epocas": 40, "lr": 2e-3},
@@ -109,7 +107,7 @@ def main():
     # DATOS
     # -----------------------------
 
-    sesion = os.path.abspath(args.sesion) if args.sesion else ultima_sesion()
+    sesion = os.path.abspath(args.sesion) if args.sesion else rutas.ultima_sesion()
     datos = cargar_recortes(sesion)
 
     img_train, ang_train = seleccionar(datos, "train")
@@ -137,7 +135,7 @@ def main():
     escalador = torch.amp.GradScaler(equipo.type, enabled=amp)
     perdida_fn = nn.SmoothL1Loss(beta=0.02)
 
-    carpeta = os.path.join(AQUI, "entrenados", f"{args.modelo}_{os.path.basename(sesion)}")
+    carpeta = os.path.join(rutas.ENTRENADOS, f"{args.modelo}_{os.path.basename(sesion)}")
     os.makedirs(carpeta, exist_ok=True)
     ruta_modelo = os.path.join(carpeta, "modelo.pt")
 

@@ -31,14 +31,16 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-ALIGNMENT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ALIGNMENT)
+AQUI = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
+sys.path.insert(0, AQUI)
 
 import geometria as g  # noqa: E402
+from modelos import DESVIACION, ESCALA_ANGULO, MEDIA  # noqa: E402,F401
 
 
-ESCALA_ANGULO = g.LIMITE_GRADOS      # salida del modelo = ángulo / 30°
-MEDIA, DESVIACION = 0.5, 0.25        # normalización de la imagen (0-1)
+# ESCALA_ANGULO, MEDIA y DESVIACION vienen de app/nucleo/modelos.py:
+# la app normaliza exactamente igual que el entrenamiento.
 
 
 # =============================================
@@ -59,7 +61,7 @@ def cargar_recortes(sesion):
     ruta_cache = os.path.join(sesion, "cache_recortes.npz")
 
     if not os.path.isfile(ruta_csv):
-        sys.exit(f"Falta {ruta_csv}: corre primero Alignment/herramientas/preparar_dataset.py")
+        sys.exit(f"Falta {ruta_csv}: corre primero Alignment/build/preparar_dataset.py")
 
     if os.path.isfile(ruta_cache) and os.path.getmtime(ruta_cache) >= os.path.getmtime(ruta_csv):
         datos = np.load(ruta_cache)

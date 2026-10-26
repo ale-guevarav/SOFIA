@@ -4,16 +4,12 @@ Los dos métodos hacen lo mismo: reciben la foto del módulo (con los 4 ArUco), 
 
 ```
 Alignment/
-├── geometria.py, preprocesamiento.py, evaluacion.py   ← compartido
-├── herramientas/   preparar_dataset.py, comparar_resultados.py
-├── geometrico/     metodo_geometrico.py, evaluar_geometrico.py
-├── pytorch/        datos.py, modelos.py, entrenar.py, evaluar_modelo.py, inferencia.py,
-│                   publicar_modelo.py, publicado/cnn.pt (modelo para el equipo)
-├── hibrido/        metodo_hibrido.py, evaluar_hibrido.py
-└── app/            app_diagnostico.py, diagnostico_worker.py (QThread)
+├── app/       la app y el núcleo del diagnóstico (geométrico, CNN, híbrido)
+├── build/     generar el dataset, entrenar, evaluar y publicar
+└── results/   modelo publicado, evaluaciones y este documento
 ```
 
-## 1. Método geométrico (`geometrico/`)
+## 1. Método geométrico (`app/nucleo/metodo_geometrico.py`)
 
 Ubica cada placa (binarización + plantilla hexagonal + centroide), mide cuánto se corrió respecto a la foto de referencia en 0,0 y con la cinemática del panel lo convierte en ángulos.
 
@@ -29,7 +25,7 @@ Ubica cada placa (binarización + plantilla hexagonal + centroide), mide cuánto
 - No corrige la perspectiva al inclinarse (la placa baja ~1 cm a 27°): sesgo en ángulos grandes.
 - Si cambia el diseño del módulo hay que reajustar umbrales a mano.
 
-## 2. Modelos PyTorch (`pytorch/`)
+## 2. Modelos PyTorch (`app/nucleo/modelos.py`, entrenados con `build/entrenar.py`)
 
 Una red aprende directo del recorte a los ángulos con las 2000 fotos de Webots. Se comparan dos: una **CNN pequeña** desde cero y una **ResNet18** preentrenada.
 
@@ -45,7 +41,7 @@ Una red aprende directo del recorte a los ángulos con las 2000 fotos de Webots.
 - Más pesada: PyTorch + GPU para que sea rápida; en CPU tarda más.
 - Puede fallar en casos que no vio en el entrenamiento, sin avisar.
 
-## 3. Método híbrido (`hibrido/`)
+## 3. Método híbrido (`app/nucleo/diagnosticador.py`)
 
 Corre los dos y, para cada hexágono:
 
@@ -77,7 +73,7 @@ Entrenamiento en una RTX 3060: CNN 40 épocas (84 min), ResNet18 25 épocas (24 
 La tabla completa (con p95 y recall de "necesita atención") se genera con:
 
 ```
-python Alignment/herramientas/comparar_resultados.py
+python Alignment/build/comparar_resultados.py
 ```
 
 ## Cuándo usar cuál

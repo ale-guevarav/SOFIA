@@ -4,15 +4,15 @@ EVALUAR UN MODELO ENTRENADO - SOFIA (diagnóstico de alineación)
 Mismas métricas, gráficas y reporte que el método geométrico
 (evaluacion.py), para comparar tal cual. Se guarda en:
 
-    Alignment/resultados/<modelo>_<sesión>_<conjunto>/
+    Alignment/results/evaluaciones/<modelo>_<sesión>_<conjunto>/
 
 El tiempo se mide con el proceso COMPLETO (foto -> ArUco -> enderezar ->
 16 recortes -> modelo), igual que en el geométrico, sobre unas fotos y
 después de un calentamiento (la primera pasada por la GPU es lenta).
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/pytorch/evaluar_modelo.py Alignment/pytorch/entrenados/cnn_<sesión>/modelo.pt
-    python Alignment/pytorch/evaluar_modelo.py <modelo.pt> --conjunto val
+    python Alignment/build/evaluar_modelo.py Alignment/build/entrenados/cnn_<sesión>/modelo.pt
+    python Alignment/build/evaluar_modelo.py <modelo.pt> --conjunto val
 """
 
 import argparse
@@ -24,13 +24,12 @@ import cv2
 import numpy as np
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, ALIGNMENT)
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
 sys.path.insert(0, AQUI)
 
 import evaluacion  # noqa: E402
-import preprocesamiento as pp  # noqa: E402
-from datos import cargar_recortes  # noqa: E402
+import rutas  # noqa: E402
+from dataset_torch import cargar_recortes  # noqa: E402
 from inferencia import ModeloAlineacion  # noqa: E402
 from modelos import MODELOS  # noqa: E402
 
@@ -62,7 +61,7 @@ def evaluar(ruta_modelo, conjunto="test", sesion=None):
 
     modelo = ModeloAlineacion(ruta_modelo)
     nombre = modelo.meta["modelo"]
-    sesion = sesion or modelo.meta["sesion"]
+    sesion = sesion or rutas.resolver_sesion(modelo.meta["sesion"])
 
     datos = cargar_recortes(sesion)
     if conjunto == "todos":
@@ -83,14 +82,14 @@ def evaluar(ruta_modelo, conjunto="test", sesion=None):
     metricas = evaluacion.calcular(reales, estimados, tiempos)
 
     titulo = MODELOS[nombre]
-    carpeta = os.path.join(ALIGNMENT, "resultados", f"{nombre}_{os.path.basename(sesion)}_{conjunto}")
+    carpeta = os.path.join(rutas.EVALUACIONES, f"{nombre}_{os.path.basename(sesion)}_{conjunto}")
 
     evaluacion.graficas(reales, estimados, carpeta, titulo)
     evaluacion.guardar(metricas, carpeta, titulo, {
         "sesión": os.path.basename(sesion),
         "conjunto": conjunto,
         "fotos": len(muestras),
-        "modelo": os.path.relpath(ruta_modelo, ALIGNMENT),
+        "modelo": os.path.relpath(ruta_modelo, rutas.ALIGNMENT),
         "dispositivo": str(modelo.equipo),
         "época elegida": modelo.meta.get("epoca"),
     })

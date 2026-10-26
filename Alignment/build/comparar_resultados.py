@@ -1,28 +1,33 @@
 """
 COMPARAR RESULTADOS - SOFIA (diagnóstico de alineación)
 
-Junta todos los Alignment/resultados/*/metricas.json en una tabla y una
+Junta todos los Alignment/results/evaluaciones/*/metricas.json en una tabla y una
 gráfica, para poner lado a lado el método geométrico y los modelos.
 
 Sale en:
-    Alignment/resultados/comparacion.md
-    Alignment/resultados/comparacion.png
+    Alignment/results/evaluaciones/comparacion.md
+    Alignment/results/evaluaciones/comparacion.png
 
 Uso (desde la carpeta SOFIA):
-    python Alignment/herramientas/comparar_resultados.py              (solo test)
-    python Alignment/herramientas/comparar_resultados.py --conjunto val
+    python Alignment/build/comparar_resultados.py              (solo test)
+    python Alignment/build/comparar_resultados.py --conjunto val
 """
 
 import argparse
 import glob
 import json
 import os
+import sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-RESULTADOS = os.path.join(ALIGNMENT, "resultados")
+sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "app", "nucleo"))
+sys.path.insert(0, AQUI)
 
-ORDEN = ["Método geométrico", "CNN pequeña", "ResNet18 preentrenada"]
+import rutas  # noqa: E402
+
+RESULTADOS = rutas.EVALUACIONES
+
+ORDEN = ["Método geométrico", "CNN pequeña", "ResNet18 preentrenada", "Método híbrido"]
 
 
 def leer(conjunto):

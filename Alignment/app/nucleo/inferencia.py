@@ -4,27 +4,18 @@ INFERENCIA - SOFIA (diagnóstico de alineación)
 Carga un modelo entrenado y estima los ángulos de los 16 hexágonos.
 
     from inferencia import ModeloAlineacion
-    modelo = ModeloAlineacion("Alignment/pytorch/entrenados/cnn_<sesión>/modelo.pt")
+    modelo = ModeloAlineacion("Alignment/results/modelo/cnn.pt")
     theta1, theta2 = modelo.estimar(foto_bgr)          # foto completa (con ArUco)
     theta1, theta2 = modelo.estimar_recortes(recortes)  # 16 recortes ya hechos
 
 Usa la GPU si hay; si no, la CPU.
 """
 
-import os
-import sys
-
 import numpy as np
 import torch
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
-ALIGNMENT = os.path.dirname(AQUI)
-sys.path.insert(0, ALIGNMENT)
-sys.path.insert(0, AQUI)
-
-import preprocesamiento as pp  # noqa: E402
-from datos import DESVIACION, MEDIA  # noqa: E402
-from modelos import crear_modelo  # noqa: E402
+import preprocesamiento as pp
+from modelos import DESVIACION, MEDIA, crear_modelo
 
 
 def dispositivo():
