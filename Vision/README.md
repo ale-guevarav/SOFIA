@@ -148,11 +148,13 @@ SOFIA/
 │   │   └── smoothing.py
 │   │
 │   ├── interfaz/                 ← piezas de la GUI
-│   │   └── vision_worker.py
+│   │   ├── vision_worker.py
+│   │   └── sim_camera.py         ← imágenes de la cámara de Webots
 │   │
-│   ├── comunicacion/             ← Bluetooth con el ESP32
+│   ├── comunicacion/             ← Bluetooth con el ESP32 / Webots
 │   │   ├── protocol.py
-│   │   └── ble_link.py
+│   │   ├── ble_link.py
+│   │   └── sim_link.py           ← mismo protocolo por TCP (Webots)
 │   │
 │   ├── evaluacion/               ← métricas del modo TEST
 │   │   ├── metrics_logger.py
@@ -221,6 +223,14 @@ Arma y valida las tramas del protocolo de comunicación con el ESP32 (ver `docs/
 ### `comunicacion/ble_link.py`
 
 Conexión Bluetooth con el ESP32: busca el dispositivo, envía las tramas, espera la confirmación (ACK) y reintenta si no llega. Corre en su propio hilo.
+
+### `comunicacion/sim_link.py`
+
+Enlace con la simulación de Webots. Hereda de `ble_link.py` y solo cambia el transporte (TCP local), así las reglas del protocolo son idénticas. Incluye un emulador de canal (retraso, pérdidas y bytes dañados) para parecerse al BLE.
+
+### `interfaz/sim_camera.py`
+
+Hilo que recibe las imágenes de la cámara cenital de Webots por un canal aparte y las muestra en la GUI.
 
 ### `ble_test.py`
 
@@ -557,6 +567,12 @@ La PC envía al ESP32 maestro las posturas y la posición de la mano por **Bluet
 **Para conectar desde la GUI:** encender el Bluetooth de la laptop, encender el ESP32 y presionar **Conectar**. No es necesario (ni recomendable) emparejarlo desde la configuración de Windows.
 
 El estándar completo (trama, comandos, códigos de error y reglas) está en `docs/PROTOCOLO_COMUNICACION.md`. El firmware del ESP32 está en la carpeta `ESP32/` de la raíz del repositorio.
+
+## Simulación en Webots
+
+En el panel **Robot** de la GUI hay una conexión para el **ESP32 (Bluetooth)** y otra para **Webots (simulación)**, y los resultados se mandan a todas las que estén conectadas: solo Webots sirve para simular sin ESP32, y con las dos conectadas funciona como **gemelo digital** (mismos comandos al robot real y a la simulación). Con Webots se usan **las mismas tramas y reglas** (ACK, reintentos, latido, estado seguro), pero por un socket TCP local (`comunicacion/sim_link.py`). La cámara cenital de la simulación se ve junto al video con **Ver cámara de Webots**; llega por un canal aparte (`interfaz/sim_camera.py`). La opción **Simular canal BLE** agrega retraso y pérdidas para que se comporte como el Bluetooth real.
+
+El mundo y los controladores están en la carpeta `Webots/` de la raíz del repositorio (ver `Webots/README.md`).
 
 ---
 

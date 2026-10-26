@@ -1,0 +1,6 @@
+# Archivos que genera Webots al compilar / ejecutar
+build/
+*.exe
+*.o
+*.d
+__pycache__/

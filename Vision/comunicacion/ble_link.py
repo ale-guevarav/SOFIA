@@ -15,6 +15,11 @@ Reglas que implementa (ver docs/PROTOCOLO_COMUNICACION.md):
       (300 ms) y se reintentan hasta 3 veces con el mismo SEQ.
     - TRACK: sin ACK, máximo 20 por segundo.
     - Latido: si no se envió nada en 1 s, se manda un PING.
+
+La parte de transporte (conectar, escribir y recibir) está separada
+en _connect(), _disconnect() y _write(). WebotsLink (sim_link.py)
+hereda de esta clase y solo cambia el transporte (TCP en lugar de
+BLE): las reglas del protocolo son exactamente las mismas.
 """
 
 import asyncio
@@ -27,6 +32,9 @@ from . import protocol as p
 
 
 class BleLink(QObject):
+
+    # Nombre del destino para los mensajes de la bitácora
+    target_name = "ESP32"
 
     # "desconectado", "buscando", "conectado"
     state_changed = Signal(str)
@@ -98,6 +106,12 @@ class BleLink(QObject):
     @property
     def connected(self):
         return self._state == "conectado"
+
+
+    @property
+    def state(self):
+        """'desconectado', 'buscando' o 'conectado'."""
+        return self._state
 
 
     def connect_device(self):
@@ -272,7 +286,7 @@ class BleLink(QObject):
 
         if self._state != "desconectado":
             self._set_state("desconectado")
-            self.log.emit("Se perdió la conexión con el ESP32")
+            self.log.emit(f"Se perdió la conexión con {self.target_name}")
 
 
     # =============================================
@@ -288,10 +302,7 @@ class BleLink(QObject):
         frame = p.build_frame(frame_type, seq, payload)
 
         try:
-            # Una escritura BLE = una trama completa
-            await self._client.write_gatt_char(
-                p.RX_CHAR_UUID, frame, response=False
-            )
+            await self._write(frame)
         except Exception as error:
             self.log.emit(f"Error al enviar: {error}")
             return None
@@ -302,6 +313,13 @@ class BleLink(QObject):
             self.log.emit(f"→ {p.Frame(frame_type, seq, payload)}")
 
         return seq
+
+
+    async def _write(self, frame):
+        # Una escritura BLE = una trama completa
+        await self._client.write_gatt_char(
+            p.RX_CHAR_UUID, frame, response=False
+        )
 
 
     async def _command_worker(self):
@@ -362,7 +380,7 @@ class BleLink(QObject):
 
             return False, f"NACK: {reason}"
 
-        return False, "Sin respuesta del ESP32"
+        return False, f"Sin respuesta de {self.target_name}"
 
 
     async def _heartbeat(self):
@@ -393,7 +411,7 @@ class BleLink(QObject):
         try:
             frame = p.parse_frame(data)
         except p.ProtocolError as error:
-            self.log.emit(f"Trama inválida del ESP32: {error}")
+            self.log.emit(f"Trama inválida de {self.target_name}: {error}")
             return
 
         try:

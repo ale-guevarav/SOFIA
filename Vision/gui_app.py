@@ -11,12 +11,18 @@ Interfaz gráfica (PySide6 / Qt) que:
     - Permite INICIAR, PAUSAR, REANUDAR y DETENER el procesamiento.
     - Se conecta por Bluetooth (BLE) al ESP32 maestro y le envía
       las posturas y la posición de la mano.
+    - Y/o, con el mismo protocolo, a la simulación de Webots (TCP local),
+      y puede mostrar la cámara cenital de la simulación.
+    - Gemelo digital: con los dos conectados, cada resultado se manda
+      al robot real y a la simulación al mismo tiempo.
 
 Arquitectura (ver docs/ARQUITECTURA_GUI.md):
 
     Hilo GUI  (esta ventana)  -> solo dibuja y atiende botones
     Hilo de visión  (VisionWorker / QThread) -> cámara + MediaPipe
     Hilo BLE  (BleLink / asyncio) -> comunicación con el ESP32
+              (o WebotsLink: misma lógica, transporte TCP)
+    Hilo cámara sim  (SimCameraClient / QThread) -> imágenes de Webots
 
 Uso (dentro de Vision/, con el venv activo):
     python gui_app.py
@@ -50,6 +56,7 @@ from PySide6.QtWidgets import (
 )
 
 from comunicacion.ble_link import BleLink
+from comunicacion.sim_link import WebotsLink
 from deteccion.gesture_recognition import GESTURE_IDS, NO_GESTURE
 from deteccion.vision_pipeline import MODE_GAME, MODE_TEST, MODE_TRACKING
 from interfaz.vision_worker import (
@@ -59,6 +66,7 @@ from interfaz.vision_worker import (
     STATE_RUNNING,
     STATE_STOPPED,
 )
+from interfaz.sim_camera import SimCameraClient
 
 
 # -----------------------------
@@ -73,7 +81,13 @@ COLORS = {
     "desconectado": "#8a8f98",
     "buscando": "#e0b341",
     "conectado": "#3fb950",
+    "esperando": "#e0b341",
+    "recibiendo": "#3fb950",
 }
+
+# Destinos a los que se pueden mandar los resultados
+TARGET_ESP32 = "ESP32"
+TARGET_WEBOTS = "Webots"
 
 STYLE_SHEET = """
 QMainWindow, QWidget { background: #15181d; color: #e6e8eb; }
@@ -134,14 +148,27 @@ class MainWindow(QMainWindow):
         self.mode = MODE_GAME
         self.last_sent_gesture = NO_GESTURE
 
-        self.ble = BleLink(parent=self)
-        self.ble.state_changed.connect(self.on_ble_state)
-        self.ble.log.connect(self.append_log)
-        self.ble.command_result.connect(self.on_command_result)
+        # Dos enlaces independientes con la MISMA lógica de protocolo.
+        # Los resultados se mandan a TODOS los que estén conectados:
+        #   solo ESP32  -> robot real
+        #   solo Webots -> simulación (sin ESP32)
+        #   los dos     -> gemelo digital
+        self.links = {
+            TARGET_ESP32: BleLink(parent=self),
+            TARGET_WEBOTS: WebotsLink(parent=self),
+        }
+
+        for link in self.links.values():
+            link.state_changed.connect(self.on_ble_state)
+            link.log.connect(self.on_link_log)
+            link.command_result.connect(self.on_command_result)
+
+        # Cámara de la simulación (hilo propio, solo si se activa)
+        self.sim_camera = None
 
         self._build_ui()
         self._update_controls()
-        self.on_ble_state("desconectado")
+        self._refresh_links()
 
 
     # =============================================
@@ -162,11 +189,27 @@ class MainWindow(QMainWindow):
         self.video_label = QLabel("Presiona INICIAR para abrir la cámara")
         self.video_label.setObjectName("video")
         self.video_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.video_label.setMinimumSize(640, 480)
+        self.video_label.setMinimumSize(480, 360)
         self.video_label.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
-        layout.addWidget(self.video_label, stretch=1)
+
+        # Vista de la simulación (a la derecha del video, oculta
+        # hasta que se active "Ver cámara de Webots")
+        self.sim_label = QLabel("Esperando la cámara de Webots...")
+        self.sim_label.setObjectName("video")
+        self.sim_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.sim_label.setMinimumSize(320, 320)
+        self.sim_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        self.sim_label.hide()
+
+        views = QHBoxLayout()
+        views.setSpacing(12)
+        views.addWidget(self.video_label, stretch=3)
+        views.addWidget(self.sim_label, stretch=2)
+        layout.addLayout(views, stretch=1)
 
         # -----------------------------
         # PANEL LATERAL (derecha)
@@ -313,25 +356,52 @@ class MainWindow(QMainWindow):
 
     def _build_ble_group(self):
 
-        group = QGroupBox("ESP32 maestro (Bluetooth)")
+        group = QGroupBox("Robot (ESP32 / Webots)")
         grid = QGridLayout(group)
 
-        self.ble_label = QLabel()
-        self.ble_label.setTextFormat(Qt.TextFormat.RichText)
+        # Una fila por destino: nombre, estado y botón
+        self.link_rows = {}
+        captions = {TARGET_ESP32: "ESP32", TARGET_WEBOTS: "Webots"}
 
-        self.btn_ble = QPushButton("Conectar")
-        self.btn_ble.clicked.connect(self.toggle_ble)
+        for row, name in enumerate(self.links):
+            caption = QLabel(captions[name])
+            state = QLabel()
+            state.setTextFormat(Qt.TextFormat.RichText)
+            button = QPushButton("Conectar")
+            button.setMinimumWidth(112)
+            button.clicked.connect(lambda _checked=False, n=name: self.toggle_link(n))
 
-        self.btn_ping = QPushButton("Enviar PING")
-        self.btn_ping.clicked.connect(self.ble.ping)
+            grid.addWidget(caption, row, 0)
+            grid.addWidget(state, row, 1)
+            grid.addWidget(button, row, 2)
+            self.link_rows[name] = (state, button)
 
-        self.chk_send = QCheckBox("Enviar resultados al ESP32")
+        # Se enciende cuando los dos están conectados
+        self.twin_label = QLabel()
+        self.twin_label.setTextFormat(Qt.TextFormat.RichText)
+        self.twin_label.setWordWrap(True)
+
+        self.btn_ping = QPushButton("PING")
+        self.btn_ping.setMinimumWidth(112)
+        self.btn_ping.clicked.connect(self.ping_all)
+
+        self.chk_send = QCheckBox("Enviar resultados")
         self.chk_send.setChecked(True)
 
-        grid.addWidget(self.ble_label, 0, 0, 1, 2)
-        grid.addWidget(self.btn_ble, 1, 0)
-        grid.addWidget(self.btn_ping, 1, 1)
-        grid.addWidget(self.chk_send, 2, 0, 1, 2)
+        # Solo Webots: emular retraso y pérdidas como en BLE
+        self.chk_channel = QCheckBox("Simular canal BLE en Webots")
+        self.chk_channel.toggled.connect(self.on_channel_toggled)
+
+        # Ver la cámara cenital de Webots (canal aparte)
+        self.chk_sim_camera = QCheckBox("Ver cámara de Webots")
+        self.chk_sim_camera.toggled.connect(self.toggle_sim_camera)
+
+        grid.addWidget(self.twin_label, 2, 0, 1, 3)
+        grid.addWidget(self.chk_send, 3, 0, 1, 2)
+        grid.addWidget(self.btn_ping, 3, 2)
+        grid.addWidget(self.chk_channel, 4, 0, 1, 3)
+        grid.addWidget(self.chk_sim_camera, 5, 0, 1, 3)
+        grid.setColumnStretch(1, 1)
 
         return group
 
@@ -398,9 +468,9 @@ class MainWindow(QMainWindow):
         self.worker.stop()
         self.append_log("Deteniendo detección...")
 
-        # El robot pasa a estado seguro
-        if self.ble.connected and self.chk_send.isChecked():
-            self.ble.send_stop()
+        # El robot (real y/o simulado) pasa a estado seguro
+        for link in self._targets():
+            link.send_stop()
 
 
     def _update_controls(self):
@@ -490,8 +560,9 @@ class MainWindow(QMainWindow):
         # Se envía solo cuando APARECE una postura nueva
         if result.gesture != self.last_sent_gesture:
 
-            if result.gesture != NO_GESTURE and self._can_send():
-                self.ble.send_pose(GESTURE_IDS[result.gesture])
+            if result.gesture != NO_GESTURE:
+                for link in self._targets():
+                    link.send_pose(GESTURE_IDS[result.gesture])
 
             self.last_sent_gesture = result.gesture
 
@@ -521,8 +592,8 @@ class MainWindow(QMainWindow):
         self.result_value.setText(f"({main.x_norm:+.2f}, {main.y_norm:+.2f})")
         self.result_detail.setText("\n".join(lines))
 
-        if self._can_send():
-            self.ble.send_track(main)
+        for link in self._targets():
+            link.send_track(main)
 
 
     @staticmethod
@@ -535,8 +606,11 @@ class MainWindow(QMainWindow):
         )[0]
 
 
-    def _can_send(self):
-        return self.chk_send.isChecked() and self.ble.connected
+    def _targets(self):
+        """Enlaces a los que se mandan los resultados (todos los conectados)."""
+        if not self.chk_send.isChecked():
+            return []
+        return [link for link in self.links.values() if link.connected]
 
 
     # =============================================
@@ -568,8 +642,8 @@ class MainWindow(QMainWindow):
         self.result_detail.setText("")
         self.append_log(f"Modo: {mode}")
 
-        if self._can_send():
-            self.ble.send_mode(mode)
+        for link in self._targets():
+            link.send_mode(mode)
 
 
     # =============================================
@@ -698,33 +772,130 @@ class MainWindow(QMainWindow):
     # BLUETOOTH
     # =============================================
 
-    @Slot()
-    def toggle_ble(self):
+    def toggle_link(self, name):
 
-        if self.ble.connected:
-            self.ble.disconnect_device()
+        link = self.links[name]
+
+        if link.connected:
+            link.disconnect_device()
         else:
-            self.ble.connect_device()
+            link.connect_device()
+
+
+    def ping_all(self):
+        for link in self.links.values():
+            if link.connected:
+                link.ping()
+
+
+    def _link_name(self, link):
+        for name, candidate in self.links.items():
+            if candidate is link:
+                return name
+        return "?"
 
 
     @Slot(str)
     def on_ble_state(self, state):
 
-        self.ble_label.setText(f"{dot(COLORS[state])}  {state.capitalize()}")
-
-        self.btn_ble.setText("Desconectar" if state == "conectado" else "Conectar")
-        self.btn_ble.setEnabled(state != "buscando")
-        self.btn_ping.setEnabled(state == "conectado")
+        link = self.sender()
 
         # Al conectar, informar el modo actual
-        if state == "conectado":
-            self.ble.send_mode(self.mode)
+        if state == "conectado" and link in self.links.values():
+            link.send_mode(self.mode)
+
+        self._refresh_links()
+
+
+    def _refresh_links(self):
+
+        for name, link in self.links.items():
+            state_label, button = self.link_rows[name]
+            state = link.state
+
+            state_label.setText(f"{dot(COLORS[state])}  {state.capitalize()}")
+            button.setText("Desconectar" if state == "conectado" else "Conectar")
+            button.setEnabled(state != "buscando")
+
+        connected = [name for name, link in self.links.items() if link.connected]
+
+        self.btn_ping.setEnabled(bool(connected))
+
+        if len(connected) == 2:
+            self.twin_label.setText(
+                f"{dot(COLORS['conectado'])}  <b>Gemelo digital</b>: "
+                "robot real + simulación"
+            )
+        elif connected == [TARGET_WEBOTS]:
+            self.twin_label.setText("Solo simulación (sin ESP32)")
+        elif connected == [TARGET_ESP32]:
+            self.twin_label.setText("Solo robot real")
+        else:
+            self.twin_label.setText("Sin conexión")
+
+
+    @Slot(str)
+    def on_link_log(self, text):
+        self.append_log(f"[{self._link_name(self.sender())}] {text}")
+
+
+    @Slot(bool)
+    def on_channel_toggled(self, checked):
+        self.links[TARGET_WEBOTS].channel_emulation = checked
+        self.append_log(
+            "Canal BLE simulado: retraso, pérdidas y errores activados"
+            if checked else "Canal BLE simulado desactivado"
+        )
+
+
+    # =============================================
+    # CÁMARA DE LA SIMULACIÓN
+    # =============================================
+
+    @Slot(bool)
+    def toggle_sim_camera(self, checked):
+
+        if checked and self.sim_camera is None:
+            self.sim_camera = SimCameraClient(parent=self)
+            self.sim_camera.frame_ready.connect(self.show_sim_frame)
+            self.sim_camera.status.connect(self.on_sim_camera_status)
+            self.sim_camera.start()
+            self.sim_label.show()
+
+        elif not checked and self.sim_camera is not None:
+            self.sim_camera.stop()
+            self.sim_camera.wait(2000)
+            self.sim_camera = None
+            self.sim_label.clear()
+            self.sim_label.setText("Esperando la cámara de Webots...")
+            self.sim_label.hide()
+
+
+    @Slot(QImage)
+    def show_sim_frame(self, image):
+
+        pixmap = QPixmap.fromImage(image).scaled(
+            self.sim_label.size(),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        self.sim_label.setPixmap(pixmap)
+
+
+    @Slot(str)
+    def on_sim_camera_status(self, status):
+
+        if status == "esperando":
+            self.sim_label.clear()
+            self.sim_label.setText(
+                "Esperando la cámara de Webots...\n(abre el mundo y corre la simulación)"
+            )
 
 
     @Slot(str, bool, str)
     def on_command_result(self, name, ok, detail):
         mark = "✔" if ok else "✖"
-        self.append_log(f"{mark} {name}: {detail}")
+        self.append_log(f"[{self._link_name(self.sender())}] {mark} {name}: {detail}")
 
 
     # =============================================
@@ -746,7 +917,12 @@ class MainWindow(QMainWindow):
             self.worker.stop()
             self.worker.wait(3000)
 
-        self.ble.shutdown()
+        if self.sim_camera is not None:
+            self.sim_camera.stop()
+            self.sim_camera.wait(2000)
+
+        for link in self.links.values():
+            link.shutdown()
 
         super().closeEvent(event)
 
