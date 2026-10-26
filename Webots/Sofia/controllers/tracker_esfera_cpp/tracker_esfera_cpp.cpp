@@ -16,12 +16,17 @@ using namespace webots;
 // Corre igual en los 16 paneles. NINGUN panel mueve la esfera: solo LEE
 //
 // Ademas lee el campo customData de la esfera, donde el maestro
-// (sofia_maestro_sim) escribe la ultima postura recibida de la GUI:
+// (sofia_maestro_sim) escribe el modo y la ultima orden de la GUI:
 //
-//     "POSE <postura 1-5> <tiempo de inicio>"
+//     "M<modo> IDLE" / "M<modo> TRACK" / "M<modo> POSE <postura> <inicio>"
 //
-// Mientras dura el patron de esa postura, el panel lo dibuja
-// (ver patrones.hpp); al terminar vuelve a apuntar a la esfera.
+//   - Modo TRACKING (M2): el panel apunta a la esfera.
+//   - Modo JUEGO / TEST: ignora la esfera y se queda en 0,0.
+//   - POSE: mientras dura el patron de esa postura, lo dibuja
+//     (ver patrones.hpp) y despues regresa a lo anterior.
+
+// Modo TRACKING en el protocolo
+const int MODO_TRACKING = 2;
 
 // Centro del arreglo 4x4 (promedio de las posiciones de los paneles)
 const double CENTRO_X = 0.0;
@@ -62,6 +67,7 @@ int main(int argc, char **argv) {
     bool en_borde = fila == 0 || fila == 3 || columna == 0 || columna == 3;
 
     std::string ultimo_comando;
+    int modo = 0;            // sin maestro: como JUEGO (paneles en 0,0)
     int postura_activa = 0;
     double inicio_patron = 0.0;
 
@@ -82,10 +88,16 @@ int main(int argc, char **argv) {
             if (comando != ultimo_comando) {
                 ultimo_comando = comando;
 
+                int nuevo_modo = 0;
                 int postura = 0;
                 double inicio = 0.0;
+                char orden[16] = "";
 
-                if (std::sscanf(comando.c_str(), "POSE %d %lf", &postura, &inicio) == 2) {
+                if (std::sscanf(comando.c_str(), "M%d %15s", &nuevo_modo, orden) >= 1) {
+                    modo = nuevo_modo;
+                }
+
+                if (std::sscanf(comando.c_str(), "M%*d POSE %d %lf", &postura, &inicio) == 2) {
                     postura_activa = postura;
                     inicio_patron = inicio;
                 } else {
@@ -112,6 +124,12 @@ int main(int argc, char **argv) {
             // Patron de la postura: u -> gdl1, v -> gdl2
             theta_1 = punto.u;
             theta_2 = punto.v;
+
+        } else if (modo != MODO_TRACKING) {
+            // JUEGO / TEST: se ignora la esfera, el panel queda en 0,0
+            postura_activa = 0;
+            theta_1 = 0.0;
+            theta_2 = 0.0;
 
         } else {
             postura_activa = 0;

@@ -15,12 +15,21 @@ Corre en la ESFERA (DEF ESFERA_TARGET) y la mueve:
 
     TRACK (modo TRACKING)  la esfera va a la posición de la mano
                            y los paneles la siguen.
-    POSE                   escribe "POSE <id> <t0>" en el customData
-                           de la esfera; cada panel lo lee y dibuja
-                           el patrón de esa postura.
+    POSE                   cada panel dibuja el patrón de esa postura.
     STOP / estado seguro   esfera al centro, sin patrón.
 
-Sin GUI conectada, la esfera se queda quieta en el centro.
+El customData de la esfera le dice a los paneles qué hacer:
+
+    "M<modo> IDLE"                 en reposo
+    "M<modo> TRACK"                siguiendo la mano
+    "M<modo> POSE <id> <t0>"       patrón de una postura
+
+Los paneles solo apuntan a la esfera en modo TRACKING (M2).
+En JUEGO y TEST la ignoran: se quedan en 0,0 y solo hacen los
+patrones de las posturas. Fuera de TRACKING la esfera se esconde
+bajo el piso (OCULTAR_ESFERA).
+
+Sin GUI conectada se queda en modo JUEGO: paneles en 0,0.
 
 Por TCP cada trama va dentro de un paquete con 1 byte de longitud
 al inicio ([N][trama]), así cada paquete equivale a una escritura BLE.
@@ -95,6 +104,10 @@ SUAVIZADO_ESFERA = 0.25       # 0-1: qué tan rápido alcanza su objetivo
 INVERTIR_X = False
 INVERTIR_Y = False
 
+# Fuera de TRACKING la esfera no se usa: se esconde bajo el piso
+OCULTAR_ESFERA = True
+ESCONDIDA = (0.0, 0.0, -0.2)
+
 
 # =============================================
 # MAESTRO
@@ -107,9 +120,15 @@ class Maestro:
         self.robot = Supervisor()
         self.time_step = int(self.robot.getBasicTimeStep())
 
-        self_node = self.robot.getSelf()
-        self.translation = self_node.getField("translation")
-        self.command_field = self_node.getField("customData")
+        # La esfera se busca por su DEF (igual que los paneles en C++);
+        # getSelf() queda como respaldo
+        sphere = self.robot.getFromDef("ESFERA_TARGET") or self.robot.getSelf()
+        self.translation = sphere.getField("translation") if sphere else None
+
+        if self.translation is None:
+            print("[MAESTRO] ERROR: no se pudo leer 'translation' de la esfera "
+                  "(DEF ESFERA_TARGET). La comunicación funciona, pero la "
+                  "esfera no se moverá.")
 
         # Posición actual y objetivo de la esfera
         self.position = list(CENTRO)
@@ -136,8 +155,9 @@ class Maestro:
         self.client = None
         self.buffer = b""
 
+        self.command = "IDLE"
         self.set_command("IDLE")
-        self.translation.setSFVec3f(list(CENTRO))
+        self.update_sphere_visibility()
 
         print(f"[MAESTRO] Esperando la GUI en {HOST}:{PORT}...")
 
@@ -347,12 +367,36 @@ class Maestro:
     # =============================================
 
     def set_command(self, text):
-        self.command_field.setSFString(text)
+        # customData del propio robot (la esfera); los paneles lo leen.
+        # Siempre lleva el modo para que sepan si deben seguir la esfera.
+        self.command = text
+        self.robot.setCustomData(f"M{self.mode} {text}")
+
+
+    def tracking(self):
+        return self.mode == p.MODE_IDS["TRACKING"]
+
+
+    def update_sphere_visibility(self):
+        """En TRACKING la esfera está en el arreglo; si no, escondida."""
+
+        if self.tracking() or not OCULTAR_ESFERA:
+            self.position = list(CENTRO)
+            self.target = list(CENTRO)
+            self.set_sphere(CENTRO)
+        else:
+            self.position = list(ESCONDIDA)
+            self.target = list(ESCONDIDA)
+            self.set_sphere(ESCONDIDA)
+
+
+    def set_sphere(self, position):
+        if self.translation is not None:
+            self.translation.setSFVec3f([float(v) for v in position])
 
 
     def on_pose(self, pose_id):
         print(f"[POSE] {pose_id} = {p.POSE_NAMES[pose_id]}")
-        self.target = list(CENTRO)
         # Los paneles usan el tiempo de la simulación como inicio común
         self.set_command(f"POSE {pose_id} {self.robot.getTime():.3f}")
 
@@ -362,7 +406,7 @@ class Maestro:
         self.last_track = time.monotonic()
 
         # Solo se sigue la mano en modo TRACKING
-        if self.mode != p.MODE_IDS["TRACKING"]:
+        if not self.tracking():
             return
 
         x = -track["x_norm"] if INVERTIR_X else track["x_norm"]
@@ -385,9 +429,13 @@ class Maestro:
         print(f"[MODE] {[k for k, v in p.MODE_IDS.items() if v == mode][0]}")
 
         # Al entrar o salir de TRACKING se empieza desde el centro
+        # (o se esconde la esfera); en cualquier caso los paneles
+        # reciben el modo nuevo
         if (mode == p.MODE_IDS["TRACKING"]) != (previous == p.MODE_IDS["TRACKING"]):
-            self.target = list(CENTRO)
             self.set_command("IDLE")
+            self.update_sphere_visibility()
+        else:
+            self.set_command(self.command)
 
 
     def on_stop(self):
@@ -400,8 +448,13 @@ class Maestro:
             print(f"[SEGURO] Estado seguro: {reason}")
 
         self.safe = True
-        self.target = list(CENTRO)
+
+        # Sin GUI se regresa a JUEGO: paneles en 0,0
+        if reason == "desconexión":
+            self.mode = p.MODE_IDS["JUEGO"]
+
         self.set_command("IDLE")
+        self.update_sphere_visibility()
 
 
     def check_timeouts(self):
@@ -411,7 +464,7 @@ class Maestro:
         if self.client is not None and not self.safe and now - self.last_rx > SAFE_TIMEOUT_S:
             self.enter_safe_state(f"{SAFE_TIMEOUT_S:.0f} s sin tramas")
 
-        if (self.mode == p.MODE_IDS["TRACKING"] and self.last_track
+        if (self.tracking() and self.last_track
                 and now - self.last_track > TRACK_TIMEOUT_S):
             self.last_track = 0.0
             self.target = list(CENTRO)
@@ -428,7 +481,7 @@ class Maestro:
                 moved = True
 
         if moved:
-            self.translation.setSFVec3f(self.position)
+            self.set_sphere(self.position)
 
 
 if __name__ == "__main__":
