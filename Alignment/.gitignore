@@ -9,3 +9,5 @@ build/datos/
 results/diagnosticos/
 
 __pycache__/
+
+.venv/
