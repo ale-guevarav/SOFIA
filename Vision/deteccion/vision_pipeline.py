@@ -219,7 +219,10 @@ class VisionPipeline:
             with measure("dibujo"):
                 # Plano -> esqueleto de la mano -> vectores
                 self.hand_tracker.draw_plane(frame)
-                self.tracking_hand_detector.draw(frame, hand_result)
+                # Solo la mano que se sigue (la otra no se dibuja)
+                self.tracking_hand_detector.draw(
+                    frame, self.hand_tracker.only_tracked(hand_result)
+                )
                 self.hand_tracker.draw_positions(
                     frame, hand_positions, panel=draw_panel
                 )

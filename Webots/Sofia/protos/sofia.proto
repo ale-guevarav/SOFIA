@@ -1,0 +1,174 @@
+#VRML_SIM R2025a utf8
+# license: Apache License 2.0
+# license url: http://www.apache.org/licenses/LICENSE-2.0
+# This is a proto file for Webots for the sofia
+# Extracted from: urdf/sofia.urdf
+
+PROTO sofia [
+  field  SFVec3f     translation     0 0 0
+  field  SFRotation  rotation        0 0 1 0
+  field  SFString    name            "sofia"  # Is `Robot.name`.
+  field  SFString    controller      "void"   # Is `Robot.controller`.
+  field  MFString    controllerArgs  []       # Is `Robot.controllerArgs`.
+  field  SFString    customData      ""       # Is `Robot.customData`.
+  field  SFBool      supervisor      FALSE    # Is `Robot.supervisor`.
+  field  SFBool      synchronization TRUE     # Is `Robot.synchronization`.
+  field  SFBool      selfCollision   FALSE    # Is `Robot.selfCollision`.
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
+    children [
+      Shape {
+        appearance DEF mat_link_0 PBRAppearance {
+          baseColor 0.800000 0.000000 0.000000
+          roughness 1.000000
+          metalness 0
+        }
+        geometry DEF Sofia003-E001-01 Mesh {
+          url "meshes/Sofia003-E001-01.STL"
+        }
+      }
+      DEF joint_1 HingeJoint {
+        jointParameters HingeJointParameters {
+          anchor 0.000000 0.000000 0.022000
+          dampingConstant 0.1
+          staticFriction 0.05
+        }
+        device [
+          RotationalMotor {
+            name "joint_1"
+            maxVelocity 10.471976
+            minPosition -0.610865
+            maxPosition 0.610865
+            maxTorque 1.0
+          }
+          PositionSensor {
+            name "joint_1_sensor"
+          }
+        ]
+        endPoint DEF link_1 Solid {
+          translation 0.000000 0.000000 0.022000
+          children [
+            Shape {
+              appearance DEF mat_link_1 PBRAppearance {
+                baseColor 0.100000 0.100000 0.100000
+                roughness 1.000000
+                metalness 0
+              }
+              geometry DEF Sofia003-E002-01 Mesh {
+                url "meshes/Sofia003-E002-01.STL"
+              }
+            }
+            DEF joint_3 HingeJoint {
+              jointParameters HingeJointParameters {
+                axis 0.000000 1.000000 0.000000
+                dampingConstant 0.1
+                staticFriction 0.05
+              }
+              device [
+                RotationalMotor {
+                  name "joint_3"
+                  maxVelocity 10.471976
+                  minPosition -0.610865
+                  maxPosition 0.610865
+                  maxTorque 1.0
+                }
+                PositionSensor {
+                  name "joint_3_sensor"
+                }
+              ]
+              endPoint DEF link_3 Solid {
+                children [
+                  Shape {
+                    appearance DEF mat_link_3 PBRAppearance {
+                      baseColor 0.500000 0.500000 0.500000
+                      roughness 1.000000
+                      metalness 0
+                    }
+                    geometry DEF Sofia003-E004-01 Mesh {
+                      url "meshes/Sofia003-E004-01.STL"
+                    }
+                  }
+                ]
+                name "link_3"
+                physics Physics {
+                  density -1
+                  mass 0.082518
+                  centerOfMass [ 0.000000 0.000000 0.034865 ]
+                  inertiaMatrix [
+                    5.870000e-05 5.870000e-05 1.151000e-04
+                    0.000000e+00 0.000000e+00 0.000000e+00
+                  ]
+                }
+              }
+            }
+          ]
+          name "link_1"
+          physics Physics {
+            density -1
+            mass 0.006565
+            centerOfMass [ -0.003480 -0.000056 -0.001474 ]
+            inertiaMatrix [
+              2.000000e-07 1.000000e-06 1.000000e-06
+              0.000000e+00 1.000000e-07 0.000000e+00
+            ]
+          }
+        }
+      }
+      DEF joint_2 HingeJoint {
+        jointParameters HingeJointParameters {
+          axis 0.000000 1.000000 0.000000
+          anchor 0.000000 0.000000 0.022000
+          dampingConstant 0.1
+          staticFriction 0.05
+        }
+        device [
+          RotationalMotor {
+            name "joint_2"
+            maxVelocity 10.471976
+            minPosition -0.610865
+            maxPosition 0.610865
+            maxTorque 1.0
+          }
+          PositionSensor {
+            name "joint_2_sensor"
+          }
+        ]
+        endPoint DEF link_2 Solid {
+          translation 0.000000 0.000000 0.022000
+          children [
+            Shape {
+              appearance DEF mat_link_2 PBRAppearance {
+                baseColor 0.100000 0.100000 0.100000
+                roughness 1.000000
+                metalness 0
+              }
+              geometry DEF Sofia003-E003-01 Mesh {
+                url "meshes/Sofia003-E003-01.STL"
+              }
+            }
+          ]
+          name "link_2"
+          physics Physics {
+            density -1
+            mass 0.004590
+            centerOfMass [ -0.000110 -0.001051 0.003100 ]
+            inertiaMatrix [
+              1.700000e-06 4.000000e-07 1.400000e-06
+              0.000000e+00 0.000000e+00 1.000000e-07
+            ]
+          }
+        }
+      }
+    ]
+    name IS name
+  }
+}

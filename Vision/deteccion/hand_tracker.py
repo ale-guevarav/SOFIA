@@ -12,7 +12,9 @@ con el origen (0, 0) en el CENTRO de la imagen:
              |
             -y
 
-Para cada mano detectada devuelve:
+Solo sigue la mano de TRACKING_HAND (la derecha); la otra se ignora.
+
+Para la mano seguida devuelve:
 
     - Coordenadas cartesianas en píxeles      (x, y)
     - Coordenadas normalizadas de -1 a 1      (x_norm, y_norm)
@@ -41,6 +43,7 @@ Para no perder el seguimiento se usan tres niveles, en orden:
 import math
 import time
 from dataclasses import asdict, dataclass
+from types import SimpleNamespace
 
 import cv2
 
@@ -66,6 +69,11 @@ POSE_HAND_POINTS = {
 # main.py y la GUI ya voltean la imagen (cv2.flip),
 # así que no hace falta invertir.
 SWAP_HANDEDNESS = False
+
+# Mano que se sigue en modo TRACKING: "DERECHA", "IZQUIERDA"
+# o None para seguir las dos. La otra mano se ignora aunque se vea
+# (se siguen detectando 2 manos para que la otra no le gane el lugar).
+TRACKING_HAND = "DERECHA"
 
 HAND_LABELS = {
     "Left": "IZQUIERDA",
@@ -159,7 +167,15 @@ class HandTracker:
         hold_time=0.35,
         fallback_window=1.0,
         pose_min_visibility=0.5,
+        only_hand=TRACKING_HAND,
     ):
+
+        # Solo esta mano ("DERECHA" / "IZQUIERDA"); None = las dos
+        self.only_hand = only_hand
+
+        # Índices (en el resultado de Hand Landmarker) de las manos
+        # que se siguieron en el último update(), para dibujar solo esas
+        self._tracked_indices = []
 
         # Suavizado EMA de la posición.
         # 1.0 = sin suavizado, más bajo = más estable
@@ -204,9 +220,16 @@ class HandTracker:
         now = time.monotonic() if now is None else now
 
         recent = self._recent_labels(now)
-        detected = len(hand_result.hand_landmarks or [])
+        detected = sum(
+            1 for index in range(len(hand_result.hand_landmarks or []))
+            if self._wanted(self._get_label(hand_result, index))
+        )
 
         return detected < len(recent)
+
+
+    def _wanted(self, label):
+        return self.only_hand is None or label == self.only_hand
 
 
     def _recent_labels(self, now):
@@ -233,6 +256,19 @@ class HandTracker:
         return HAND_LABELS.get(name)
 
 
+    def only_tracked(self, hand_result):
+        """
+        El resultado de Hand Landmarker solo con las manos que se siguieron
+        en el último update() (para no dibujar la otra mano).
+        """
+        landmarks = hand_result.hand_landmarks or []
+        handedness = hand_result.handedness or []
+        return SimpleNamespace(
+            hand_landmarks=[landmarks[i] for i in self._tracked_indices if i < len(landmarks)],
+            handedness=[handedness[i] for i in self._tracked_indices if i < len(handedness)],
+        )
+
+
     # =============================================
     # CALCULAR POSICIONES
     # =============================================
@@ -250,6 +286,7 @@ class HandTracker:
 
         # label -> (pixel_x, pixel_y, source)
         raw = {}
+        self._tracked_indices = []
 
         # -----------------------------
         # 1. HAND LANDMARKER
@@ -268,6 +305,12 @@ class HandTracker:
                 )
                 if label is None:
                     continue
+
+            # La otra mano no se sigue
+            if not self._wanted(label):
+                continue
+
+            self._tracked_indices.append(index)
 
             pixel_x = sum(hand_landmarks[i].x for i in PALM_POINTS) / len(PALM_POINTS) * width
             pixel_y = sum(hand_landmarks[i].y for i in PALM_POINTS) / len(PALM_POINTS) * height

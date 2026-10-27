@@ -12,8 +12,15 @@
 
 using namespace webots;
 
-// Controlador de un panel 2-DOF que orienta su "palo" hacia la esfera.
-// Corre igual en los 16 paneles. NINGUN panel mueve la esfera: solo LEE
+// Controlador de una unidad SOFIA (PROTO protos/sofia.proto) que orienta
+// su placa hacia la esfera.
+// Corre igual en las 16 unidades. NINGUNA mueve la esfera: solo LEE
+//
+// Motores del PROTO:
+//     joint_1  eje X, en la base            -> theta_1
+//     joint_3  eje Y, lleva la placa        -> theta_2
+//     joint_2  eje Y, segunda biela del mecanismo: recibe el mismo
+//              angulo que joint_3 (como en sofia_controller_gestos)
 //
 // Ademas lee el campo customData de la esfera, donde el maestro
 // (sofia_maestro_sim) escribe el modo y la ultima orden de la GUI:
@@ -32,14 +39,19 @@ const int MODO_TRACKING = 2;
 const double CENTRO_X = 0.0;
 const double CENTRO_Y = 0.035;
 
+// Altura de los ejes sobre el origen de la unidad (joint_1 y joint_2 del PROTO)
+const double ALTURA_PIVOTE = 0.022;
+
 int main(int argc, char **argv) {
     Supervisor *robot = new Supervisor();
     int timeStep = (int)robot->getBasicTimeStep();
 
-    Motor *motor_gdl1 = robot->getMotor("motor_gdl1");
-    Motor *motor_gdl2 = robot->getMotor("motor_gdl2");
-    if (!motor_gdl1 || !motor_gdl2) {
-        std::cerr << "[" << robot->getName() << "] ERROR: motores no encontrados." << std::endl;
+    Motor *motor_q1 = robot->getMotor("joint_1");
+    Motor *motor_q2 = robot->getMotor("joint_2");
+    Motor *motor_q3 = robot->getMotor("joint_3");
+    if (!motor_q1 || !motor_q2 || !motor_q3) {
+        std::cerr << "[" << robot->getName() << "] ERROR: motores joint_1/2/3 no encontrados "
+                  << "(el mundo debe usar el PROTO sofia)." << std::endl;
     }
 
     // Campo de posicion de la esfera (solo lectura desde aqui)
@@ -77,7 +89,7 @@ int main(int argc, char **argv) {
 
     const double K_SUAVIZADO = 0.15;     // que tan rapido reacciona el panel (0-1)
     const double MAX_PASO = 0.15;        // rad, tope de cambio por paso (evita saltos)
-    const double LIMITE_SEGURO = 0.48;   // rad, margen bajo el tope mecanico (0.5235)
+    const double LIMITE_SEGURO = 0.48;   // rad (27.5 grados); el PROTO permite 0.6109 (35 grados)
 
     while (robot->step(timeStep) != -1) {
 
@@ -146,7 +158,7 @@ int main(int argc, char **argv) {
             // 2) Vector unitario de este panel hacia la esfera
             double v_x = target_x - my_pos[0];
             double v_y = target_y - my_pos[1];
-            double v_z = target_z - (my_pos[2] + 0.025); // offset al pivote del motor
+            double v_z = target_z - (my_pos[2] + ALTURA_PIVOTE); // pivote de los motores
 
             double mag = std::sqrt(v_x * v_x + v_y * v_y + v_z * v_z);
             if (mag > 0.0) { v_x /= mag; v_y /= mag; v_z /= mag; }
@@ -167,9 +179,10 @@ int main(int argc, char **argv) {
         theta_2_actual += d2;
 
         // 5) Aplicar a los motores
-        if (motor_gdl1 && motor_gdl2) {
-            motor_gdl1->setPosition(theta_1_actual);
-            motor_gdl2->setPosition(theta_2_actual);
+        if (motor_q1 && motor_q2 && motor_q3) {
+            motor_q1->setPosition(theta_1_actual);
+            motor_q2->setPosition(theta_2_actual);   // biela: mismo angulo que joint_3
+            motor_q3->setPosition(theta_2_actual);
         }
     }
 

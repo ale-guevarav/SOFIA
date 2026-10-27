@@ -188,6 +188,11 @@ def main():
     with open(ORIGEN, encoding="utf-8") as archivo:
         texto = archivo.read().replace("\r\n", "\n")
 
+    if 'EXTERNPROTO "../protos/sofia.proto"' in texto:
+        sys.exit("sofia.wbt ya usa el PROTO sofia: esta herramienta todavía arma los paneles viejos.\n"
+                 "Los mundos del dataset y en vivo se pasan al PROTO en el paso 2; mientras tanto\n"
+                 "usa los sofia_dataset.wbt y sofia_diagnostico_vivo.wbt que ya están en el repo.")
+
     texto = modificar_paneles(texto)
     texto = modificar_suelo(texto)
     texto = quitar_esfera_y_luces(texto)

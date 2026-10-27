@@ -2,11 +2,11 @@
 // PATRONES DE LOS PANELES POR POSTURA - SOFIA (Webots)
 // =============================================
 //
-// Cada postura que detecta la visión se "dibuja" con los palos
-// de los 16 paneles. Las coordenadas son las de la CÁMARA CENITAL:
+// Cada postura que detecta la visión se "dibuja" con las placas
+// de las 16 unidades. Las coordenadas son las de la CÁMARA CENITAL:
 //
-//     u = derecha en la imagen   ->  motor_gdl1 (theta_1)
-//     v = arriba en la imagen    ->  motor_gdl2 (theta_2)
+//     u = derecha en la imagen   ->  joint_1 (theta_1)
+//     v = arriba en la imagen    ->  joint_3 + joint_2 (theta_2)
 //
 //   INICIO   arriba-abajo, todos al unísono
 //   RECARGAR "círculo de carga": solo los 12 paneles del borde,
