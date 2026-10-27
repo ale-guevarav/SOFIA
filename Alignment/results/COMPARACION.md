@@ -51,6 +51,8 @@ Corre los dos y, para cada hexágono:
 
 ## Resultados (test: 300 fotos = 4800 hexágonos, sesión de 2000 fotos de Webots)
 
+> **Ojo:** estos números son de los **paneles anteriores** (placa de 69 mm, brazo de 58 mm). Desde que el arreglo usa el PROTO `sofia` (placa de 60 mm, brazo de 37 mm, unidades más juntas) hay que regenerar el dataset, reentrenar y volver a evaluar; esta tabla se actualiza con eso.
+
 | Método | MAE (°) | RMSE (°) | Error máx (°) | MAE 0-2° | MAE 2-5° | MAE 5-15° | MAE >15° | Exactitud estados | F1 macro | ms/foto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Geométrico | 0.539 | 1.927 | 74.0 | **0.132** | **0.145** | 0.331 | 1.301 | **97.2 %** | **0.967** | 32 (CPU) |

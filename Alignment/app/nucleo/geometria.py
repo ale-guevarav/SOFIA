@@ -19,9 +19,9 @@ Imagen ENDEREZADA (vista desde arriba, como la cámara cenital):
 Con el centro del arreglo en (u, v) = (0, 0).
 
 Ángulos de cada panel (los que estima el modelo):
-    theta1 = motor_gdl1 (eje X del mundo): positivo inclina el palo hacia -Y,
+    theta1 = joint_1 (eje X del mundo): positivo inclina la placa hacia -Y,
              es decir, hacia la DERECHA de la imagen.
-    theta2 = motor_gdl2 (eje Y del mundo): positivo inclina hacia +X,
+    theta2 = joint_3 (eje Y del mundo): positivo inclina hacia +X,
              es decir, hacia ARRIBA de la imagen.
 """
 
@@ -29,7 +29,7 @@ import math
 
 
 # =============================================
-# ARREGLO DE 4 x 4 HEXÁGONOS (medidas de la simulación actual)
+# ARREGLO DE 4 x 4 HEXÁGONOS (PROTO sofia en Webots)
 # =============================================
 
 FILAS = 4
@@ -37,7 +37,9 @@ COLUMNAS = 4
 
 # Posición (x, y) del centro de cada panel en el mundo.
 # Filas pares e impares están desfasadas (arreglo tipo panal).
-FILAS_X = [-0.225, -0.075, 0.075, 0.225]
+# Separación mínima sin choques con las placas a ±30° (igual que sofia.wbt):
+# 140 mm en la fila y 116 mm entre filas.
+FILAS_X = [-0.174, -0.058, 0.058, 0.174]
 COLUMNAS_Y_PAR = [-0.210, -0.070, 0.070, 0.210]
 COLUMNAS_Y_IMPAR = [-0.140, 0.000, 0.140, 0.280]
 
@@ -46,16 +48,16 @@ CENTRO_X = 0.0
 CENTRO_Y = 0.035
 
 # Placa hexagonal
-RADIO_HEXAGONO = 0.069         # m, centro a vértice
+RADIO_HEXAGONO = 0.060         # m, centro a vértice (120 mm de punta a punta)
 
 # Altura de la cara superior de las placas con el panel en 0,0 (m)
-# base 0.025 + eslabón 0.025 + palo 0.055 + placa 0.003
-ALTURA_PLACAS = 0.108
+# ejes a 0.022 sobre el piso + 0.037 de los ejes a la cara de la placa
+ALTURA_PLACAS = 0.059
 
 # Distancia de los ejes a la placa (para el método geométrico).
-# En la simulación los dos ejes se cruzan en el mismo punto (z = 0.05).
-BRAZO_GDL1 = 0.058             # eje gdl1 -> placa
-BRAZO_GDL2 = 0.058             # eje gdl2 -> placa
+# En el PROTO los dos ejes se cruzan en el mismo punto (z = 0.022).
+BRAZO_GDL1 = 0.037             # eje joint_1 -> cara de la placa
+BRAZO_GDL2 = 0.037             # eje joint_3 -> cara de la placa
 
 # Tope mecánico (±30°) y tope seguro de los controladores
 LIMITE_GRADOS = 30.0

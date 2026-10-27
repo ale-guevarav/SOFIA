@@ -2,8 +2,11 @@
 // PANEL PARA EL DATASET - SOFIA (diagnostico de alineacion)
 // =============================================
 //
-// Se usa SOLO en sofia_dataset.wbt. Pone el panel en el angulo
-// exacto que pide el generador y reporta lo que mide su sensor.
+// Se usa en sofia_dataset.wbt y sofia_diagnostico_vivo.wbt (PROTO sofia).
+// Pone la unidad en el angulo exacto que pide el supervisor y reporta lo
+// que miden sus sensores:
+//     theta_1 -> joint_1            (sensor joint_1_sensor)
+//     theta_2 -> joint_3 y joint_2  (joint_2 es la biela; sensor joint_3_sensor)
 //
 // El generador (DEF GENERADOR) escribe en su customData:
 //
@@ -41,12 +44,13 @@ int main() {
     Supervisor *robot = new Supervisor();
     int timeStep = (int)robot->getBasicTimeStep();
 
-    Motor *motor_1 = robot->getMotor("motor_gdl1");
-    Motor *motor_2 = robot->getMotor("motor_gdl2");
-    PositionSensor *sensor_1 = robot->getPositionSensor("sensor_gdl1");
-    PositionSensor *sensor_2 = robot->getPositionSensor("sensor_gdl2");
+    Motor *motor_1 = robot->getMotor("joint_1");
+    Motor *motor_2 = robot->getMotor("joint_3");          // lleva la placa
+    Motor *motor_biela = robot->getMotor("joint_2");      // biela: mismo angulo que joint_3
+    PositionSensor *sensor_1 = robot->getPositionSensor("joint_1_sensor");
+    PositionSensor *sensor_2 = robot->getPositionSensor("joint_3_sensor");
 
-    if (!motor_1 || !motor_2 || !sensor_1 || !sensor_2) {
+    if (!motor_1 || !motor_2 || !motor_biela || !sensor_1 || !sensor_2) {
         std::cerr << "[" << robot->getName() << "] ERROR: faltan motores o sensores." << std::endl;
         delete robot;
         return 1;
@@ -105,6 +109,7 @@ int main() {
         // 2) Ir al objetivo
         motor_1->setPosition(objetivo_1);
         motor_2->setPosition(objetivo_2);
+        motor_biela->setPosition(objetivo_2);
 
         // 3) Medir y avisar cuando ya llego
         double medido_1 = sensor_1->getValue();

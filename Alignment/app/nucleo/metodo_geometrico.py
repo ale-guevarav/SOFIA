@@ -40,7 +40,9 @@ import preprocesamiento as pp
 
 # Plantilla: hexágono claro (placa) sobre un anillo oscuro (hueco)
 ANILLO_M = 0.006
-BUSQUEDA_M = 0.040            # cuánto se puede correr la placa (27.5° -> ~2.7 cm)
+# Cuánto se puede correr la placa: a 30° se mueve L·sin(30°) (~1.9 cm con el
+# PROTO); un poco más de margen, pero sin llegar a la placa vecina.
+BUSQUEDA_M = g.BRAZO_GDL1 * math.sin(math.radians(g.LIMITE_GRADOS)) + 0.008
 
 
 def _plantilla():

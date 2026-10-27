@@ -3,8 +3,11 @@
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the sofia
 # Extracted from: urdf/sofia.urdf
-# Cambio de SOFIA: tope de los 3 motores en ±30° (0.523599 rad), como el
-# robot real; el original de sofia-maquinas-estado trae ±35° (0.610865).
+# Cambios de SOFIA respecto al original de sofia-maquinas-estado:
+#   - tope de los 3 motores en ±30° (0.523599 rad), como el robot real
+#     (el original trae ±35°, 0.610865);
+#   - campo colorPlaca para cambiar el color de la placa (el mundo del
+#     diagnóstico la pone clara para que contraste con el piso).
 
 PROTO sofia [
   field  SFVec3f     translation     0 0 0
@@ -16,6 +19,7 @@ PROTO sofia [
   field  SFBool      supervisor      FALSE    # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE     # Is `Robot.synchronization`.
   field  SFBool      selfCollision   FALSE    # Is `Robot.selfCollision`.
+  field  SFColor     colorPlaca      0.5 0.5 0.5  # Color de la placa (link_3).
 ]
 {
   Robot {
@@ -91,7 +95,7 @@ PROTO sofia [
                 children [
                   Shape {
                     appearance DEF mat_link_3 PBRAppearance {
-                      baseColor 0.500000 0.500000 0.500000
+                      baseColor IS colorPlaca
                       roughness 1.000000
                       metalness 0
                     }

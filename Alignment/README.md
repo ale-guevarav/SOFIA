@@ -61,7 +61,7 @@ En Webots (`Webots/Sofia/`):
 | --- | --- |
 | `worlds/sofia_dataset.wbt` + `controllers/dataset_generator/` | Genera el dataset |
 | `worlds/sofia_diagnostico_vivo.wbt` + `controllers/diagnostico_vivo/` | Conecta la cámara con la app para probar en vivo |
-| `controllers/panel_dataset/` | Pone cada panel en un ángulo exacto y lo mide con un sensor (los dos mundos) |
+| `controllers/panel_dataset/` | Pone cada unidad (PROTO `sofia`) en un ángulo exacto y la mide con sus sensores (los dos mundos) |
 
 Todo se corre **desde la carpeta `SOFIA`** con el entorno activado.
 

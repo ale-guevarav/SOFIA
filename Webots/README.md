@@ -27,8 +27,8 @@ GUI (Vision/gui_app.py)
 | `controllers/tracker_esfera_cpp/` | **Unidades** (C++). Apuntan la placa a la esfera; si llega una postura, dibujan su patrón (`patrones.hpp`). |
 | `controllers/camara_sim/` | **Cámara cenital** (Python). Solo manda imágenes a la GUI. |
 | `controllers/esfera_control/` | Controlador original (la esfera se mueve sola). Ya no lo usa el mundo; se deja como referencia. |
-| `Sofia/worlds/sofia_dataset.wbt` y `sofia_diagnostico_vivo.wbt` | Mundos del **diagnóstico de alineación** (ver `Alignment/README.md`). *Todavía con los paneles anteriores; pasan al PROTO en el paso 2.* |
-| `controllers/panel_dataset/` | Paneles del dataset (C++): ángulo exacto + lectura de su sensor de posición |
+| `Sofia/worlds/sofia_dataset.wbt` y `sofia_diagnostico_vivo.wbt` | Mundos del **diagnóstico de alineación**, con las mismas 16 unidades (placa clara con `colorPlaca`). Los genera `Alignment/build/herramientas/crear_mundo_dataset.py` a partir de `sofia.wbt`; ver `Alignment/README.md` |
+| `controllers/panel_dataset/` | Unidades del diagnóstico (C++): ángulo exacto en `joint_1` y `joint_3`/`joint_2` + lectura de `joint_1_sensor` y `joint_3_sensor` |
 | `controllers/dataset_generator/` | Supervisor del dataset (Python): ángulos y escena al azar, fotos y etiquetas |
 
 ## Qué hace cada comando

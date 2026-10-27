@@ -2,6 +2,7 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "../protos/sofia.proto"
 
 WorldInfo {
   basicTimeStep 8
@@ -29,83 +30,29 @@ Solid {
   boundingObject Box { size 1 1 0.01 }
 }
 
-DEF PANEL_0_0 Robot {
-  translation -0.225 -0.210 0.025
-  name "Panel_0_0"
-  controller "panel_dataset"
-  supervisor TRUE
-  children [
-    DEF B_S Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.2 roughness 0.5 } geometry Cylinder { radius 0.025 height 0.05 } }
-    HingeJoint {
-      jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 }
-      device [
-        RotationalMotor {
-          name "motor_gdl1"
-          minPosition -0.5235
-          maxPosition 0.5235
-          maxTorque 3
-        } PositionSensor { name "sensor_gdl1" }
-      ]
-      endPoint Solid {
-        translation 0 0 0.025
-        children [
-          HingeJoint {
-            jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 }
-            device [
-              RotationalMotor {
-                name "motor_gdl2"
-                minPosition -0.5235
-                maxPosition 0.5235
-                maxTorque 3
-              } PositionSensor { name "sensor_gdl2" }
-            ]
-            endPoint Solid {
-              translation 0 0 0
-              children [
-                DEF P_G Group {
-                  children [
-                    Transform {
-                      translation 0 0 0.0275
-                      children [
-                        Shape { appearance PBRAppearance { baseColor 0.15 0.15 0.15 roughness 0.5 } geometry Cylinder { radius 0.006 height 0.055 } }
-                        Transform {
-                          translation 0 0 0.0275
-                          children [
-                            Shape { appearance DEF PLACA_APARIENCIA PBRAppearance { baseColor 0.92 0.92 0.92 roughness 0.6 } geometry IndexedFaceSet { coord Coordinate { point [ 0 0 0.003 0.069282 0 0.003 0.034641 0.06 0.003 -0.034641 0.06 0.003 -0.069282 0 0.003 -0.034641 -0.06 0.003 0.034641 -0.06 0.003 ] } coordIndex [ 0 1 2 -1 0 2 3 -1 0 3 4 -1 0 4 5 -1 0 5 6 -1 0 6 1 -1 ] } }
-                            Shape { appearance Appearance { material Material { emissiveColor 0.1 0.1 0.1 } } geometry IndexedLineSet { coord Coordinate { point [ 0.069282 0 0.004 0.034641 0.06 0.004 -0.034641 0.06 0.004 -0.069282 0 0.004 -0.034641 -0.06 0.004 0.034641 -0.06 0.004 0.069282 0 0.004 ] } coordIndex [ 0 1 2 3 4 5 6 -1 ] } }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-              name "Palo" boundingObject DEF P_B Group { children [ Transform { translation 0 0 0.0275 children [ Cylinder { radius 0.006 height 0.055 } ] } ] } physics DEF PHYS Physics { density -1 mass 0.1 }
-            }
-          }
-        ]
-        name "Eslabon" boundingObject DEF E_B Sphere { radius 0.01 } physics USE PHYS
-      }
-    }
-  ]
-  boundingObject DEF B_B Cylinder { radius 0.023 height 0.05 }
-}
-
-DEF PANEL_0_1 Robot { translation -0.225 -0.070 0.025 name "Panel_0_1" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_0_2 Robot { translation -0.225 0.070 0.025 name "Panel_0_2" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_0_3 Robot { translation -0.225 0.210 0.025 name "Panel_0_3" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_1_0 Robot { translation -0.075 -0.140 0.025 name "Panel_1_0" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_1_1 Robot { translation -0.075 0.000 0.025 name "Panel_1_1" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_1_2 Robot { translation -0.075 0.140 0.025 name "Panel_1_2" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_1_3 Robot { translation -0.075 0.280 0.025 name "Panel_1_3" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_2_0 Robot { translation 0.075 -0.210 0.025 name "Panel_2_0" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_2_1 Robot { translation 0.075 -0.070 0.025 name "Panel_2_1" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_2_2 Robot { translation 0.075 0.070 0.025 name "Panel_2_2" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_2_3 Robot { translation 0.075 0.210 0.025 name "Panel_2_3" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_3_0 Robot { translation 0.225 -0.140 0.025 name "Panel_3_0" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_3_1 Robot { translation 0.225 0.000 0.025 name "Panel_3_1" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_3_2 Robot { translation 0.225 0.140 0.025 name "Panel_3_2" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
-DEF PANEL_3_3 Robot { translation 0.225 0.280 0.025 name "Panel_3_3" controller "panel_dataset" supervisor TRUE children [ USE B_S HingeJoint { jointParameters HingeJointParameters { axis 1 0 0 anchor 0 0 0.025 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl1" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl1" } ] endPoint Solid { translation 0 0 0.025 children [ HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0 0 minStop -0.5235 maxStop 0.5235 dampingConstant 0.01 staticFriction 0.001 } device [ RotationalMotor { name "motor_gdl2" minPosition -0.5235 maxPosition 0.5235 maxTorque 3 } PositionSensor { name "sensor_gdl2" } ] endPoint Solid { translation 0 0 0 children [ USE P_G ] name "Palo" boundingObject USE P_B physics USE PHYS } } ] name "Eslabon" boundingObject USE E_B physics USE PHYS } } ] boundingObject USE B_B }
+# 16 unidades SOFIA (PROTO de protos/sofia.proto, del repo sofia-maquinas-estado).
+# El origen de cada unidad está en el piso; la placa queda a ~59 mm.
+# Separación mínima sin choques con TODAS las placas en su tope (±30°),
+# medida sobre las mallas del PROTO: 140 mm entre vecinas de la misma
+# fila y 116 mm entre filas (135.5 mm en diagonal), con ~3 mm de margen.
+# Motores: joint_1 (eje X) = theta_1; joint_3 (eje Y, lleva la placa) = theta_2;
+# joint_2 es la segunda biela y recibe el mismo ángulo que joint_3.
+DEF PANEL_0_0 sofia { translation -0.174 -0.210 0 name "Panel_0_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_1 sofia { translation -0.174 -0.070 0 name "Panel_0_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_2 sofia { translation -0.174 0.070 0 name "Panel_0_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_3 sofia { translation -0.174 0.210 0 name "Panel_0_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_0 sofia { translation -0.058 -0.140 0 name "Panel_1_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_1 sofia { translation -0.058 0.000 0 name "Panel_1_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_2 sofia { translation -0.058 0.140 0 name "Panel_1_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_3 sofia { translation -0.058 0.280 0 name "Panel_1_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_0 sofia { translation 0.058 -0.210 0 name "Panel_2_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_1 sofia { translation 0.058 -0.070 0 name "Panel_2_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_2 sofia { translation 0.058 0.070 0 name "Panel_2_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_3 sofia { translation 0.058 0.210 0 name "Panel_2_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_0 sofia { translation 0.174 -0.140 0 name "Panel_3_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_1 sofia { translation 0.174 0.000 0 name "Panel_3_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_2 sofia { translation 0.174 0.140 0 name "Panel_3_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_3 sofia { translation 0.174 0.280 0 name "Panel_3_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
 
 
 # =============================================
@@ -127,7 +74,7 @@ DEF LUZ_PUNTUAL PointLight {
 
 # Marco: 4 marcadores ArUco a la altura de las placas
 Solid {
-  translation 0.3800 0.4150 0.1070
+  translation 0.3800 0.4150 0.0580
   children [
     Shape {
       appearance PBRAppearance {
@@ -138,11 +85,11 @@ Solid {
       geometry Box { size 0.080 0.080 0.002 }
     }
     Transform {
-      translation 0 0 -0.0535
+      translation 0 0 -0.0290
       children [
         Shape {
           appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 1 metalness 0 }
-          geometry Box { size 0.02 0.02 0.1050 }
+          geometry Box { size 0.02 0.02 0.0560 }
         }
       ]
     }
@@ -151,7 +98,7 @@ Solid {
 }
 
 Solid {
-  translation 0.3800 -0.3450 0.1070
+  translation 0.3800 -0.3450 0.0580
   children [
     Shape {
       appearance PBRAppearance {
@@ -162,11 +109,11 @@ Solid {
       geometry Box { size 0.080 0.080 0.002 }
     }
     Transform {
-      translation 0 0 -0.0535
+      translation 0 0 -0.0290
       children [
         Shape {
           appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 1 metalness 0 }
-          geometry Box { size 0.02 0.02 0.1050 }
+          geometry Box { size 0.02 0.02 0.0560 }
         }
       ]
     }
@@ -175,7 +122,7 @@ Solid {
 }
 
 Solid {
-  translation -0.3800 -0.3450 0.1070
+  translation -0.3800 -0.3450 0.0580
   children [
     Shape {
       appearance PBRAppearance {
@@ -186,11 +133,11 @@ Solid {
       geometry Box { size 0.080 0.080 0.002 }
     }
     Transform {
-      translation 0 0 -0.0535
+      translation 0 0 -0.0290
       children [
         Shape {
           appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 1 metalness 0 }
-          geometry Box { size 0.02 0.02 0.1050 }
+          geometry Box { size 0.02 0.02 0.0560 }
         }
       ]
     }
@@ -199,7 +146,7 @@ Solid {
 }
 
 Solid {
-  translation -0.3800 0.4150 0.1070
+  translation -0.3800 0.4150 0.0580
   children [
     Shape {
       appearance PBRAppearance {
@@ -210,11 +157,11 @@ Solid {
       geometry Box { size 0.080 0.080 0.002 }
     }
     Transform {
-      translation 0 0 -0.0535
+      translation 0 0 -0.0290
       children [
         Shape {
           appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 1 metalness 0 }
-          geometry Box { size 0.02 0.02 0.1050 }
+          geometry Box { size 0.02 0.02 0.0560 }
         }
       ]
     }

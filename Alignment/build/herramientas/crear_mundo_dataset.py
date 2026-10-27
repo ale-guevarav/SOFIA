@@ -10,8 +10,8 @@ para el diagnóstico de alineación:
 
 Los dos tienen:
 
-    - Los 16 paneles con un controlador propio (panel_dataset) que pone
-      ángulos EXACTOS y reporta lo que mide un PositionSensor.
+    - Las 16 unidades (PROTO sofia) con un controlador propio (panel_dataset)
+      que pone ángulos EXACTOS y reporta lo que miden sus sensores.
     - Marco con 4 marcadores ArUco en las esquinas, a la altura de las placas.
     - Cámara de alta resolución (supervisor dataset_generator) que cambia
       la luz y su propia posición, toma las fotos y guarda los ángulos.
@@ -47,36 +47,18 @@ CAMARA_FOV = 1.0            # rad
 
 
 def modificar_paneles(texto):
+    """
+    Las 16 unidades son el PROTO sofia (ya trae sensores de posición).
+    Solo cambia: DEF para que el supervisor las encuentre, el controlador
+    del dataset y una placa clara para que contraste con el piso oscuro.
+    """
 
-    # DEF PANEL_<fila>_<columna> para que el supervisor los encuentre
     texto, n = re.subn(
-        r'Robot \{(\s+translation\s+[-\d. ]+\s+name\s+"Panel_(\d)_(\d)")',
-        r'DEF PANEL_\2_\3 Robot {\1',
+        r'sofia \{ translation ([-\d. ]+) name "Panel_(\d)_(\d)" controller "tracker_esfera_cpp"',
+        r'DEF PANEL_\2_\3 sofia { translation \1 name "Panel_\2_\3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset"',
         texto,
     )
-    assert n == 16, f"Se esperaban 16 paneles y hay {n}"
-
-    # Controlador del dataset en lugar del de seguimiento
-    texto, n = re.subn(r'controller "tracker_esfera_cpp"', 'controller "panel_dataset"', texto)
-    assert n == 16, n
-
-    # Un sensor de posición junto a cada motor (la "verdad" de los ángulos)
-    texto, n = re.subn(
-        r'(RotationalMotor\s*\{\s*name\s*"motor_(gdl\d)"[^}]*\})',
-        r'\1 PositionSensor { name "sensor_\2" }',
-        texto,
-    )
-    assert n == 32, n
-
-    # Placas claras (contraste con el piso oscuro). DEF por si se quiere
-    # cambiar su color desde el supervisor.
-    texto, n = re.subn(
-        r'appearance PBRAppearance \{ baseColor 0\.8 0\.8 0\.8 roughness 0\.6 \}',
-        'appearance DEF PLACA_APARIENCIA PBRAppearance { baseColor 0.92 0.92 0.92 roughness 0.6 }',
-        texto,
-    )
-    assert n == 1, n
-
+    assert n == 16, f"Se esperaban 16 unidades (PROTO sofia) en sofia.wbt y hay {n}"
     return texto
 
 
@@ -187,11 +169,6 @@ def main():
 
     with open(ORIGEN, encoding="utf-8") as archivo:
         texto = archivo.read().replace("\r\n", "\n")
-
-    if 'EXTERNPROTO "../protos/sofia.proto"' in texto:
-        sys.exit("sofia.wbt ya usa el PROTO sofia: esta herramienta todavía arma los paneles viejos.\n"
-                 "Los mundos del dataset y en vivo se pasan al PROTO en el paso 2; mientras tanto\n"
-                 "usa los sofia_dataset.wbt y sofia_diagnostico_vivo.wbt que ya están en el repo.")
 
     texto = modificar_paneles(texto)
     texto = modificar_suelo(texto)
