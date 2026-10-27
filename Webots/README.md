@@ -21,7 +21,7 @@ GUI (Vision/gui_app.py)
 | Archivo | Qué hace |
 | --- | --- |
 | `Sofia/worlds/sofia.wbt` | Mundo: 16 unidades (PROTO `sofia`), la esfera (maestro) y la cámara cenital |
-| `Sofia/protos/sofia.proto` + `protos/meshes/` | **PROTO de la unidad** (copiado de sofia-maquinas-estado). Motores `joint_1` (eje X, θ1), `joint_3` (eje Y, lleva la placa, θ2) y `joint_2` (segunda biela, mismo ángulo que `joint_3`); ±35° |
+| `Sofia/protos/sofia.proto` + `protos/meshes/` | **PROTO de la unidad** (copiado de sofia-maquinas-estado). Motores `joint_1` (eje X, θ1), `joint_3` (eje Y, lleva la placa, θ2) y `joint_2` (segunda biela, mismo ángulo que `joint_3`). Tope ajustado a **±30°** como el robot real (el original trae ±35°) |
 | `Sofia/urdf/sofia.urdf` | URDF de donde sale el PROTO (para regenerarlo con `urdf2webots`) |
 | `controllers/sofia_maestro_sim/` | **Maestro** (Python), corre en la esfera. Hace lo mismo que el firmware del ESP32: valida tramas, contesta ACK/NACK, ignora duplicados y pasa a estado seguro. Reusa `Vision/comunicacion/protocol.py`. |
 | `controllers/tracker_esfera_cpp/` | **Unidades** (C++). Apuntan la placa a la esfera; si llega una postura, dibujan su patrón (`patrones.hpp`). |

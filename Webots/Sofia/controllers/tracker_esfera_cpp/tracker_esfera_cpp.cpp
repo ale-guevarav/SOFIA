@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
     const double K_SUAVIZADO = 0.15;     // que tan rapido reacciona el panel (0-1)
     const double MAX_PASO = 0.15;        // rad, tope de cambio por paso (evita saltos)
-    const double LIMITE_SEGURO = 0.48;   // rad (27.5 grados); el PROTO permite 0.6109 (35 grados)
+    const double LIMITE_SEGURO = 0.48;   // rad (27.5 grados), margen bajo el tope de 30 grados del PROTO
 
     while (robot->step(timeStep) != -1) {
 

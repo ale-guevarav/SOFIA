@@ -3,6 +3,8 @@
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the sofia
 # Extracted from: urdf/sofia.urdf
+# Cambio de SOFIA: tope de los 3 motores en ±30° (0.523599 rad), como el
+# robot real; el original de sofia-maquinas-estado trae ±35° (0.610865).
 
 PROTO sofia [
   field  SFVec3f     translation     0 0 0
@@ -46,8 +48,8 @@ PROTO sofia [
           RotationalMotor {
             name "joint_1"
             maxVelocity 10.471976
-            minPosition -0.610865
-            maxPosition 0.610865
+            minPosition -0.523599
+            maxPosition 0.523599
             maxTorque 1.0
           }
           PositionSensor {
@@ -77,8 +79,8 @@ PROTO sofia [
                 RotationalMotor {
                   name "joint_3"
                   maxVelocity 10.471976
-                  minPosition -0.610865
-                  maxPosition 0.610865
+                  minPosition -0.523599
+                  maxPosition 0.523599
                   maxTorque 1.0
                 }
                 PositionSensor {
@@ -134,8 +136,8 @@ PROTO sofia [
           RotationalMotor {
             name "joint_2"
             maxVelocity 10.471976
-            minPosition -0.610865
-            maxPosition 0.610865
+            minPosition -0.523599
+            maxPosition 0.523599
             maxTorque 1.0
           }
           PositionSensor {

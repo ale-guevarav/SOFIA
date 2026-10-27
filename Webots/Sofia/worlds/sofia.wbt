@@ -32,24 +32,27 @@ Solid {
 
 # 16 unidades SOFIA (PROTO de protos/sofia.proto, del repo sofia-maquinas-estado).
 # El origen de cada unidad está en el piso; la placa queda a ~59 mm.
+# Separación mínima sin choques con TODAS las placas en su tope (±30°),
+# medida sobre las mallas del PROTO: 140 mm entre vecinas de la misma
+# fila y 116 mm entre filas (135.5 mm en diagonal), con ~3 mm de margen.
 # Motores: joint_1 (eje X) = theta_1; joint_3 (eje Y, lleva la placa) = theta_2;
 # joint_2 es la segunda biela y recibe el mismo ángulo que joint_3.
-sofia { translation -0.225 -0.210 0 name "Panel_0_0" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.225 -0.070 0 name "Panel_0_1" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.225 0.070 0 name "Panel_0_2" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.225 0.210 0 name "Panel_0_3" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.075 -0.140 0 name "Panel_1_0" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.075 0.000 0 name "Panel_1_1" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.075 0.140 0 name "Panel_1_2" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation -0.075 0.280 0 name "Panel_1_3" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.075 -0.210 0 name "Panel_2_0" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.075 -0.070 0 name "Panel_2_1" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.075 0.070 0 name "Panel_2_2" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.075 0.210 0 name "Panel_2_3" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.225 -0.140 0 name "Panel_3_0" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.225 0.000 0 name "Panel_3_1" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.225 0.140 0 name "Panel_3_2" controller "tracker_esfera_cpp" supervisor TRUE }
-sofia { translation 0.225 0.280 0 name "Panel_3_3" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.174 -0.210 0 name "Panel_0_0" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.174 -0.070 0 name "Panel_0_1" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.174 0.070 0 name "Panel_0_2" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.174 0.210 0 name "Panel_0_3" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.058 -0.140 0 name "Panel_1_0" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.058 0.000 0 name "Panel_1_1" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.058 0.140 0 name "Panel_1_2" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation -0.058 0.280 0 name "Panel_1_3" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.058 -0.210 0 name "Panel_2_0" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.058 -0.070 0 name "Panel_2_1" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.058 0.070 0 name "Panel_2_2" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.058 0.210 0 name "Panel_2_3" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.174 -0.140 0 name "Panel_3_0" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.174 0.000 0 name "Panel_3_1" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.174 0.140 0 name "Panel_3_2" controller "tracker_esfera_cpp" supervisor TRUE }
+sofia { translation 0.174 0.280 0 name "Panel_3_3" controller "tracker_esfera_cpp" supervisor TRUE }
 
 DEF ESFERA_TARGET Robot {
   translation 0 0 0.25

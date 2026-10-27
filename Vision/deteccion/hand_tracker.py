@@ -57,18 +57,22 @@ import cv2
 # Su promedio es el "centro de la mano".
 PALM_POINTS = (0, 5, 9, 13, 17)
 
-# Landmarks de Pose Landmarker de cada mano:
-# muñeca, meñique e índice.
-POSE_HAND_POINTS = {
-    "IZQUIERDA": (15, 17, 19),
-    "DERECHA": (16, 18, 20),
-}
+# IZQUIERDA / DERECHA SON LAS DE LA PERSONA.
+#
+# main.py y la GUI voltean la imagen (cv2.flip) para que se vea como
+# espejo. En la imagen volteada, MediaPipe ve la mano derecha de la
+# persona como si fuera una izquierda (comprobado con la cámara: sin
+# invertir, "DERECHA" seguía la mano izquierda). Por eso se invierten
+# las etiquetas de Hand Landmarker y los landmarks de Pose.
+SWAP_HANDEDNESS = True
 
-# MediaPipe Hands decide izquierda/derecha suponiendo
-# que la imagen está en espejo (como una selfie).
-# main.py y la GUI ya voltean la imagen (cv2.flip),
-# así que no hace falta invertir.
-SWAP_HANDEDNESS = False
+# Landmarks de Pose Landmarker de cada mano de la persona:
+# muñeca, meñique e índice. Pose también ve la imagen volteada:
+# sus puntos "izquierdos" (15, 17, 19) son la mano derecha.
+POSE_HAND_POINTS = {
+    "DERECHA": (15, 17, 19),
+    "IZQUIERDA": (16, 18, 20),
+}
 
 # Mano que se sigue en modo TRACKING: "DERECHA", "IZQUIERDA"
 # o None para seguir las dos. La otra mano se ignora aunque se vea
