@@ -1,9 +1,9 @@
 \relax 
 \citation{sofia_architecture}
 \citation{lugaresi2019mediapipe}
-\citation{esp32c3}
 \citation{webots}
 \citation{pyside6}
+\citation{bleak}
 \def\@LN@column{1}
 \@LN{0}{0}
 \@LN{1}{0}
@@ -22,6 +22,7 @@
 \@LN{14}{0}
 \@LN{15}{0}
 \@LN{16}{0}
+\@writefile{toc}{\contentsline {section}{\numberline {I}SOFIA in Brief}{1}{}\protected@file@percent }
 \@LN{17}{0}
 \@LN{18}{0}
 \@LN{19}{0}
@@ -35,13 +36,12 @@
 \@LN{27}{0}
 \@LN{28}{0}
 \@LN{29}{0}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Architecture}{1}{}\protected@file@percent }
 \@LN{30}{0}
 \@LN{31}{0}
 \@LN{32}{0}
 \@LN{33}{0}
 \@LN{34}{0}
-\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
-\newlabel{sec:intro}{{I}{1}{}{section.1}{}}
 \@LN{35}{0}
 \@LN{36}{0}
 \@LN{37}{0}
@@ -54,11 +54,13 @@
 \@LN{44}{0}
 \@LN{45}{0}
 \@LN{46}{0}
+\def\@LN@column{2}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Threads of the GUI. Each box below the GUI thread runs in its own thread and only communicates with it through Qt signals.}}{1}{}\protected@file@percent }
+\newlabel{fig:arq}{{1}{1}{}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces State machine of the processing thread.}}{1}{}\protected@file@percent }
+\newlabel{fig:worker}{{2}{1}{}{figure.2}{}}
 \@LN{47}{0}
 \@LN{48}{0}
-\def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Comparison of GUI Frameworks}}{1}{}\protected@file@percent }
-\newlabel{tab:framework}{{I}{1}{}{table.1}{}}
 \@LN{49}{0}
 \@LN{50}{0}
 \@LN{51}{0}
@@ -67,6 +69,7 @@
 \@LN{54}{0}
 \@LN{55}{0}
 \@LN{56}{0}
+\@writefile{toc}{\contentsline {section}{\numberline {III}The Processing Thread}{1}{}\protected@file@percent }
 \@LN{57}{0}
 \@LN{58}{0}
 \@LN{59}{0}
@@ -78,47 +81,49 @@
 \@LN{65}{0}
 \@LN{66}{0}
 \@LN{67}{0}
-\@LN{68}{0}
-\@LN{69}{0}
-\@LN{70}{0}
-\@LN{71}{0}
-\@LN{72}{0}
-\@LN{73}{0}
-\@LN{74}{0}
-\@LN{75}{0}
-\@LN{76}{0}
-\@writefile{toc}{\contentsline {section}{\numberline {II}GUI Architecture and Design}{1}{}\protected@file@percent }
-\newlabel{sec:gui}{{II}{1}{}{section.2}{}}
-\@LN{77}{0}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Framework Selection}{1}{}\protected@file@percent }
-\@LN{78}{0}
-\@LN{79}{0}
-\@LN{80}{0}
-\@LN{81}{0}
-\@LN{82}{0}
-\@LN{83}{0}
-\citation{bleak}
 \def\@LN@column{1}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Software architecture of the GUI. Each dashed region runs in its own thread.}}{2}{}\protected@file@percent }
-\newlabel{fig:architecture}{{1}{2}{}{figure.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Main Software Components}}{2}{}\protected@file@percent }
-\newlabel{tab:modules}{{II}{2}{}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Messages}}{2}{}\protected@file@percent }
+\newlabel{tab:msg}{{I}{2}{}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces State machine of the reliable sending of a command (stop-and-wait with retransmission).}}{2}{}\protected@file@percent }
+\newlabel{fig:ack}{{3}{2}{}{figure.3}{}}
+\@LN{68}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Talking to the Robot}{2}{}\protected@file@percent }
+\@LN{69}{1}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Messages}{2}{}\protected@file@percent }
+\@LN{70}{1}
+\@LN{71}{1}
+\@LN{72}{1}
+\@LN{73}{1}
+\@LN{74}{1}
+\@LN{75}{1}
+\@LN{76}{1}
+\@LN{77}{1}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Reliable Sending}{2}{}\protected@file@percent }
+\@LN{78}{1}
+\@LN{79}{1}
+\@LN{80}{1}
+\@LN{81}{1}
+\@LN{82}{1}
+\@LN{83}{1}
 \@LN{84}{1}
 \@LN{85}{1}
 \@LN{86}{1}
 \@LN{87}{1}
 \@LN{88}{1}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Link Supervision}{2}{}\protected@file@percent }
 \@LN{89}{1}
 \@LN{90}{1}
 \@LN{91}{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Software Architecture}{2}{}\protected@file@percent }
 \@LN{92}{1}
 \@LN{93}{1}
 \@LN{94}{1}
 \@LN{95}{1}
 \@LN{96}{1}
+\def\@LN@column{2}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces State machine of the link supervision.}}{2}{}\protected@file@percent }
+\newlabel{fig:link}{{4}{2}{}{figure.4}{}}
 \@LN{97}{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Threading Model}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Simulation and Digital Twin}{2}{}\protected@file@percent }
 \@LN{98}{1}
 \@LN{99}{1}
 \@LN{100}{1}
@@ -126,11 +131,6 @@
 \@LN{102}{1}
 \@LN{103}{1}
 \@LN{104}{1}
-\def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Threads of the Application}}{2}{}\protected@file@percent }
-\newlabel{tab:threads}{{III}{2}{}{table.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Design Decisions of the GUI}}{2}{}\protected@file@percent }
-\newlabel{tab:decisions}{{IV}{2}{}{table.4}{}}
 \@LN{105}{1}
 \@LN{106}{1}
 \@LN{107}{1}
@@ -139,7 +139,6 @@
 \@LN{110}{1}
 \@LN{111}{1}
 \@LN{112}{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Wireframe and Layout}{2}{}\protected@file@percent }
 \@LN{113}{1}
 \@LN{114}{1}
 \@LN{115}{1}
@@ -148,46 +147,38 @@
 \@LN{118}{1}
 \@LN{119}{1}
 \@LN{120}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Verification}{2}{}\protected@file@percent }
 \@LN{121}{1}
 \@LN{122}{1}
 \@LN{123}{1}
 \@LN{124}{1}
-\@writefile{toc}{\contentsline {section}{\numberline {III}Detection Visualization and Controls}{2}{}\protected@file@percent }
-\newlabel{sec:impl}{{III}{2}{}{section.3}{}}
 \@LN{125}{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Processing Thread}{2}{}\protected@file@percent }
 \@LN{126}{1}
 \@LN{127}{1}
 \@LN{128}{1}
 \@LN{129}{1}
 \@LN{130}{1}
 \@LN{131}{1}
-\citation{esp32c3}
-\citation{bt_core}
-\citation{nordic_nus}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Wireframe of the main window. The right column keeps every control visible without covering the video.}}{3}{}\protected@file@percent }
-\newlabel{fig:wireframe}{{2}{3}{}{figure.2}{}}
+\@LN{132}{1}
+\@LN{133}{1}
+\@LN{134}{1}
+\@LN{135}{1}
+\@LN{136}{1}
+\@LN{137}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusions}{2}{}\protected@file@percent }
+\@LN{138}{1}
+\@LN{139}{1}
+\@LN{140}{1}
+\@LN{141}{1}
+\@LN{142}{1}
+\bibstyle{IEEEtran}
+\bibdata{bibliography}
+\bibcite{sofia_architecture}{1}
+\bibcite{lugaresi2019mediapipe}{2}
+\bibcite{webots}{3}
+\bibcite{pyside6}{4}
+\bibcite{bleak}{5}
 \def\@LN@column{1}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Processing loop of the vision thread}}{3}{}\protected@file@percent }
-\newlabel{alg:worker}{{1}{3}{}{algorithm.1}{}}
-\@LN{132}{2}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Detection Controls}{3}{}\protected@file@percent }
-\@LN{133}{2}
-\@LN{134}{2}
-\@LN{135}{2}
-\@LN{136}{2}
-\@LN{137}{2}
-\@LN{138}{2}
-\@LN{139}{2}
-\@LN{140}{2}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Visualization of the Result}{3}{}\protected@file@percent }
-\@LN{141}{2}
-\@LN{142}{2}
-\def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Effect of Each Control on the Processing Thread}}{3}{}\protected@file@percent }
-\newlabel{tab:controls}{{V}{3}{}{table.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces States of the processing thread and the controls that produce each transition.}}{3}{}\protected@file@percent }
-\newlabel{fig:states}{{3}{3}{}{figure.3}{}}
 \@LN{143}{2}
 \@LN{144}{2}
 \@LN{145}{2}
@@ -195,344 +186,22 @@
 \@LN{147}{2}
 \@LN{148}{2}
 \@LN{149}{2}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Communication Standard}{3}{}\protected@file@percent }
-\newlabel{sec:protocol}{{IV}{3}{}{section.4}{}}
 \@LN{150}{2}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Link Layer}{3}{}\protected@file@percent }
 \@LN{151}{2}
 \@LN{152}{2}
-\def\@LN@column{1}
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces BLE Link Parameters}}{4}{}\protected@file@percent }
-\newlabel{tab:ble}{{VI}{4}{}{table.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Frame structure of the communication standard.}}{4}{}\protected@file@percent }
-\newlabel{fig:frame}{{4}{4}{}{figure.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Frame Fields}}{4}{}\protected@file@percent }
-\newlabel{tab:fields}{{VII}{4}{}{table.7}{}}
-\@LN{153}{3}
-\@LN{154}{3}
-\@LN{155}{3}
-\@LN{156}{3}
-\@LN{157}{3}
-\@LN{158}{3}
-\@LN{159}{3}
-\@LN{160}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Frame Structure}{4}{}\protected@file@percent }
-\@LN{161}{3}
-\@LN{162}{3}
-\@LN{163}{3}
-\@LN{164}{3}
-\@LN{165}{3}
-\@LN{166}{3}
-\@LN{167}{3}
-\@LN{168}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Commands and Payloads}{4}{}\protected@file@percent }
-\@LN{169}{3}
-\@LN{170}{3}
-\@LN{171}{3}
-\@LN{172}{3}
-\@LN{173}{3}
-\@LN{174}{3}
-\@LN{175}{3}
-\@LN{176}{3}
-\@LN{177}{3}
-\@LN{178}{3}
-\@LN{179}{3}
-\@LN{180}{3}
-\@LN{181}{3}
+\@writefile{toc}{\contentsline {section}{References}{3}{}\protected@file@percent }
+\@LN{153}{2}
+\@LN{154}{2}
+\@LN{155}{2}
+\@LN{156}{2}
+\@LN{157}{2}
+\@LN{158}{2}
+\@LN{159}{2}
+\@LN{160}{2}
+\@LN{161}{2}
+\@LN{162}{2}
+\@LN{163}{2}
+\@LN{164}{2}
+\@LN{165}{2}
 \def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Message Types}}{4}{}\protected@file@percent }
-\newlabel{tab:types}{{VIII}{4}{}{table.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces TRACK Payload}}{4}{}\protected@file@percent }
-\newlabel{tab:track}{{IX}{4}{}{table.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Error Codes}}{4}{}\protected@file@percent }
-\newlabel{tab:errors}{{X}{4}{}{table.10}{}}
-\@LN{182}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Acknowledgements and Error Codes}{4}{}\protected@file@percent }
-\@LN{183}{3}
-\@LN{184}{3}
-\@LN{185}{3}
-\@LN{186}{3}
-\@LN{187}{3}
-\@LN{188}{3}
-\@LN{189}{3}
-\@LN{190}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Communication Rules}{4}{}\protected@file@percent }
-\@LN{191}{3}
-\@LN{192}{3}
-\@LN{193}{3}
-\@LN{194}{3}
-\@LN{195}{3}
-\@LN{196}{3}
-\@LN{197}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Example Frames}{4}{}\protected@file@percent }
-\@LN{198}{3}
-\@LN{199}{3}
-\@LN{200}{3}
-\@LN{201}{3}
-\@writefile{toc}{\contentsline {section}{\numberline {V}ESP32 Master Firmware}{4}{}\protected@file@percent }
-\newlabel{sec:esp32}{{V}{4}{}{section.5}{}}
-\@LN{202}{3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Reception and Validation}{4}{}\protected@file@percent }
-\@LN{203}{3}
-\@LN{204}{3}
-\citation{pca9685,adafruit_pwm}
-\citation{webots}
-\def\@LN@column{1}
-\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Communication Rules}}{5}{}\protected@file@percent }
-\newlabel{tab:rules}{{XI}{5}{}{table.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Retransmission after a lost acknowledgement (rules R2--R4).}}{5}{}\protected@file@percent }
-\newlabel{fig:sequence}{{5}{5}{}{figure.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XII}{\ignorespaces Example Frames (Hexadecimal)}}{5}{}\protected@file@percent }
-\newlabel{tab:examples}{{XII}{5}{}{table.12}{}}
-\@LN{205}{4}
-\@LN{206}{4}
-\@LN{207}{4}
-\@LN{208}{4}
-\@LN{209}{4}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Motion Patterns}{5}{}\protected@file@percent }
-\@LN{210}{4}
-\@LN{211}{4}
-\@LN{212}{4}
-\@LN{213}{4}
-\@LN{214}{4}
-\@LN{215}{4}
-\@LN{216}{4}
-\@LN{217}{4}
-\@LN{218}{4}
-\@LN{219}{4}
-\@LN{220}{4}
-\def\@LN@column{2}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Frame processing in the ESP32}}{5}{}\protected@file@percent }
-\newlabel{alg:frame}{{2}{5}{}{algorithm.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XIII}{\ignorespaces Motion Associated with Each Command}}{5}{}\protected@file@percent }
-\newlabel{tab:patterns}{{XIII}{5}{}{table.13}{}}
-\@LN{221}{4}
-\@LN{222}{4}
-\@LN{223}{4}
-\@LN{224}{4}
-\@LN{225}{4}
-\@LN{226}{4}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Webots Simulation and Digital Twin}{5}{}\protected@file@percent }
-\newlabel{sec:webots}{{VI}{5}{}{section.6}{}}
-\@LN{227}{4}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Purpose and Architecture}{5}{}\protected@file@percent }
-\@LN{228}{4}
-\@LN{229}{4}
-\@LN{230}{4}
-\@LN{231}{4}
-\@LN{232}{4}
-\@LN{233}{4}
-\@LN{234}{4}
-\@LN{235}{4}
-\@LN{236}{4}
-\@LN{237}{4}
-\def\@LN@column{1}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Integration of the Webots simulation with the GUI. The command link and the camera stream use independent threads and sockets; when both the ESP32 and Webots are connected, every command is sent to both (digital twin).}}{6}{}\protected@file@percent }
-\newlabel{fig:webots}{{6}{6}{}{figure.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XIV}{\ignorespaces Parameters of the Optional Channel Emulator}}{6}{}\protected@file@percent }
-\newlabel{tab:channel}{{XIV}{6}{}{table.14}{}}
-\@LN{238}{5}
-\@LN{239}{5}
-\@LN{240}{5}
-\@LN{241}{5}
-\@LN{242}{5}
-\@LN{243}{5}
-\@LN{244}{5}
-\@LN{245}{5}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Transport over TCP}{6}{}\protected@file@percent }
-\@LN{246}{5}
-\@LN{247}{5}
-\@LN{248}{5}
-\@LN{249}{5}
-\@LN{250}{5}
-\@LN{251}{5}
-\@LN{252}{5}
-\@LN{253}{5}
-\@LN{254}{5}
-\@LN{255}{5}
-\@LN{256}{5}
-\@LN{257}{5}
-\@LN{258}{5}
-\@LN{259}{5}
-\@LN{260}{5}
-\@LN{261}{5}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Simulated Master Controller}{6}{}\protected@file@percent }
-\@LN{262}{5}
-\@LN{263}{5}
-\@LN{264}{5}
-\@LN{265}{5}
-\@LN{266}{5}
-\def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {XV}{\ignorespaces Response of the Simulation to Each Command}}{6}{}\protected@file@percent }
-\newlabel{tab:simcommands}{{XV}{6}{}{table.15}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {XVI}{\ignorespaces Motion Patterns of the 16-Unit Simulation}}{6}{}\protected@file@percent }
-\newlabel{tab:simpatterns}{{XVI}{6}{}{table.16}{}}
-\@LN{267}{5}
-\@LN{268}{5}
-\@LN{269}{5}
-\@LN{270}{5}
-\@LN{271}{5}
-\@LN{272}{5}
-\@LN{273}{5}
-\@LN{274}{5}
-\@LN{275}{5}
-\@LN{276}{5}
-\@LN{277}{5}
-\@LN{278}{5}
-\@LN{279}{5}
-\@LN{280}{5}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Unit Controllers}{6}{}\protected@file@percent }
-\@LN{281}{5}
-\@LN{282}{5}
-\@LN{283}{5}
-\@LN{284}{5}
-\@LN{285}{5}
-\newlabel{eq:ik}{{1}{6}{}{equation.1}{}}
-\@LN{286}{5}
-\@LN{287}{5}
-\@LN{288}{5}
-\@LN{289}{5}
-\@LN{290}{5}
-\@LN{291}{5}
-\@LN{292}{5}
-\@LN{293}{5}
-\@LN{294}{5}
-\@LN{295}{5}
-\@LN{296}{5}
-\@LN{297}{5}
-\@LN{298}{5}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Virtual Camera}{6}{}\protected@file@percent }
-\@LN{299}{5}
-\@LN{300}{5}
-\bibstyle{IEEEtran}
-\bibdata{bibliography}
-\bibcite{sofia_architecture}{1}
-\bibcite{lugaresi2019mediapipe}{2}
-\def\@LN@column{1}
-\@writefile{lot}{\contentsline {table}{\numberline {XVII}{\ignorespaces Operating Configurations}}{7}{}\protected@file@percent }
-\newlabel{tab:configs}{{XVII}{7}{}{table.17}{}}
-\@LN{301}{6}
-\@LN{302}{6}
-\@LN{303}{6}
-\@LN{304}{6}
-\@LN{305}{6}
-\@LN{306}{6}
-\@LN{307}{6}
-\@LN{308}{6}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Operating Configurations and Digital Twin}{7}{}\protected@file@percent }
-\@LN{309}{6}
-\@LN{310}{6}
-\@LN{311}{6}
-\@LN{312}{6}
-\@LN{313}{6}
-\@LN{314}{6}
-\@LN{315}{6}
-\@LN{316}{6}
-\@LN{317}{6}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Verification}{7}{}\protected@file@percent }
-\newlabel{sec:verification}{{VII}{7}{}{section.7}{}}
-\@LN{318}{6}
-\@LN{319}{6}
-\@LN{320}{6}
-\@LN{321}{6}
-\@LN{322}{6}
-\@LN{323}{6}
-\@LN{324}{6}
-\@LN{325}{6}
-\@LN{326}{6}
-\@LN{327}{6}
-\@LN{328}{6}
-\@LN{329}{6}
-\@LN{330}{6}
-\@LN{331}{6}
-\@LN{332}{6}
-\@LN{333}{6}
-\@LN{334}{6}
-\@LN{335}{6}
-\@LN{336}{6}
-\@LN{337}{6}
-\@LN{338}{6}
-\@LN{339}{6}
-\@LN{340}{6}
-\@LN{341}{6}
-\@LN{342}{6}
-\@LN{343}{6}
-\@LN{344}{6}
-\@LN{345}{6}
-\@LN{346}{6}
-\@LN{347}{6}
-\def\@LN@column{2}
-\@writefile{lot}{\contentsline {table}{\numberline {XVIII}{\ignorespaces Verification Results}}{7}{}\protected@file@percent }
-\newlabel{tab:verification}{{XVIII}{7}{}{table.18}{}}
-\@LN{348}{6}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusions}{7}{}\protected@file@percent }
-\newlabel{sec:conclusions}{{VIII}{7}{}{section.8}{}}
-\@LN{349}{6}
-\@LN{350}{6}
-\@LN{351}{6}
-\@LN{352}{6}
-\@LN{353}{6}
-\@LN{354}{6}
-\@LN{355}{6}
-\@LN{356}{6}
-\@LN{357}{6}
-\@LN{358}{6}
-\@LN{359}{6}
-\@LN{360}{6}
-\@LN{361}{6}
-\@LN{362}{6}
-\@LN{363}{6}
-\@LN{364}{6}
-\@LN{365}{6}
-\@LN{366}{6}
-\@LN{367}{6}
-\@LN{368}{6}
-\@LN{369}{6}
-\@LN{370}{6}
-\@LN{371}{6}
-\@LN{372}{6}
-\@LN{373}{6}
-\@LN{374}{6}
-\@LN{375}{6}
-\@LN{376}{6}
-\@LN{377}{6}
-\@LN{378}{6}
-\@writefile{toc}{\contentsline {section}{References}{7}{}\protected@file@percent }
-\@LN{379}{6}
-\@LN{380}{6}
-\bibcite{esp32c3}{3}
-\bibcite{webots}{4}
-\bibcite{pyside6}{5}
-\bibcite{bleak}{6}
-\bibcite{bt_core}{7}
-\bibcite{nordic_nus}{8}
-\bibcite{pca9685}{9}
-\bibcite{adafruit_pwm}{10}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Trajectories of the unit generated by the simulated ESP32 firmware for each command. The black dot marks the center and the red arrow the initial direction.}}{8}{}\protected@file@percent }
-\newlabel{fig:trajectories}{{7}{8}{}{figure.7}{}}
-\def\@LN@column{1}
-\@LN{381}{7}
-\@LN{382}{7}
-\@LN{383}{7}
-\@LN{384}{7}
-\@LN{385}{7}
-\@LN{386}{7}
-\@LN{387}{7}
-\@LN{388}{7}
-\@LN{389}{7}
-\@LN{390}{7}
-\@LN{391}{7}
-\@LN{392}{7}
-\@LN{393}{7}
-\@LN{394}{7}
-\@LN{395}{7}
-\@LN{396}{7}
-\@LN{397}{7}
-\@LN{398}{7}
-\@LN{399}{7}
-\@LN{400}{7}
-\@LN{401}{7}
-\@LN{402}{7}
-\@LN{403}{7}
-\def\@LN@column{2}
-\gdef \@abspage@last{8}
+\gdef \@abspage@last{3}

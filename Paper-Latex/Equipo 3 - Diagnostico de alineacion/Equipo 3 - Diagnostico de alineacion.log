@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.16)  26 OCT 2026 01:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.10.16)  28 OCT 2026 17:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -487,7 +487,33 @@ File: pgflibraryarrows.meta.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 \pgfarrowlinewidth=\dimen318
 ) (O:\MikTex\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarycalc.code.tex
 File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (O:\MikTex\tex/latex/l3backend\l3backend-pdftex.def
+) (O:\MikTex\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryautomata.code.tex
+File: tikzlibraryautomata.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+ (O:\MikTex\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+ (O:\MikTex\tex/generic/pgf/libraries/shapes\pgflibraryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfnodepartlowerbox=\box71
+\pgfnodeparttwobox=\box72
+\pgfnodepartthreebox=\box73
+\pgfnodepartfourbox=\box74
+\pgfnodeparttwentybox=\box75
+\pgfnodepartnineteenbox=\box76
+\pgfnodeparteighteenbox=\box77
+\pgfnodepartseventeenbox=\box78
+\pgfnodepartsixteenbox=\box79
+\pgfnodepartfifteenbox=\box80
+\pgfnodepartfourteenbox=\box81
+\pgfnodepartthirteenbox=\box82
+\pgfnodeparttwelvebox=\box83
+\pgfnodepartelevenbox=\box84
+\pgfnodeparttenbox=\box85
+\pgfnodepartninebox=\box86
+\pgfnodeparteightbox=\box87
+\pgfnodepartsevenbox=\box88
+\pgfnodepartsixbox=\box89
+\pgfnodepartfivebox=\box90
+))) (O:\MikTex\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count339
 )
@@ -498,27 +524,27 @@ LaTeX Warning: Unused global option(s):
 (Equipo 3 - Diagnostico de alineacion.aux)
 \openout1 = `"Equipo 3 - Diagnostico de alineacion.aux"'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
 
 -- Lines per column: 58 (exact).
 (O:\MikTex\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count340
 \scratchdimen=\dimen319
-\scratchbox=\box71
+\scratchbox=\box91
 \nofMPsegments=\count341
 \nofMParguments=\count342
 \everyMPshowfont=\toks39
@@ -533,47 +559,44 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (O:\MikTex\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-LaTeX Font Info:    Trying to load font information for U+msa on input line 37.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 46.
  (O:\MikTex\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 46.
  (O:\MikTex\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for OT1+phv on input line 38.
+LaTeX Font Info:    Trying to load font information for OT1+phv on input line 47.
  (O:\MikTex\tex/latex/psnfss\ot1phv.fd
 File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
 )
-Underfull \hbox (badness 1622) in paragraph at lines 86--88
-\OT1/ptm/m/n/10 which is in-verted as $\OML/cmm/m/it/10 ^^R[] \OT1/cmr/m/n/10 = [](^^A\OML/cmm/m/it/10 v=L\OT1/cmr/m/n/10 )$ \OT1/ptm/m/n/10 and $\OML/cmm/m/it/10 ^^R[] \OT1/cmr/m/n/10 =
- []
-
-[1{C:/Users/Jp/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{O:/MikTex/fonts/enc/dvips/base/8r.enc}
-
-
-]
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 138.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 88.
  (O:\MikTex\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [2] (Equipo 3 - Diagnostico de alineacion.bbl) [3] (Equipo 3 - Diagnostico de alineacion.aux)
+) [1{C:/Users/Jp/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{O:/MikTex/fonts/enc/dvips/base/8r.enc}
+
+
+] [2] (Equipo 3 - Diagnostico de alineacion.bbl) [3
+
+] (Equipo 3 - Diagnostico de alineacion.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 16044 strings out of 467871
- 314466 string characters out of 5435219
- 737744 words of memory out of 5000000
- 44618 multiletter control sequences out of 15000+600000
- 667616 words of font info for 116 fonts, out of 8000000 for 9000
+ 16753 strings out of 467871
+ 337662 string characters out of 5435219
+ 768720 words of memory out of 5000000
+ 45315 multiletter control sequences out of 15000+600000
+ 669859 words of font info for 118 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 88i,12n,94p,1642b,773s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<O:/MikTex/fonts/type1/public/amsfonts/cm/cmex10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi8.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi9.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr9.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy6.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy7.pfb><O:/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><O:/MikTex/fonts/type1/urw/helvetic/uhvr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmb8a.pfb><O:/MikTex/fonts/type1/urw/times/utmbi8a.pfb><O:/MikTex/fonts/type1/urw/times/utmr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - Diagnostico de alineacion.pdf" (3 pages, 233276 bytes).
+ 88i,11n,94p,1076b,977s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmmi9.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr7.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmr9.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy5.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy6.pfb><O:/MikTex/fonts/type1/public/amsfonts/cm/cmsy7.pfb><O:/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><O:/MikTex/fonts/type1/urw/helvetic/uhvr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmb8a.pfb><O:/MikTex/fonts/type1/urw/times/utmbi8a.pfb><O:/MikTex/fonts/type1/urw/times/utmr8a.pfb><O:/MikTex/fonts/type1/urw/times/utmri8a.pfb>
+Output written on "Equipo 3 - Diagnostico de alineacion.pdf" (3 pages, 213129 bytes).
 PDF statistics:
- 116 PDF objects out of 1000 (max. 8388607)
+ 106 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

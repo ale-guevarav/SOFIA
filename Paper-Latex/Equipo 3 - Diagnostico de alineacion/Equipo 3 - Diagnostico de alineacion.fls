@@ -206,6 +206,12 @@ INPUT O:\MikTex\tex\generic\pgf\libraries\pgflibraryarrows.meta.code.tex
 INPUT O:\MikTex\tex\generic\pgf\libraries\pgflibraryarrows.meta.code.tex
 INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarycalc.code.tex
 INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarycalc.code.tex
+INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibraryautomata.code.tex
+INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibraryautomata.code.tex
+INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibraryshapes.multipart.code.tex
+INPUT O:\MikTex\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibraryshapes.multipart.code.tex
+INPUT O:\MikTex\tex\generic\pgf\libraries\shapes\pgflibraryshapes.multipart.code.tex
+INPUT O:\MikTex\tex\generic\pgf\libraries\shapes\pgflibraryshapes.multipart.code.tex
 INPUT O:\MikTex\tex\latex\l3backend\l3backend-pdftex.def
 INPUT O:\MikTex\tex\latex\l3backend\l3backend-pdftex.def
 INPUT .\Equipo 3 - Diagnostico de alineacion.aux
@@ -251,12 +257,11 @@ INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam10.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam7.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
 INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msbm7.tfm
-INPUT O:\MikTex\fonts\tfm\public\cm\cmr8.tfm
-INPUT O:\MikTex\fonts\tfm\public\cm\cmmi8.tfm
-INPUT O:\MikTex\fonts\tfm\public\cm\cmsy8.tfm
-INPUT O:\MikTex\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
-INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam10.tfm
-INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
+INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
+INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
+INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
+INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr7t.tfm
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmrc7t.tfm
 OUTPUT Equipo 3 - Diagnostico de alineacion.pdf
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
@@ -278,36 +283,37 @@ INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
-INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
-INPUT O:\MikTex\fonts\tfm\adobe\times\ptmrc7t.tfm
-INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
-INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
-INPUT O:\MikTex\tex\latex\psnfss\ot1pcr.fd
-INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr7t.tfm
-INPUT O:\MikTex\fonts\vf\adobe\times\ptmrc7t.vf
-INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
-INPUT O:\MikTex\fonts\vf\adobe\times\ptmb7t.vf
-INPUT O:\MikTex\fonts\tfm\adobe\times\ptmb8r.tfm
-INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
-INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
 INPUT O:\MikTex\fonts\vf\adobe\courier\pcrr7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\courier\pcrr8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmr7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmrc7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmr8r.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmr8.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmmi8.tfm
+INPUT O:\MikTex\fonts\tfm\public\cm\cmsy8.tfm
+INPUT O:\MikTex\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
+INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msam10.tfm
+INPUT O:\MikTex\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmb7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmb8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
+INPUT O:\MikTex\fonts\vf\adobe\times\ptmb7t.vf
+INPUT O:\MikTex\fonts\tfm\adobe\times\ptmb8r.tfm
 INPUT .\Equipo 3 - Diagnostico de alineacion.bbl
 INPUT .\Equipo 3 - Diagnostico de alineacion.bbl
 INPUT Equipo 3 - Diagnostico de alineacion.bbl
 INPUT O:\MikTex\fonts\vf\adobe\times\ptmri7t.vf
 INPUT O:\MikTex\fonts\tfm\adobe\times\ptmri8r.tfm
 INPUT Equipo 3 - Diagnostico de alineacion.aux
-INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmex10.pfb
-INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmex10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi10.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi5.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi5.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi7.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi7.pfb
-INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi8.pfb
-INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi8.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi9.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmmi9.pfb
 INPUT O:\MikTex\fonts\type1\public\amsfonts\cm\cmr10.pfb
