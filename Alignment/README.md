@@ -136,6 +136,29 @@ python Alignment/build/comparar_resultados.py            tabla de la última ses
 python Alignment/build/publicar_modelo.py                copia la última CNN a results/modelo/cnn.pt
 ```
 
+### Entrenar por partes
+
+`entrenar.py` guarda el estado completo al terminar cada época (`ultimo.pt`), así que no hace falta dejar la PC entrenando todo el día:
+
+```
+python Alignment/build/entrenar.py --modelo cnn --minutos 60     para después de ~1 hora
+python Alignment/build/entrenar.py --reanudar --minutos 60       otro día: sigue donde se quedó
+python Alignment/build/entrenar.py --reanudar                    hasta terminar (y evalúa en test)
+```
+
+También se puede parar con **Ctrl+C** en cualquier momento (se pierde solo la época que iba a la mitad). Al reanudar sigue con la misma época, el mismo learning rate y el mismo mejor modelo, como si no se hubiera parado.
+
+### Afinar un modelo (más épocas o fotos reales)
+
+```
+python Alignment/build/entrenar.py --desde Alignment/results/modelo/cnn.pt                       10 épocas más
+python Alignment/build/entrenar.py --desde Alignment/results/modelo/cnn.pt <sesión> --epocas 15  con otra sesión
+```
+
+Empieza con los pesos del modelo y un learning rate 10 veces menor (para ajustar sin "desaprender") y sale en `build/entrenados/<modelo>_<sesión>_afinado/`.
+
+**Fotos del módulo real:** se arma una sesión con la misma estructura que las de Webots (`imagenes/00000.jpg …` con la foto 0 en 0,0, y `etiquetas.csv` con θ1 y θ2 de cada panel en cada foto, por ejemplo mandando ángulos conocidos con el ESP32), se prepara con `preparar_dataset.py` y se afina la CNN de Webots con `--desde`. Con pocas fotos reales basta, porque la red ya aprendió en la simulación.
+
 Todos usan la **última sesión** si no se les pasa otra. Publica (y sube con `git add Alignment/results/modelo`) solo cuando el modelo mejore: cada versión subida se queda en el historial de git.
 
 PyTorch con CUDA:
