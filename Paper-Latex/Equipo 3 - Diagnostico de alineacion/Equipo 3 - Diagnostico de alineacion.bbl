@@ -25,21 +25,23 @@
 J.~A. Lizárraga, ``Presentación del labdst: Sesión 1 - contexto,
   metodología d-lab y sofia,'' 2026, iTESO, 17 de agosto de 2026.
 
-\bibitem{webots}
-O.~Michel, ``Cyberbotics ltd. {Webots}: Professional mobile robot simulation,''
-  \emph{International Journal of Advanced Robotic Systems}, vol.~1, no.~1, pp.
-  39--42, 2004.
-
 \bibitem{aruco}
 S.~Garrido-Jurado, R.~Mu{\~n}oz-Salinas, F.~J. Madrid-Cuevas, and M.~J.
   Mar{\'i}n-Jim{\'e}nez, ``Automatic generation and detection of highly
   reliable fiducial markers under occlusion,'' \emph{Pattern Recognition},
   vol.~47, no.~6, pp. 2280--2292, 2014.
 
-\bibitem{otsu}
-N.~Otsu, ``A threshold selection method from gray-level histograms,''
-  \emph{IEEE Transactions on Systems, Man, and Cybernetics}, vol.~9, no.~1, pp.
-  62--66, 1979.
+\bibitem{webots}
+O.~Michel, ``Cyberbotics ltd. {Webots}: Professional mobile robot simulation,''
+  \emph{International Journal of Advanced Robotic Systems}, vol.~1, no.~1, pp.
+  39--42, 2004.
+
+\bibitem{urdf2webots}
+\BIBentryALTinterwordspacing
+{Cyberbotics Ltd.}, ``urdf2webots: Convert {URDF} robot descriptions to
+  {Webots} {PROTO} nodes,'' 2025. [Online]. Available:
+  \url{https://github.com/cyberbotics/urdf2webots}
+\BIBentrySTDinterwordspacing
 
 \bibitem{pytorch}
 A.~Paszke \emph{et~al.}, ``{PyTorch}: An imperative style, high-performance
@@ -50,15 +52,5 @@ A.~Paszke \emph{et~al.}, ``{PyTorch}: An imperative style, high-performance
 K.~He, X.~Zhang, S.~Ren, and J.~Sun, ``Deep residual learning for image
   recognition,'' in \emph{Proc. IEEE Conference on Computer Vision and Pattern
   Recognition (CVPR)}, 2016, pp. 770--778.
-
-\bibitem{adamw}
-I.~Loshchilov and F.~Hutter, ``Decoupled weight decay regularization,'' in
-  \emph{International Conference on Learning Representations (ICLR)}, 2019.
-
-\bibitem{onecycle}
-L.~N. Smith and N.~Topin, ``Super-convergence: Very fast training of neural
-  networks using large learning rates,'' in \emph{Proc. SPIE 11006, Artificial
-  Intelligence and Machine Learning for Multi-Domain Operations Applications},
-  2019.
 
 \end{thebibliography}
