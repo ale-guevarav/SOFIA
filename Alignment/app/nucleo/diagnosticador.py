@@ -20,11 +20,15 @@ REGLA, para cada hexágono:
 
 La CNN decide la zona (paso 3) porque nunca se equivoca por mucho.
 
+Con las unidades del PROTO la CNN es más precisa que el geométrico también
+en ángulos chicos, así que el híbrido ya no mejora a la CNN sola (ver
+results/COMPARACION.md): la app usa la CNN por defecto.
+
 DIAGNOSTICADOR
 --------------
 Diagnosticador(metodo) es lo que usan la app y las evaluaciones:
 
-    diag = Diagnosticador("hibrido")          # o "geometrico" / "cnn"
+    diag = Diagnosticador("cnn")              # o "geometrico" / "hibrido"
     diag.fijar_referencia(foto_en_cero)       # opcional, mejora el geométrico
     d = diag.analizar(foto_bgr)
     d.theta1, d.theta2, d.estado, d.fuente, d.desacuerdo, d.tiempos_ms
@@ -116,7 +120,7 @@ class Diagnostico:
 
 class Diagnosticador:
 
-    def __init__(self, metodo="hibrido", ruta_modelo=None):
+    def __init__(self, metodo="cnn", ruta_modelo=None):
         if metodo not in METODOS:
             raise ValueError(f"Método desconocido: {metodo}")
 

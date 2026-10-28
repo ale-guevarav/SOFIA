@@ -37,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser(description="Evalúa el método híbrido")
     parser.add_argument("sesion", nargs="?", help="carpeta de la sesión (por defecto, la última)")
     parser.add_argument("--conjunto", default="test", choices=["train", "val", "test", "todos"])
-    parser.add_argument("--modelo", help="modelo.pt de la CNN (por defecto, el publicado o el último)")
+    parser.add_argument("--modelo", help="modelo.pt de la CNN (por defecto, la entrenada con esta sesión)")
     args = parser.parse_args()
 
     sesion = os.path.abspath(args.sesion) if args.sesion else rutas.ultima_sesion()
@@ -45,10 +45,21 @@ def main():
     if not os.path.isfile(ruta_csv):
         sys.exit(f"Falta {ruta_csv}: corre primero preparar_dataset.py")
 
-    diag = mh.Diagnosticador("hibrido", args.modelo)
+    # La CNN entrenada con ESTA sesión; si no hay, la publicada (o la última)
+    modelo = args.modelo
+    if modelo is None:
+        propio = os.path.join(rutas.ENTRENADOS, f"cnn_{os.path.basename(sesion)}", "modelo.pt")
+        modelo = propio if os.path.isfile(propio) else None
+
+    diag = mh.Diagnosticador("hibrido", modelo)
     if diag.metodo != "hibrido":
         sys.exit(f"No se puede evaluar el híbrido: {diag.aviso}")
     print(f"Modelo: {diag.ruta_modelo} ({diag.dispositivo})")
+
+    sesion_modelo = os.path.basename(os.path.normpath(str(diag.cnn.meta.get("sesion", ""))))
+    if sesion_modelo != os.path.basename(sesion):
+        print(f"⚠ Esa CNN se entrenó con {sesion_modelo}, no con {os.path.basename(sesion)}: "
+              "si cambió el módulo o la geometría, el resultado no es comparable")
 
     ok, motivo = diag.fijar_referencia(cv2.imread(os.path.join(sesion, "imagenes", "00000.jpg")))
     if not ok:

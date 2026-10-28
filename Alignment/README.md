@@ -12,7 +12,7 @@ Porcentaje = eje más desviado / 30° × 100 (30° es el tope mecánico).
 
 ```
 Foto ──► 4 marcadores ArUco del marco ──► foto enderezada (vista desde arriba)
-     ──► 16 recortes, uno por hexágono ──► geométrico + CNN (híbrido) ──► (θ1, θ2) y estado
+     ──► 16 recortes, uno por hexágono ──► CNN (o geométrico) ──► (θ1, θ2) y estado
 ```
 
 Comparación de los métodos y resultados: [`results/COMPARACION.md`](results/COMPARACION.md).
@@ -30,7 +30,7 @@ Alignment/
 │       ├── preprocesamiento.py     ArUco -> foto enderezada -> 16 recortes
 │       ├── metodo_geometrico.py    método sin entrenamiento
 │       ├── modelos.py, inferencia.py   CNN / ResNet18 y cómo usarlas
-│       ├── diagnosticador.py       híbrido + lo que llama la app
+│       ├── diagnosticador.py       lo que llama la app (CNN, geométrico o híbrido)
 │       └── rutas.py                dónde está cada carpeta
 │
 ├── build/      DONDE SE ENTRENA (o reentrena)
@@ -48,7 +48,7 @@ Alignment/
 ├── results/    LO QUE SALE DEL BUILD Y USA LA APP
 │   ├── modelo/cnn.pt           modelo publicado (sí se sube, ~5 MB)
 │   ├── evaluaciones/           métricas, gráficas y comparacion.md de cada método
-│   ├── COMPARACION.md          geométrico vs PyTorch vs híbrido
+│   ├── COMPARACION.md          geométrico vs CNN vs híbrido
 │   ├── marcadores_imprimir.png hoja para el marco del módulo real
 │   └── diagnosticos/           reportes guardados desde la app (no se suben)
 │
@@ -73,7 +73,7 @@ Todo se corre **desde la carpeta `SOFIA`** con el entorno activado.
 python Alignment/app/app_diagnostico.py
 ```
 
-Usa `results/modelo/cnn.pt` con el método **híbrido**. Sin PyTorch o sin modelo, avisa y usa el geométrico.
+Usa `results/modelo/cnn.pt` con la **CNN** (la más precisa: 0.20° de error en test). Sin PyTorch o sin modelo, avisa y usa el geométrico.
 
 | Fuente | Cómo |
 | --- | --- |

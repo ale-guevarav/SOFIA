@@ -8,7 +8,7 @@ Ventana para PROBAR el diagnóstico:
       "?" = el geométrico y la CNN no coinciden; blanco = valor real).
     - Mapa 4x4 con theta1 / theta2 y el estado de cada hexágono,
       en la misma posición que en la foto.
-    - Método: híbrido, CNN o geométrico.
+    - Método: CNN (por defecto, la más precisa), híbrido o geométrico.
     - Webots en vivo: mover los paneles desde aquí y ver el diagnóstico
       contra los ángulos medidos en la simulación.
     - Guardar el reporte (imagen + CSV) en results/diagnosticos/.
@@ -40,7 +40,7 @@ import geometria as g  # noqa: E402
 import rutas  # noqa: E402
 from diagnostico_worker import CAMARA, FOTOS, SIN_FUENTE, WEBOTS, DiagnosticoWorker  # noqa: E402
 
-METODOS = [("hibrido", "Híbrido (geométrico + CNN)"), ("cnn", "CNN pequeña"), ("geometrico", "Geométrico")]
+METODOS = [("cnn", "CNN pequeña"), ("hibrido", "Híbrido (geométrico + CNN)"), ("geometrico", "Geométrico")]
 
 COLOR_ESTADO = {
     "OK": QColor(200, 240, 200),
