@@ -89,8 +89,7 @@ class WebotsLink(BleLink):
         self._client = writer
         self._reader_task = self._loop.create_task(self._read_packets(reader))
 
-        self._set_state("conectado")
-        self.log.emit("Conectado a Webots")
+        self._on_connected(f"Webots ({self.host}:{self.port})")
 
 
     async def _disconnect(self):
@@ -112,6 +111,14 @@ class WebotsLink(BleLink):
         if self._state != "desconectado":
             self._set_state("desconectado")
             self.log.emit("Desconectado de Webots")
+
+
+    async def _close_transport(self, writer):
+        # Enlace muerto (sin respuestas): cerrar el socket y su lector
+        if self._reader_task is not None:
+            self._reader_task.cancel()
+            self._reader_task = None
+        writer.close()
 
 
     async def _read_packets(self, reader):

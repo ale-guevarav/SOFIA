@@ -20,6 +20,16 @@ que main.py, pero el estado de la prueba (cuenta regresiva, YA,
 acierto/fallo) se manda a la GUI en lugar de dibujarse en el video.
 Al detener se guarda el JSON y se genera el reporte.
 
+Fallas de la cámara (no tiran la app):
+    - Si la cámara no abre al iniciar, se reintenta cada 2 s
+      hasta que abra o el usuario presione DETENER.
+    - Si deja de mandar imágenes (5 lecturas fallidas seguidas),
+      se libera y se vuelve a abrir con la misma espera.
+    - Si MediaPipe falla en un frame, se avisa y se sigue con el
+      siguiente; solo se detiene si falla 30 frames seguidos.
+    Cada evento sale por la señal camera_event para la GUI y el
+    registro de la sesión.
+
 Estados del hilo:
 
     iniciar()  ->  CARGANDO  ->  CORRIENDO  <->  PAUSADO
@@ -34,9 +44,15 @@ import cv2
 from PySide6.QtCore import QMutex, QThread, QWaitCondition, Signal
 from PySide6.QtGui import QImage
 
+from deteccion.gesture_recognition import NO_GESTURE
 from deteccion.vision_pipeline import VisionPipeline, MODE_GAME, MODE_TEST
 from evaluacion.metrics_logger import PerformanceMetrics
 
+
+# Reintentos de la cámara
+CAMERA_RETRY_S = 2.0          # espera entre intentos de abrirla
+CAMERA_MAX_READ_FAILS = 5     # lecturas fallidas seguidas = cámara perdida
+MAX_PROCESS_FAILS = 30        # frames seguidos con error = detener
 
 # Estados que se reportan a la GUI
 STATE_LOADING = "CARGANDO"
@@ -67,6 +83,10 @@ class VisionWorker(QThread):
 
     # Ruta del reporte generado al detener (modo TEST)
     report_ready = Signal(str)
+
+    # (tipo, detalle) con tipo: "no_disponible", "perdida",
+    # "recuperada", "error_proceso"
+    camera_event = Signal(str, str)
 
 
     def __init__(self, camera_index=0, mode=MODE_GAME, parent=None):
@@ -139,6 +159,49 @@ class VisionWorker(QThread):
 
 
     # =============================================
+    # CÁMARA
+    # =============================================
+
+    def _wait_unless_stopped(self, seconds):
+        """Espera sin gastar CPU; stop() la interrumpe. Regresa si sigue corriendo."""
+        with self._locked():
+            if self._running:
+                self._resume_condition.wait(self._mutex, int(seconds * 1000))
+            return self._running
+
+
+    def _open_camera(self, reason):
+        """
+        Abre la cámara; si no se puede, reintenta cada CAMERA_RETRY_S
+        hasta lograrlo o hasta que se presione DETENER (regresa None).
+        """
+
+        attempt = 0
+
+        while True:
+
+            cap = cv2.VideoCapture(self.camera_index)
+
+            if cap.isOpened():
+                ok, _ = cap.read()
+                if ok:
+                    return cap
+
+            cap.release()
+            attempt += 1
+
+            if attempt == 1:
+                self.error.emit(
+                    f"{reason}: cámara {self.camera_index} no disponible. "
+                    f"Reintentando cada {CAMERA_RETRY_S:.0f} s (DETENER para cancelar)"
+                )
+            self.camera_event.emit("no_disponible", str(attempt))
+
+            if not self._wait_unless_stopped(CAMERA_RETRY_S):
+                return None
+
+
+    # =============================================
     # BUCLE DEL HILO
     # =============================================
 
@@ -146,10 +209,9 @@ class VisionWorker(QThread):
 
         self.state_changed.emit(STATE_LOADING)
 
-        cap = cv2.VideoCapture(self.camera_index)
+        cap = self._open_camera("Al iniciar")
 
-        if not cap.isOpened():
-            self.error.emit(f"No se pudo abrir la cámara {self.camera_index}")
+        if cap is None:
             self.state_changed.emit(STATE_STOPPED)
             return
 
@@ -182,6 +244,9 @@ class VisionWorker(QThread):
 
         fps = 0.0
         previous_time = time.perf_counter()
+
+        read_fails = 0
+        process_fails = 0
 
         try:
             while True:
@@ -257,8 +322,32 @@ class VisionWorker(QThread):
                 ret, frame = cap.read()
 
                 if not ret:
-                    self.error.emit("Se perdió la señal de la cámara")
-                    break
+                    read_fails += 1
+
+                    if read_fails < CAMERA_MAX_READ_FAILS:
+                        time.sleep(0.02)
+                        continue
+
+                    # Cámara perdida (desconectada u ocupada por otra app)
+                    lost_at = time.perf_counter()
+                    self.error.emit("Se perdió la señal de la cámara; intentando recuperarla")
+                    self.camera_event.emit("perdida", "")
+                    cap.release()
+
+                    cap = self._open_camera("Cámara perdida")
+
+                    if cap is None:
+                        cap = cv2.VideoCapture()   # vacío: release() en finally
+                        break
+
+                    down_s = time.perf_counter() - lost_at
+                    self.camera_event.emit("recuperada", f"{down_s:.1f}")
+                    self.error.emit(f"Cámara recuperada tras {down_s:.1f} s")
+                    read_fails = 0
+                    previous_time = time.perf_counter()
+                    continue
+
+                read_fails = 0
 
                 in_test = mode == MODE_TEST
 
@@ -270,11 +359,30 @@ class VisionWorker(QThread):
 
                 # El panel de texto lo muestra la GUI,
                 # no se dibuja sobre el video
-                result = pipeline.process(
-                    frame,
-                    measure=metrics.measure if in_test else None,
-                    draw_panel=False,
-                )
+                try:
+                    result = pipeline.process(
+                        frame,
+                        measure=metrics.measure if in_test else None,
+                        draw_panel=False,
+                    )
+                    process_fails = 0
+
+                except Exception as error:
+                    # Un frame dañado no debe tirar la detección
+                    process_fails += 1
+                    if in_test:
+                        metrics.end_frame(NO_GESTURE, False, set())
+                    if process_fails == 1:
+                        self.error.emit(f"Error al procesar un frame: {error}")
+                    self.camera_event.emit("error_proceso", str(error))
+
+                    if process_fails >= MAX_PROCESS_FAILS:
+                        self.error.emit(
+                            f"{MAX_PROCESS_FAILS} frames seguidos con error: "
+                            "se detiene la detección"
+                        )
+                        break
+                    continue
 
                 if in_test:
                     metrics.end_frame(

@@ -133,7 +133,9 @@ ERROR_NAMES = {
 ACK_TIMEOUT_S = 0.30      # Espera máxima de un ACK
 MAX_RETRIES = 3           # Reintentos de un comando sin ACK
 TRACK_MIN_INTERVAL_S = 0.05   # TRACK a máximo 20 Hz
-HEARTBEAT_INTERVAL_S = 1.0    # PING de latido si no hay tráfico
+HEARTBEAT_INTERVAL_S = 1.0    # PING de latido si no llega nada en 1 s
+LINK_LOST_S = 3.0             # Sin respuestas en 3 s -> enlace perdido
+RECONNECT_DELAYS_S = (1, 2, 4, 8, 10)   # Espera entre reintentos de conexión
 
 
 # =============================================

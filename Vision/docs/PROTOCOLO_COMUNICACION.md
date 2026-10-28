@@ -187,10 +187,12 @@ El ESP32 valida en este orden: **longitud → SOF → LEN → CRC → TYPE → P
 | **R4** | **Duplicados:** si el ESP32 recibe un comando con el mismo TYPE y SEQ que el último que ejecutó, dentro de una ventana de 1 s, **no lo vuelve a ejecutar** pero sí envía ACK otra vez. Así un reintento (porque se perdió el ACK) no hace que el robot actúe dos veces. |
 | **R5** | **Correspondencia:** un ACK/NACK solo es válido si su `acked_type` y `acked_seq` coinciden con el comando en espera. Las respuestas que no coinciden se descartan. |
 | **R6** | **Frecuencia de TRACK:** máximo 20 tramas por segundo (una cada 50 ms). La PC descarta los excesos. |
-| **R7** | **Latido:** si la PC no ha enviado nada en 1 s, envía un PING. |
+| **R7** | **Latido:** si la PC no ha **recibido** nada del ESP32 en 1 s, envía un PING (el ESP32 lo contesta con ACK). Se mira lo recibido y no lo enviado porque en TRACKING la PC manda TRACK sin parar y esos no llevan ACK. |
 | **R8** | **Vigilancia (watchdog):** si el ESP32 no recibe ninguna trama válida en 3 s, o si se pierde la conexión BLE, entra a **estado seguro**. |
 | **R9** | **Al conectar,** la PC envía MODE con el modo actual. **Al detener la detección,** la PC envía STOP. |
 | **R10** | **Errores en TRACK:** se responden con NACK (para diagnóstico), pero la PC no los reintenta, porque el siguiente TRACK reemplaza al anterior. |
+| **R11** | **Enlace perdido en la PC:** si la PC no recibe ninguna respuesta en 3 s, cierra la conexión aunque el sistema operativo la siga viendo abierta. |
+| **R12** | **Reconexión automática:** si la conexión se pierde o no se logra y el usuario no pidió desconectar, la PC reintenta sola con esperas de 1, 2, 4, 8 y luego cada 10 s. Al reconectar se vuelve a enviar MODE (R9). El botón *Cancelar* detiene los reintentos. |
 
 ---
 

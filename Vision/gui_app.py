@@ -15,6 +15,12 @@ Interfaz gráfica (PySide6 / Qt) que:
       y puede mostrar la cámara cenital de la simulación.
     - Gemelo digital: con los dos conectados, cada resultado se manda
       al robot real y a la simulación al mismo tiempo.
+    - Manejo de fallas: reconexión automática con el ESP32 / Webots,
+      recuperación de la cámara y errores que se avisan en la
+      bitácora sin cerrar la aplicación.
+    - Registro de la sesión (evaluacion/session_logger.py): posturas,
+      comandos, latencias y fallas en CSV + un resumen por condición
+      de prueba, como evidencia de las pruebas.
 
 Arquitectura (ver docs/ARQUITECTURA_GUI.md):
 
@@ -31,6 +37,8 @@ Uso (dentro de Vision/, con el venv activo):
 import math
 import os
 import sys
+import time
+import traceback
 
 # Trabajar desde la carpeta de este archivo
 # (rutas "models/..." relativas)
@@ -46,6 +54,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QPlainTextEdit,
     QPushButton,
@@ -67,6 +76,7 @@ from interfaz.vision_worker import (
     STATE_STOPPED,
 )
 from interfaz.sim_camera import SimCameraClient
+from evaluacion.session_logger import SessionLogger
 
 
 # -----------------------------
@@ -82,6 +92,7 @@ COLORS = {
     "buscando": "#e0b341",
     "conectado": "#3fb950",
     "esperando": "#e0b341",
+    "reconectando": "#e0b341",
     "recibiendo": "#3fb950",
 }
 
@@ -148,6 +159,9 @@ class MainWindow(QMainWindow):
         self.mode = MODE_GAME
         self.last_sent_gesture = NO_GESTURE
 
+        # Evidencia de las pruebas (CSV + resumen)
+        self.session = SessionLogger()
+
         # Dos enlaces independientes con la MISMA lógica de protocolo.
         # Los resultados se mandan a TODOS los que estén conectados:
         #   solo ESP32  -> robot real
@@ -162,6 +176,8 @@ class MainWindow(QMainWindow):
             link.state_changed.connect(self.on_ble_state)
             link.log.connect(self.on_link_log)
             link.command_result.connect(self.on_command_result)
+            link.command_done.connect(self.on_command_done)
+            link.link_event.connect(self.on_link_event)
 
         # Cámara de la simulación (hilo propio, solo si se activa)
         self.sim_camera = None
@@ -415,6 +431,22 @@ class MainWindow(QMainWindow):
         self.log_view.setReadOnly(True)
         self.log_view.setMaximumBlockCount(300)
 
+        # Condición que se está probando: va en cada fila del registro
+        # y el resumen separa los resultados por condición
+        self.label_edit = QLineEdit()
+        self.label_edit.setPlaceholderText("Condición de prueba (ej. luz baja, 2 personas)")
+        self.label_edit.editingFinished.connect(
+            lambda: self.session.set_label(self.label_edit.text())
+        )
+
+        self.btn_summary = QPushButton("Guardar resumen")
+        self.btn_summary.clicked.connect(self.save_summary)
+
+        row = QHBoxLayout()
+        row.addWidget(self.label_edit, stretch=1)
+        row.addWidget(self.btn_summary)
+
+        box.addLayout(row)
         box.addWidget(self.log_view)
 
         return group
@@ -439,6 +471,7 @@ class MainWindow(QMainWindow):
         self.worker.error.connect(self.on_worker_error)
         self.worker.test_status.connect(self.show_test_status)
         self.worker.report_ready.connect(self.on_report_ready)
+        self.worker.camera_event.connect(self.on_camera_event)
         self.worker.finished.connect(self.on_worker_finished)
 
         self.worker.start()
@@ -507,6 +540,31 @@ class MainWindow(QMainWindow):
     def on_worker_error(self, message):
         self.append_log(f"ERROR: {message}")
         self.statusBar().showMessage(message)
+        self.session.event("vision", "error", message)
+
+
+    @Slot(str, str)
+    def on_camera_event(self, kind, detail):
+
+        if kind != "error_proceso":
+            self.session.event("camara", kind, detail)
+
+        if kind == "perdida":
+            # Sin cámara no hay postura confiable: robot a estado seguro
+            for link in self._targets():
+                link.send_stop()
+            self.last_sent_gesture = NO_GESTURE
+            self.result_value.setText(NO_GESTURE)
+            self.video_label.clear()
+            self.video_label.setText("Cámara perdida\nIntentando recuperarla...")
+
+        elif kind == "no_disponible":
+            self.video_label.clear()
+            self.video_label.setText(
+                f"Cámara no disponible (intento {detail})\n"
+                "Revisa que esté conectada y que otra app no la use.\n"
+                "Presiona DETENER para cancelar."
+            )
 
 
     @Slot()
@@ -560,9 +618,19 @@ class MainWindow(QMainWindow):
         # Se envía solo cuando APARECE una postura nueva
         if result.gesture != self.last_sent_gesture:
 
+            self.session.posture(
+                result.gesture, result.person_detected, result.processing_ms
+            )
+
             if result.gesture != NO_GESTURE:
+                # tag: para medir el ciclo detección -> ACK del ESP32
+                tag = {
+                    "postura": result.gesture,
+                    "t_detect": time.monotonic(),
+                    "proc_ms": result.processing_ms,
+                }
                 for link in self._targets():
-                    link.send_pose(GESTURE_IDS[result.gesture])
+                    link.send_pose(GESTURE_IDS[result.gesture], tag)
 
             self.last_sent_gesture = result.gesture
 
@@ -776,8 +844,10 @@ class MainWindow(QMainWindow):
 
         link = self.links[name]
 
-        if link.connected:
+        # "Desconectar" o "Cancelar" (si está reintentando solo)
+        if link.connected or link.reconnecting:
             link.disconnect_device()
+            self.session.event(name, "desconexion_usuario")
         else:
             link.connect_device()
 
@@ -813,8 +883,15 @@ class MainWindow(QMainWindow):
             state_label, button = self.link_rows[name]
             state = link.state
 
-            state_label.setText(f"{dot(COLORS[state])}  {state.capitalize()}")
-            button.setText("Desconectar" if state == "conectado" else "Conectar")
+            if state == "desconectado" and link.reconnecting:
+                attempt = link.reconnect_attempt
+                text = "Reconectando" + (f" ({attempt})" if attempt else "")
+                state_label.setText(f"{dot(COLORS['reconectando'])}  {text}")
+                button.setText("Cancelar")
+            else:
+                state_label.setText(f"{dot(COLORS[state])}  {state.capitalize()}")
+                button.setText("Desconectar" if state == "conectado" else "Conectar")
+
             button.setEnabled(state != "buscando")
 
         connected = [name for name, link in self.links.items() if link.connected]
@@ -898,6 +975,42 @@ class MainWindow(QMainWindow):
         self.append_log(f"[{self._link_name(self.sender())}] {mark} {name}: {detail}")
 
 
+    @Slot(object)
+    def on_command_done(self, info):
+        self.session.command(self._link_name(self.sender()), info)
+
+
+    @Slot(str, str)
+    def on_link_event(self, kind, detail):
+
+        name = self._link_name(self.sender())
+        self.session.event(name, kind, detail)
+
+        if kind == "perdido":
+            self.statusBar().showMessage(f"{name}: enlace perdido, reconectando...")
+        elif kind == "reconectado":
+            self.statusBar().showMessage(f"{name}: reconectado tras {detail} s")
+
+
+    def _link_stats(self):
+        return {name: dict(link.stats) for name, link in self.links.items()}
+
+
+    @Slot()
+    def save_summary(self):
+
+        # Por si se escribió la etiqueta sin dar Enter
+        self.session.set_label(self.label_edit.text())
+
+        path = self.session.summary(self._link_stats())
+
+        if path is None:
+            self.append_log("Aún no hay datos en esta sesión")
+        else:
+            self.append_log(f"Resumen guardado: {path}")
+            self.statusBar().showMessage(f"Resumen: {path}")
+
+
     # =============================================
     # BITÁCORA
     # =============================================
@@ -905,6 +1018,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def append_log(self, text):
         self.log_view.appendPlainText(text)
+        self.session.log_line(text)
 
 
     # =============================================
@@ -924,6 +1038,13 @@ class MainWindow(QMainWindow):
         for link in self.links.values():
             link.shutdown()
 
+        try:
+            path = self.session.close(self._link_stats())
+            if path:
+                print(f"Resumen de la sesión: {path}")
+        except Exception as error:
+            print(f"No se pudo guardar el resumen: {error}")
+
         super().closeEvent(event)
 
 
@@ -938,6 +1059,23 @@ def main():
     app.setStyleSheet(STYLE_SHEET)
 
     window = MainWindow()
+
+    # Un error no previsto en la interfaz se registra y se avisa,
+    # pero NO cierra la aplicación (el robot sigue protegido por
+    # su propio estado seguro si deja de recibir tramas)
+    def on_unexpected_error(exc_type, exc, tb):
+        traceback.print_exception(exc_type, exc, tb)
+        try:
+            window.append_log(f"ERROR inesperado: {exc_type.__name__}: {exc}")
+            window.session.event(
+                "app", "excepcion",
+                "".join(traceback.format_exception_only(exc_type, exc)).strip(),
+            )
+        except Exception:
+            pass
+
+    sys.excepthook = on_unexpected_error
+
     window.show()
 
     sys.exit(app.exec())

@@ -156,13 +156,15 @@ SOFIA/
 │   │   ├── ble_link.py
 │   │   └── sim_link.py           ← mismo protocolo por TCP (Webots)
 │   │
-│   ├── evaluacion/               ← métricas del modo TEST
+│   ├── evaluacion/               ← métricas del modo TEST y registro de sesión
 │   │   ├── metrics_logger.py
-│   │   └── generate_report.py
+│   │   ├── generate_report.py
+│   │   └── session_logger.py     ← evidencia de las pruebas de integración
 │   │
 │   ├── docs/                     ← explicación del código
 │   │   ├── ARQUITECTURA_GUI.md
-│   │   └── PROTOCOLO_COMUNICACION.md
+│   │   ├── PROTOCOLO_COMUNICACION.md
+│   │   └── PRUEBAS_INTEGRACION.md ← pruebas del ciclo y de estrés, errores
 │   │
 │   ├── models/
 │   │   ├── pose_landmarker.task
@@ -560,11 +562,15 @@ La PC envía al ESP32 maestro las posturas y la posición de la mano por **Bluet
 | --- | --- |
 | POSE (1-5) | Cuando aparece una postura nueva |
 | TRACK (x, y, vector) | Continuamente en modo TRACKING (máx. 20 por segundo) |
-| PING | Comando de prueba y latido cada segundo sin tráfico |
+| PING | Comando de prueba y latido si no llega nada en 1 s |
 | MODE | Al conectar y al cambiar de modo |
 | STOP | Al detener la detección |
 
 **Para conectar desde la GUI:** encender el Bluetooth de la laptop, encender el ESP32 y presionar **Conectar**. No es necesario (ni recomendable) emparejarlo desde la configuración de Windows.
+
+**Si algo falla, la app no se cierra.** Si el ESP32 se desconecta o deja de contestar 3 s, la GUI lo marca como *Reconectando* y reintenta sola (1, 2, 4, 8 y luego cada 10 s); **Cancelar** detiene los reintentos. Si la cámara no abre o se desconecta, se manda STOP al robot y se reintenta abrirla cada 2 s.
+
+**Evidencia de pruebas.** Cada sesión de la GUI se guarda en `metrics/sesiones/` (posturas, comandos con su ACK y latencia, caídas y reconexiones) con un `resumen.md` por condición de prueba. La condición se escribe en el campo de arriba de la bitácora. El procedimiento está en `docs/PRUEBAS_INTEGRACION.md`.
 
 El estándar completo (trama, comandos, códigos de error y reglas) está en `docs/PROTOCOLO_COMUNICACION.md`. El firmware del ESP32 está en la carpeta `ESP32/` de la raíz del repositorio.
 
