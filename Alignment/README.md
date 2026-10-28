@@ -112,7 +112,7 @@ Usa `results/modelo/cnn.pt` con el método **híbrido**. Sin PyTorch o sin model
    (regenera las texturas, `results/marcadores_imprimir.png` y los dos mundos)
 2. Abre en Webots `Webots/Sofia/worlds/sofia_dataset.wbt`.
 3. Compila los paneles **una vez**: abre `controllers/panel_dataset/panel_dataset.cpp` y presiona **Build**.
-4. Cuántas fotos: `DATASET_MUESTRAS` en `controllers/dataset_generator/runtime.ini` (20 para probar, 2000 para el dataset completo).
+4. Cuántas fotos: `DATASET_MUESTRAS` en `controllers/dataset_generator/runtime.ini` (20 para probar, 10 000 para el dataset completo; semilla en `DATASET_SEMILLA`). Con 10 000 fotos ocupa ~8 GB entre fotos, recortes y caché.
 5. Dale ▶. Sale en `Alignment/build/datos/webots/sesion_<fecha>/`:
 
 | Archivo | Contenido |
@@ -123,17 +123,16 @@ Usa `results/modelo/cnn.pt` con el método **híbrido**. Sin PyTorch o sin model
 | `escenas.csv` | Posición de la cámara, luces y piso de cada foto |
 | `config.json` | Geometría y cámara usadas |
 
-En cada foto cambian: **ángulos** (5 % en 0,0, 50 % casi alineados ±3°, el resto ±27°), **cámara** (±4 cm, 1.30–1.40 m de altura, ±4° de inclinación, ±8° de giro), **luces** y **tono del piso**.
+En cada foto cambian: **ángulos** de cada panel, como pasaría en el robot (10 % en 0,0; 60 % desalineación mínima, hasta 5°; 20 % notoria, de 5° a 15°, como si lo hubieran movido a mano o se trabara; 10 % muy desalineado, de 15° al tope), **cámara** (±4 cm, 1.30–1.40 m de altura, ±4° de inclinación, ±8° de giro), **luces** y **tono del piso**. Queda ~35 % OK, ~36 % REVISAR y ~29 % DESALINEADO.
 
 ### 2. Preparar, entrenar, evaluar y publicar
 
 ```
 python Alignment/build/preparar_dataset.py               recortes + división train/val/test (por foto)
-python Alignment/build/entrenar.py --modelo cnn          (~85 min en una RTX 3060; también evalúa en test)
-python Alignment/build/entrenar.py --modelo resnet18     (opcional, ~25 min)
+python Alignment/build/entrenar.py --modelo cnn          (lotes y aumentos en la GPU; también evalúa en test)
 python Alignment/build/evaluar_geometrico.py
 python Alignment/build/evaluar_hibrido.py
-python Alignment/build/comparar_resultados.py            tabla en results/evaluaciones/comparacion.md
+python Alignment/build/comparar_resultados.py            tabla de la última sesión en results/evaluaciones/comparacion.md
 python Alignment/build/publicar_modelo.py                copia la última CNN a results/modelo/cnn.pt
 ```
 
@@ -149,7 +148,7 @@ pip install -r Alignment/requirements.txt
 
 ## El marco del módulo real
 
-Imprime `results/marcadores_imprimir.png` **al 100 %** (sin "ajustar a la página") y comprueba con regla que el cuadro negro mida 60 mm. Los centros de los 4 marcadores van en un cuadrado de `LADO_MARCO` (`app/nucleo/geometria.py`), **a la altura de las placas** con el módulo en 0,0:
+Imprime `results/marcadores_imprimir.png` **al 100 %** (sin "ajustar a la página") y comprueba con regla que el cuadro negro mida 60 mm. Los centros de los 4 marcadores van en un cuadrado de `LADO_MARCO` = **600 mm** (`app/nucleo/geometria.py`), centrado en el arreglo y **a la altura de las placas** con el módulo en 0,0:
 
 ```
   ID 0 ─────────── ID 1        (vista desde arriba, como la cámara)

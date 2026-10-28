@@ -11,6 +11,10 @@ Sale en:
 Uso (desde la carpeta SOFIA):
     python Alignment/build/comparar_resultados.py              (solo test)
     python Alignment/build/comparar_resultados.py --conjunto val
+    python Alignment/build/comparar_resultados.py --sesion todas     (mezcla sesiones)
+
+Por defecto solo compara los resultados de la ÚLTIMA sesión de Webots,
+para no mezclar datasets distintos (por ejemplo, antes y después del PROTO).
 """
 
 import argparse
@@ -30,12 +34,14 @@ RESULTADOS = rutas.EVALUACIONES
 ORDEN = ["Método geométrico", "CNN pequeña", "ResNet18 preentrenada", "Método híbrido"]
 
 
-def leer(conjunto):
+def leer(conjunto, sesion=None):
     filas = []
     for ruta in sorted(glob.glob(os.path.join(RESULTADOS, "*", "metricas.json"))):
         with open(ruta, encoding="utf-8") as archivo:
             datos = json.load(archivo)
         if datos.get("conjunto") != conjunto:
+            continue
+        if sesion and datos.get("sesión") != sesion:
             continue
         datos["carpeta"] = os.path.basename(os.path.dirname(ruta))
         filas.append(datos)
@@ -94,11 +100,19 @@ def grafica(filas, rangos, ruta):
 def main():
     parser = argparse.ArgumentParser(description="Compara los resultados guardados")
     parser.add_argument("--conjunto", default="test", choices=["train", "val", "test", "todos"])
+    parser.add_argument("--sesion", help="nombre de la sesión, o 'todas' (por defecto, la última)")
     args = parser.parse_args()
 
-    filas = leer(args.conjunto)
+    if args.sesion == "todas":
+        sesion = None
+    elif args.sesion:
+        sesion = os.path.basename(os.path.normpath(args.sesion))
+    else:
+        sesion = os.path.basename(rutas.ultima_sesion())
+
+    filas = leer(args.conjunto, sesion)
     if not filas:
-        raise SystemExit(f"No hay resultados de '{args.conjunto}' en {RESULTADOS}")
+        raise SystemExit(f"No hay resultados de '{args.conjunto}' de la sesión {sesion or '(todas)'} en {RESULTADOS}")
 
     lineas, rangos = tabla(filas)
     grafica(filas, rangos, os.path.join(RESULTADOS, "comparacion.png"))

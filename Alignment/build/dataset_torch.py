@@ -4,11 +4,13 @@ DATOS PARA PYTORCH - SOFIA (diagnóstico de alineación)
 Lee los recortes de una sesión preparada (preparar_dataset.py) y los
 entrega a PyTorch.
 
-    - La primera vez lee los 32,000 PNG y guarda un caché
-      (<sesión>/cache_recortes.npz, ~500 MB); las siguientes veces
+    - La primera vez lee los PNG (16 por foto) y guarda un caché
+      (<sesión>/cache_recortes.npz, ~260 MB por cada 1000 fotos); las siguientes veces
       carga en segundos.
     - Entradas: recorte de 128x128 en gris, normalizado.
     - Salidas: (theta1, theta2) / 30°  -> valores entre -1 y 1.
+
+Con GPU, CargadorGPU (abajo) sube todo a la GPU y hace los aumentos ahí.
 
 AUMENTOS (solo en entrenamiento)
 --------------------------------
@@ -157,3 +159,90 @@ class DatasetRecortes(Dataset):
         x = torch.from_numpy((x - MEDIA) / DESVIACION)[None]
         y = torch.from_numpy(angulo / ESCALA_ANGULO)
         return x, y
+
+
+# =============================================
+# TODO EN LA GPU (rápido con datasets grandes)
+# =============================================
+
+def aumentar_lote(x, y, generador):
+    """
+    Los mismos aumentos que DatasetRecortes, pero para un lote entero
+    que ya está en la GPU. x: (B, 1, H, W) en 0-1; y: (B, 2) ángulo / 30°.
+    """
+    lote = x.shape[0]
+    equipo = x.device
+
+    def al_azar(bajo, alto, forma):
+        return torch.empty(forma, device=equipo).uniform_(bajo, alto, generator=generador)
+
+    # Espejos (con el cambio de signo del ángulo correspondiente)
+    horizontal = torch.rand(lote, device=equipo, generator=generador) < 0.5
+    x = torch.where(horizontal[:, None, None, None], x.flip(-1), x)
+    y[:, 0] = torch.where(horizontal, -y[:, 0], y[:, 0])
+
+    vertical = torch.rand(lote, device=equipo, generator=generador) < 0.5
+    x = torch.where(vertical[:, None, None, None], x.flip(-2), x)
+    y[:, 1] = torch.where(vertical, -y[:, 1], y[:, 1])
+
+    # Luz: ganancia, desplazamiento y gamma
+    forma = (lote, 1, 1, 1)
+    x = (x * al_azar(0.7, 1.3, forma) + al_azar(-0.1, 0.1, forma)).clamp(0, 1)
+    x = x.pow(al_azar(0.8, 1.25, forma))
+
+    # Desenfoque (a 30 % del lote, con una sigma al azar para ese lote)
+    sigma = float(al_azar(0.3, 1.2, (1,)))
+    radio = 3
+    t = torch.arange(-radio, radio + 1, device=equipo, dtype=x.dtype)
+    nucleo = torch.exp(-t ** 2 / (2 * sigma ** 2))
+    nucleo = (nucleo[:, None] * nucleo[None, :]) / nucleo.sum() ** 2
+    borroso = torch.nn.functional.conv2d(
+        torch.nn.functional.pad(x, (radio,) * 4, mode="reflect"), nucleo[None, None])
+    desenfocar = torch.rand(lote, device=equipo, generator=generador) < 0.3
+    x = torch.where(desenfocar[:, None, None, None], borroso, x)
+
+    # Ruido
+    ruido = torch.randn(x.shape, device=equipo, generator=generador)
+    x = (x + ruido * al_azar(0.0, 0.03, forma)).clamp(0, 1)
+
+    return x, y
+
+
+class CargadorGPU:
+    """
+    Reemplaza al DataLoader: sube TODOS los recortes a la GPU una vez
+    (uint8, ~16 KB por recorte; 10 000 fotos ~ 2.6 GB) y arma cada lote
+    ahí mismo, con los aumentos en la GPU. Así el CPU deja de ser el
+    cuello de botella (antes cada época tardaba por los aumentos).
+    """
+
+    def __init__(self, imagenes, angulos, equipo, lote, aumentar=False,
+                 barajar=False, descartar_ultimo=False, semilla=0):
+        self.imagenes = torch.from_numpy(np.ascontiguousarray(imagenes)).to(equipo)
+        self.angulos = torch.from_numpy(angulos.astype(np.float32) / ESCALA_ANGULO).to(equipo)
+        self.equipo = equipo
+        self.lote = lote
+        self.aumentar = aumentar
+        self.barajar = barajar
+        self.descartar_ultimo = descartar_ultimo
+        self.generador = torch.Generator(device=equipo)
+        self.generador.manual_seed(semilla)
+
+    def __len__(self):
+        n = len(self.imagenes)
+        return n // self.lote if self.descartar_ultimo else -(-n // self.lote)
+
+    def __iter__(self):
+        n = len(self.imagenes)
+        if self.barajar:
+            orden = torch.randperm(n, device=self.equipo, generator=self.generador)
+        else:
+            orden = torch.arange(n, device=self.equipo)
+
+        for i in range(len(self)):
+            indices = orden[i * self.lote:(i + 1) * self.lote]
+            x = self.imagenes[indices].unsqueeze(1).float() / 255.0
+            y = self.angulos[indices].clone()
+            if self.aumentar:
+                x, y = aumentar_lote(x, y, self.generador)
+            yield (x - MEDIA) / DESVIACION, y

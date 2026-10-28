@@ -3,8 +3,10 @@ GENERADOR DEL DATASET - SOFIA (diagnóstico de alineación)
 
 Supervisor de sofia_dataset.wbt. En cada muestra:
 
-    1. Elige ángulos aleatorios para los 16 paneles: la mitad casi
-       alineados (±3°) y la otra mitad en todo el rango (±27°).
+    1. Elige ángulos aleatorios para los 16 paneles, como pasaría en el
+       robot: casi siempre desalineaciones mínimas (hasta 5°), a veces
+       notorias (5-15°, alguien lo movió a mano o se trabó) y rara vez
+       muy desalineado (15° hasta el tope).
     2. Cambia la escena al azar: luces, color del piso y posición e
        inclinación de la cámara (el marco ArUco lo endereza después).
     3. Espera a que los 16 paneles lleguen (panel_dataset avisa).
@@ -20,7 +22,7 @@ Salida (en la carpeta SOFIA):
         escenas.csv        parámetros de la escena de cada muestra
         config.json        geometría y cámara usadas
 
-Cuántas muestras: variable de entorno DATASET_MUESTRAS (por defecto 2000).
+Cuántas muestras: variable de entorno DATASET_MUESTRAS (por defecto 10000).
 """
 
 import csv
@@ -61,13 +63,18 @@ import rutas  # noqa: E402
 # CONFIGURACIÓN
 # =============================================
 
-MUESTRAS = int(os.environ.get("DATASET_MUESTRAS", "2000"))
-SEMILLA = int(os.environ.get("DATASET_SEMILLA", "7"))
+MUESTRAS = int(os.environ.get("DATASET_MUESTRAS", "10000"))
+SEMILLA = int(os.environ.get("DATASET_SEMILLA", "11"))
 
-PROB_CASI_ALINEADO = 0.5      # paneles con ángulos chicos
-CASI_ALINEADO_GRADOS = 3.0
-RANGO_GRADOS = 27.0           # dentro del tope seguro de 27.5°
-PROB_CERO = 0.05              # paneles exactamente en 0,0
+# Desalineación de cada panel: |theta| = sqrt(theta1² + theta2²) en una
+# dirección al azar. (probabilidad, |theta| mínimo, |theta| máximo)
+DESALINEACIONES = [
+    (0.10, 0.0, 0.0),         # exactamente en 0,0
+    (0.60, 0.0, 5.0),         # mínima: lo normal (OK / REVISAR / algo de DESALINEADO)
+    (0.20, 5.0, 15.0),        # notoria: lo movieron a mano, se trabó
+    (0.10, 15.0, 35.0),       # muy desalineado (cada eje se limita al tope)
+]
+RANGO_GRADOS = 27.0           # tope de cada eje (dentro del tope seguro de 27.5°)
 
 # Cámara (posición por defecto y variación)
 CAMARA_CENTRO = (g.CENTRO_X, g.CENTRO_Y, 1.35)
@@ -195,6 +202,7 @@ class Generador:
         config = {
             "muestras": MUESTRAS,
             "semilla": SEMILLA,
+            "desalineaciones": DESALINEACIONES,
             "camara": {
                 "resolucion": [self.camara.getWidth(), self.camara.getHeight()],
                 "fov_rad": self.camara.getFov(),
@@ -219,17 +227,18 @@ class Generador:
 
         for _ in range(16):
             sorteo = self.rng.random()
+            acumulado = 0.0
+            for probabilidad, minimo, maximo in DESALINEACIONES:
+                acumulado += probabilidad
+                if sorteo < acumulado:
+                    break
 
-            if sorteo < PROB_CERO:
-                par = (0.0, 0.0)
-            elif sorteo < PROB_CERO + PROB_CASI_ALINEADO:
-                par = (self.rng.uniform(-CASI_ALINEADO_GRADOS, CASI_ALINEADO_GRADOS),
-                       self.rng.uniform(-CASI_ALINEADO_GRADOS, CASI_ALINEADO_GRADOS))
-            else:
-                par = (self.rng.uniform(-RANGO_GRADOS, RANGO_GRADOS),
-                       self.rng.uniform(-RANGO_GRADOS, RANGO_GRADOS))
-
-            angulos.extend(par)
+            magnitud = self.rng.uniform(minimo, maximo)
+            direccion = self.rng.uniform(0, 2 * math.pi)
+            angulos.extend(
+                max(-RANGO_GRADOS, min(RANGO_GRADOS, magnitud * f))
+                for f in (math.cos(direccion), math.sin(direccion))
+            )
 
         return angulos
 

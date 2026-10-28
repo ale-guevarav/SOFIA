@@ -37,11 +37,11 @@ sys.path.insert(0, AQUI)
 
 import geometria as g  # noqa: E402
 import rutas  # noqa: E402
-from dataset_torch import DatasetRecortes, cargar_recortes, seleccionar  # noqa: E402
+from dataset_torch import CargadorGPU, DatasetRecortes, cargar_recortes, seleccionar  # noqa: E402
 from modelos import DESVIACION, ESCALA_ANGULO, MEDIA, MODELOS, contar_parametros, crear_modelo  # noqa: E402
 
 POR_DEFECTO = {
-    "cnn": {"epocas": 40, "lr": 2e-3},
+    "cnn": {"epocas": 25, "lr": 2e-3},        # con ~10 000 fotos; con pocas fotos, más épocas
     "resnet18": {"epocas": 25, "lr": 1e-3},
 }
 
@@ -86,6 +86,8 @@ def main():
     parser.add_argument("--trabajadores", type=int, default=0,
                         help="procesos para cargar datos (0 = el principal; en Windows es lo más seguro)")
     parser.add_argument("--semilla", type=int, default=2026)
+    parser.add_argument("--aumentos", choices=["gpu", "cpu"],
+                        help="dónde se arman los lotes (por defecto, gpu si hay)")
     parser.add_argument("--sin-evaluar", action="store_true", help="no evaluar en test al terminar")
     args = parser.parse_args()
 
@@ -114,12 +116,22 @@ def main():
     img_val, ang_val = seleccionar(datos, "val")
     print(f"Sesión {os.path.basename(sesion)} · train {len(img_train)} · val {len(img_val)} recortes")
 
-    opciones = dict(batch_size=args.lote, num_workers=args.trabajadores,
-                    pin_memory=amp, persistent_workers=args.trabajadores > 0)
-    cargador_train = DataLoader(DatasetRecortes(img_train, ang_train, aumentar=True, semilla=args.semilla),
-                                shuffle=True, drop_last=True, **opciones)
-    cargador_train_eval = DataLoader(DatasetRecortes(img_train[::5], ang_train[::5]), **opciones)
-    cargador_val = DataLoader(DatasetRecortes(img_val, ang_val), **opciones)
+    aumentos_gpu = (args.aumentos or ("gpu" if amp else "cpu")) == "gpu" and amp
+    if aumentos_gpu:
+        # Todo el dataset en la GPU y los aumentos ahí: mucho más rápido
+        cargador_train = CargadorGPU(img_train, ang_train, equipo, args.lote, aumentar=True,
+                                     barajar=True, descartar_ultimo=True, semilla=args.semilla)
+        cargador_train_eval = CargadorGPU(img_train[::5], ang_train[::5], equipo, 512)
+        cargador_val = CargadorGPU(img_val, ang_val, equipo, 512)
+        print("Lotes y aumentos en la GPU")
+    else:
+        opciones = dict(batch_size=args.lote, num_workers=args.trabajadores,
+                        pin_memory=amp, persistent_workers=args.trabajadores > 0)
+        cargador_train = DataLoader(DatasetRecortes(img_train, ang_train, aumentar=True, semilla=args.semilla),
+                                    shuffle=True, drop_last=True, **opciones)
+        cargador_train_eval = DataLoader(DatasetRecortes(img_train[::5], ang_train[::5]), **opciones)
+        cargador_val = DataLoader(DatasetRecortes(img_val, ang_val), **opciones)
+        print("Lotes y aumentos en el CPU")
 
     # -----------------------------
     # MODELO

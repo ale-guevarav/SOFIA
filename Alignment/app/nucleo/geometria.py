@@ -96,8 +96,10 @@ LADO_MARCADOR = 0.060
 LADO_CUADRO_BLANCO = 0.080
 
 # Los centros de los 4 marcadores forman un cuadrado de este lado,
-# centrado en el arreglo (m)
-LADO_MARCO = 0.760
+# centrado en el arreglo (m). Es el más chico en el que ningún cuadro
+# blanco toca el área que barren las placas a ±30° (70.5 mm desde su
+# centro), con ~15 mm de margen: 0.597 m, redondeado a 0.60 m.
+LADO_MARCO = 0.600
 
 # Marcador -> esquina, en la imagen enderezada (u, v):
 #   0 arriba-izquierda, 1 arriba-derecha, 2 abajo-derecha, 3 abajo-izquierda
@@ -125,7 +127,8 @@ def esquinas_mundo():
 
 # Resolución de la imagen enderezada
 PIXELES_POR_METRO = 1000        # 1 px = 1 mm (similar a la cámara)
-MARGEN_M = 0.05                 # margen alrededor del marco
+MARGEN_M = 0.06                 # margen alrededor del marco (los recortes de las
+                                # placas de las orillas llegan a 0.345 m del centro)
 
 LADO_ENDEREZADA_PX = int(round((LADO_MARCO + 2 * MARGEN_M) * PIXELES_POR_METRO))
 
