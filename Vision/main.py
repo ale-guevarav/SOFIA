@@ -1,61 +1,133 @@
-import cv2 
+import os
+import cv2
 import time
 
-from pose_detector import PoseDetector
-from hand_detector import HandDetector
-from gesture_detector import GestureDetector
-from smoothing import TemporalConfirmation
-from Vision.metrics_logger import PerformanceMetrics
+# Trabajar siempre desde la carpeta de este archivo,
+# para que las rutas "models/..." y "metrics/..." funcionen
+# sin importar desde dónde se ejecute (ej. botón ▶ de VS Code)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-
-# -----------------------------
-# CONFIGURACIÓN DE MEDIAPIPE
-# -----------------------------
-
-# Crear detector de postura
-pose_detector = PoseDetector()
-
-# Crear detector de manos
-hand_detector = HandDetector()
-
-# Crear detector de gestos
-gesture_detector = GestureDetector()
-
-
-# -----------------------------
-# CONFIRMACIÓN TEMPORAL
-# -----------------------------
-
-shield_confirmation = TemporalConfirmation(
-    required_frames=5
-)
-
-attack_confirmation = TemporalConfirmation(
-    required_frames=5
+from evaluacion.metrics_logger import PerformanceMetrics
+from deteccion.vision_pipeline import (
+    VisionPipeline,
+    MODES,
+    MODE_GAME,
+    MODE_TEST,
+    MODE_TRACKING,
 )
 
 
-# -----------------------------
-# REGISTRO DE MÉTRICAS
-# -----------------------------
+# =============================================
+# MODOS DEL SISTEMA
+# =============================================
+#
+#   JUEGO     -> Reconoce las 5 posturas (uso normal).
+#   TEST      -> Igual que JUEGO + pruebas y métricas (teclas 1-5, 0, s).
+#   TRACKING  -> NO reconoce posturas. Solo sigue la mano y la
+#                ubica en un plano cartesiano con (0,0) al centro.
+#
+# Teclas para cambiar de modo:
+#   J = JUEGO   T = TEST   K = TRACKING   M = siguiente modo
+#   Q = salir
+#
+# Toda la detección vive en deteccion/vision_pipeline.py
+# (la misma que usa la GUI: gui_app.py).
 
+MODE_KEYS = {
+    ord("j"): MODE_GAME,
+    ord("t"): MODE_TEST,
+    ord("k"): MODE_TRACKING,
+}
+
+NEXT_MODE_KEY = ord("m")
+
+# Colores BGR de la etiqueta de cada modo
+MODE_COLORS = {
+    MODE_GAME: (0, 200, 0),
+    MODE_TEST: (0, 0, 255),
+    MODE_TRACKING: (255, 160, 0),
+}
+
+# Modo con el que arranca el programa
+INITIAL_MODE = MODE_GAME
+
+
+# =============================================
+# TEXTOS DE INTERFAZ
+# =============================================
+
+def put_text(frame, text, position, color, scale=0.8, thickness=2,
+             outline=True):
+
+    # Contorno negro para que se lea sobre cualquier fondo
+    if outline:
+        cv2.putText(frame, text, position, cv2.FONT_HERSHEY_SIMPLEX,
+                    scale, (0, 0, 0), thickness + 3, cv2.LINE_AA)
+
+    cv2.putText(frame, text, position, cv2.FONT_HERSHEY_SIMPLEX,
+                scale, color, thickness, cv2.LINE_AA)
+
+
+def draw_mode_label(frame, mode):
+
+    width = frame.shape[1]
+
+    label = f"MODO: {mode}"
+    help_text = "[J]uego [T]est [K]tracking [M]cambiar [Q]salir"
+
+    (label_width, _), _ = cv2.getTextSize(
+        label, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2
+    )
+    (help_width, _), _ = cv2.getTextSize(
+        help_text, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1
+    )
+
+    put_text(frame, label, (width - label_width - 20, 40),
+             MODE_COLORS[mode], 0.9, 2)
+
+    # Menú: texto limpio sobre una franja oscura
+    # semitransparente (sin contorno)
+    help_x = width - help_width - 20
+    help_y = 68
+
+    overlay = frame.copy()
+    cv2.rectangle(
+        overlay,
+        (help_x - 8, help_y - 16),
+        (width - 12, help_y + 8),
+        (0, 0, 0),
+        -1,
+    )
+    cv2.addWeighted(overlay, 0.5, frame, 0.5, 0, frame)
+
+    put_text(frame, help_text, (help_x, help_y),
+             (255, 255, 255), 0.45, 1, outline=False)
+
+
+# =============================================
+# CONFIGURACIÓN
+# =============================================
+
+pipeline = VisionPipeline()
+
+# Arranca en pausa: solo mide en modo TEST
 metrics = PerformanceMetrics(
     output_dir="metrics",
     trial_timeout=6.0,   # segundos para hacer el gesto
     countdown=3.0,       # cuenta regresiva antes de cada prueba
+    start_active=False,
 )
 
 
 # -----------------------------
-# CONFIGURACIÓN DE LA CÁMARA
+# CÁMARA
 # -----------------------------
 
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("Error: No se pudo abrir la cámara")
-    pose_detector.close()
-    hand_detector.close()
+    pipeline.close()
     exit()
 
 metrics.set_info(
@@ -66,25 +138,46 @@ metrics.set_info(
 )
 
 print("Cámara iniciada correctamente")
-print("Presiona 'q' para cerrar")
-print("Métricas: 1-5 probar gesto | 0 modo libre | s guardar")
+print("Modos: J juego | T test | K tracking | M siguiente | Q salir")
+print("En TEST: 1-5 probar gesto | 0 modo libre | s guardar")
 
 
-# MediaPipe (timestamp creciente)
-frame_timestamp_ms = 0
+# =============================================
+# CAMBIO DE MODO
+# =============================================
+
+def change_mode(current_mode, new_mode):
+
+    if new_mode == current_mode:
+        return current_mode
+
+    # Las métricas solo corren en TEST
+    if current_mode == MODE_TEST:
+        metrics.pause()
+
+    if new_mode == MODE_TEST:
+        metrics.resume()
+
+    pipeline.set_mode(new_mode)
+
+    print(f"[MODO] {current_mode} -> {new_mode}")
+
+    return new_mode
 
 
-# -----------------------------
+mode = MODE_GAME
+mode = change_mode(mode, INITIAL_MODE)
+
+
+# =============================================
 # WHILE PRINCIPAL
-# -----------------------------
+# =============================================
 
 previous_time = time.time()
 
-# Tiempo hasta el que se mostrará
-# el último gesto dinámico detectado
-reload_display_until = 0
-start_display_until = 0
-end_display_until = 0
+# Última información de tracking
+# (lista de HandPosition, disponible para usarla después)
+hand_positions = []
 
 try:
 
@@ -96,238 +189,79 @@ try:
             print("Error: No se pudo capturar el frame")
             break
 
+        # Imagen en espejo (como selfie)
+        frame = cv2.flip(frame, 1)
+
         # Empieza a medir el procesamiento
-        # (no incluye la espera de la cámara)
+        # (solo hace algo en modo TEST)
         metrics.begin_frame()
 
         # -----------------------------
-        # DETECCIÓN CON MEDIAPIPE
+        # DETECCIÓN
         # -----------------------------
 
-        with metrics.measure("pose"):
-
-            # OpenCV trabaja en BGR
-            # MediaPipe trabaja en RGB
-            frame_rgb = cv2.cvtColor(
-                frame,
-                cv2.COLOR_BGR2RGB
-            )
-
-            # Analizar postura
-            pose_result = pose_detector.detect(
-                frame_rgb,
-                frame_timestamp_ms
-            )
-
-            # Aplicar EMA a los landmarks corporales
-            smoothed_landmarks = (
-                pose_detector.get_smoothed_landmarks(
-                    pose_result
-                )
-            )
-
-        with metrics.measure("manos"):
-
-            # Analizar manos
-            hand_result = hand_detector.detect(
-                frame_rgb,
-                frame_timestamp_ms
-            )
-
-        # Aumentar timestamp después de analizar
-        # postura y manos en el mismo frame
-        frame_timestamp_ms += 33
-
-
-        # -----------------------------
-        # DIBUJAR LANDMARKS
-        # -----------------------------
-
-        with metrics.measure("dibujo"):
-
-            person_detected = pose_detector.draw(
-                frame,
-                pose_result
-            )
-
-            hand_detector.draw(
-                frame,
-                hand_result
-            )
-
-
-        # -----------------------------
-        # DETECCIÓN DE GESTOS
-        # -----------------------------
-
-        with metrics.measure("gestos"):
-
-            # ESCUDO
-            shield_raw = (
-                gesture_detector.detect_shield(
-                    smoothed_landmarks
-                )
-            )
-
-            shield_detected = (
-                shield_confirmation.update(
-                    shield_raw
-                )
-            )
-
-            # ATAQUE: cuerpo + dos pistolas
-            attack_body_detected = (
-                gesture_detector.detect_attack_body(
-                    smoothed_landmarks
-                )
-            )
-
-            gun_hands_detected = (
-                hand_detector.detect_gun_hands(
-                    hand_result
-                )
-            )
-
-            attack_raw = (
-                attack_body_detected
-                and gun_hands_detected
-            )
-
-            attack_detected = (
-                attack_confirmation.update(
-                    attack_raw
-                )
-            )
-
-            # RECARGAR
-            reload_detected = (
-                gesture_detector.detect_reload(
-                    smoothed_landmarks
-                )
-            )
-
-            if reload_detected:
-                reload_display_until = (
-                    time.time() + 0.8
-                )
-
-            # INICIO
-            start_detected = (
-                gesture_detector.detect_start(
-                    smoothed_landmarks
-                )
-            )
-
-            if start_detected:
-                start_display_until = (
-                    time.time() + 0.8
-                )
-
-            # FIN
-            end_detected = (
-                gesture_detector.detect_end(
-                    smoothed_landmarks
-                )
-            )
-
-            if end_detected:
-                end_display_until = (
-                    time.time() + 0.8
-                )
-
-            # -----------------------------
-            # POSTURA DETECTADA
-            # -----------------------------
-
-            detected_gesture = "---"
-
-            # POSTURAS ESTÁTICAS
-            if shield_detected:
-                detected_gesture = "ESCUDO"
-
-            elif attack_detected:
-                detected_gesture = "ATAQUE"
-
-            # POSTURAS DINÁMICAS
-            elif time.time() < reload_display_until:
-                detected_gesture = "RECARGAR"
-
-            elif time.time() < start_display_until:
-                detected_gesture = "INICIO"
-
-            elif time.time() < end_display_until:
-                detected_gesture = "FIN"
-
-
-        # -----------------------------
-        # TEXTOS EN PANTALLA
-        # -----------------------------
-
-        with metrics.measure("dibujo"):
-
-            cv2.putText(
-                frame,
-                f"Postura: {detected_gesture}",
-                (30, 130),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.9,
-                (0, 255, 255),
-                2
-            )
-
-            if person_detected:
-
-                cv2.putText(
-                    frame,
-                    "Persona detectada",
-                    (30, 50),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 255, 0),
-                    2
-                )
-
-            else:
-
-                cv2.putText(
-                    frame,
-                    "Persona no detectada",
-                    (30, 50),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 0, 255),
-                    2
-                )
-
-            # FPS instantáneo
-            current_time = time.time()
-            time_difference = current_time - previous_time
-            fps = 1 / time_difference if time_difference > 0 else 0
-            previous_time = current_time
-
-            cv2.putText(
-                frame,
-                f"FPS: {int(fps)}",
-                (30, 90),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.8,
-                (255, 255, 255),
-                2
-            )
-
-
-        # -----------------------------
-        # REGISTRAR MÉTRICAS DEL FRAME
-        # -----------------------------
-
-        metrics.end_frame(
-            detected_gesture,
-            person_detected
+        result = pipeline.process(
+            frame,
+            measure=metrics.measure
         )
 
-        # Estado de la evaluación en pantalla
-        metrics.draw_overlay(frame)
+        hand_positions = result.hand_positions
 
+        # -----------------------------
+        # TEXTOS DE JUEGO / TEST
+        # -----------------------------
+
+        if mode != MODE_TRACKING:
+
+            with metrics.measure("dibujo"):
+
+                put_text(
+                    frame,
+                    f"Postura: {result.gesture}",
+                    (30, 130),
+                    (0, 255, 255),
+                    0.9
+                )
+
+                if result.person_detected:
+                    put_text(frame, "Persona detectada",
+                             (30, 50), (0, 255, 0), 1)
+                else:
+                    put_text(frame, "Persona no detectada",
+                             (30, 50), (0, 0, 255), 1)
+
+        # -----------------------------
+        # MÉTRICAS (solo TEST)
+        # -----------------------------
+
+        if mode == MODE_TEST:
+
+            metrics.end_frame(
+                result.gesture,
+                result.person_detected,
+                result.candidates
+            )
+
+            metrics.draw_overlay(frame)
+
+        # -----------------------------
+        # FPS (todos los modos)
+        # -----------------------------
+
+        current_time = time.time()
+        time_difference = current_time - previous_time
+        fps = 1 / time_difference if time_difference > 0 else 0
+        previous_time = current_time
+
+        put_text(
+            frame,
+            f"FPS: {int(fps)}",
+            (30, 90),
+            (255, 255, 255),
+            0.8
+        )
+
+        draw_mode_label(frame, mode)
 
         # -----------------------------
         # MOSTRAR RESULTADO
@@ -344,8 +278,17 @@ try:
         if key == ord("q"):
             break
 
-        # Teclas de evaluación (1-5, 0, x, s)
-        metrics.handle_key(key)
+        # Cambiar de modo
+        if key in MODE_KEYS:
+            mode = change_mode(mode, MODE_KEYS[key])
+
+        elif key == NEXT_MODE_KEY:
+            next_mode = MODES[(MODES.index(mode) + 1) % len(MODES)]
+            mode = change_mode(mode, next_mode)
+
+        # Teclas de pruebas (1-5, 0, x, s) solo en TEST
+        elif mode == MODE_TEST:
+            metrics.handle_key(key)
 
 finally:
 
@@ -356,21 +299,24 @@ finally:
     cap.release()
     cv2.destroyAllWindows()
 
-    pose_detector.close()
-    hand_detector.close()
+    pipeline.close()
 
     # -----------------------------
     # GUARDAR MÉTRICAS Y REPORTE
     # -----------------------------
 
-    json_path = metrics.save()
+    # Solo si se usó el modo TEST
+    if metrics.frame_count > 0:
 
-    try:
-        from Vision.generate_report import generate
-        generate(json_path)
-    except Exception as error:
-        print(
-            "No se pudo generar el reporte automáticamente: "
-            f"{error}"
-        )
-        print("Puedes generarlo con: python generate_report.py")
+        metrics.pause()
+        json_path = metrics.save()
+
+        try:
+            from evaluacion.generate_report import generate
+            generate(json_path)
+        except Exception as error:
+            print(
+                "No se pudo generar el reporte automáticamente: "
+                f"{error}"
+            )
+            print("Puedes generarlo con: python -m evaluacion.generate_report")

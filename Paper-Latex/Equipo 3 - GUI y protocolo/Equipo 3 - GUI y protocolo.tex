@@ -1,0 +1,212 @@
+\documentclass[lettersize,journal]{IEEEtran}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,automata,decorations.pathreplacing}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+% Estilo común de las máquinas de estado (estados en círculo)
+\tikzset{
+	fsm/.style={font=\scriptsize, >={Stealth[length=1.6mm]}, auto,
+		every state/.style={draw, circle, minimum size=1.15cm, inner sep=1pt, align=center,
+			font=\tiny, fill=blue!6}},
+	tr/.style={->, thick},
+	lb/.style={font=\tiny, align=center, inner sep=1pt}
+}
+
+\begin{document}
+	\title{Graphical User Interface of the SOFIA Vision System}
+
+	\author{
+		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
+		Jorge A. Lizarraga, Luis E. González-Jiménez, Luis F. Luque-Vega
+
+		\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
+	}
+
+	\markboth{Laboratory for the Development of Technological Solutions}
+	{Graphical User Interface of the SOFIA Vision System}
+
+	\maketitle
+
+	\begin{abstract}
+		SOFIA is a modular kinetic surface that responds to the gestures of a user. This work presents its graphical user interface (GUI): the window that shows the camera, controls the gesture detection, and sends each recognized gesture to the robot or to its simulation. The GUI runs the video processing and each communication link in separate threads, so that it never freezes. Its behavior is explained with three state machines: the processing thread, which can be started, paused, resumed, and stopped; the reliable sending of commands, with acknowledgements and retransmission; and the link supervision. The same commands can be sent to the robot, to a Webots simulation, or to both at the same time, which turns the simulation into a digital twin of the robot.
+	\end{abstract}
+
+	\begin{IEEEkeywords}
+		Graphical user interface, multithreading, state machines, communication protocol, gesture recognition, Webots, digital twin.
+	\end{IEEEkeywords}
+
+
+	\section{SOFIA in Brief}
+
+	SOFIA is an interactive installation made of 16 hexagonal units in a honeycomb arrangement; each unit can tilt in two directions \cite{sofia_architecture}. It has four parts: (i) a \emph{vision system} that watches the user with a camera and recognizes five gestures (INICIO, RECARGAR, ESCUDO, ATAQUE, and FIN) or follows the position of the right hand, using MediaPipe \cite{lugaresi2019mediapipe}; (ii) the \emph{GUI}, which shows the result and controls the system; (iii) a \emph{robot controller}, which receives commands through a wireless link and moves the units; and (iv) a \emph{simulation} of the 16 units in Webots \cite{webots}, which can play the role of the robot. This paper is about the GUI and how it talks to the robot and to the simulation.
+
+
+	\section{Architecture}
+
+	The GUI was built with PySide6 \cite{pyside6}, the Python version of Qt, because it provides threads that are integrated with the interface (\texttt{QThread}), signals to pass data between threads safely, and a way to pause a thread without consuming CPU. Fig.~\ref{fig:arq} shows the threads. The \emph{GUI thread} only draws the window and handles the buttons. The \emph{vision thread} reads the camera and runs the detection, which takes tens of milliseconds per frame. Each \emph{link thread} talks to one target, the robot over Bluetooth Low Energy \cite{bleak} or the simulation over a local TCP socket, because waiting for an answer may take from milliseconds to seconds. A last thread receives the images of a virtual camera of the simulation. Threads never touch the widgets: they send their results to the GUI thread through Qt signals.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[
+			font=\scriptsize,
+			box/.style={draw, rounded corners=2pt, align=center, minimum height=0.6cm, inner sep=2pt, fill=white},
+			arr/.style={-{Stealth[length=1.6mm]}, thick}
+			]
+			\node[box, fill=blue!8, minimum width=7.6cm] (gui) at (0,0) {GUI thread: video, result, controls, event log};
+			\node[box, fill=green!10, minimum width=1.7cm] (vis) at (-2.9,-1.3) {Vision\\thread};
+			\node[box, fill=orange!12, minimum width=1.7cm] (rob) at (-0.95,-1.3) {Robot link\\(BLE)};
+			\node[box, fill=orange!12, minimum width=1.7cm] (sim) at (0.95,-1.3) {Simulation\\link (TCP)};
+			\node[box, fill=gray!12, minimum width=1.7cm] (cam) at (2.9,-1.3) {Virtual\\camera};
+			\node[box, minimum width=1.7cm] (c) at (-2.9,-2.55) {Camera};
+			\node[box, minimum width=1.7cm] (r) at (-0.95,-2.55) {Robot\\controller};
+			\node[box, minimum width=3.6cm] (w) at (1.9,-2.55) {Webots simulation\\(16 units)};
+			\draw[arr] (vis) -- node[left, font=\tiny]{frame, gesture} (vis |- gui.south);
+			\draw[arr] (gui.south -| rob) -- node[left, font=\tiny]{commands} (rob);
+			\draw[arr] (gui.south -| sim) -- (sim);
+			\draw[arr] (cam) -- node[right, font=\tiny]{images} (cam |- gui.south);
+			\draw[arr] (c) -- (vis);
+			\draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (rob) -- (r);
+			\draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (sim) -- (sim |- w.north);
+			\draw[arr] (cam |- w.north) -- (cam);
+		\end{tikzpicture}
+		\caption{Threads of the GUI. Each box below the GUI thread runs in its own thread and only communicates with it through Qt signals.}
+		\label{fig:arq}
+	\end{figure}
+
+	The window has the video on the left and, on the right, the controls in the order in which they are used: detection (start, pause, resume, stop), mode, result, targets (robot and simulation), and an event log with every command sent and its answer. There are three modes: \emph{game}, where each new gesture is sent once; \emph{tracking}, where the position of the right hand is sent continuously; and \emph{test}, where the GUI asks the user for gestures and measures how often and how fast they are recognized. The image is shown as a mirror, as in a selfie; since the detector names the hands for a non-mirrored image, the GUI swaps them, so that tracking follows the real right hand and ignores the other one.
+
+
+	\section{The Processing Thread}
+
+	The vision thread follows the state machine of Fig.~\ref{fig:worker}. \emph{Start} creates the thread, which opens the camera and loads the models (LOADING) and then processes frames (RUNNING). \emph{Pause} makes the thread wait on a condition without using the CPU, with the camera still open; \emph{resume} wakes it up. \emph{Stop} ends the loop, releases the camera, and sends a STOP command to the robot. Any error, such as a camera that cannot be opened or that stops sending frames, also leads to STOPPED with a message in the window, instead of closing the application. The buttons are enabled according to the state, so only valid transitions can be requested.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (det) at (0,0) {STOPPED};
+			\node[state] (car) at (2.4,0) {LOADING};
+			\node[state, fill=green!10] (cor) at (4.8,0) {RUNNING};
+			\node[state, fill=yellow!15] (pau) at (4.8,-1.9) {PAUSED};
+			\draw[tr] (det) -- node[lb]{start} (car);
+			\draw[tr] (car) -- node[lb]{ready} (cor);
+			\draw[tr] (cor) edge[loop above] node[lb]{frame $\rightarrow$ result} (cor);
+			\draw[tr] (cor) to[bend left=20] node[lb, right]{pause} (pau);
+			\draw[tr] (pau) to[bend left=20] node[lb, left]{resume} (cor);
+			\draw[tr] (cor) to[bend right=40] node[lb, above]{stop / camera lost} (det);
+			\draw[tr] (pau.west) -| node[lb, below, pos=0.3]{stop} (det.south);
+			\draw[tr] (car) to[bend left=35] node[lb, below]{error} (det);
+		\end{tikzpicture}
+		\caption{State machine of the processing thread.}
+		\label{fig:worker}
+	\end{figure}
+
+
+	\section{Talking to the Robot}
+
+	\subsection{Messages}
+
+	Each message is a short frame: a start byte (\texttt{0xA5}), the type, a sequence number, the payload length, the payload (0--14 bytes), and a CRC-8 checksum that detects damaged frames. The messages are listed in Table~\ref{tab:msg}. A gesture is sent with POSE only when it changes, and the hand position with TRACK up to 20 times per second; TRACK is not acknowledged, since a newer position replaces an older one.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Messages}
+		\label{tab:msg}
+		\scriptsize
+		\setlength{\tabcolsep}{2.5pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}P{1.0cm} P{1.5cm} Y@{}}
+			\toprule
+			Type & Direction & Meaning\\
+			\midrule
+			POSE & GUI $\rightarrow$ robot & Recognized gesture (1--5)\\
+			TRACK & GUI $\rightarrow$ robot & Hand position, no acknowledgement\\
+			MODE & GUI $\rightarrow$ robot & Active mode (game, test, tracking)\\
+			PING & GUI $\rightarrow$ robot & Test of the link and heartbeat\\
+			STOP & GUI $\rightarrow$ robot & Go to a safe position\\
+			ACK / NACK & robot $\rightarrow$ GUI & Received / rejected, with an error code\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subsection{Reliable Sending}
+
+	Every command except TRACK is sent with the state machine of Fig.~\ref{fig:ack}, one at a time. After sending, the link waits up to 300~ms for an acknowledgement that matches the type and sequence number of the command. If it does not arrive, or if the frame arrived damaged (NACK with a CRC error), the command is sent again \emph{with the same sequence number}, up to three times; if all fail, it is reported as failed in the event log. Since the sequence number does not change, the robot recognizes a repeated command whose first acknowledgement was lost, answers it again, and does not repeat the movement.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (idle) at (0,0) {IDLE};
+			\node[state] (env) at (2.6,0) {SEND\\$k$-th try};
+			\node[state] (esp) at (5.2,0) {WAIT\\ACK};
+			\node[state, fill=green!10] (ok) at (5.2,-2.0) {DONE};
+			\node[state, fill=red!8] (fal) at (2.6,-2.0) {FAILED};
+			\draw[tr] (idle) -- node[lb]{command} (env);
+			\draw[tr] (env) -- node[lb]{frame} (esp);
+			\draw[tr] (esp) to[bend right=40] node[lb, above]{300 ms or NACK CRC,\\$k<3$: same SEQ} (env);
+			\draw[tr] (esp) -- node[lb, right]{ACK} (ok);
+			\draw[tr] (esp) -- node[lb, above left=-2pt]{$k=3$ or\\other NACK} (fal);
+			\draw[tr] (ok.south) -- ++(0,-0.35) -| node[lb, below, pos=0.25]{next command} (idle.south);
+			\draw[tr] (fal) -- node[lb, above left=-2pt]{log} (idle);
+		\end{tikzpicture}
+		\caption{State machine of the reliable sending of a command (stop-and-wait with retransmission).}
+		\label{fig:ack}
+	\end{figure}
+
+	\subsection{Link Supervision}
+
+	The link itself follows the state machine of Fig.~\ref{fig:link}. When the user presses \emph{connect}, the GUI searches for the robot and opens the link; on success, it sends the active mode. While connected, if nothing has been sent for 1~s, the GUI sends a PING (heartbeat), so that the robot can tell a quiet link from a lost one: if the robot receives nothing for 3~s, it moves to a safe position by itself. If the link is lost, the GUI shows it in the window and returns to DISCONNECTED without closing.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (des) at (0,0) {DISCON-\\NECTED};
+			\node[state] (bus) at (2.6,0) {SEARCH};
+			\node[state, fill=green!10] (con) at (5.2,0) {CONNEC-\\TED};
+			\draw[tr] (des) -- node[lb]{connect} (bus);
+			\draw[tr] (bus) -- node[lb]{found\\$\rightarrow$ MODE} (con);
+			\draw[tr] (bus) to[bend left=35] node[lb, below]{not found} (des);
+			\draw[tr] (con) edge[loop above] node[lb]{1 s quiet $\rightarrow$ PING} (con);
+			\draw[tr] (con) to[bend right=35] node[lb, above]{link lost / disconnect} (des);
+		\end{tikzpicture}
+		\caption{State machine of the link supervision.}
+		\label{fig:link}
+	\end{figure}
+
+
+	\section{Simulation and Digital Twin}
+
+	The simulation receives \emph{exactly the same frames} as the robot, so it also tests the protocol, not only the movements. Since TCP carries a stream of bytes instead of separate packets, each frame is preceded by one byte with its length. A simulated controller in Webots validates and acknowledges the frames with the same rules and moves the 16 simulated units: in game mode, each gesture draws a pattern with the whole array; in tracking mode, the units point at a sphere that follows the hand. A local link never loses frames, so the GUI can optionally add delay ($30\pm10$~ms), losses (3\,\%), and damaged bytes (2\,\%), like a wireless link, to see the retransmissions of Fig.~\ref{fig:ack} in action. A virtual camera above the array sends its images ($320\times320$~px, about 15 per second) through a separate socket and thread, so the user sees, in the same window, the gesture and the response of the simulated array.
+
+	The GUI sends each command to \emph{every} connected target. With only the simulation connected, the whole system can be tested without the robot; with only the robot, it works as usual; and with both, every command reaches the robot and the simulation at the same time, which then works as a digital twin. The event log labels each answer with its target, so both responses can be compared.
+
+
+	\section{Verification}
+
+	The GUI was tested with the camera and the detection replaced by stubs, applying the controls in sequence: the thread went through LOADING, RUNNING, PAUSED, RUNNING, and STOPPED, and sent no frames while paused. The link was tested against a simulated robot: commands were acknowledged; a lost acknowledgement caused a retransmission with the same sequence number and a single execution; a robot that never answers produced three attempts and a failure; TRACK was limited to 20 frames per second; and a PING was sent after 1~s without traffic. With the Webots simulation, every gesture drew its pattern on the 16 units, and the units followed the sphere only in tracking mode. A preliminary test with the physical robot confirmed the wireless link and the movement of one unit. Pending are a quantitative measurement on the robot and the test of the digital twin with both targets connected.
+
+
+	\section{Conclusions}
+
+	The GUI of SOFIA keeps the interface responsive by running the video processing and each communication link in separate threads. Its main behaviors are simple state machines: the processing thread (start, pause, resume, stop, and recovery from camera errors), the reliable sending of commands (acknowledgement, retransmission with the same sequence number, and failure report), and the link supervision (heartbeat and safe position). Because the simulation speaks the same protocol as the robot, the system can be developed and tested without hardware and can run a digital twin of the robot. Future work includes the automatic reconnection of the link, the stress tests with several users and lighting conditions, and the measurement of the time from gesture to movement on the robot.
+
+	\balance
+
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliography}
+
+\end{document}

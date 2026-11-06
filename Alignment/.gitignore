@@ -1,0 +1,13 @@
+# Generado en build/ (pesa mucho; no se sube)
+build/datos/
+*.pt
+*.pth
+*.npz
+# (excepción: results/modelo/ sí sube su cnn.pt, ver su .gitignore)
+
+# Reportes guardados desde la app
+results/diagnosticos/
+
+__pycache__/
+
+.venv/

@@ -1,0 +1,6 @@
+# Mallas y binarios: git no debe cambiarles los fines de línea
+*.stl binary
+*.STL binary
+*.png binary
+*.jpg binary
+*.pt binary

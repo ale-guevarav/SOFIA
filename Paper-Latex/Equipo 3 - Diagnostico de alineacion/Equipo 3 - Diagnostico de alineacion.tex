@@ -1,0 +1,219 @@
+\documentclass[lettersize,journal]{IEEEtran}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc,automata}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+% Estilo común de las máquinas de estado
+\tikzset{
+	fsm/.style={font=\scriptsize, >={Stealth[length=1.6mm]}, auto, node distance=1.15cm and 1.5cm,
+		every state/.style={draw, circle, minimum size=1.2cm, inner sep=1pt, align=center,
+			font=\tiny, fill=blue!6}},
+	tr/.style={->, thick},
+	lb/.style={font=\tiny, align=center, inner sep=1pt}
+}
+
+\begin{document}
+	\title{Vision-Based Misalignment Diagnosis of the SOFIA Units: From a First Run to a Larger Dataset}
+
+	\author{
+		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
+		Jorge A. Lizarraga, Luis E. González-Jiménez, Luis F. Luque-Vega
+
+		\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
+	}
+
+	\markboth{Laboratory for the Development of Technological Solutions}
+	{Vision-Based Misalignment Diagnosis of the SOFIA Units}
+
+	\maketitle
+
+	\begin{abstract}
+		A SOFIA module has 16 hexagonal plates, and each one can tilt in two directions \cite{sofia_architecture}. This work estimates the two angles of every plate from one overhead photograph and labels each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Three methods were compared on images generated in Webots: a geometric method without training, a small convolutional neural network (CNN), and a hybrid rule that combines them. A first run used simplified plates and 2000 images; a second run used the simulation model of the real unit and 10\,000 images. In the second run, the CNN reached a mean error of $0.20^\circ$ (before, $0.25^\circ$) and became the best method in every range, while the geometric method and, with it, the hybrid rule lost accuracy because the plate of the real unit moves less per degree. The algorithms are explained as state machines.
+	\end{abstract}
+
+	\begin{IEEEkeywords}
+		Misalignment diagnosis, ArUco markers, convolutional neural networks, Webots, synthetic data, state machines.
+	\end{IEEEkeywords}
+
+
+	\section{How the Samples Were Obtained}
+
+	\subsection{The Photograph}
+
+	Four ArUco markers \cite{aruco} are placed around the module, at the height of the plates. From their centers, the photograph is \emph{rectified}: it is converted into a top view where 1~px equals 1~mm, no matter where the camera is. In that view, every plate at zero always falls on the same pixel, so a square crop of $128\times128$~px is cut around each plate. The 16 crops are what the methods receive.
+
+	\subsection{The Generator in Webots}
+
+	Taking thousands of real photographs with known angles is not practical, so the photographs were generated in Webots \cite{webots}, where the angles are known exactly. A supervisor controller and the 16 plate controllers follow the state machine of Fig.~\ref{fig:gen}. For each sample, the supervisor chooses random angles and a random scene (camera height of 1.30--1.40~m, tilt of up to $\pm4^\circ$, yaw of up to $\pm8^\circ$, lights, and floor), sends the angles, and waits until all 16 plates report that they are still. Only then it takes the photograph and saves, as the label, the angles \emph{measured} by the joint sensors, not the commanded ones. If a plate does not arrive within 3~s, the sample is discarded. Sample~0, with every plate at zero, is the reference.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (esc) at (0,0) {SCENE};
+			\node[state] (ord) at (2.35,0) {SEND\\ANGLES};
+			\node[state] (esp) at (4.7,0) {WAIT};
+			\node[state] (foto) at (4.7,-1.5) {PHOTO +\\LABELS};
+			\node[state, fill=red!8] (desc) at (2.35,-1.5) {DISCARD};
+			\node[state, accepting, fill=green!8] (fin) at (6.85,-1.5) {END};
+			\draw[tr] (esc) -- node[lb]{random\\camera, light} (ord);
+			\draw[tr] (ord) -- node[lb]{16 targets} (esp);
+			\draw[tr] (esp) edge[loop above] node[lb]{moving} (esp);
+			\draw[tr] (esp) -- node[lb, right]{16 still} (foto);
+			\draw[tr] (esp) -- node[lb, above left=-1pt]{3 s} (desc);
+			\draw[tr] (desc) -- node[lb, below left=-1pt]{next} (esc);
+			\draw[tr] (foto) -- node[lb]{$N$ samples} (fin);
+			\draw[tr] (foto.south) -- ++(0,-0.35) -| node[lb, below, pos=0.25]{next sample} (esc.south);
+		\end{tikzpicture}
+		\caption{State machine of the dataset generator. A photograph is taken only when the 16 plates report that they reached their target.}
+		\label{fig:gen}
+	\end{figure}
+
+	\subsection{First Run and Second Run}
+
+	Table~\ref{tab:runs} compares the two runs. The second run replaced the simplified plates with the PROTO of the real unit (generated from its CAD model with \texttt{urdf2webots} \cite{urdf2webots}), placed the units as close as possible without collisions, moved the markers closer, used five times more images, and changed how the angles are chosen: in the first run they were uniform, while in the second they follow what is expected in the robot, mostly small misalignments and sometimes large ones, as if a plate were moved by hand or jammed. In both runs the images were split \emph{by photograph} into training, validation, and test sets, so the 16 plates of one photograph never fall in different sets.
+
+	\begin{table}[!t]
+		\centering
+		\caption{The Two Runs}
+		\label{tab:runs}
+		\scriptsize
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}P{2.0cm} Y Y@{}}
+			\toprule
+			& First run & Second run\\
+			\midrule
+			Unit & Simplified plate, 69~mm, arm $L=58$~mm & Real unit (PROTO), 60~mm, arm $L=37$~mm\\
+			Markers & 0.76~m square & 0.60~m square\\
+			Images (train / val / test) & 2000 (1399 / 300 / 300) & 10\,000 (6999 / 1500 / 1500)\\
+			Angles per plate & 5\,\% zero, 50\,\% within $\pm3^\circ$, 45\,\% within $\pm27^\circ$ & 10\,\% zero, 60\,\% up to $5^\circ$, 20\,\% 5--$15^\circ$, 10\,\% $15^\circ$--limit\\
+			CNN training & 40 epochs, 84~min & 25 epochs, $\approx$4~h, in parts\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+
+	\section{Methods and Training}
+
+	\subsection{Geometric Method}
+
+	It finds each plate in the top view and measures how far its center moved from the reference. With the plate at a distance $L$ from the joint axes, the shift is $\Delta v = L\sin\theta_2$ and $\Delta u = L\cos\theta_2\sin\theta_1$, which gives the two angles directly. It needs no training, but an error of 1~mm in the position becomes an error of $1/L$ radians: $1.0^\circ$ with $L=58$~mm and $1.5^\circ$ with $L=37$~mm.
+
+	\subsection{CNN}
+
+	A small CNN (five blocks of convolutions, 1.28~M parameters) receives one crop and returns the two angles. It was trained in PyTorch \cite{pytorch} with the training images, mirrored and with random changes of light and noise so that it does not depend on a single scene. After every epoch, its error is measured on the validation images, and only the best epoch is kept. The test images are used once, at the end, to report the results.
+
+	Since the second run takes about 4~hours, training was split into sessions with the state machine of Fig.~\ref{fig:train}. The complete state (weights, optimizer, and learning rate) is saved after every epoch, so a session can stop after a time limit or with Ctrl+C and the next one resumes at the same epoch, as if it had not stopped.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (car) at (0,0) {LOAD};
+			\node[state] (ent) at (2.4,0) {TRAIN\\EPOCH};
+			\node[state] (val) at (4.8,0) {VALIDATE\\+ SAVE};
+			\node[state, fill=yellow!15] (pau) at (4.8,-1.5) {PAUSE};
+			\node[state, accepting, fill=green!8] (test) at (2.4,-1.5) {TEST};
+			\draw[tr] (car) -- node[lb]{data in\\the GPU} (ent);
+			\draw[tr] (ent) -- (val);
+			\draw[tr] (val) to[bend right=35] node[lb, above]{next epoch} (ent);
+			\draw[tr] (val) -- node[lb, right]{time limit\\or Ctrl+C} (pau);
+			\draw[tr] (val) -- node[lb, above left=-1pt]{last epoch} (test);
+			\draw[tr] (pau.south) -- ++(0,-0.35) -| node[lb, below, pos=0.25]{resume: same epoch and learning rate} (car.south);
+		\end{tikzpicture}
+		\caption{State machine of the training. The state is saved after every epoch, so training can be split into several sessions.}
+		\label{fig:train}
+	\end{figure}
+
+	\subsection{Hybrid Rule}
+
+	Both methods are run, and for each plate: if they differ by more than $2^\circ$, the CNN is used and the plate is marked for inspection; if they agree and the plate is near zero ($\le6^\circ$), the geometric value is used; otherwise, the CNN. It was designed in the first run, where the geometric method was the most accurate near zero.
+
+	\subsection{Why ResNet18 Was Dropped}
+
+	In the first run, a ResNet18 \cite{resnet} pretrained on ImageNet was also trained. Although it is ten times larger (13.3~M parameters), it was less accurate than the small CNN (Table~\ref{tab:results}): what it learned from everyday photographs does not help to measure a shift of a few pixels. For this reason, and to save training time, it was not used in the second run.
+
+
+	\section{Results}
+	\label{sec:results}
+
+	Table~\ref{tab:results} shows the error on the test images of each run (300 and 1500 photographs). The two test sets are not the same, since the unit and the distribution of angles changed, so the comparison is between the two complete setups.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Test Error ($^\circ$) and State Accuracy}
+		\label{tab:results}
+		\scriptsize
+		\setlength{\tabcolsep}{2.5pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c c c c@{}}
+			\toprule
+			Method & Mean & Max & $0$--$5^\circ$ & $>15^\circ$ & States\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{First run (simplified plates, 2000 images)}}\\
+			Geometric & 0.539 & 74.0 & \textbf{0.13} & 1.30 & 97.2\,\%\\
+			CNN & 0.248 & 4.4 & 0.18 & \textbf{0.36} & 96.3\,\%\\
+			ResNet18 & 0.293 & 4.1 & 0.21 & 0.43 & 95.9\,\%\\
+			Hybrid & \textbf{0.223} & 4.4 & \textbf{0.13} & \textbf{0.36} & \textbf{97.2\,\%}\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{Second run (real unit, 10\,000 images)}}\\
+			Geometric & 0.521 & 5.9 & 0.33 & 1.60 & 94.1\,\%\\
+			CNN & \textbf{0.204} & \textbf{3.3} & \textbf{0.17} & \textbf{0.41} & \textbf{96.8\,\%}\\
+			Hybrid & 0.329 & \textbf{3.3} & 0.33 & \textbf{0.41} & 94.1\,\%\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\textbf{First run.} Each method was good at something different. The geometric method was the most precise near zero ($0.13^\circ$), but sometimes failed badly (up to $74^\circ$) when a very tilted plate was confused with its neighbor. The CNN never failed badly (at most $4.4^\circ$). The hybrid rule took the best of both and was the best method ($0.223^\circ$).
+
+	\textbf{Second run.} The CNN improved to $0.204^\circ$ with an error of at most $3.3^\circ$ in 24\,000 plates, and became the best method in every range, even near zero. The geometric method lost precision near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the arm of the real unit is shorter, so the plate moves less per degree and each pixel of error weighs more; on the other hand, it no longer fails badly (at most $5.9^\circ$). As a consequence, the hybrid rule \emph{fell} from the best to the middle ($0.329^\circ$): it uses the geometric value precisely near zero, where it is now the least precise. Its inspection marks are not useful either: 873 of its 901 marks were errors of the geometric method, not of the CNN. The CNN is therefore the default method; the geometric method remains as a fallback without a GPU.
+
+	Two lessons follow. First, more and more realistic images made the CNN better, even with a harder unit. Second, a CNN must be retrained when the unit changes: the CNN of the first run, tested on the real unit, had an error of $1.6^\circ$.
+
+
+	\section{Diagnosis Application}
+
+	The methods are used in an application with its own processing thread, which can read a camera, saved photographs, or a live Webots simulation. In the live mode, the application moves the simulated plates and checks each diagnosis against the measured angles. The difficulty is to analyze the right photograph: one taken after the plates stopped, and only once per movement. This is solved with the state machine of Fig.~\ref{fig:live}: every command increases a version number, and a photograph carries that version only when the 16 plates are still.
+
+	\begin{figure}[!t]
+		\centering
+		\begin{tikzpicture}[fsm]
+			\node[state, initial, initial text=] (esp) {WAIT\\COMMAND};
+			\node[state, right=of esp] (mov) {MOVING\\(version $v$)};
+			\node[state, right=of mov] (qui) {STILL};
+			\node[state, below=of qui, fill=green!8] (ana) {ANALYZE\\photo $v$};
+			\draw[tr] (esp) -- node[lb]{command\\$v \leftarrow v+1$} (mov);
+			\draw[tr] (mov) edge[loop above] node[lb]{photos with\\version 0} (mov);
+			\draw[tr] (mov) -- node[lb]{16 plates\\still} (qui);
+			\draw[tr] (qui) -- node[lb, right]{photo with\\version $v$} (ana);
+			\draw[tr] (ana) -| node[lb, below, pos=0.25]{once per version} (esp);
+		\end{tikzpicture}
+		\caption{State machine of the live mode. Each command produces exactly one diagnosis, with a photograph taken after the plates stopped.}
+		\label{fig:live}
+	\end{figure}
+
+
+	\section{Conclusions}
+
+	One photograph with four markers is enough to estimate the angles of the 16 plates. In a first run, a hybrid rule was the best method because the geometric method and the CNN failed in different places. With the real unit and five times more realistic images, the CNN became the best method everywhere ($0.20^\circ$ of mean error, $3.3^\circ$ at most, and 96.8\,\% of correct states), and the hybrid rule stopped being useful, since the shorter arm of the real unit penalizes the geometric method. ResNet18 was dropped because a larger network did not help. The next step is to test the CNN with photographs of the physical module and fine-tune it with a few real images.
+
+	\balance
+
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliography}
+
+\end{document}
