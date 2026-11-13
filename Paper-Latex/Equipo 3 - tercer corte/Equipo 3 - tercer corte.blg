@@ -1,6 +1,6 @@
 This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
-The top-level auxiliary file: Equipo 3 - segundo corte.aux
+The top-level auxiliary file: Equipo 3 - tercer corte.aux
 Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: IEEEtran.bst
 Reallocating 'name_of_file' (item size: 1) to 13 items.
@@ -10,7 +10,7 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'wiz_functions' (item size: 4) to 6000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: bibliography.bib
-Repeated entry---line 46 of file bibliography.bib
+Repeated entry---line 91 of file bibliography.bib
  : @misc{pca9685
  :              ,
 I'm skipping whatever remains of this entry
@@ -21,7 +21,7 @@ I'm skipping whatever remains of this entry
 Done.
 You've used 17 entries,
             4087 wiz_defined-function locations,
-            905 strings with 10635 characters,
+            905 strings with 10633 characters,
 and the built_in function-call counts, 10245 in all, are:
 = -- 786
 > -- 202

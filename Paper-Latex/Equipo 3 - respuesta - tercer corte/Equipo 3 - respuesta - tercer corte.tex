@@ -1,0 +1,170 @@
+%=================================================================
+% PLANTILLA -- Respuesta a los revisores -- Segundo Corte
+% LabDST RoboCoffee, ITESO.
+%
+% Como usarla:
+%   1. Copien esta carpeta junto a la carpeta de su paper revisado
+%      (las dos carpetas deben ser HERMANAS) y cambien "N" por el
+%      numero de su equipo, en el nombre de la carpeta y del .tex.
+%   2. Ajusten la ruta de \LabDSTpaper: relativa, SIN extension,
+%      entre comillas y en UNA sola linea.
+%   3. En el paper, marquen cada cambio con \linelabel{ln:...} (texto)
+%      o \label{sec:/fig:/tab:/eq:...} (secciones, figuras, tablas,
+%      ecuaciones).
+%   4. Escriban un \LabDSTcomment por CADA clave del PDF de
+%      observaciones (R1.1, R1.2, ..., R4.n), en el mismo orden.
+%   5. Compilen primero el paper (pdflatex -> bibtex -> pdflatex ->
+%      pdflatex) y despues esta carta DOS veces (pdflatex x2).
+%      Si aparece "??", revisen la ruta o el nombre de la etiqueta.
+%
+% La carta se escribe en ingles, como el paper. El comentario del
+% revisor se copia TEXTUAL desde el PDF de observaciones.
+%
+% \LabDSTcomment{Clave}{Estado}{Ubicacion}{Comentario}{Respuesta}
+%   Estado:    A = Addressed
+%              P = Partially addressed
+%              N = Not addressed (justified)
+%   Ubicacion: \rln{x} -> "line NN"     \rlns{x}{y} -> "lines NN--MM"
+%              \Rln, \Rlns (inicio de oracion), Section~\ref{sec:...},
+%              Fig.~\ref{fig:...}, Table~\ref{tab:...}, \eqref{eq:...}
+%   \LabDSTquote{...} cita el texto NUEVO del paper.
+%
+% Borren los comentarios <...> y todo lo que este entre < >.
+%=================================================================
+\documentclass{LabDSTresponse}
+\LabDSTpaper{"../Equipo 3 - tercer corte/Equipo 3 - tercer corte"}
+
+\begin{document}
+	\LabDSTtitle{Second Cut}{Team 3}{Servo Characterization for the SOFIA Modular Kinetic
+		Surface}
+	
+	%-----------------------------------------------------------------
+	\LabDSTsection{Acknowledgements}
+	
+	The authors thank the reviewers for their careful evaluation of the first-cut manuscript. Their comments helped clarify the research scope, experimental methodology, and electrical compatibility. All comments were considered; the responses below follow the keys of the review report (R1.1, R1.2, \ldots). Line, section, figure, table, and equation numbers refer to the revised manuscript that accompanies this letter.
+	
+	\textbf{Main changes.} (i) Refined problem statement and objectives (Section~\ref{sec:intro}). (ii) Expanded characterization methodology (Section~\ref{sec:methods}). (iii) Documented RS-485 voltage-level adaptation (Section~\ref{sec:rs485_logic}).
+	
+	\LabDSTsummary
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{1}{Format, LaTeX and template compliance}
+	
+	\LabDSTcomment{R1.1}{A}{}
+	{Discussion y Conclusions son solo encabezados, y no existen Author Contributions, Data Availability (con la URL del
+		repositorio), Acknowledgment (con la declaración de uso de IA) ni Conflicts of Interest. Era la observación R1.5 del primer
+		corte.}
+	{}
+	
+	\LabDSTcomment{R1.2}{A}{}
+	{Los nombres de los gestos están en español: INICIO, FIN, RECARGAR, ESCUDO y ATAQUE. También hay un error de
+		espacio: “in thisstudy” (Línea 162).
+	}
+	{}
+	
+	\LabDSTcomment{R1.3}{A}{}
+	{La Fig. 1 mide 6 cm de ancho y su texto interno (“CH 1”, “JST-PH (MALE)”) no se lee impreso. Tampoco muestra el riel
+		de 5 V, la fuente, el transceptor RS-485 ni el dispositivo de corona. El esquemático (Fig. 4) es ilegible a una columna, y la
+		PCB (Fig. 5) no tiene cotas ni identificación de pistas.}
+	{}
+	
+	\LabDSTcomment{R1.4}{A}{}
+	{La lista de autores no incluye a la profesora Graciela Baca, y la afiliación no indica el departamento.}
+	{}
+	
+	\LabDSTcomment{R1.5}{A}{}
+	{El BOM conserva elementos sin describir (“Pro3”, “Axis 1 (9 × 9 mm)”, “Inser M3x5x4”) y una fila “MG90S / SG90”,
+		aunque la Tabla IX descarta el SG90. El PCA9685 se atribuye a “NXP Semi”, pero se usa como módulo comercial. Faltan
+		el divisor del RS-485 como componente de la PCB y la fuente de alimentación}
+	{}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{2}{Scientific Writing and Language}
+	
+	\LabDSTcomment{R2.1}{A}{}
+	{El abstract describe el método propuesto, pero no da ningún resultado, aunque ya existen: la medición de 5.00 V y el divisor,
+		y las métricas de los gestos. Además, describe el dispositivo de corona como si fuera parte del trabajo, cuando no se ha
+		diseñado.}
+	{}
+	
+	\LabDSTcomment{R2.1}{A}{}
+	{Hay afirmaciones que los datos no sostienen:
+		• “power supply stability and protection against voltage sags must be managed through software-level trajectory
+		smoothing” (Línea 424): el suavizado reduce los picos, pero no sustituye una fuente y una distribución de potencia dimensionadas;
+		• “little mechanical chatter and motion desynchronization occurred, establishing 350◦
+		/s as the maximum operational
+		threshold” (Línea 435): no hay tabla, gráfica ni criterio que defina el umbral;
+		• “Preliminary observations from the velocity sweeps confirm small timing variations between identical micro-servos”
+		(Línea 445): no se reporta ninguna medición de tiempo.}
+	{}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{3}{Technical Content: Materials and Methods, and Design and Implementation}
+	
+	\LabDSTcomment{R3.1}{A}{}
+	{El esquemático tiene tres errores eléctricos que el texto no menciona:
+		• Lógica del PCA9685 a 5 V. La terminal VCC de J1 y J2 está en la red VCC, que es el pin de 5 V de la ESP32-C3.
+		El pin de 3.3 V no está conectado. Así, los PCA9685 operan su lógica a 5 V y, en los módulos comerciales, las
+		resistencias de pull-up de SDA y SCL llevan 5 V a GPIO0 y GPIO1, que no toleran 5 V. La Tabla V dice lo contrario:
+		“Uses 3.3 V logic power supply”.
+		4
+		• LED en pines de arranque. El LED RGB está en GPIO8 (azul) y GPIO9 (verde), y OE en GPIO2: son los tres pines
+		de arranque que la Tabla IV pide verificar. Un LED con su resistencia a tierra puede bajar GPIO9 en el arranque y
+		dejar la ESP32-C3 en modo de descarga. Además, R1–R3 no tienen valor en el esquemático.
+		• Potencia de los servos por JST-PH. El riel V+ de los servos solo entra por J3/J4, conectores JST-PH de 2.0 mm
+		que soportan alrededor de 2 A por contacto. El propio artículo estima más de 22 A para 32 servos (Línea 411). La
+		arquitectura de SOFIA usa JST-VH (observación R3.6 del primer corte).
+		Tampoco hay capacitores de desacoplo ni de bulk}
+	{}
+	
+	\LabDSTcomment{R3.2}{A}{}
+	{La sección de potencia usa “approximately 250 mA during movement” y “peak stall currents reaching up to 700 mA” sin
+		fuente, mientras la Tabla VI dice que la corriente de bloqueo “Not reported” requiere medición. No se dimensiona la fuente
+		ni se dice qué corriente soporta la PCB.}
+	{}
+	
+	\LabDSTcomment{R3.3}{A}{}
+	{El dispositivo de corona con interruptores de límite, que es la base del diferenciador, solo se menciona: no hay CAD, figura,
+		número ni posición de los interruptores, resolución angular, ni cómo se registra el tiempo (interrupciones de la ESP32-C3,
+		timer, frecuencia). Además, el protocolo (Línea 244) habla de medir el “transient velocity profile”, pero unos interruptores
+		en posiciones fijas dan tiempos de paso, no un perfil continuo. No se explica cómo se ajusta $\tau_m$m a esos tiempos.}
+	{}
+	
+	\LabDSTcomment{R3.4}{A}{}
+	{No se describe la arquitectura del firmware de la ESP32-C3 ni el formato de los mensajes entre la PC y la ESP32-C3 (Wi-Fi
+		o Bluetooth), ni el uso del RS-485 entre placas (Línea 180). El valor de $\alpha_m$ del Algoritmo 1 no se da.}
+	{}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{4}{D-Lab Methodology, Results, and Validation}
+	
+	\LabDSTcomment{R4.1}{P}{}
+	{La pregunta de investigación es si estimar $\tau_m$m e integrarla al controlador mejora la sincronización. Ninguna de las dos partes
+		avanzó: no hay dispositivo ni $\tau_m$m medido, y el resultado que se reporta es el reconocimiento de gestos, que no responde la
+		pregunta. La Línea 445 pospone la medición al siguiente corte.}
+	{}
+	
+	\LabDSTcomment{R4.2}{P}{}
+	{Las métricas de la Tabla XIV no son consistentes:
+		• La Línea 490 dice que ESCUDO se confundió con RECARGAR. Pero RECARGAR tiene precisión de 100%, lo que
+		no es posible si hubo ESCUDOs detectados como RECARGAR.
+		• FIN tiene precisión de 70%, es decir, tres detecciones falsas de FIN que no aparecen en ninguna otra fila.
+		• La columna Accuracy es igual a Recall en todas las filas: por clase, eso es la tasa de aciertos, no la exactitud.
+		• La Tabla XV tiene 4 intentos de ESCUDO y la Tabla XIV 12, sin decir si son la misma prueba. La Línea 499 aclara
+		que las mediciones preliminares son de una versión anterior, pero no dice si la Tabla XIV lo es.
+		Con 6–16 intentos por clase y sin intervalos de confianza, los porcentajes tienen mucha incertidumbre}
+	{}
+	
+	\LabDSTcomment{R4.3}{P}{}
+	{La pregunta y el objetivo 3 hablan de “a 32-actuator kinetic surface” y de igualar los tiempos de asentamiento de todos
+		los actuadores, pero el alcance declarado es de dos servos de un módulo (Línea 162). El objetivo 1 (diseñar la PCB) no se
+		relaciona con la pregunta, y los gestos no se relacionan con ningún objetivo.}
+	{}
+	
+	\LabDSTcomment{R4.4}{P}{}
+	{Sigue sin haber análisis Discover del demostrador: la Línea 113 habla de “the functional decomposition of the demonstrator”, pero no se muestra. No se declaran el repositorio en GitHub ni la bitácora, y no hay incrementos de integración
+		documentados.}
+	{}
+	
+	
+\end{document}

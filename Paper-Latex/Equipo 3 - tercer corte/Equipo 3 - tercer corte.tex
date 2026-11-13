@@ -254,7 +254,7 @@
 	These variables will be considered when evaluating differences in the dynamic response of the two servomotors.
 	
 	The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
-	\linelabel{ln:only2}However, only the two servomotors of the selected module will be evaluated experimentally in thisstudy.
+	\linelabel{ln:only2}However, only the two servomotors of the selected module will be evaluated experimentally in this study.
 	
 	\linelabel{ln:requirements-intro}The main electrical, communication, and mechanical requirements of the SOFIA demonstrator are summarized in Table~\ref{tab:sofia_requirements}. These requirements are based on the system architecture and the established technical verification criteria \cite{sofia_architecture,technical_session}.
 	
@@ -773,7 +773,7 @@
 	
 	\linelabel{ln:model-vis2}Captured BGR frames are converted to RGB for MediaPipe processing. Body landmarks are filtered via an Exponential Moving Average (EMA) to reduce frame-to-frame fluctuations, enabling the system to evaluate normalized distances, joint angles, and relative positions. Hand landmarks are concurrently analyzed to identify specific finger configurations.
 	
-	\linelabel{ln:model-vis3}The system recognizes five gestures divided into dynamic gestures (INICIO and FIN, requiring movement sequences over time) and static gestures (RECARGAR, ESCUDO, and ATAQUE, defined by specific body and hand configurations). Once recognized, the interface displays the gesture label, detected landmarks, and a real-time frames-per-second (FPS) indicator.
+	\linelabel{ln:model-vis3}The system recognizes five gestures divided into dynamic gestures (START and END, requiring movement sequences over time) and static gestures (RELOAD, SHIELD, and ATTACK, defined by specific body and hand configurations). Once recognized, the interface displays the gesture label, detected landmarks, and a real-time frames-per-second (FPS) indicator.
 	
 	\linelabel{ln:model-vis4}Currently, the subsystem operates as an independent perception prototype. Although designed for human-robot interaction, direct communication with the ESP32-C3 controller and physical module actuation have not yet been experimentally verified.
 	
