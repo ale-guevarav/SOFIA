@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  13 NOV 2026 15:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  13 NOV 2026 15:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -337,34 +337,52 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 39.
 
+
+LaTeX Warning: Reference `ln:ln:model-vis3' on page 1 undefined on input line 4
+8.
+
+
+LaTeX Warning: Reference `ln:ln:only2' on page 1 undefined on input line 48.
+
+
+LaTeX Warning: Reference `ln:ln:model-vis3' on page 1 undefined on input line 6
+9.
+
+
+LaTeX Warning: Reference `ln:ln:only2' on page 1 undefined on input line 69.
+
 [1
 
 {C:/Users/Marrc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Marr
 c/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 7
-9.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 8
+5.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 LaTeX Info: Symbol \textopenbullet not provided by
             font family ptm in TS1 encoding.
-            Default family used instead on input line 99.
+            Default family used instead on input line 105.
 
 [2] [3] [4] (Equipo 3 - respuesta - tercer corte.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-07-20>
  ***********
+
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 3590 strings out of 467501
- 54356 string characters out of 5408550
- 498932 words of memory out of 5000000
- 32793 multiletter control sequences out of 15000+600000
+ 3592 strings out of 467501
+ 54387 string characters out of 5408550
+ 498961 words of memory out of 5000000
+ 32795 multiletter control sequences out of 15000+600000
  660026 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,6n,79p,483b,216s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,6n,79p,483b,215s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Marrc\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1000.pk><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmsy10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
@@ -373,7 +391,7 @@ imes/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
 imes/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmri8a.pfb>
-Output written on "Equipo 3 - respuesta - tercer corte.pdf" (4 pages, 86260 byt
+Output written on "Equipo 3 - respuesta - tercer corte.pdf" (4 pages, 87301 byt
 es).
 PDF statistics:
  51 PDF objects out of 1000 (max. 8388607)
