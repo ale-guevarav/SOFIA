@@ -107,7 +107,7 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{3}{Technical Content: Materials and Methods, and Design and Implementation}
 	
-	\LabDSTcomment{R3.1}{A}{}
+	\LabDSTcomment{R3.1}{P}{}
 	{El esquemático tiene tres errores eléctricos que el texto no menciona:
 		• Lógica del PCA9685 a 5 V. La terminal VCC de J1 y J2 está en la red VCC, que es el pin de 5 V de la ESP32-C3.
 		El pin de 3.3 V no está conectado. Así, los PCA9685 operan su lógica a 5 V y, en los módulos comerciales, las
@@ -121,7 +121,15 @@
 		que soportan alrededor de 2 A por contacto. El propio artículo estima más de 22 A para 32 servos (Línea 411). La
 		arquitectura de SOFIA usa JST-VH (observación R3.6 del primer corte).
 		Tampoco hay capacitores de desacoplo ni de bulk}
-	{}
+	{We thank the reviewer for identifying these important electrical design limitations. The observations highlight aspects of the PCB that require further verification and improvement.
+	
+	A. PCA9685 logic voltage: In the current design, the PCA9685 modules receive their logic supply from the 5 V pin of the ESP32-C3, while the servomotors are powered by a separate external 5 V supply. We acknowledge that this arrangement does not guarantee voltage compatibility between the PCA9685 I²C interface and the 3.3 V GPIOs of the ESP32-C3. Therefore, the logic supply and I²C pull-up configuration require correction and electrical verification.
+	
+	B. ESP32-C3 boot pins: We acknowledge the potential risks associated with using GPIO2, GPIO8, and GPIO9, which have boot-strapping functions. The current PCB design has not been revised to eliminate these risks. A future hardware revision will evaluate the reassignment of these connections and verify their electrical states during startup.
+	
+	C. Power distribution and connectors: We agree that the current PCB requires further analysis of its power distribution and connector current ratings. A complete experimental characterization of the simultaneous current consumption of the 32 servomotors has not been performed. Since this study focuses on the development and integration of the SOFIA control architecture, full-scale power distribution validation is outside the current experimental scope. Consequently, the existing design cannot yet be considered electrically validated for simultaneous full-load operation of all actuators.
+	
+	D. Decoupling capacitors: We acknowledge the importance of local decoupling and bulk capacitance for maintaining supply stability during operation. The present design has not undergone a complete verification of its decoupling requirements. Future PCB revisions will include an evaluation of the existing module-level capacitors and any additional components required to improve power integrity.}
 	
 	\LabDSTcomment{R3.2}{A}{}
 	{La sección de potencia usa “approximately 250 mA during movement” y “peak stall currents reaching up to 700 mA” sin

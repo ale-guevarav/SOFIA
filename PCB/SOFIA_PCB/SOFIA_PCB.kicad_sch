@@ -2319,16 +2319,6 @@
 		)
 		(uuid "03cb63cd-912c-4a0b-8b4e-a9fdc7bba6c7")
 	)
-	(label "Red"
-		(at 139.7 110.49 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "071824df-fb7c-42c4-b199-7170028a39d7")
-	)
 	(label "GND"
 		(at 181.61 78.74 180)
 		(effects
@@ -2369,6 +2359,26 @@
 		)
 		(uuid "136247aa-33c6-458d-ac27-e0c1fb22fd79")
 	)
+	(label "Green"
+		(at 139.7 113.03 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1c69bdff-faf3-4bda-8b3f-b298b8d657d5")
+	)
+	(label "Red"
+		(at 139.7 115.57 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1d2857d6-a13e-43b7-96a3-ff7ecdb2e501")
+	)
 	(label "GND"
 		(at 154.94 105.41 180)
 		(effects
@@ -2379,7 +2389,7 @@
 		)
 		(uuid "1d6c65ec-059d-4a5b-aa1d-d9f16e185ffb")
 	)
-	(label "VCC"
+	(label "+5V"
 		(at 81.28 113.03 0)
 		(effects
 			(font
@@ -2388,16 +2398,6 @@
 			(justify left bottom)
 		)
 		(uuid "21145b5c-42f2-4466-82a7-c97b1aa114a4")
-	)
-	(label "Green"
-		(at 139.7 107.95 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "2683ce0d-57e8-46be-b2eb-dc70fb1d72f4")
 	)
 	(label "Green"
 		(at 140.97 69.85 0)
@@ -2449,7 +2449,7 @@
 		)
 		(uuid "46806a34-fb51-4ca1-8f84-62734be592d5")
 	)
-	(label "VCC"
+	(label "+5V"
 		(at 153.67 76.2 180)
 		(effects
 			(font
@@ -2479,7 +2479,7 @@
 		)
 		(uuid "5529cd8b-c86f-4ac0-9aea-eb8ee003ff14")
 	)
-	(label "VCC"
+	(label "+5V"
 		(at 139.7 95.25 0)
 		(effects
 			(font
@@ -2489,7 +2489,7 @@
 		)
 		(uuid "68f9a539-2206-4528-9a2a-627e0f156ff5")
 	)
-	(label "VCC"
+	(label "+5V"
 		(at 181.61 76.2 180)
 		(effects
 			(font
@@ -2549,7 +2549,7 @@
 		)
 		(uuid "79cf0ff4-7558-49c1-8562-8fd14b7005a6")
 	)
-	(label "VCC"
+	(label "+3.3V"
 		(at 154.94 95.25 180)
 		(effects
 			(font
@@ -2570,16 +2570,6 @@
 		(uuid "89b5f575-fdb4-4299-bdef-8f1b7421ad9a")
 	)
 	(label "Blue"
-		(at 139.7 105.41 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "98c96176-0022-4301-b796-024bdd529e68")
-	)
-	(label "Blue"
 		(at 134.62 74.93 0)
 		(effects
 			(font
@@ -2588,6 +2578,16 @@
 			(justify left bottom)
 		)
 		(uuid "ab2e78a7-3bff-45e7-98f3-75eb103fb17e")
+	)
+	(label "+3.3V"
+		(at 139.7 97.79 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "abed08c4-494a-4e28-82ec-da98e94ee9c5")
 	)
 	(label "Red"
 		(at 142.24 64.77 0)
@@ -2619,6 +2619,16 @@
 		)
 		(uuid "c3731b1d-9d60-4fe0-83a1-af994d6ee66e")
 	)
+	(label "Blue"
+		(at 139.7 110.49 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c558fbbb-e0b9-4123-9961-8e35378d898b")
+	)
 	(label "OE"
 		(at 154.94 120.65 180)
 		(effects
@@ -2649,7 +2659,7 @@
 		)
 		(uuid "d67dbdab-80ca-4eff-ae9c-5a5a25d2437a")
 	)
-	(label "VCC"
+	(label "+3.3V"
 		(at 154.94 113.03 180)
 		(effects
 			(font
