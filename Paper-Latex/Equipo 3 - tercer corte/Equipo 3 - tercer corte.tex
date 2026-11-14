@@ -855,7 +855,7 @@
 	enable differential serial communication with
 	additional SOFIA modules.
 	
-	\linelabel{ln:jst}The PCB incorporates JST-PH connectors with a
+	\linelabel{ln:jst}The PCB incorporates JST-VH connectors with a
 	2.0 mm pitch, selected to meet the physical
 	interconnection requirements of the system.
 	Dedicated mounting positions and electrical
@@ -904,10 +904,37 @@
 		\label{fig:sofia_pcb}
 	\end{figure}
 	
-	\subsection{Power Budget and Current Constraints}
-	\linelabel{ln:power}Power supply limitations present a critical physical constraint during simultaneous multi-actuator operation. At nominal load, each MG90S micro-servo draws approximately $250\text{ mA}$ during movement, with peak stall currents reaching up to $700\text{ mA}$. Simultaneous actuation of all 32 servos in the complete kinetic surface could result in transient current spikes exceeding $22\text{ A}$, triggering severe voltage sags and brownout resets on the ESP32-C3 controller. Consequently, current power distribution limits prevent driving all actuators concurrently at peak torque, reinforcing the need for the experimental characterization of single modules, peak-current aware firmware sequencing, and smooth trajectory filtering to minimize transient current demand.
-	
 	\linelabel{ln:pca-ilim}It is worth noting that the PCA9685 PWM drivers do not incorporate active current-limiting mechanisms \cite{pca9685}. The breakout boards route power directly from the main $5\text{ V}$ power source. As a result, the current drawn by each MG90S servo depends entirely on its mechanical load, operating voltage, and movement profile. Because the driver chip does not regulate or restrict motor current, power supply stability and protection against voltage sags must be managed through software-level trajectory smoothing in the ESP32-C3 firmware.
+	
+	
+	\subsection{PCB Limitations
+	\linelabel{ln:pcb-revision}
+	During the electrical evaluation of the PCB,
+	design issues were identified regarding
+	the PCA9685 logic supply voltage and the
+	use of ESP32-C3 boot-strapping pins for
+	the RGB LED connections.
+	
+	To address these issues, the PCB schematic
+	was modified to supply the PCA9685 logic
+	at 3.3 V instead of 5 V, and the RGB LED
+	connections were reassigned to different
+	GPIO pins.
+	
+	However, the original PCB had already been
+	manufactured before these modifications
+	were introduced. Therefore, the fabricated
+	prototype does not incorporate these
+	corrections, and the revised design has
+	not yet been physically implemented or
+	experimentally validated.
+	
+	Further improvements regarding power
+	distribution, connector current ratings,
+	and decoupling capacitors are also
+	identified as future development
+	requirements for the SOFIA module.
+	
 	
 	\section{Results}
 	\label{sec:results}
