@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  13 NOV 2026 15:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  14 NOV 2026 11:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -376,13 +376,13 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 3592 strings out of 467501
- 54387 string characters out of 5408550
+ 3591 strings out of 467501
+ 54372 string characters out of 5408550
  498961 words of memory out of 5000000
- 32795 multiletter control sequences out of 15000+600000
+ 32794 multiletter control sequences out of 15000+600000
  660026 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,6n,79p,483b,215s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,6n,79p,324b,216s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Marrc\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1000.pk><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmsy10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
@@ -391,7 +391,7 @@ imes/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
 imes/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmri8a.pfb>
-Output written on "Equipo 3 - respuesta - tercer corte.pdf" (4 pages, 87301 byt
+Output written on "Equipo 3 - respuesta - tercer corte.pdf" (4 pages, 86834 byt
 es).
 PDF statistics:
  51 PDF objects out of 1000 (max. 8388607)
