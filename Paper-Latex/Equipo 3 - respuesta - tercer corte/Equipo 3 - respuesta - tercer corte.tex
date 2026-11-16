@@ -41,23 +41,35 @@
 	%-----------------------------------------------------------------
 	\LabDSTsection{Acknowledgements}
 	
-	Falta hacer esto
+	The authors thank the reviewers for their
+	detailed evaluation of the second-cut
+	manuscript. Their observations contributed
+	to improving the technical documentation,
+	clarity, and consistency of the proposed
+	SOFIA system.
+	
+	The following responses address the
+	reviewers' comments individually, indicating
+	the modifications introduced and the aspects
+	that remain subject to further development.
+	All references to sections, figures, tables,
+	and lines correspond to the revised manuscript
+	accompanying this letter.
 	
 	\textbf{Main changes.} Falta hacer esto.
 	
 	\LabDSTsummary
 	
 	%-----------------------------------------------------------------
-	\LabDSTreviewer{1}{Format, LaTeX and template compliance}
+	\LabDSTreviewer{1}{Formato, LaTeX y cumplimiento de la plantilla}
 	
-	\LabDSTcomment{R1.1}{A}{}
+	\LabDSTcomment{R1.1}{N}{}
 	{Discussion y Conclusions son solo encabezados, y no existen Author Contributions, Data Availability (con la URL del
 		repositorio), Acknowledgment (con la declaración de uso de IA) ni Conflicts of Interest. Era la observación R1.5 del primer
 		corte.}
 	{}
 	
-	\LabDSTcomment{R1.2}{A}
-	{\Rln{model-vis3}, \rln{only2}}
+	\LabDSTcomment{R1.2}{A}{\Rln{model-vis3}, \rln{only2}}
 	{Los nombres de los gestos están en español: INICIO, FIN,
 		RECARGAR, ESCUDO y ATAQUE. También hay un error de
 		espacio: ``in thisstudy'' (Línea 162).}
@@ -68,32 +80,59 @@
 		Additionally, the typographical error ``in thisstudy''
 		was corrected to ``in this study''.}
 	
-	\LabDSTcomment{R1.3}{A}{}
+	\LabDSTcomment{R1.3}{N}{}
 	{La Fig. 1 mide 6 cm de ancho y su texto interno (“CH 1”, “JST-PH (MALE)”) no se lee impreso. Tampoco muestra el riel
 		de 5 V, la fuente, el transceptor RS-485 ni el dispositivo de corona. El esquemático (Fig. 4) es ilegible a una columna, y la
 		PCB (Fig. 5) no tiene cotas ni identificación de pistas.}
 	{}
 	
-	\LabDSTcomment{R1.4}{A}{}
+	\LabDSTcomment{R1.4}{P}{Page~1, affiliation footnote}
 	{La lista de autores no incluye a la profesora Graciela Baca, y la afiliación no indica el departamento.}
-	{}
+	{The names of the course professors have been included in the author list. Additionally, the departmental affiliation has been updated to specify the Department of Electronics and Computer Systems (DESI).}
 	
-	\LabDSTcomment{R1.5}{A}{}
-	{El BOM conserva elementos sin describir (“Pro3”, “Axis 1 (9 × 9 mm)”, “Inser M3x5x4”) y una fila “MG90S / SG90”,
-		aunque la Tabla IX descarta el SG90. El PCA9685 se atribuye a “NXP Semi”, pero se usa como módulo comercial. Faltan
-		el divisor del RS-485 como componente de la PCB y la fuente de alimentación}
-	{}
+	
+	\LabDSTcomment{R1.5}{P}{Table~\ref{tab:bom}}
+	{El BOM conserva elementos sin describir
+		("Pro3", "Axis 1 (9 x 9 mm)",
+		"Inser M3x5x4") y una fila "MG90S / SG90",
+		aunque la Tabla IX descarta el SG90.
+		El PCA9685 se atribuye a "NXP Semi",
+		pero se usa como modulo comercial.
+		Faltan el divisor del RS-485 como
+		componente de la PCB y la fuente
+		de alimentacion.}
+	{The Bill of Materials was revised to
+		improve component identification and
+		consistency with the electronic architecture.
+		Mechanical components were assigned
+		specific technical descriptions, and the
+		servomotor selection was standardized to
+		the MG90S.
+		
+		The PCA9685 was identified as a commercial
+		breakout module incorporating the NXP
+		PCA9685 integrated circuit. Additionally,
+		the RS-485 voltage divider (10 kOhm and
+		20 kOhm resistors) and a generic regulated
+		5 V DC power supply were included in the
+		BOM.
+		
+		The supply current rating remains to be
+		specified, while verification of its
+		suitability for full-system operation
+		is identified as future work.}
+	
 	
 	%-----------------------------------------------------------------
-	\LabDSTreviewer{2}{Scientific Writing and Language}
+	\LabDSTreviewer{2}{Redacción científica e idioma}
 	
-	\LabDSTcomment{R2.1}{A}{}
+	\LabDSTcomment{R2.1}{N}{}
 	{El abstract describe el método propuesto, pero no da ningún resultado, aunque ya existen: la medición de 5.00 V y el divisor,
 		y las métricas de los gestos. Además, describe el dispositivo de corona como si fuera parte del trabajo, cuando no se ha
 		diseñado.}
 	{}
 	
-	\LabDSTcomment{R2.1}{A}{}
+	\LabDSTcomment{R2.2}{N}{}
 	{Hay afirmaciones que los datos no sostienen:
 		• “power supply stability and protection against voltage sags must be managed through software-level trajectory
 		smoothing” (Línea 424): el suavizado reduce los picos, pero no sustituye una fuente y una distribución de potencia dimensionadas;
@@ -105,9 +144,9 @@
 	{}
 	
 	%-----------------------------------------------------------------
-	\LabDSTreviewer{3}{Technical Content: Materials and Methods, and Design and Implementation}
+	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
 	
-	\LabDSTcomment{R3.1}{P}{}
+	\LabDSTcomment{R3.1}{P}{Fig.~\ref{fig:sofia_schematic}, Fig.~\ref{fig:sofia_pcb}, \Rln{pcb}, \Rln{pcb-traces}, \Rln{pcb-revision}}
 	{El esquemático tiene tres errores eléctricos que el texto no menciona:
 		• Lógica del PCA9685 a 5 V. La terminal VCC de J1 y J2 está en la red VCC, que es el pin de 5 V de la ESP32-C3.
 		El pin de 3.3 V no está conectado. Así, los PCA9685 operan su lógica a 5 V y, en los módulos comerciales, las
@@ -123,42 +162,59 @@
 		Tampoco hay capacitores de desacoplo ni de bulk}
 	{We thank the reviewer for identifying these important electrical design issues.
 		
-		Following the review, the PCB design was updated to supply the PCA9685 logic from the ESP32-C3's 3.3 V rail instead of the 5 V rail. The RGB LED connections were also reassigned to avoid potential interference with the microcontroller's boot-strapping pins.
+		The electronic schematic was updated to
+		provide a 3.3 V logic supply for both
+		PCA9685 modules. The RGB LED connections
+		were reassigned to non-strapping GPIO pins,
+		and the output-enable (OE) signals were
+		assigned to GPIO3 of the ESP32-C3.
 		
-		However, the PCB had already been manufactured before these corrections were introduced. Therefore, the updated design has not yet been fabricated or electrically validated. Its implementation remains part of a future hardware revision of the SOFIA module.
+		The current-limiting resistor values
+		for the RGB LED (R1--R3) are now specified
+		in the schematic.
 		
-		The servomotors are powered by a separate external 5 V supply. Nevertheless, the current capacity of the connectors and PCB traces has not been fully characterized. Additional improvements, including power distribution verification and appropriate decoupling capacitors, are also planned for future development.
+		The PCB is documented as a single-layer
+		integration prototype, with 0.7 mm-wide
+		power traces and 0.5 mm-wide signal traces.
 		
-		These limitations are acknowledged in the revised manuscript, distinguishing the manufactured prototype from the updated PCB design.}
+		The manufactured PCB corresponds to the
+		initial prototype, while the updated
+		schematic configuration remains pending
+		physical implementation and validation.
+		
+		The manuscript also identifies the
+		verification of connector current ratings,
+		power distribution capacity, and
+		decoupling requirements as future work.}
 	
-	\LabDSTcomment{R3.2}{A}{}
+	\LabDSTcomment{R3.2}{N}{}
 	{La sección de potencia usa “approximately 250 mA during movement” y “peak stall currents reaching up to 700 mA” sin
 		fuente, mientras la Tabla VI dice que la corriente de bloqueo “Not reported” requiere medición. No se dimensiona la fuente
 		ni se dice qué corriente soporta la PCB.}
 	{}
 	
-	\LabDSTcomment{R3.3}{A}{}
+	\LabDSTcomment{R3.3}{N}{}
 	{El dispositivo de corona con interruptores de límite, que es la base del diferenciador, solo se menciona: no hay CAD, figura,
 		número ni posición de los interruptores, resolución angular, ni cómo se registra el tiempo (interrupciones de la ESP32-C3,
 		timer, frecuencia). Además, el protocolo (Línea 244) habla de medir el “transient velocity profile”, pero unos interruptores
 		en posiciones fijas dan tiempos de paso, no un perfil continuo. No se explica cómo se ajusta $\tau_m$m a esos tiempos.}
 	{}
 	
-	\LabDSTcomment{R3.4}{A}{}
+	\LabDSTcomment{R3.4}{N}{}
 	{No se describe la arquitectura del firmware de la ESP32-C3 ni el formato de los mensajes entre la PC y la ESP32-C3 (Wi-Fi
 		o Bluetooth), ni el uso del RS-485 entre placas (Línea 180). El valor de $\alpha_m$ del Algoritmo 1 no se da.}
 	{}
 	
 	%-----------------------------------------------------------------
-	\LabDSTreviewer{4}{D-Lab Methodology, Results, and Validation}
+	\LabDSTreviewer{4}{Metodología D-Lab, resultados y validación}
 	
-	\LabDSTcomment{R4.1}{P}{}
+	\LabDSTcomment{R4.1}{N}{}
 	{La pregunta de investigación es si estimar $\tau_m$m e integrarla al controlador mejora la sincronización. Ninguna de las dos partes
 		avanzó: no hay dispositivo ni $\tau_m$m medido, y el resultado que se reporta es el reconocimiento de gestos, que no responde la
 		pregunta. La Línea 445 pospone la medición al siguiente corte.}
 	{}
 	
-	\LabDSTcomment{R4.2}{P}{}
+	\LabDSTcomment{R4.2}{N}{}
 	{Las métricas de la Tabla XIV no son consistentes:
 		• La Línea 490 dice que ESCUDO se confundió con RECARGAR. Pero RECARGAR tiene precisión de 100%, lo que
 		no es posible si hubo ESCUDOs detectados como RECARGAR.
@@ -169,13 +225,13 @@
 		Con 6–16 intentos por clase y sin intervalos de confianza, los porcentajes tienen mucha incertidumbre}
 	{}
 	
-	\LabDSTcomment{R4.3}{P}{}
+	\LabDSTcomment{R4.3}{N}{}
 	{La pregunta y el objetivo 3 hablan de “a 32-actuator kinetic surface” y de igualar los tiempos de asentamiento de todos
 		los actuadores, pero el alcance declarado es de dos servos de un módulo (Línea 162). El objetivo 1 (diseñar la PCB) no se
 		relaciona con la pregunta, y los gestos no se relacionan con ningún objetivo.}
 	{}
 	
-	\LabDSTcomment{R4.4}{P}{}
+	\LabDSTcomment{R4.4}{N}{}
 	{Sigue sin haber análisis Discover del demostrador: la Línea 113 habla de “the functional decomposition of the demonstrator”, pero no se muestra. No se declaran el repositorio en GitHub ni la bitácora, y no hay incrementos de integración
 		documentados.}
 	{}

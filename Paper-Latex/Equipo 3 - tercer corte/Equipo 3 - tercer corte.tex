@@ -32,7 +32,9 @@
 		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
 		Jorge A. Lizarraga, Luis E. González-Jiménez, Luis F. Luque-Vega
 		
-		\thanks{The authors are affiliated with the Instituto Tecnológico de Estudios Superiores de Occidente (ITESO), Tlaquepaque, Jalisco, Mexico.}
+		\thanks{The authors are with the Department
+			of Electronics and Computer Systems,
+			ITESO, Tlaquepaque 45604, Jalisco, Mexico.}
 	}
 	
 	
@@ -299,12 +301,12 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-PH connectors.
+	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-VH connectors.
 	
 	
 	\begin{figure}[!t]
 		\centering
-		\includegraphics[width=2.4in]{figures/SOFIA_DIAGRAM}
+		\includegraphics[width=\columnwidth]{figures/SOFIA_DIAGRAM}
 		\caption{Block diagram describing SOFIA components and connections.}
 		\label{fig1}
 	\end{figure}
@@ -559,6 +561,7 @@
 	devices, are summarized in Table~\ref{tab:bom}.
 	
 	
+	
 	\begin{table}[!t]
 		\centering
 		\caption{SOFIA Demonstrator Bill of Materials (BOM) Summary}
@@ -569,38 +572,128 @@
 		\renewcommand{\arraystretch}{1.05}
 		
 		\begin{tabularx}{\columnwidth}{@{}P{0.8cm} P{2.0cm} P{0.5cm} P{0.5cm} P{2.4cm} P{1.1cm} P{0.8cm}@{}}
+			
 			\toprule
-			\textbf{Item} & \textbf{Component} & \textbf{Qty / Unit} & \textbf{Qty / Sys} & \textbf{Technical Description} & \textbf{Manufacturer} & \textbf{Location} \\
+			\textbf{Item} &
+			\textbf{Component} &
+			\textbf{Qty / Unit} &
+			\textbf{Qty / Sys} &
+			\textbf{Technical Description} &
+			\textbf{Manufacturer} &
+			\textbf{Location} \\
 			\midrule
 			
-			1 & Sofia003-P001-03 & 1 & 16 & Sofia Module Base & In-house (LabDST) & ITESO, MX \\
-			2 & MG90S / SG90 Servo & 2 & 32 & Micro Servo Motor & Tower Pro & Hong Kong \\
-			3 & Sofia003-E002-01 & 1 & 16 & Lower Joint Subassembly & In-house (LabDST) & ITESO, MX \\
-			3.1/4.4 & Pro3 & 2 & 32 & Servo Horn & Tower Pro & Hong Kong \\
-			3.2 & Sofia003-P004-02 & 1 & 16 & Lower Joint Support Left & In-house (LabDST) & ITESO, MX \\
-			3.3 & Sofia003-P004-03 & 1 & 16 & Lower Joint Support Right & In-house (LabDST) & ITESO, MX \\
-			3.4/3.5/ 4.3/7/8 & M2 Screws (various) & 10 & 160 & Servo Arm Screw ($M2 \times 10/12$ mm) & Walfront & Shenzhen, CN \\
-			3.6 & Axis 1 ($9 \times 9$ mm) & 1 & 16 & Joint Shaft ($9\text{ mm} \times 9\text{ mm}$) & Mae & Local \\
-			3.7 & Sofia003-P002-02 & 1 & 16 & Lower Joint Link & In-house (LabDST) & ITESO, MX \\
-			4 & Sofia003-E003-01 & 1 & 16 & Upper Joint Subassembly & In-house (LabDST) & ITESO, MX \\
-			4.1 & Sofia003-P005-01 & 1 & 16 & Upper Joint Support Left & In-house (LabDST) & ITESO, MX \\
-			4.2 & Sofia003-P005-02 & 1 & 16 & Upper Joint Support Right & In-house (LabDST) & ITESO, MX \\
-			5 & Sofia003-P008-01 & 1 & 16 & Sofia Top Module Linkage & In-house (LabDST) & ITESO, MX \\
-			6 & Sofia003-P009-01 & 1 & 16 & Top Platform Support & In-house (LabDST) & ITESO, MX \\
-			9 & Inser M3x5x4 & 1 & 16 & M3 Threaded Insert ($5 \times 4$ mm) & ZWMSSLL & Shenzhen, CN \\
-			10 & Sofia003-P000-01 & 1 & 16 & Sofia Hexagonal Top Platform & In-house (LabDST) & ITESO, MX \\
+			1 & Sofia003-P001-03 & 1 & 16 &
+			SOFIA module base &
+			In-house (LabDST) & ITESO, MX \\
+			
+			2 & MG90S Servo & 2 & 32 &
+			Micro servomotor for module actuation &
+			Tower Pro & Hong Kong \\
+			
+			3 & Sofia003-E002-01 & 1 & 16 &
+			Lower joint subassembly &
+			In-house (LabDST) & ITESO, MX \\
+			
+			3.1/4.4 & Pro3 Servo Horn & 2 & 32 &
+			Servo output horn for mechanical linkage &
+			Tower Pro & Hong Kong \\
+			
+			3.2 & Sofia003-P004-02 & 1 & 16 &
+			Lower joint support, left &
+			In-house (LabDST) & ITESO, MX \\
+			
+			3.3 & Sofia003-P004-03 & 1 & 16 &
+			Lower joint support, right &
+			In-house (LabDST) & ITESO, MX \\
+			
+			3.4/3.5/
+			4.3/7/8 & M2 Screws & 10 & 160 &
+			M2 screws, 10 and 12 mm lengths &
+			Walfront & Shenzhen, CN \\
+			
+			3.6 & Axis 1 & 1 & 16 &
+			Joint shaft, 1 mm x 9 mm &
+			Mae & Local \\
+			
+			3.7 & Sofia003-P002-02 & 1 & 16 &
+			Lower joint link &
+			In-house (LabDST) & ITESO, MX \\
+			
+			4 & Sofia003-E003-01 & 1 & 16 &
+			Upper joint subassembly &
+			In-house (LabDST) & ITESO, MX \\
+			
+			4.1 & Sofia003-P005-01 & 1 & 16 &
+			Upper joint support, left &
+			In-house (LabDST) & ITESO, MX \\
+			
+			4.2 & Sofia003-P005-02 & 1 & 16 &
+			Upper joint support, right &
+			In-house (LabDST) & ITESO, MX \\
+			
+			5 & Sofia003-P008-01 & 1 & 16 &
+			SOFIA top module linkage &
+			In-house (LabDST) & ITESO, MX \\
+			
+			6 & Sofia003-P009-01 & 1 & 16 &
+			Top platform support &
+			In-house (LabDST) & ITESO, MX \\
+			
+			9 & M3 Threaded Insert & 1 & 16 &
+			M3 threaded insert, 5 mm x 4 mm &
+			ZWMSSLL & Shenzhen, CN \\
+			
+			10 & Sofia003-P000-01 & 1 & 16 &
+			SOFIA hexagonal top platform &
+			In-house (LabDST) & ITESO, MX \\
+			
 			\midrule
-			-- & ESP32-C3 SuperMini & -- & 1 & Central MCU (Wi-Fi/BLE telemetry) & Espressif & Shanghai, CN \\
-			-- & PCA9685 Servo Driver & -- & 2 & 16-channel 12-bit $\text{I}^2\text{C}$ PWM driver board & NXP Semi & Eindhoven, NL \\
-			-- & MAX13487E TTL485 & -- & 1 & Controller-side half-duplex RS-485 transceiver & Analog Devices & Wilmington, US \\
-			-- & LED RGB & -- & 1 & System state status indicator LED & Mexbit & Local \\
-			-- & JST-PH Male & -- & 1 & High-current power PCB header and MODBUS communication & JTAREA & Local \\
-			-- & JST-PH Female & -- & 1 & High-current power harness plug and MODBUS communication & JTAREA & Local \\
-			-- & R1--R5 (Resistors) & -- & 5 & RGB LED: 470 $\Omega$ (R1), 330 $\Omega$ (R2--R3); RS-485 divider: 10 k$\Omega$ (R4), 18 k$\Omega$ (R5) & Mexbit & Local \\
+			
+			-- & ESP32-C3 SuperMini & -- & 1 &
+			Central microcontroller with Wi-Fi/BLE &
+			Espressif (IC) & Shanghai, CN \\
+			
+			-- & PCA9685 PWM Module & -- & 2 &
+			16-channel, 12-bit I2C PWM breakout module &
+			Generic (NXP IC) & Unspecified \\
+			
+			-- & MAX13487E TTL485 & -- & 1 &
+			Half-duplex RS-485 transceiver module &
+			Generic (ADI IC) & Unspecified \\
+			
+			-- & RGB LED & -- & 1 &
+			RGB status indicator &
+			Generic & Local \\
+			
+			-- & JST-VH Male & -- & 1 &
+			2.0 mm-pitch PCB connector for power
+			and communication &
+			JTAREA & Local \\
+			
+			-- & JST-VH Female & -- & 1 &
+			2.0 mm-pitch mating connector for power
+			and communication &
+			JTAREA & Local \\
+			
+			-- & R1--R3 & -- & 3 &
+			RGB LED resistors: 330 Ohm &
+			Generic & Local \\
+			
+			-- & R4--R5 & -- & 2 &
+			RS-485 voltage divider:
+			10 kOhm (R4), 20 kOhm (R5) &
+			Generic & Local \\
+			
+			-- & Regulated DC Power Supply & -- & 1 &
+			External regulated 5 V DC supply
+			for servomotor power &
+			Generic & Local \\
 			
 			\bottomrule
 		\end{tabularx}
 	\end{table}
+	
 	
 	\subsection{Justification of Technological Selection}
 	
@@ -838,102 +931,72 @@
 	\subsection{PCB Design and Electronic Integration}
 	\label{subsec:pcb_design}
 	
-	\linelabel{ln:pcb}A custom printed circuit board (PCB) was designed
-	to integrate the electronic control and communication
-	modules of the SOFIA kinetic surface. The PCB
-	functions as a carrier board, providing mechanical
-	mounting and electrical interconnections for the
-	ESP32-C3 SuperMini microcontroller, two PCA9685
-	PWM driver modules, and the MAX13487E RS-485
-	transceiver interfaces.
+	\linelabel{ln:pcb}
+	A single-layer printed circuit board (PCB)
+	was developed as a functional integration
+	prototype for the SOFIA modular kinetic
+	surface. The board provides the electrical
+	interconnections and mounting interfaces
+	for an ESP32-C3 SuperMini, two PCA9685
+	PWM driver modules, and MAX13487E RS-485
+	communication interfaces, as illustrated
+	in Fig.~\ref{fig:sofia_schematic}.
 	
-	The ESP32-C3 serves as the main controller,
-	communicating with the PCA9685 modules through
-	the I2C interface. Each PCA9685 provides 16 PWM
-	channels, allowing the proposed architecture to
-	control up to 32 servomotors. The RS-485 interfaces
-	enable differential serial communication with
-	additional SOFIA modules.
+	The ESP32-C3 communicates with both PCA9685
+	modules through the I2C bus, providing
+	32 PWM channels for servomotor control.
+	The servomotors are powered by an external
+	5 V supply, while the RS-485 interfaces
+	are intended to support future inter-module
+	communication. A resistive voltage divider
+	consisting of 10 kOhm and 20 kOhm resistors
+	reduces the nominal 5 V receiver output
+	of the RS-485 transceiver to approximately
+	3.33 V at the microcontroller input.
 	
-	\linelabel{ln:jst}The PCB incorporates JST-VH connectors with a
-	2.0 mm pitch, selected to meet the physical
-	interconnection requirements of the system.
-	Dedicated mounting positions and electrical
-	connections are also provided for the control
-	modules, communication interfaces, and an RGB LED.
 	
-	To address the logic-level incompatibility between
-	the 5 V MAX13487E transceiver and the 3.3 V
-	ESP32-C3 microcontroller, a resistive voltage
-	divider was incorporated into the PCB schematic.
-	The circuit consists of a 10 kOhm resistor (R4)
-	and an 18 kOhm resistor (R5), reducing a nominal
-	5 V receiver-output signal to approximately
-	3.21 V at the ESP32-C3 UART input. The electrical
-	compatibility analysis is detailed in the
-	RS-485 Logic-Level Compatibility subsection
-	of Materials and Methods.
-	
-	The electronic schematic is presented in
-	Fig.~\ref{fig:sofia_schematic}, illustrating the
-	connections between the microcontroller, PWM
-	drivers, communication interfaces, and peripheral
-	components.
-	
-	\begin{figure}[!t]
+	\begin{figure*}[!t]
 		\centering
-		\includegraphics[width=\columnwidth]{figures/sofia_pcb_schematic.png}
-		\caption{Electronic schematic of the SOFIA carrier PCB,
-			showing the ESP32-C3 microcontroller, PCA9685 PWM
-			driver interfaces, MAX13487E RS-485 connections,
-			and peripheral circuitry.}
+		\includegraphics[width=\textwidth]
+		{figures/sofia_pcb_schematic.png}
+		\caption{Revised electronic schematic of
+			the SOFIA control PCB.}
 		\label{fig:sofia_schematic}
-	\end{figure}
+	\end{figure*}
 	
-	Based on the electronic schematic, a two-layer PCB
-	layout was developed to organize component
-	placement and signal routing. The resulting
-	design, shown in Fig.~\ref{fig:sofia_pcb},
-	provides a compact integration platform for
-	the electronic modules and their connections.
+	\linelabel{ln:pcb-traces}
+	The PCB layout was developed with 0.7 mm-wide
+	traces for power distribution and 0.5 mm-wide
+	traces for signal routing. The component
+	arrangement, copper routing, and overall
+	board dimensions are illustrated in
+	Fig.~\ref{fig:sofia_pcb}.
 	
-	\begin{figure}[!t]
+	\begin{figure*}[!t]
 		\centering
-		\includegraphics[width=\columnwidth]{figures/sofia_pcb.png}
-		\caption{Completed two-layer PCB layout developed for the SOFIA electronic control system.}
+		\includegraphics[width=\textwidth]
+		{figures/sofia_pcb.png}
+		\caption{Single-layer PCB prototype showing
+			component placement, copper routing,
+			and board dimensions.}
 		\label{fig:sofia_pcb}
-	\end{figure}
+	\end{figure*}
 	
-	\linelabel{ln:pca-ilim}It is worth noting that the PCA9685 PWM drivers do not incorporate active current-limiting mechanisms \cite{pca9685}. The breakout boards route power directly from the main $5\text{ V}$ power source. As a result, the current drawn by each MG90S servo depends entirely on its mechanical load, operating voltage, and movement profile. Because the driver chip does not regulate or restrict motor current, power supply stability and protection against voltage sags must be managed through software-level trajectory smoothing in the ESP32-C3 firmware.
-	
-	
-	\subsection{PCB Limitations
+	\subsection{PCB Prototype Limitations}
 	\linelabel{ln:pcb-revision}
-	During the electrical evaluation of the PCB,
-	design issues were identified regarding
-	the PCA9685 logic supply voltage and the
-	use of ESP32-C3 boot-strapping pins for
-	the RGB LED connections.
+	The PCB was developed as a functional
+	prototype for integrating the SOFIA
+	electronic subsystems. However, its
+	current-carrying capacity and power
+	distribution performance have not yet
+	been validated under full system load.
 	
-	To address these issues, the PCB schematic
-	was modified to supply the PCA9685 logic
-	at 3.3 V instead of 5 V, and the RGB LED
-	connections were reassigned to different
-	GPIO pins.
-	
-	However, the original PCB had already been
-	manufactured before these modifications
-	were introduced. Therefore, the fabricated
-	prototype does not incorporate these
-	corrections, and the revised design has
-	not yet been physically implemented or
-	experimentally validated.
-	
-	Further improvements regarding power
-	distribution, connector current ratings,
-	and decoupling capacitors are also
-	identified as future development
-	requirements for the SOFIA module.
+	Future work will focus on characterizing
+	servomotor current consumption, verifying
+	PCB trace and connector ratings, and
+	evaluating power distribution and
+	decoupling requirements to support
+	reliable operation of the complete system.
 	
 	
 	\section{Results}
