@@ -1,22 +1,34 @@
 /*
  * =============================================================
- *  SOFIA - MOVIMIENTO DE UNA UNIDAD (2 SERVOS, 2 GDL)
+ *  SOFIA - MOVIMIENTO DEL MÓDULO (16 UNIDADES, 2 PCA9685)
  * =============================================================
  *
- *  Cada postura detectada por visión dibuja un patrón con la
- *  unidad. El servo X (canal 0) mueve en horizontal y el
- *  servo Y (canal 1) en vertical:
+ *  El módulo tiene 16 unidades de 2 servos (32 servos) en dos
+ *  PCA9685 del mismo bus I2C, 8 unidades por placa:
  *
- *      1 INICIO    -> círculo (2 vueltas)
- *      2 RECARGAR  -> cuadrado (2 vueltas)
+ *      placa 1 (dirección menor)  -> unidades 1-8
+ *      placa 2                    -> unidades 9-16
+ *      en cada placa: canal 0 = X y 1 = Y de su primera unidad,
+ *                     canal 2 = X y 3 = Y de la segunda, etc.
+ *
+ *  Cada postura hace que las 16 unidades dibujen la misma figura
+ *  POR TURNOS: unas 3 a la vez y desfasadas (una casi acabando,
+ *  otra a la mitad, otra empezando) mientras la que ya terminó
+ *  regresa al centro. Así nunca se mueven los 32 servos juntos
+ *  (menos corriente) y por I2C solo viajan los canales de las
+ *  unidades que se están moviendo. El servo X mueve en
+ *  horizontal y el servo Y en vertical:
+ *
+ *      1 INICIO    -> círculo
+ *      2 RECARGAR  -> cuadrado
  *      3 ESCUDO    -> una X
- *      4 ATAQUE    -> línea arriba-abajo (3 veces)
+ *      4 ATAQUE    -> línea arriba-abajo (2 veces)
  *      5 FIN       -> zigzag de izquierda a derecha
  *
- *  Al terminar cada patrón la unidad regresa al centro.
+ *  Todas las figuras son UNA lista de puntos compartida; cada
+ *  unidad solo guarda en qué punto va (pocos bytes por unidad).
  *
- *  En modo TRACKING la unidad apunta hacia la posición
- *  de la mano que manda la PC.
+ *  En modo TRACKING las 16 apuntan juntas hacia la mano.
  *
  *  Hardware y calibración tomados de las pruebas de
  *  mecatrónica (Prueba_Servos / SG90_WindowVelocity_PCA).
@@ -34,15 +46,28 @@
 // HARDWARE (igual que las pruebas de mecatrónica)
 // =============================================
 
-// ESP32-C3 + PCA9685
+// ESP32-C3 + 2 PCA9685 en el mismo bus I2C
 const int SDA_PIN = 0;
 const int SCL_PIN = 1;
-const int OE_PIN  = 5;     // LOW = salidas del PCA9685 habilitadas
+const int OE_PIN  = 5;     // LOW = salidas de los PCA9685 habilitadas
 
-const uint8_t PCA9685_ADDR = 0x40;
+// 400 kHz: una actualización de las 16 unidades tarda ~3 ms.
+// Si los cables entre placas son largos y hay fallas, bajar a
+// 100000 (sigue alcanzando: ~12 ms de los 20 ms del periodo)
+const uint32_t I2C_HZ = 400000;
 
-const int CANAL_SERVO_X = 0;   // Horizontal (izquierda / derecha)
-const int CANAL_SERVO_Y = 1;   // Vertical (arriba / abajo)
+// Direcciones si no se pueden detectar solas. Al arrancar se
+// buscan los PCA9685 en el bus y se usan en orden de dirección
+// (la segunda placa debe tener puenteado A0 u otro jumper)
+const int NUM_PLACAS = 2;
+const uint8_t PCA_DIRECCIONES_DEFAULT[NUM_PLACAS] = {0x40, 0x41};
+
+const int UNIDADES_POR_PLACA = 8;
+const int NUM_UNIDADES = NUM_PLACAS * UNIDADES_POR_PLACA;   // 16
+
+// Canales de la unidad k (0-7) dentro de su placa
+inline int canalX(int k) { return 2 * k; }       // Horizontal
+inline int canalY(int k) { return 2 * k + 1; }   // Vertical
 
 // =============================================
 // CALIBRACIÓN (de SG90_WindowVelocity_PCA)
@@ -59,6 +84,15 @@ const int PWM_EN_THETA_MAX = 225;   // cuentas del PCA9685 en +60°
 const bool INVERTIR_X = false;
 const bool INVERTIR_Y = false;
 
+// Ajuste fino por unidad (grados que se suman a su centro), por si
+// alguna placa no queda plana en 0°. Unidad 1 = posición 0
+const float AJUSTE_X[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const float AJUSTE_Y[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// Al arrancar se centran las unidades de una en una con esta pausa,
+// para no pedir la corriente de los 32 servos al mismo tiempo
+const int PAUSA_ARRANQUE_MS = 40;
+
 // =============================================
 // PARÁMETROS DE MOVIMIENTO
 // =============================================
@@ -67,22 +101,41 @@ const bool INVERTIR_Y = false;
 const unsigned long TS_US = 20000UL;
 const float TS_S = 0.020f;
 
-// Tamaño de los patrones: grados desde el centro
-const float AMPLITUD = 35.0f;
+// Tamaño de los patrones: grados desde el centro.
+// 20° porque las unidades se mueven desfasadas: dos vecinas pueden
+// inclinarse una hacia la otra. Con 134 mm entre centros (30 mm entre
+// aristas) a ±20° por eje quedan ~6 mm entre placas; a ±25° solo
+// ~1.5 mm y a ±30° se tocan
+const float AMPLITUD = 20.0f;
 
-// Velocidades (grados/segundo). Las pruebas de
-// mecatrónica llegaron hasta 600 °/s; se usa un
-// valor holgado para que el movimiento se vea limpio
-const float VEL_PATRON  = 120.0f;
-const float VEL_REGRESO = 90.0f;
+// Velocidades (grados/segundo). Las pruebas de mecatrónica
+// llegaron hasta 600 °/s. Con 240 °/s cada figura dura ~1-1.5 s
+// por unidad y la tanda de 16 unidades ~6-9 s
+const float VEL_PATRON  = 240.0f;
+const float VEL_REGRESO = 180.0f;
 const float VEL_TRACK   = 300.0f;
+
+// Cuántas unidades dibujan la figura al mismo tiempo (las que
+// regresan al centro no cuentan). Más = la tanda acaba antes
+// pero se mueven más servos juntos (más corriente)
+const int SIMULTANEAS = 3;
+
+// Orden en que entran las unidades a la cola (1 = primera unidad).
+// Se puede cambiar para seguir el acomodo físico del módulo
+const uint8_t ORDEN_UNIDADES[NUM_UNIDADES] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+};
+
+// Veces que se repite cada figura (índice = postura)
+//                        -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
+const uint8_t REPETICIONES[6] = {0,  1,      1,        1,      2,      1};
 
 // TRACKING: grados de giro cuando la mano está
 // en el borde de la imagen (x_norm o y_norm = ±1)
 const float RANGO_TRACK = 45.0f;
 
 // Si en TRACKING no llega posición en este tiempo,
-// la unidad regresa al centro
+// las unidades regresan al centro
 const unsigned long TRACK_TIMEOUT_MS = 1500UL;
 
 // No se reenvía al PCA9685 si el cambio es menor a esto
@@ -97,6 +150,7 @@ struct Punto {
   float y;
 };
 
+// Estado general del módulo
 enum EstadoMovimiento {
   QUIETO,
   PATRON,
@@ -104,25 +158,49 @@ enum EstadoMovimiento {
   REGRESANDO,
 };
 
+// Estado de cada unidad
+enum FaseUnidad : uint8_t {
+  U_QUIETA,     // en el centro, sin moverse
+  U_FIGURA,     // dibujando la figura
+  U_REGRESO,    // volviendo al centro
+  U_MANO,       // siguiendo la mano (TRACKING)
+};
+
+struct Unidad {
+  float x, y;                 // posición actual (grados)
+  float enviadoX, enviadoY;   // última enviada al PCA9685
+  int16_t indice;             // punto de la ruta al que va
+  FaseUnidad fase;
+};
+
 const char* NOMBRES_PATRON[] = {
   "CENTRO", "CIRCULO", "CUADRADO", "X", "LINEA ARRIBA-ABAJO", "ZIGZAG"
 };
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(PCA9685_ADDR);
+Adafruit_PWMServoDriver* placas[NUM_PLACAS] = {nullptr, nullptr};
+uint8_t direccionPlaca[NUM_PLACAS] = {0, 0};
+int placasEncontradas = 0;
+
+// Prueba de cableado: -1 = todas las unidades;
+// 0-15 = solo esa unidad entra a la cola y se mueve
+int unidadPrueba = -1;
 
 EstadoMovimiento estado = QUIETO;
+Unidad unidades[NUM_UNIDADES];
 
-// Posición actual y última enviada (grados)
-float posX = 0.0f, posY = 0.0f;
-float enviadoX = -1000.0f, enviadoY = -1000.0f;
-
-// Trayectoria: lista de puntos a recorrer (grados)
-const int MAX_PUNTOS = 160;
+// Ruta de la figura actual, COMPARTIDA por todas las unidades
+// (sin el regreso al centro: eso lo hace cada unidad al acabar)
+const int MAX_PUNTOS = 80;
 Punto ruta[MAX_PUNTOS];
 int numPuntos = 0;
-int indicePunto = 0;
-float velocidadRuta = VEL_PATRON;
 int patronActual = 0;
+
+// Cola de unidades que faltan por dibujar la figura
+uint8_t cola[NUM_UNIDADES];
+int largoCola = 0;
+int siguienteEnCola = 0;
+unsigned long ultimoArranqueMs = 0;
+unsigned long intervaloArranqueMs = 0;   // duración de la figura / SIMULTANEAS
 
 // Objetivo en TRACKING
 Punto objetivoMano = {0.0f, 0.0f};
@@ -148,21 +226,61 @@ int theta_a_pwm(float theta) {
   return (int)roundf(PWM_EN_THETA_MIN + m * (theta - THETA_MIN));
 }
 
-void aplicarServos(bool forzar = false) {
-  if (!forzar &&
-      fabsf(posX - enviadoX) < E_QUANT &&
-      fabsf(posY - enviadoY) < E_QUANT) {
-    return;
+const uint8_t PCA_MODE1 = 0x00;
+const uint8_t PCA_LED0_ON_L = 0x06;
+const uint8_t PCA_MODE1_AI = 0x20;
+
+// Escribe los 2 canales de una unidad (X y Y son contiguos) en UNA
+// transacción I2C de 9 bytes, con el auto-incremento del PCA9685
+void escribirUnidad(int u) {
+  int b = u / UNIDADES_POR_PLACA;
+  int k = u % UNIDADES_POR_PLACA;
+
+  if (b >= placasEncontradas) return;
+
+  Unidad& un = unidades[u];
+  float thetaX = (INVERTIR_X ? -un.x : un.x) + AJUSTE_X[u];
+  float thetaY = (INVERTIR_Y ? -un.y : un.y) + AJUSTE_Y[u];
+  int cuentas[2] = {theta_a_pwm(thetaX), theta_a_pwm(thetaY)};
+
+  Wire.beginTransmission(direccionPlaca[b]);
+  Wire.write(PCA_LED0_ON_L + 4 * canalX(k));
+  for (int c = 0; c < 2; c++) {
+    Wire.write(0);                          // ON_L
+    Wire.write(0);                          // ON_H
+    Wire.write(cuentas[c] & 0xFF);          // OFF_L
+    Wire.write((cuentas[c] >> 8) & 0x0F);   // OFF_H
   }
+  Wire.endTransmission();
 
-  float thetaX = INVERTIR_X ? -posX : posX;
-  float thetaY = INVERTIR_Y ? -posY : posY;
+  un.enviadoX = un.x;
+  un.enviadoY = un.y;
+}
 
-  pwm.setPWM(CANAL_SERVO_X, 0, theta_a_pwm(thetaX));
-  pwm.setPWM(CANAL_SERVO_Y, 0, theta_a_pwm(thetaY));
+// Solo viajan por I2C las unidades cuya posición cambió
+void aplicarServos(bool forzar = false) {
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    Unidad& un = unidades[u];
+    if (forzar ||
+        fabsf(un.x - un.enviadoX) >= E_QUANT ||
+        fabsf(un.y - un.enviadoY) >= E_QUANT) {
+      escribirUnidad(u);
+    }
+  }
+}
 
-  enviadoX = posX;
-  enviadoY = posY;
+// Busca PCA9685 en el bus (0x40-0x7F; 0x70 es la dirección
+// "todas las placas" y se salta). Regresa cuántas encontró
+int buscarPlacas(uint8_t encontradas[], int maximo) {
+  int n = 0;
+  for (uint8_t dir = 0x40; dir <= 0x7F && n < maximo; dir++) {
+    if (dir == 0x70) continue;
+    Wire.beginTransmission(dir);
+    if (Wire.endTransmission() == 0) {
+      encontradas[n++] = dir;
+    }
+  }
+  return n;
 }
 
 bool iniciarServos() {
@@ -171,25 +289,78 @@ bool iniciarServos() {
   digitalWrite(OE_PIN, LOW);
 
   Wire.begin(SDA_PIN, SCL_PIN);
+  Wire.setClock(I2C_HZ);
 
-  if (!pwm.begin()) {
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    unidades[u] = {0.0f, 0.0f, -1000.0f, -1000.0f, 0, U_QUIETA};
+  }
+
+  uint8_t encontradas[NUM_PLACAS];
+  int n = buscarPlacas(encontradas, NUM_PLACAS);
+
+  if (n == 0) {
+    // Nada respondió: intentar con las direcciones por defecto
+    for (int b = 0; b < NUM_PLACAS; b++) encontradas[b] = PCA_DIRECCIONES_DEFAULT[b];
+    n = NUM_PLACAS;
+  }
+
+  placasEncontradas = 0;
+
+  for (int b = 0; b < n; b++) {
+    Adafruit_PWMServoDriver* placa = new Adafruit_PWMServoDriver(encontradas[b]);
+
+    if (!placa->begin()) {
+      Serial.printf("PCA9685 en 0x%02X: no responde\n", encontradas[b]);
+      delete placa;
+      continue;
+    }
+
+    placa->setOscillatorFrequency(27000000);
+    placa->setPWMFreq(50);
+
+    // Asegurar el auto-incremento para escribirUnidad()
+    Wire.beginTransmission(encontradas[b]);
+    Wire.write(PCA_MODE1);
+    Wire.endTransmission();
+    Wire.requestFrom((int)encontradas[b], 1);
+    uint8_t mode1 = Wire.available() ? Wire.read() : 0;
+    Wire.beginTransmission(encontradas[b]);
+    Wire.write(PCA_MODE1);
+    Wire.write(mode1 | PCA_MODE1_AI);
+    Wire.endTransmission();
+
+    placas[placasEncontradas] = placa;
+    direccionPlaca[placasEncontradas] = encontradas[b];
+    placasEncontradas++;
+
+    int primera = (placasEncontradas - 1) * UNIDADES_POR_PLACA + 1;
+    Serial.printf("PCA9685 en 0x%02X -> unidades %d-%d\n",
+                  encontradas[b], primera, primera + UNIDADES_POR_PLACA - 1);
+  }
+
+  if (placasEncontradas == 0) {
     return false;
   }
 
-  pwm.setOscillatorFrequency(27000000);
-  pwm.setPWMFreq(50);
+  if (placasEncontradas < NUM_PLACAS) {
+    Serial.printf("AVISO: solo %d de %d PCA9685; se mueven %d unidades\n",
+                  placasEncontradas, NUM_PLACAS, placasEncontradas * UNIDADES_POR_PLACA);
+  }
+
   delay(300);
 
-  posX = 0.0f;
-  posY = 0.0f;
-  aplicarServos(true);
+  // Centrar de una en una (evita el pico de corriente de 32 servos)
+  for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
+    escribirUnidad(u);
+    delay(PAUSA_ARRANQUE_MS);
+  }
 
   tControlUs = micros();
   return true;
 }
 
 // =============================================
-// CONSTRUCCIÓN DE RUTAS
+// CONSTRUCCIÓN DE LA RUTA (compartida)
 // =============================================
 
 void agregarPunto(float x, float y) {
@@ -244,42 +415,88 @@ void agregarCirculo(int vueltas) {
   }
 }
 
+// Tiempo que tarda una unidad en recorrer la ruta desde el centro
+unsigned long duracionRutaMs() {
+  float largo = 0.0f, x = 0.0f, y = 0.0f;
+  for (int i = 0; i < numPuntos; i++) {
+    largo += sqrtf((ruta[i].x - x) * (ruta[i].x - x) + (ruta[i].y - y) * (ruta[i].y - y));
+    x = ruta[i].x;
+    y = ruta[i].y;
+  }
+  return (unsigned long)(1000.0f * largo / VEL_PATRON);
+}
+
 // =============================================
 // COMANDOS DE MOVIMIENTO
 // =============================================
 
+// Toda unidad fuera del centro (o moviéndose) regresa; se vacía la cola
 void irAlCentro() {
-  numPuntos = 0;
-  indicePunto = 0;
-  agregarPunto(0.0f, 0.0f);
-
-  velocidadRuta = VEL_REGRESO;
+  largoCola = 0;
+  siguienteEnCola = 0;
   patronActual = 0;
+
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    Unidad& un = unidades[u];
+    if (un.fase != U_QUIETA || un.x != 0.0f || un.y != 0.0f) {
+      un.fase = U_REGRESO;
+    }
+  }
+
   estado = REGRESANDO;
 }
 
 // pose: 1 INICIO, 2 RECARGAR, 3 ESCUDO, 4 ATAQUE, 5 FIN
 void iniciarPatron(uint8_t pose) {
-  numPuntos = 0;
-  indicePunto = 0;
-
-  switch (pose) {
-    case 1: agregarCirculo(2);                          break;
-    case 2: agregarFigura(FIG_CUADRADO, N_FIG(FIG_CUADRADO), 2); break;
-    case 3: agregarFigura(FIG_X, N_FIG(FIG_X), 1);      break;
-    case 4: agregarFigura(FIG_LINEA, N_FIG(FIG_LINEA), 3); break;
-    case 5: agregarFigura(FIG_ZIGZAG, N_FIG(FIG_ZIGZAG), 1); break;
-    default: irAlCentro(); return;
+  if (pose < 1 || pose > 5) {
+    irAlCentro();
+    return;
   }
 
-  // Siempre termina en el centro
-  agregarPunto(0.0f, 0.0f);
+  numPuntos = 0;
+  int vueltas = REPETICIONES[pose];
 
-  velocidadRuta = VEL_PATRON;
+  switch (pose) {
+    case 1: agregarCirculo(vueltas);                                    break;
+    case 2: agregarFigura(FIG_CUADRADO, N_FIG(FIG_CUADRADO), vueltas);  break;
+    case 3: agregarFigura(FIG_X, N_FIG(FIG_X), vueltas);                break;
+    case 4: agregarFigura(FIG_LINEA, N_FIG(FIG_LINEA), vueltas);        break;
+    case 5: agregarFigura(FIG_ZIGZAG, N_FIG(FIG_ZIGZAG), vueltas);      break;
+  }
+
+  // Las que venían de la postura anterior regresan al centro;
+  // si les toca turno antes de llegar, arrancan desde donde estén
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    if (unidades[u].fase == U_FIGURA || unidades[u].fase == U_MANO) {
+      unidades[u].fase = U_REGRESO;
+    }
+  }
+
+  // Cola: todas en ORDEN_UNIDADES, o solo la de la prueba de cableado
+  largoCola = 0;
+  if (unidadPrueba >= 0) {
+    cola[largoCola++] = unidadPrueba;
+  } else {
+    for (int i = 0; i < NUM_UNIDADES; i++) {
+      int u = ORDEN_UNIDADES[i] - 1;
+      if (u >= 0 && u < placasEncontradas * UNIDADES_POR_PLACA) {
+        cola[largoCola++] = u;
+      }
+    }
+  }
+  siguienteEnCola = 0;
+
+  // Arrancar una cada (duración / SIMULTANEAS): así quedan desfasadas
+  // (una acabando, otra a la mitad, otra empezando)
+  unsigned long duracion = duracionRutaMs();
+  intervaloArranqueMs = duracion / SIMULTANEAS;
+  ultimoArranqueMs = millis() - intervaloArranqueMs;   // la primera arranca ya
+
   patronActual = pose;
   estado = PATRON;
 
-  Serial.printf("[MOV] Patron: %s (%d puntos)\n", NOMBRES_PATRON[pose], numPuntos);
+  Serial.printf("[MOV] Patron: %s (%d puntos, %lu ms por unidad, %d unidades, %d a la vez)\n",
+                NOMBRES_PATRON[pose], numPuntos, duracion, largoCola, SIMULTANEAS);
 }
 
 // x_norm, y_norm: -1 a 1 (centro de la imagen = 0)
@@ -287,6 +504,17 @@ void seguirMano(float xNorm, float yNorm) {
   objetivoMano.x = saturar(xNorm, -1.0f, 1.0f) * RANGO_TRACK;
   objetivoMano.y = saturar(yNorm, -1.0f, 1.0f) * RANGO_TRACK;
   ultimoTrackMs = millis();
+
+  if (estado != SIGUIENDO_MANO) {
+    largoCola = 0;
+    siguienteEnCola = 0;
+    for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
+      if (unidadPrueba < 0 || u == unidadPrueba) {
+        unidades[u].fase = U_MANO;
+      }
+    }
+  }
+
   estado = SIGUIENDO_MANO;
 }
 
@@ -294,26 +522,50 @@ bool enMovimiento() {
   return estado == PATRON || estado == REGRESANDO;
 }
 
+// Tecla 'u' del Monitor Serie: recorre las unidades de una en una
+// para revisar el cableado (1-5 dibujan la figura solo en esa)
+void siguienteUnidadPrueba() {
+  unidadPrueba++;
+
+  if (unidadPrueba >= placasEncontradas * UNIDADES_POR_PLACA) {
+    unidadPrueba = -1;
+    Serial.println("[PRUEBA] Todas las unidades se mueven");
+  } else {
+    int b = unidadPrueba / UNIDADES_POR_PLACA;
+    int k = unidadPrueba % UNIDADES_POR_PLACA;
+    Serial.printf("[PRUEBA] Solo la unidad %d (PCA 0x%02X, canales %d=X y %d=Y)\n",
+                  unidadPrueba + 1, direccionPlaca[b], canalX(k), canalY(k));
+  }
+}
+
 // =============================================
 // AVANCE HACIA UN PUNTO (velocidad constante)
 // Regresa true si ya llegó
 // =============================================
 
-bool avanzarHacia(float x, float y, float velocidad) {
-  float dx = x - posX;
-  float dy = y - posY;
+bool avanzarHacia(Unidad& un, float x, float y, float velocidad) {
+  float dx = x - un.x;
+  float dy = y - un.y;
   float distancia = sqrtf(dx * dx + dy * dy);
   float paso = velocidad * TS_S;
 
   if (distancia <= paso) {
-    posX = x;
-    posY = y;
+    un.x = x;
+    un.y = y;
     return true;
   }
 
-  posX += dx / distancia * paso;
-  posY += dy / distancia * paso;
+  un.x += dx / distancia * paso;
+  un.y += dy / distancia * paso;
   return false;
+}
+
+int unidadesEnFigura() {
+  int n = 0;
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    if (unidades[u].fase == U_FIGURA) n++;
+  }
+  return n;
 }
 
 // =============================================
@@ -333,32 +585,88 @@ void actualizarMovimiento() {
     tControlUs = ahora;
   }
 
-  switch (estado) {
+  // -----------------------------
+  // COLA: arrancar la siguiente unidad
+  // -----------------------------
 
-    case PATRON:
-    case REGRESANDO:
-      if (avanzarHacia(ruta[indicePunto].x, ruta[indicePunto].y, velocidadRuta)) {
-        indicePunto++;
-        if (indicePunto >= numPuntos) {
-          if (estado == PATRON) {
-            Serial.printf("[MOV] Patron %s terminado\n", NOMBRES_PATRON[patronActual]);
+  if (estado == PATRON && siguienteEnCola < largoCola) {
+    unsigned long ms = millis();
+    if (unidadesEnFigura() < SIMULTANEAS &&
+        ms - ultimoArranqueMs >= intervaloArranqueMs) {
+      Unidad& un = unidades[cola[siguienteEnCola++]];
+      un.fase = U_FIGURA;
+      un.indice = 0;
+      ultimoArranqueMs = ms;
+    }
+  }
+
+  if (estado == SIGUIENDO_MANO && millis() - ultimoTrackMs > TRACK_TIMEOUT_MS) {
+    Serial.println("[MOV] Sin posicion de mano: regreso al centro");
+    irAlCentro();
+  }
+
+  // -----------------------------
+  // AVANZAR CADA UNIDAD
+  // -----------------------------
+
+  bool algunaActiva = false;
+
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    Unidad& un = unidades[u];
+
+    switch (un.fase) {
+
+      case U_FIGURA: {
+        // Recorre la ruta sin frenar en cada punto: lo que sobra del
+        // paso al llegar a un punto se usa hacia el siguiente
+        float paso = VEL_PATRON * TS_S;
+        while (paso > 0.0f && un.indice < numPuntos) {
+          float dx = ruta[un.indice].x - un.x;
+          float dy = ruta[un.indice].y - un.y;
+          float d = sqrtf(dx * dx + dy * dy);
+          if (d <= paso) {
+            un.x = ruta[un.indice].x;
+            un.y = ruta[un.indice].y;
+            un.indice++;
+            paso -= d;
+          } else {
+            un.x += dx / d * paso;
+            un.y += dy / d * paso;
+            paso = 0.0f;
           }
-          estado = QUIETO;
         }
+        if (un.indice >= numPuntos) {
+          un.fase = U_REGRESO;
+        }
+        break;
       }
-      break;
 
-    case SIGUIENDO_MANO:
-      if (millis() - ultimoTrackMs > TRACK_TIMEOUT_MS) {
-        Serial.println("[MOV] Sin posicion de mano: regreso al centro");
-        irAlCentro();
-      } else {
-        avanzarHacia(objetivoMano.x, objetivoMano.y, VEL_TRACK);
-      }
-      break;
+      case U_REGRESO:
+        if (avanzarHacia(un, 0.0f, 0.0f, VEL_REGRESO)) {
+          un.fase = U_QUIETA;
+        }
+        break;
 
-    case QUIETO:
-      break;
+      case U_MANO:
+        avanzarHacia(un, objetivoMano.x, objetivoMano.y, VEL_TRACK);
+        break;
+
+      case U_QUIETA:
+        break;
+    }
+
+    if (un.fase != U_QUIETA) {
+      algunaActiva = true;
+    }
+  }
+
+  // ¿Terminó la tanda?
+  if ((estado == PATRON && siguienteEnCola >= largoCola && !algunaActiva) ||
+      (estado == REGRESANDO && !algunaActiva)) {
+    if (estado == PATRON) {
+      Serial.printf("[MOV] Patron %s terminado\n", NOMBRES_PATRON[patronActual]);
+    }
+    estado = QUIETO;
   }
 
   aplicarServos();

@@ -2,7 +2,7 @@
  * =============================================================
  *  SOFIA - ESP32 MAESTRO
  *  Recibe comandos de la PC (visión) por BLE y mueve
- *  una unidad de 2 servos (2 GDL) según la postura
+ *  las 16 unidades del módulo (2 PCA9685) según la postura
  * =============================================================
  *
  *  Implementa el Estándar de Comunicación
@@ -438,14 +438,15 @@ void setup() {
   Serial.println("\n=== SOFIA ESP32 MAESTRO ===");
 
   // -----------------------------
-  // SERVOS (PCA9685)
+  // SERVOS (2 x PCA9685)
   // -----------------------------
 
   if (iniciarServos()) {
-    Serial.println("PCA9685 listo. Unidad en el centro.");
+    Serial.printf("Servos listos: %d unidades en el centro.\n",
+                  placasEncontradas * UNIDADES_POR_PLACA);
   } else {
     // Se sigue sin servos para poder probar la comunicación
-    Serial.println("ERROR: PCA9685 NO DETECTADO (la comunicación BLE sigue funcionando)");
+    Serial.println("ERROR: NINGUN PCA9685 DETECTADO (la comunicación BLE sigue funcionando)");
   }
 
   rxQueue = xQueueCreate(16, sizeof(RxPacket));
@@ -537,6 +538,9 @@ void loop() {
     } else if (c == '0') {
       Serial.println("[SERIAL] Al centro");
       irAlCentro();
+    } else if (c == 'u' || c == 'U') {
+      // Prueba de cableado: una unidad a la vez
+      siguienteUnidadPrueba();
     }
   }
 

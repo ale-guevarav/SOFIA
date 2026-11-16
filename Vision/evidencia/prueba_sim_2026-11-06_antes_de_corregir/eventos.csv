@@ -1,0 +1,54 @@
+t_s,hora,etiqueta,origen,tipo,detalle
+0.306,13:33:54.653,,Webots,conectado,Webots (127.0.0.1:5655)
+0.312,13:33:54.659,S1 ciclo 5 posturas,gui,etiqueta,S1 ciclo 5 posturas
+6.867,13:34:01.215,S2 canal BLE simulado,gui,etiqueta,S2 canal BLE simulado
+69.744,13:35:04.091,S3 cambios rapidos,gui,etiqueta,S3 cambios rapidos
+100.292,13:35:34.639,S4 tracking 20 Hz + posturas,gui,etiqueta,S4 tracking 20 Hz + posturas
+163.313,13:36:37.661,S5 simulacion detenida,gui,etiqueta,S5 simulacion detenida
+163.320,13:36:37.668,S5 simulacion detenida,Webots,perdido,Se perdió la conexión con Webots
+164.384,13:36:38.732,S5 simulacion detenida,Webots,reintento,1
+165.388,13:36:39.736,S5 simulacion detenida,Webots,reintento,2
+167.396,13:36:41.743,S5 simulacion detenida,Webots,reintento,3
+171.408,13:36:45.755,S5 simulacion detenida,Webots,reintento,4
+171.408,13:36:45.756,S5 simulacion detenida,Webots,reconectado,8.1
+172.439,13:36:46.786,S5 simulacion detenida,Webots,perdido,Se perdió la conexión con Webots
+173.664,13:36:48.012,S5 simulacion detenida,Webots,reintento,1
+174.667,13:36:49.015,S5 simulacion detenida,Webots,reintento,2
+176.673,13:36:51.021,S5 simulacion detenida,Webots,reintento,3
+180.682,13:36:55.029,S5 simulacion detenida,Webots,reintento,4
+180.682,13:36:55.030,S5 simulacion detenida,Webots,reconectado,8.2
+181.709,13:36:56.057,S5 simulacion detenida,Webots,perdido,Se perdió la conexión con Webots
+182.938,13:36:57.286,S5 simulacion detenida,Webots,reintento,1
+183.942,13:36:58.290,S5 simulacion detenida,Webots,reintento,2
+185.950,13:37:00.298,S5 simulacion detenida,Webots,reintento,3
+189.962,13:37:04.310,S5 simulacion detenida,Webots,reintento,4
+189.963,13:37:04.310,S5 simulacion detenida,Webots,reconectado,8.3
+190.992,13:37:05.339,S5 simulacion detenida,Webots,perdido,Se perdió la conexión con Webots
+192.220,13:37:06.568,S5 simulacion detenida,Webots,reintento,1
+193.225,13:37:07.573,S5 simulacion detenida,Webots,reintento,2
+195.232,13:37:09.580,S5 simulacion detenida,Webots,reintento,3
+199.241,13:37:13.588,S5 simulacion detenida,Webots,reintento,4
+199.241,13:37:13.589,S5 simulacion detenida,Webots,reconectado,8.2
+200.260,13:37:14.608,S5 simulacion detenida,Webots,perdido,Se perdió la conexión con Webots
+201.498,13:37:15.845,S5 simulacion detenida,Webots,reintento,1
+202.501,13:37:16.849,S5 simulacion detenida,Webots,reintento,2
+204.507,13:37:18.855,S5 simulacion detenida,Webots,reintento,3
+208.516,13:37:22.864,S5 simulacion detenida,Webots,reintento,4
+208.517,13:37:22.865,S5 simulacion detenida,Webots,reconectado,8.3
+209.542,13:37:23.890,S6 robot sin respuesta,gui,etiqueta,S6 robot sin respuesta
+211.776,13:37:26.124,S6 robot sin respuesta,Webots,perdido,Sin respuesta de Webots en 3.2 s: enlace perdido
+212.779,13:37:27.127,S6 robot sin respuesta,Webots,reintento,1
+212.780,13:37:27.127,S6 robot sin respuesta,Webots,reconectado,1.0
+218.794,13:37:33.142,S6 robot sin respuesta,Webots,perdido,Sin respuesta de Webots en 3.2 s: enlace perdido
+219.797,13:37:34.145,S6 robot sin respuesta,Webots,reintento,1
+219.798,13:37:34.145,S6 robot sin respuesta,Webots,reconectado,1.0
+225.811,13:37:40.159,S6 robot sin respuesta,Webots,perdido,Sin respuesta de Webots en 3.2 s: enlace perdido
+226.814,13:37:41.162,S6 robot sin respuesta,Webots,reintento,1
+226.815,13:37:41.162,S6 robot sin respuesta,Webots,reconectado,1.0
+232.829,13:37:47.177,S6 robot sin respuesta,Webots,perdido,Sin respuesta de Webots en 3.2 s: enlace perdido
+233.832,13:37:48.179,S6 robot sin respuesta,Webots,reintento,1
+233.833,13:37:48.180,S6 robot sin respuesta,Webots,reconectado,1.0
+239.847,13:37:54.195,S6 robot sin respuesta,Webots,perdido,Sin respuesta de Webots en 3.2 s: enlace perdido
+240.849,13:37:55.197,S6 robot sin respuesta,Webots,reintento,1
+240.850,13:37:55.198,S6 robot sin respuesta,Webots,reconectado,1.0
+244.697,13:37:59.045,S7 reglas del maestro,gui,etiqueta,S7 reglas del maestro

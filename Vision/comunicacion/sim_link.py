@@ -89,7 +89,7 @@ class WebotsLink(BleLink):
         self._client = writer
         self._reader_task = self._loop.create_task(self._read_packets(reader))
 
-        self._on_connected(f"Webots ({self.host}:{self.port})")
+        await self._confirm_link(f"Webots ({self.host}:{self.port})")
 
 
     async def _disconnect(self):

@@ -1,0 +1,194 @@
+{
+  "S1": {
+    "total": {
+      "enviados": 100,
+      "ack": 100,
+      "exito_pct": 100.0,
+      "intentos_prom": 1.0,
+      "con_reintento": 0,
+      "lat_prom_ms": 9.7,
+      "lat_p95_ms": 14.4,
+      "lat_max_ms": 17.5,
+      "fallas": {}
+    },
+    "por_postura": {
+      "INICIO": {
+        "enviados": 20,
+        "ack": 20,
+        "ejecutadas": 20,
+        "lat_prom_ms": 10.06
+      },
+      "RECARGAR": {
+        "enviados": 20,
+        "ack": 20,
+        "ejecutadas": 20,
+        "lat_prom_ms": 9.07
+      },
+      "ESCUDO": {
+        "enviados": 20,
+        "ack": 20,
+        "ejecutadas": 20,
+        "lat_prom_ms": 9.69
+      },
+      "ATAQUE": {
+        "enviados": 20,
+        "ack": 20,
+        "ejecutadas": 20,
+        "lat_prom_ms": 9.12
+      },
+      "FIN": {
+        "enviados": 20,
+        "ack": 20,
+        "ejecutadas": 20,
+        "lat_prom_ms": 10.67
+      }
+    }
+  },
+  "S2": {
+    "enviados": 300,
+    "ack": 300,
+    "exito_pct": 100.0,
+    "intentos_prom": 1.137,
+    "con_reintento": 39,
+    "lat_prom_ms": 105.3,
+    "lat_p95_ms": 371.3,
+    "lat_max_ms": 678.0,
+    "fallas": {},
+    "nacks": 8,
+    "ejecutadas_maestro": 300,
+    "caidas": 0
+  },
+  "S3": {
+    "enviados": 300,
+    "ack": 300,
+    "exito_pct": 100.0,
+    "intentos_prom": 1.08,
+    "con_reintento": 22,
+    "lat_prom_ms": 318.9,
+    "lat_p95_ms": 831.4,
+    "lat_max_ms": 1115.7,
+    "fallas": {},
+    "pedidos": 300,
+    "ejecutadas_maestro": 300,
+    "caidas": 0
+  },
+  "S4": {
+    "enviados": 29,
+    "ack": 29,
+    "exito_pct": 100.0,
+    "intentos_prom": 1.069,
+    "con_reintento": 2,
+    "lat_prom_ms": 92.8,
+    "lat_p95_ms": 375.8,
+    "lat_max_ms": 386.5,
+    "fallas": {},
+    "tramas_track": 893,
+    "latidos": 30,
+    "caidas": 0
+  },
+  "S5": [
+    {
+      "deteccion_s": 0.02,
+      "reconexion_tras_reanudar_s": 3.27,
+      "sin_servicio_s": 8.27,
+      "intentos": 4,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 0.02,
+      "reconexion_tras_reanudar_s": 3.27,
+      "sin_servicio_s": 8.27,
+      "intentos": 4,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 0.01,
+      "reconexion_tras_reanudar_s": 3.28,
+      "sin_servicio_s": 8.28,
+      "intentos": 4,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 0.02,
+      "reconexion_tras_reanudar_s": 3.27,
+      "sin_servicio_s": 8.27,
+      "intentos": 4,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 0.01,
+      "reconexion_tras_reanudar_s": 3.27,
+      "sin_servicio_s": 8.27,
+      "intentos": 4,
+      "pose_despues_ok": true,
+      "reconecto": true
+    }
+  ],
+  "S6": [
+    {
+      "deteccion_s": 2.17,
+      "sin_servicio_s": 6.05,
+      "reconexion_tras_responder_s": 0.05,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 2.13,
+      "sin_servicio_s": 6.04,
+      "reconexion_tras_responder_s": 0.04,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 2.1,
+      "sin_servicio_s": 6.04,
+      "reconexion_tras_responder_s": 0.04,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 2.06,
+      "sin_servicio_s": 6.04,
+      "reconexion_tras_responder_s": 0.04,
+      "pose_despues_ok": true,
+      "reconecto": true
+    },
+    {
+      "deteccion_s": 2.03,
+      "sin_servicio_s": 6.04,
+      "reconexion_tras_responder_s": 0.04,
+      "pose_despues_ok": true,
+      "reconecto": true
+    }
+  ],
+  "S7": {
+    "duplicado": {
+      "acks": 2,
+      "ejecuciones": 1
+    },
+    "crc_dañado": {
+      "respuesta": [
+        "NACK"
+      ],
+      "error": [
+        "CRC incorrecto"
+      ],
+      "ejecuciones": 0
+    },
+    "estado_seguro_s": 3.02,
+    "estado_seguro_motivo": "3 s sin tramas"
+  },
+  "stats_enlace": {
+    "tramas_track": 893,
+    "latidos": 40,
+    "reintentos_ack": 84,
+    "nacks": 9,
+    "caidas": 10,
+    "reconexiones": 10
+  },
+  "resumen_md": "prueba_sim_2026-11-06/resumen.md"
+}

@@ -183,7 +183,7 @@ El ESP32 valida en este orden: **longitud → SOF → LEN → CRC → TYPE → P
 |---|---|
 | **R1** | **Stop-and-wait para comandos.** POSE, PING, MODE y STOP se envían de uno en uno: la PC no envía el siguiente comando hasta recibir ACK/NACK o agotar los reintentos. TRACK sí puede enviarse mientras se espera un ACK. |
 | **R2** | **Tiempo de espera:** 300 ms por ACK. |
-| **R3** | **Reintentos:** hasta 3 envíos en total con el **mismo SEQ**. Si los 3 fallan, el comando se reporta como fallido a la interfaz. |
+| **R3** | **Reintentos:** hasta 3 envíos en total con el **mismo SEQ**. Se reintenta si no llega ACK o si llega un NACK de transmisión (SOF, longitud, CRC u ocupado), porque esos los causa el ruido y no el comando. Si los 3 fallan, el comando se reporta como fallido a la interfaz. |
 | **R4** | **Duplicados:** si el ESP32 recibe un comando con el mismo TYPE y SEQ que el último que ejecutó, dentro de una ventana de 1 s, **no lo vuelve a ejecutar** pero sí envía ACK otra vez. Así un reintento (porque se perdió el ACK) no hace que el robot actúe dos veces. |
 | **R5** | **Correspondencia:** un ACK/NACK solo es válido si su `acked_type` y `acked_seq` coinciden con el comando en espera. Las respuestas que no coinciden se descartan. |
 | **R6** | **Frecuencia de TRACK:** máximo 20 tramas por segundo (una cada 50 ms). La PC descarta los excesos. |
@@ -193,6 +193,7 @@ El ESP32 valida en este orden: **longitud → SOF → LEN → CRC → TYPE → P
 | **R10** | **Errores en TRACK:** se responden con NACK (para diagnóstico), pero la PC no los reintenta, porque el siguiente TRACK reemplaza al anterior. |
 | **R11** | **Enlace perdido en la PC:** si la PC no recibe ninguna respuesta en 3 s, cierra la conexión aunque el sistema operativo la siga viendo abierta. |
 | **R12** | **Reconexión automática:** si la conexión se pierde o no se logra y el usuario no pidió desconectar, la PC reintenta sola con esperas de 1, 2, 4, 8 y luego cada 10 s. Al reconectar se vuelve a enviar MODE (R9). El botón *Cancelar* detiene los reintentos. |
+| **R13** | **Verificación al conectar:** la conexión cuenta como lista solo cuando el robot contesta un PING. Si no contesta, se cierra y se reintenta (R12). |
 
 ---
 

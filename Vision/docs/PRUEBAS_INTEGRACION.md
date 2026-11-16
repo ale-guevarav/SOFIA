@@ -133,6 +133,8 @@ Cada condición lleva su propia etiqueta. Al final, **Guardar resumen**.
 | E11 | Comando sin conexión | Postura detectada mientras se reconecta | Enlace no conectado | No se envía y se registra como "Sin conexión" |
 | E12 | La PC deja de mandar | App cerrada o colgada | El ESP32 pasa 3 s sin tramas | El ESP32 entra a estado seguro y regresa al centro |
 | E13 | Error inesperado en la GUI | Fallo de programación | `sys.excepthook` | Se registra en la bitácora y en `eventos.csv`; la app sigue abierta |
+| E14 | NACK por ruido en LEN o SOF | Bit dañado en la transmisión | El ESP32 responde NACK de longitud o SOF | La PC lo reintenta igual que un error de CRC |
+| E15 | Conexión abierta pero el robot no contesta al reconectar | Robot colgado o simulación pausada | El PING de verificación no recibe ACK | No se marca como conectado; se cierra y se reintenta |
 
 **Errores encontrados en las pruebas** (llenar con lo que salga en `eventos.csv` y en las observaciones)
 
@@ -142,7 +144,18 @@ Cada condición lleva su propia etiqueta. Al final, **Guardar resumen**.
 
 ---
 
-## 6. Prueba rápida sin robot
+## 6. Prueba automática de comunicación y estrés
+
+Prueba el enlace de la GUI contra el controlador de la simulación, sin Webots, sin cámara y sin ESP32. Tarda unos 5 minutos:
+
+```
+cd Vision
+python -m evaluacion.prueba_comunicacion_sim
+```
+
+Escenarios: ciclo de las 5 posturas, canal BLE simulado, cambios rápidos, tracking a 20 Hz, simulación detenida, robot sin responder y reglas del robot (duplicados, CRC, estado seguro). Los resultados quedan en `metrics/prueba_sim/`; la corrida del 6 de noviembre está en `evidencia/`.
+
+## 7. Prueba rápida sin robot
 
 Sirve para revisar la reconexión antes de ir al laboratorio.
 

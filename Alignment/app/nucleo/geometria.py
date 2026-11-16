@@ -37,15 +37,16 @@ COLUMNAS = 4
 
 # Posición (x, y) del centro de cada panel en el mundo.
 # Filas pares e impares están desfasadas (arreglo tipo panal).
-# Separación mínima sin choques con las placas a ±30° (igual que sofia.wbt):
-# 140 mm en la fila y 116 mm entre filas.
-FILAS_X = [-0.174, -0.058, 0.058, 0.174]
-COLUMNAS_Y_PAR = [-0.210, -0.070, 0.070, 0.210]
-COLUMNAS_Y_IMPAR = [-0.140, 0.000, 0.140, 0.280]
+# Medidas del robot real (igual que sofia.wbt): 30 mm entre aristas a
+# cualquier vecino -> 134 mm entre centros en la fila, 116 mm entre
+# filas y las filas impares desplazadas 67 mm.
+FILAS_X = [-0.1741, -0.0580, 0.0580, 0.1741]
+COLUMNAS_Y_PAR = [-0.201, -0.067, 0.067, 0.201]
+COLUMNAS_Y_IMPAR = [-0.134, 0.000, 0.134, 0.268]
 
 # Centro del arreglo (promedio de los 16 paneles)
 CENTRO_X = 0.0
-CENTRO_Y = 0.035
+CENTRO_Y = 0.0335
 
 # Placa hexagonal
 RADIO_HEXAGONO = 0.060         # m, centro a vértice (120 mm de punta a punta)
@@ -96,9 +97,9 @@ LADO_MARCADOR = 0.060
 LADO_CUADRO_BLANCO = 0.080
 
 # Los centros de los 4 marcadores forman un cuadrado de este lado,
-# centrado en el arreglo (m). Es el más chico en el que ningún cuadro
-# blanco toca el área que barren las placas a ±30° (70.5 mm desde su
-# centro), con ~15 mm de margen: 0.597 m, redondeado a 0.60 m.
+# centrado en el arreglo (m). Ningún cuadro blanco toca el área que
+# barren las placas a ±30° (70.5 mm desde su centro): con el arreglo
+# real (134 mm) queda ~19 mm de margen.
 LADO_MARCO = 0.600
 
 # Marcador -> esquina, en la imagen enderezada (u, v):

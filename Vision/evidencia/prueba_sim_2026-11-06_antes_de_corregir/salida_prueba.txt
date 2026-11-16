@@ -1,0 +1,1811 @@
+   0.00  [MAESTRO] [MAESTRO] Protocolo: /home/claude/repo/SOFIA/Vision/comunicacion/protocol.py
+   0.00  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+   0.31  [PC] Conectando a Webots en 127.0.0.1:5655...
+   0.31  [PC] Conectado a Webots (127.0.0.1:5655)
+   0.31  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:55456
+   0.31  ===== S1 ciclo 5 posturas
+   0.31  [PC] → POSE seq=0 payload=01
+   0.33  [MAESTRO] [POSE] 1 = INICIO
+   0.39  [PC] → POSE seq=1 payload=02
+   0.39  [MAESTRO] [POSE] 2 = RECARGAR
+   0.45  [PC] → POSE seq=2 payload=03
+   0.46  [MAESTRO] [POSE] 3 = ESCUDO
+   0.52  [PC] → POSE seq=3 payload=04
+   0.52  [MAESTRO] [POSE] 4 = ATAQUE
+   0.58  [PC] → POSE seq=4 payload=05
+   0.59  [MAESTRO] [POSE] 5 = FIN
+   0.65  [PC] → POSE seq=5 payload=01
+   0.66  [MAESTRO] [POSE] 1 = INICIO
+   0.71  [PC] → POSE seq=6 payload=02
+   0.72  [MAESTRO] [POSE] 2 = RECARGAR
+   0.78  [PC] → POSE seq=7 payload=03
+   0.79  [MAESTRO] [POSE] 3 = ESCUDO
+   0.84  [PC] → POSE seq=8 payload=04
+   0.85  [MAESTRO] [POSE] 4 = ATAQUE
+   0.91  [PC] → POSE seq=9 payload=05
+   0.92  [MAESTRO] [POSE] 5 = FIN
+   0.97  [PC] → POSE seq=10 payload=01
+   0.98  [MAESTRO] [POSE] 1 = INICIO
+   1.04  [PC] → POSE seq=11 payload=02
+   1.05  [MAESTRO] [POSE] 2 = RECARGAR
+   1.10  [PC] → POSE seq=12 payload=03
+   1.11  [MAESTRO] [POSE] 3 = ESCUDO
+   1.17  [PC] → POSE seq=13 payload=04
+   1.18  [MAESTRO] [POSE] 4 = ATAQUE
+   1.23  [PC] → POSE seq=14 payload=05
+   1.24  [MAESTRO] [POSE] 5 = FIN
+   1.30  [PC] → POSE seq=15 payload=01
+   1.31  [MAESTRO] [POSE] 1 = INICIO
+   1.36  [PC] → POSE seq=16 payload=02
+   1.37  [MAESTRO] [POSE] 2 = RECARGAR
+   1.43  [PC] → POSE seq=17 payload=03
+   1.44  [MAESTRO] [POSE] 3 = ESCUDO
+   1.50  [PC] → POSE seq=18 payload=04
+   1.50  [MAESTRO] [POSE] 4 = ATAQUE
+   1.56  [PC] → POSE seq=19 payload=05
+   1.57  [MAESTRO] [POSE] 5 = FIN
+   1.63  [PC] → POSE seq=20 payload=01
+   1.63  [MAESTRO] [POSE] 1 = INICIO
+   1.69  [PC] → POSE seq=21 payload=02
+   1.70  [MAESTRO] [POSE] 2 = RECARGAR
+   1.76  [PC] → POSE seq=22 payload=03
+   1.76  [MAESTRO] [POSE] 3 = ESCUDO
+   1.82  [PC] → POSE seq=23 payload=04
+   1.83  [MAESTRO] [POSE] 4 = ATAQUE
+   1.89  [PC] → POSE seq=24 payload=05
+   1.89  [MAESTRO] [POSE] 5 = FIN
+   1.95  [PC] → POSE seq=25 payload=01
+   1.96  [MAESTRO] [POSE] 1 = INICIO
+   2.02  [PC] → POSE seq=26 payload=02
+   2.02  [MAESTRO] [POSE] 2 = RECARGAR
+   2.08  [PC] → POSE seq=27 payload=03
+   2.09  [MAESTRO] [POSE] 3 = ESCUDO
+   2.14  [PC] → POSE seq=28 payload=04
+   2.15  [MAESTRO] [POSE] 4 = ATAQUE
+   2.21  [PC] → POSE seq=29 payload=05
+   2.22  [MAESTRO] [POSE] 5 = FIN
+   2.27  [PC] → POSE seq=30 payload=01
+   2.29  [MAESTRO] [POSE] 1 = INICIO
+   2.34  [PC] → POSE seq=31 payload=02
+   2.35  [MAESTRO] [POSE] 2 = RECARGAR
+   2.40  [PC] → POSE seq=32 payload=03
+   2.42  [MAESTRO] [POSE] 3 = ESCUDO
+   2.48  [PC] → POSE seq=33 payload=04
+   2.48  [MAESTRO] [POSE] 4 = ATAQUE
+   2.54  [PC] → POSE seq=34 payload=05
+   2.55  [MAESTRO] [POSE] 5 = FIN
+   2.61  [PC] → POSE seq=35 payload=01
+   2.61  [MAESTRO] [POSE] 1 = INICIO
+   2.67  [PC] → POSE seq=36 payload=02
+   2.68  [MAESTRO] [POSE] 2 = RECARGAR
+   2.73  [PC] → POSE seq=37 payload=03
+   2.74  [MAESTRO] [POSE] 3 = ESCUDO
+   2.80  [PC] → POSE seq=38 payload=04
+   2.81  [MAESTRO] [POSE] 4 = ATAQUE
+   2.86  [PC] → POSE seq=39 payload=05
+   2.87  [MAESTRO] [POSE] 5 = FIN
+   2.93  [PC] → POSE seq=40 payload=01
+   2.94  [MAESTRO] [POSE] 1 = INICIO
+   2.99  [PC] → POSE seq=41 payload=02
+   3.00  [MAESTRO] [POSE] 2 = RECARGAR
+   3.06  [PC] → POSE seq=42 payload=03
+   3.07  [MAESTRO] [POSE] 3 = ESCUDO
+   3.12  [PC] → POSE seq=43 payload=04
+   3.13  [MAESTRO] [POSE] 4 = ATAQUE
+   3.19  [PC] → POSE seq=44 payload=05
+   3.20  [MAESTRO] [POSE] 5 = FIN
+   3.25  [PC] → POSE seq=45 payload=01
+   3.26  [MAESTRO] [POSE] 1 = INICIO
+   3.32  [PC] → POSE seq=46 payload=02
+   3.33  [MAESTRO] [POSE] 2 = RECARGAR
+   3.39  [PC] → POSE seq=47 payload=03
+   3.40  [MAESTRO] [POSE] 3 = ESCUDO
+   3.46  [PC] → POSE seq=48 payload=04
+   3.46  [MAESTRO] [POSE] 4 = ATAQUE
+   3.52  [PC] → POSE seq=49 payload=05
+   3.53  [MAESTRO] [POSE] 5 = FIN
+   3.59  [PC] → POSE seq=50 payload=01
+   3.59  [MAESTRO] [POSE] 1 = INICIO
+   3.65  [PC] → POSE seq=51 payload=02
+   3.66  [MAESTRO] [POSE] 2 = RECARGAR
+   3.72  [PC] → POSE seq=52 payload=03
+   3.72  [MAESTRO] [POSE] 3 = ESCUDO
+   3.78  [PC] → POSE seq=53 payload=04
+   3.79  [MAESTRO] [POSE] 4 = ATAQUE
+   3.85  [PC] → POSE seq=54 payload=05
+   3.86  [MAESTRO] [POSE] 5 = FIN
+   3.91  [PC] → POSE seq=55 payload=01
+   3.92  [MAESTRO] [POSE] 1 = INICIO
+   3.98  [PC] → POSE seq=56 payload=02
+   3.99  [MAESTRO] [POSE] 2 = RECARGAR
+   4.04  [PC] → POSE seq=57 payload=03
+   4.05  [MAESTRO] [POSE] 3 = ESCUDO
+   4.11  [PC] → POSE seq=58 payload=04
+   4.12  [MAESTRO] [POSE] 4 = ATAQUE
+   4.17  [PC] → POSE seq=59 payload=05
+   4.18  [MAESTRO] [POSE] 5 = FIN
+   4.24  [PC] → POSE seq=60 payload=01
+   4.25  [MAESTRO] [POSE] 1 = INICIO
+   4.32  [PC] → POSE seq=61 payload=02
+   4.33  [MAESTRO] [POSE] 2 = RECARGAR
+   4.39  [PC] → POSE seq=62 payload=03
+   4.40  [MAESTRO] [POSE] 3 = ESCUDO
+   4.46  [PC] → POSE seq=63 payload=04
+   4.46  [MAESTRO] [POSE] 4 = ATAQUE
+   4.52  [PC] → POSE seq=64 payload=05
+   4.53  [MAESTRO] [POSE] 5 = FIN
+   4.59  [PC] → POSE seq=65 payload=01
+   4.59  [MAESTRO] [POSE] 1 = INICIO
+   4.65  [PC] → POSE seq=66 payload=02
+   4.66  [MAESTRO] [POSE] 2 = RECARGAR
+   4.72  [PC] → POSE seq=67 payload=03
+   4.72  [MAESTRO] [POSE] 3 = ESCUDO
+   4.78  [PC] → POSE seq=68 payload=04
+   4.79  [MAESTRO] [POSE] 4 = ATAQUE
+   4.84  [PC] → POSE seq=69 payload=05
+   4.85  [MAESTRO] [POSE] 5 = FIN
+   4.91  [PC] → POSE seq=70 payload=01
+   4.92  [MAESTRO] [POSE] 1 = INICIO
+   4.97  [PC] → POSE seq=71 payload=02
+   4.98  [MAESTRO] [POSE] 2 = RECARGAR
+   5.04  [PC] → POSE seq=72 payload=03
+   5.05  [MAESTRO] [POSE] 3 = ESCUDO
+   5.10  [PC] → POSE seq=73 payload=04
+   5.11  [MAESTRO] [POSE] 4 = ATAQUE
+   5.17  [PC] → POSE seq=74 payload=05
+   5.18  [MAESTRO] [POSE] 5 = FIN
+   5.23  [PC] → POSE seq=75 payload=01
+   5.24  [MAESTRO] [POSE] 1 = INICIO
+   5.31  [PC] → POSE seq=76 payload=02
+   5.31  [MAESTRO] [POSE] 2 = RECARGAR
+   5.37  [PC] → POSE seq=77 payload=03
+   5.38  [MAESTRO] [POSE] 3 = ESCUDO
+   5.44  [PC] → POSE seq=78 payload=04
+   5.44  [MAESTRO] [POSE] 4 = ATAQUE
+   5.50  [PC] → POSE seq=79 payload=05
+   5.51  [MAESTRO] [POSE] 5 = FIN
+   5.57  [PC] → POSE seq=80 payload=01
+   5.57  [MAESTRO] [POSE] 1 = INICIO
+   5.63  [PC] → POSE seq=81 payload=02
+   5.64  [MAESTRO] [POSE] 2 = RECARGAR
+   5.69  [PC] → POSE seq=82 payload=03
+   5.70  [MAESTRO] [POSE] 3 = ESCUDO
+   5.76  [PC] → POSE seq=83 payload=04
+   5.77  [MAESTRO] [POSE] 4 = ATAQUE
+   5.82  [PC] → POSE seq=84 payload=05
+   5.83  [MAESTRO] [POSE] 5 = FIN
+   5.89  [PC] → POSE seq=85 payload=01
+   5.90  [MAESTRO] [POSE] 1 = INICIO
+   5.95  [PC] → POSE seq=86 payload=02
+   5.96  [MAESTRO] [POSE] 2 = RECARGAR
+   6.02  [PC] → POSE seq=87 payload=03
+   6.03  [MAESTRO] [POSE] 3 = ESCUDO
+   6.08  [PC] → POSE seq=88 payload=04
+   6.09  [MAESTRO] [POSE] 4 = ATAQUE
+   6.15  [PC] → POSE seq=89 payload=05
+   6.16  [MAESTRO] [POSE] 5 = FIN
+   6.21  [PC] → POSE seq=90 payload=01
+   6.22  [MAESTRO] [POSE] 1 = INICIO
+   6.28  [PC] → POSE seq=91 payload=02
+   6.29  [MAESTRO] [POSE] 2 = RECARGAR
+   6.34  [PC] → POSE seq=92 payload=03
+   6.35  [MAESTRO] [POSE] 3 = ESCUDO
+   6.41  [PC] → POSE seq=93 payload=04
+   6.42  [MAESTRO] [POSE] 4 = ATAQUE
+   6.48  [PC] → POSE seq=94 payload=05
+   6.48  [MAESTRO] [POSE] 5 = FIN
+   6.54  [PC] → POSE seq=95 payload=01
+   6.55  [MAESTRO] [POSE] 1 = INICIO
+   6.61  [PC] → POSE seq=96 payload=02
+   6.61  [MAESTRO] [POSE] 2 = RECARGAR
+   6.67  [PC] → POSE seq=97 payload=03
+   6.68  [MAESTRO] [POSE] 3 = ESCUDO
+   6.74  [PC] → POSE seq=98 payload=04
+   6.74  [MAESTRO] [POSE] 4 = ATAQUE
+   6.80  [PC] → POSE seq=99 payload=05
+   6.81  [MAESTRO] [POSE] 5 = FIN
+   6.87  ===== S2 canal BLE simulado
+   6.87  [PC] → POSE seq=100 payload=01
+   6.91  [MAESTRO] [POSE] 1 = INICIO
+   7.04  [PC] → POSE seq=101 payload=02
+   7.07  [MAESTRO] [POSE] 2 = RECARGAR
+   7.20  [PC] → POSE seq=102 payload=03
+   7.23  [MAESTRO] [POSE] 3 = ESCUDO
+   7.37  [PC] → POSE seq=103 payload=04
+   7.42  [MAESTRO] [POSE] 4 = ATAQUE
+   7.56  [PC] → POSE seq=104 payload=05
+   7.60  [MAESTRO] [POSE] 5 = FIN
+   7.74  [PC] → POSE seq=105 payload=01
+   7.78  [MAESTRO] [POSE] 1 = INICIO
+   7.91  [PC] → POSE seq=106 payload=02
+   7.94  [MAESTRO] [POSE] 2 = RECARGAR
+   8.07  [PC] → POSE seq=107 payload=03
+   8.10  [MAESTRO] [POSE] 3 = ESCUDO
+   8.24  [PC] → POSE seq=108 payload=04
+   8.30  [MAESTRO] [POSE] 4 = ATAQUE
+   8.45  [PC] → POSE seq=109 payload=05
+   8.48  [MAESTRO] [POSE] 5 = FIN
+   8.62  [PC] → POSE seq=110 payload=01
+   8.66  [MAESTRO] [POSE] 1 = INICIO
+   8.79  [PC] → POSE seq=111 payload=02
+   8.83  [MAESTRO] [POSE] 2 = RECARGAR
+   8.98  [PC] → POSE seq=112 payload=03
+   9.03  [MAESTRO] [POSE] 3 = ESCUDO
+   9.17  [PC] → POSE seq=113 payload=04
+   9.47  [PC] Sin ACK (intento 1/3)
+   9.47  [PC] → POSE seq=113 payload=04
+   9.50  [MAESTRO] [POSE] 4 = ATAQUE
+   9.63  [PC] → POSE seq=114 payload=05
+   9.68  [MAESTRO] [POSE] 5 = FIN
+   9.82  [PC] → POSE seq=115 payload=01
+   9.86  [MAESTRO] [POSE] 1 = INICIO
+   9.99  [PC] → POSE seq=116 payload=02
+  10.02  [MAESTRO] [POSE] 2 = RECARGAR
+  10.15  [PC] → POSE seq=117 payload=03
+  10.18  [MAESTRO] [POSE] 3 = ESCUDO
+  10.45  [PC] Sin ACK (intento 1/3)
+  10.46  [PC] → POSE seq=117 payload=03
+  10.63  [PC] → POSE seq=118 payload=04
+  10.66  [MAESTRO] [POSE] 4 = ATAQUE
+  10.80  [PC] → POSE seq=119 payload=05
+  10.83  [MAESTRO] [POSE] 5 = FIN
+  10.96  [PC] → POSE seq=120 payload=01
+  11.00  [MAESTRO] [POSE] 1 = INICIO
+  11.13  [PC] → POSE seq=121 payload=02
+  11.16  [MAESTRO] [POSE] 2 = RECARGAR
+  11.43  [PC] Sin ACK (intento 1/3)
+  11.43  [PC] → POSE seq=121 payload=02
+  11.58  [PC] → POSE seq=122 payload=03
+  11.63  [MAESTRO] [POSE] 3 = ESCUDO
+  11.77  [PC] → POSE seq=123 payload=04
+  11.80  [MAESTRO] [POSE] 4 = ATAQUE
+  11.93  [PC] → POSE seq=124 payload=05
+  11.96  [MAESTRO] [POSE] 5 = FIN
+  12.10  [PC] → POSE seq=125 payload=01
+  12.14  [MAESTRO] [POSE] 1 = INICIO
+  12.27  [PC] → POSE seq=126 payload=02
+  12.32  [MAESTRO] [POSE] 2 = RECARGAR
+  12.46  [PC] → POSE seq=127 payload=03
+  12.50  [MAESTRO] [POSE] 3 = ESCUDO
+  12.63  [PC] → POSE seq=128 payload=04
+  12.66  [MAESTRO] [POSE] 4 = ATAQUE
+  12.94  [PC] Sin ACK (intento 1/3)
+  12.94  [PC] → POSE seq=128 payload=04
+  13.12  [PC] → POSE seq=129 payload=05
+  13.15  [MAESTRO] [POSE] 5 = FIN
+  13.28  [PC] → POSE seq=130 payload=01
+  13.33  [MAESTRO] [POSE] 1 = INICIO
+  13.48  [PC] → POSE seq=131 payload=02
+  13.51  [MAESTRO] [POSE] 2 = RECARGAR
+  13.66  [PC] → POSE seq=132 payload=03
+  13.71  [MAESTRO] [POSE] 3 = ESCUDO
+  13.85  [PC] → POSE seq=133 payload=04
+  13.90  [MAESTRO] [POSE] 4 = ATAQUE
+  14.03  [PC] → POSE seq=134 payload=05
+  14.08  [MAESTRO] [POSE] 5 = FIN
+  14.22  [PC] → POSE seq=135 payload=01
+  14.26  [MAESTRO] [POSE] 1 = INICIO
+  14.29  [PC] Trama inválida de Webots: CRC incorrecto
+  14.52  [PC] Sin ACK (intento 1/3)
+  14.52  [PC] → POSE seq=135 payload=01
+  14.70  [PC] → POSE seq=136 payload=02
+  14.75  [MAESTRO] [POSE] 2 = RECARGAR
+  14.87  [PC] → POSE seq=137 payload=03
+  14.91  [MAESTRO] [POSE] 3 = ESCUDO
+  15.04  [PC] → POSE seq=138 payload=04
+  15.09  [MAESTRO] [POSE] 4 = ATAQUE
+  15.12  [PC] Trama inválida de Webots: CRC incorrecto
+  15.34  [PC] Sin ACK (intento 1/3)
+  15.34  [PC] → POSE seq=138 payload=04
+  15.51  [PC] → POSE seq=139 payload=05
+  15.54  [MAESTRO] [POSE] 5 = FIN
+  15.67  [PC] → POSE seq=140 payload=01
+  15.71  [MAESTRO] [POSE] 1 = INICIO
+  15.85  [PC] → POSE seq=141 payload=02
+  15.90  [MAESTRO] [POSE] 2 = RECARGAR
+  16.04  [PC] → POSE seq=142 payload=03
+  16.08  [MAESTRO] [POSE] 3 = ESCUDO
+  16.23  [PC] → POSE seq=143 payload=04
+  16.28  [MAESTRO] [POSE] 4 = ATAQUE
+  16.41  [PC] → POSE seq=144 payload=05
+  16.46  [MAESTRO] [POSE] 5 = FIN
+  16.59  [PC] → POSE seq=145 payload=01
+  16.64  [MAESTRO] [POSE] 1 = INICIO
+  16.77  [PC] → POSE seq=146 payload=02
+  16.81  [MAESTRO] [POSE] 2 = RECARGAR
+  16.94  [PC] → POSE seq=147 payload=03
+  16.99  [MAESTRO] [POSE] 3 = ESCUDO
+  17.13  [PC] → POSE seq=148 payload=04
+  17.16  [MAESTRO] [POSE] 4 = ATAQUE
+  17.30  [PC] → POSE seq=149 payload=05
+  17.34  [MAESTRO] [POSE] 5 = FIN
+  17.48  [PC] → POSE seq=150 payload=01
+  17.51  [MAESTRO] [POSE] 1 = INICIO
+  17.64  [PC] → POSE seq=151 payload=02
+  17.69  [MAESTRO] [POSE] 2 = RECARGAR
+  17.83  [PC] → POSE seq=152 payload=03
+  17.87  [MAESTRO] [POSE] 3 = ESCUDO
+  18.01  [PC] → POSE seq=153 payload=04
+  18.05  [MAESTRO] [POSE] 4 = ATAQUE
+  18.32  [PC] Sin ACK (intento 1/3)
+  18.32  [PC] → POSE seq=153 payload=04
+  18.49  [PC] → POSE seq=154 payload=05
+  18.79  [PC] Sin ACK (intento 1/3)
+  18.79  [PC] → POSE seq=154 payload=05
+  18.83  [MAESTRO] [POSE] 5 = FIN
+  18.97  [PC] → POSE seq=155 payload=01
+  19.01  [MAESTRO] [POSE] 1 = INICIO
+  19.15  [PC] → POSE seq=156 payload=02
+  19.19  [MAESTRO] [POSE] 2 = RECARGAR
+  19.33  [PC] → POSE seq=157 payload=03
+  19.37  [MAESTRO] [POSE] 3 = ESCUDO
+  19.51  [PC] → POSE seq=158 payload=04
+  19.55  [MAESTRO] [POSE] 4 = ATAQUE
+  19.69  [PC] → POSE seq=159 payload=05
+  19.73  [MAESTRO] [POSE] 5 = FIN
+  19.86  [PC] → POSE seq=160 payload=01
+  19.89  [MAESTRO] [POSE] 1 = INICIO
+  20.03  [PC] → POSE seq=161 payload=02
+  20.33  [PC] Sin ACK (intento 1/3)
+  20.33  [PC] → POSE seq=161 payload=02
+  20.38  [MAESTRO] [POSE] 2 = RECARGAR
+  20.51  [PC] → POSE seq=162 payload=03
+  20.56  [MAESTRO] [POSE] 3 = ESCUDO
+  20.69  [PC] → POSE seq=163 payload=04
+  20.74  [MAESTRO] [NACK] tipo=0x00 seq=163 error=0x02 (Longitud inválida)
+  20.78  [PC] ← NACK POSE seq=163: Longitud inválida
+  20.89  [PC] → POSE seq=164 payload=05
+  20.92  [MAESTRO] [POSE] 5 = FIN
+  21.06  [PC] → POSE seq=165 payload=01
+  21.09  [MAESTRO] [POSE] 1 = INICIO
+  21.23  [PC] → POSE seq=166 payload=02
+  21.26  [MAESTRO] [POSE] 2 = RECARGAR
+  21.40  [PC] → POSE seq=167 payload=03
+  21.44  [MAESTRO] [POSE] 3 = ESCUDO
+  21.57  [PC] → POSE seq=168 payload=04
+  21.62  [MAESTRO] [POSE] 4 = ATAQUE
+  21.76  [PC] → POSE seq=169 payload=05
+  21.81  [MAESTRO] [POSE] 5 = FIN
+  21.95  [PC] → POSE seq=170 payload=01
+  21.99  [MAESTRO] [POSE] 1 = INICIO
+  22.14  [PC] → POSE seq=171 payload=02
+  22.17  [MAESTRO] [POSE] 2 = RECARGAR
+  22.30  [PC] → POSE seq=172 payload=03
+  22.33  [MAESTRO] [POSE] 3 = ESCUDO
+  22.47  [PC] → POSE seq=173 payload=04
+  22.51  [MAESTRO] [NACK] tipo=0x02 seq=173 error=0x03 (CRC incorrecto)
+  22.54  [PC] ← NACK PING seq=173: CRC incorrecto
+  22.77  [PC] Sin ACK (intento 1/3)
+  22.77  [PC] → POSE seq=173 payload=04
+  22.82  [MAESTRO] [POSE] 4 = ATAQUE
+  22.97  [PC] → POSE seq=174 payload=05
+  23.00  [MAESTRO] [POSE] 5 = FIN
+  23.14  [PC] → POSE seq=175 payload=01
+  23.18  [MAESTRO] [POSE] 1 = INICIO
+  23.31  [PC] → POSE seq=176 payload=02
+  23.34  [MAESTRO] [NACK] tipo=0x80 seq=176 error=0x03 (CRC incorrecto)
+  23.38  [PC] ← NACK ACK seq=176: CRC incorrecto
+  23.61  [PC] Sin ACK (intento 1/3)
+  23.61  [PC] → POSE seq=176 payload=02
+  23.65  [MAESTRO] [POSE] 2 = RECARGAR
+  23.80  [PC] → POSE seq=177 payload=03
+  23.85  [MAESTRO] [POSE] 3 = ESCUDO
+  24.10  [PC] Sin ACK (intento 1/3)
+  24.10  [PC] → POSE seq=177 payload=03
+  24.29  [PC] → POSE seq=178 payload=04
+  24.33  [MAESTRO] [POSE] 4 = ATAQUE
+  24.48  [PC] → POSE seq=179 payload=05
+  24.51  [MAESTRO] [POSE] 5 = FIN
+  24.64  [PC] → POSE seq=180 payload=01
+  24.67  [MAESTRO] [POSE] 1 = INICIO
+  24.94  [PC] Sin ACK (intento 1/3)
+  24.94  [PC] → POSE seq=180 payload=01
+  25.12  [PC] → POSE seq=181 payload=02
+  25.15  [MAESTRO] [NACK] tipo=0x00 seq=181 error=0x02 (Longitud inválida)
+  25.19  [PC] ← NACK POSE seq=181: Longitud inválida
+  25.29  [PC] → POSE seq=182 payload=03
+  25.33  [MAESTRO] [POSE] 3 = ESCUDO
+  25.46  [PC] → POSE seq=183 payload=04
+  25.49  [MAESTRO] [POSE] 4 = ATAQUE
+  25.62  [PC] → POSE seq=184 payload=05
+  25.65  [MAESTRO] [POSE] 5 = FIN
+  25.78  [PC] → POSE seq=185 payload=01
+  25.83  [MAESTRO] [POSE] 1 = INICIO
+  25.98  [PC] → POSE seq=186 payload=02
+  26.01  [MAESTRO] [POSE] 2 = RECARGAR
+  26.16  [PC] → POSE seq=187 payload=03
+  26.19  [MAESTRO] [POSE] 3 = ESCUDO
+  26.32  [PC] → POSE seq=188 payload=04
+  26.37  [MAESTRO] [POSE] 4 = ATAQUE
+  26.51  [PC] → POSE seq=189 payload=05
+  26.55  [MAESTRO] [POSE] 5 = FIN
+  26.67  [PC] → POSE seq=190 payload=01
+  26.71  [MAESTRO] [POSE] 1 = INICIO
+  26.85  [PC] → POSE seq=191 payload=02
+  26.87  [MAESTRO] [POSE] 2 = RECARGAR
+  27.01  [PC] → POSE seq=192 payload=03
+  27.05  [MAESTRO] [POSE] 3 = ESCUDO
+  27.19  [PC] → POSE seq=193 payload=04
+  27.23  [MAESTRO] [POSE] 4 = ATAQUE
+  27.38  [PC] → POSE seq=194 payload=05
+  27.42  [MAESTRO] [POSE] 5 = FIN
+  27.56  [PC] → POSE seq=195 payload=01
+  27.60  [MAESTRO] [POSE] 1 = INICIO
+  27.74  [PC] → POSE seq=196 payload=02
+  28.05  [PC] Sin ACK (intento 1/3)
+  28.05  [PC] → POSE seq=196 payload=02
+  28.09  [MAESTRO] [POSE] 2 = RECARGAR
+  28.22  [PC] → POSE seq=197 payload=03
+  28.27  [MAESTRO] [POSE] 3 = ESCUDO
+  28.40  [PC] → POSE seq=198 payload=04
+  28.45  [MAESTRO] [POSE] 4 = ATAQUE
+  28.59  [PC] → POSE seq=199 payload=05
+  28.63  [MAESTRO] [POSE] 5 = FIN
+  28.77  [PC] → POSE seq=200 payload=01
+  28.81  [MAESTRO] [POSE] 1 = INICIO
+  28.94  [PC] → POSE seq=201 payload=02
+  28.97  [MAESTRO] [POSE] 2 = RECARGAR
+  29.11  [PC] → POSE seq=202 payload=03
+  29.15  [MAESTRO] [POSE] 3 = ESCUDO
+  29.41  [PC] Sin ACK (intento 1/3)
+  29.41  [PC] → POSE seq=202 payload=03
+  29.60  [PC] → POSE seq=203 payload=04
+  29.65  [MAESTRO] [POSE] 4 = ATAQUE
+  29.78  [PC] → POSE seq=204 payload=05
+  29.81  [MAESTRO] [POSE] 5 = FIN
+  29.96  [PC] → POSE seq=205 payload=01
+  29.99  [MAESTRO] [POSE] 1 = INICIO
+  30.12  [PC] → POSE seq=206 payload=02
+  30.15  [MAESTRO] [POSE] 2 = RECARGAR
+  30.29  [PC] → POSE seq=207 payload=03
+  30.33  [MAESTRO] [POSE] 3 = ESCUDO
+  30.48  [PC] → POSE seq=208 payload=04
+  30.51  [MAESTRO] [POSE] 4 = ATAQUE
+  30.66  [PC] → POSE seq=209 payload=05
+  30.69  [MAESTRO] [POSE] 5 = FIN
+  30.82  [PC] → POSE seq=210 payload=01
+  30.87  [MAESTRO] [POSE] 1 = INICIO
+  31.02  [PC] → POSE seq=211 payload=02
+  31.05  [MAESTRO] [POSE] 2 = RECARGAR
+  31.18  [PC] → POSE seq=212 payload=03
+  31.21  [MAESTRO] [POSE] 3 = ESCUDO
+  31.34  [PC] → POSE seq=213 payload=04
+  31.39  [MAESTRO] [POSE] 4 = ATAQUE
+  31.52  [PC] → POSE seq=214 payload=05
+  31.57  [MAESTRO] [POSE] 5 = FIN
+  31.70  [PC] → POSE seq=215 payload=01
+  31.73  [MAESTRO] [POSE] 1 = INICIO
+  31.85  [PC] → POSE seq=216 payload=02
+  31.89  [MAESTRO] [POSE] 2 = RECARGAR
+  32.02  [PC] → POSE seq=217 payload=03
+  32.05  [MAESTRO] [POSE] 3 = ESCUDO
+  32.19  [PC] → POSE seq=218 payload=04
+  32.22  [MAESTRO] [POSE] 4 = ATAQUE
+  32.35  [PC] → POSE seq=219 payload=05
+  32.65  [PC] Sin ACK (intento 1/3)
+  32.65  [PC] → POSE seq=219 payload=05
+  32.69  [MAESTRO] [POSE] 5 = FIN
+  32.81  [PC] → POSE seq=220 payload=01
+  32.87  [MAESTRO] [POSE] 1 = INICIO
+  33.01  [PC] → POSE seq=221 payload=02
+  33.05  [MAESTRO] [POSE] 2 = RECARGAR
+  33.19  [PC] → POSE seq=222 payload=03
+  33.22  [MAESTRO] [POSE] 3 = ESCUDO
+  33.37  [PC] → POSE seq=223 payload=04
+  33.42  [MAESTRO] [POSE] 4 = ATAQUE
+  33.55  [PC] → POSE seq=224 payload=05
+  33.60  [MAESTRO] [POSE] 5 = FIN
+  33.73  [PC] → POSE seq=225 payload=01
+  33.78  [MAESTRO] [POSE] 1 = INICIO
+  33.90  [PC] → POSE seq=226 payload=02
+  33.94  [MAESTRO] [POSE] 2 = RECARGAR
+  34.08  [PC] → POSE seq=227 payload=03
+  34.12  [MAESTRO] [POSE] 3 = ESCUDO
+  34.26  [PC] → POSE seq=228 payload=04
+  34.30  [MAESTRO] [POSE] 4 = ATAQUE
+  34.44  [PC] → POSE seq=229 payload=05
+  34.49  [MAESTRO] [POSE] 5 = FIN
+  34.63  [PC] → POSE seq=230 payload=01
+  34.65  [MAESTRO] [POSE] 1 = INICIO
+  34.80  [PC] → POSE seq=231 payload=02
+  34.83  [MAESTRO] [POSE] 2 = RECARGAR
+  34.98  [PC] → POSE seq=232 payload=03
+  35.03  [MAESTRO] [POSE] 3 = ESCUDO
+  35.17  [PC] → POSE seq=233 payload=04
+  35.19  [MAESTRO] [POSE] 4 = ATAQUE
+  35.32  [PC] → POSE seq=234 payload=05
+  35.35  [MAESTRO] [POSE] 5 = FIN
+  35.49  [PC] → POSE seq=235 payload=01
+  35.53  [MAESTRO] [NACK] tipo=0x00 seq=235 error=0x02 (Longitud inválida)
+  35.56  [PC] ← NACK POSE seq=235: Longitud inválida
+  35.66  [PC] → POSE seq=236 payload=02
+  35.69  [MAESTRO] [POSE] 2 = RECARGAR
+  35.83  [PC] → POSE seq=237 payload=03
+  35.87  [MAESTRO] [POSE] 3 = ESCUDO
+  36.00  [PC] → POSE seq=238 payload=04
+  36.03  [MAESTRO] [POSE] 4 = ATAQUE
+  36.18  [PC] → POSE seq=239 payload=05
+  36.21  [MAESTRO] [POSE] 5 = FIN
+  36.35  [PC] → POSE seq=240 payload=01
+  36.65  [PC] Sin ACK (intento 1/3)
+  36.65  [PC] → POSE seq=240 payload=01
+  36.70  [MAESTRO] [POSE] 1 = INICIO
+  36.83  [PC] → POSE seq=241 payload=02
+  36.88  [MAESTRO] [NACK] tipo=0x00 seq=241 error=0x03 (CRC incorrecto)
+  36.91  [PC] ← NACK POSE seq=241: CRC incorrecto
+  36.91  [PC] NACK (CRC incorrecto), reintentando
+  36.91  [PC] → POSE seq=241 payload=02
+  36.94  [MAESTRO] [POSE] 2 = RECARGAR
+  37.09  [PC] → POSE seq=242 payload=03
+  37.14  [MAESTRO] [POSE] 3 = ESCUDO
+  37.27  [PC] → POSE seq=243 payload=04
+  37.30  [MAESTRO] [POSE] 4 = ATAQUE
+  37.44  [PC] → POSE seq=244 payload=05
+  37.48  [MAESTRO] [POSE] 5 = FIN
+  37.61  [PC] → POSE seq=245 payload=01
+  37.66  [MAESTRO] [POSE] 1 = INICIO
+  37.79  [PC] → POSE seq=246 payload=02
+  37.82  [MAESTRO] [POSE] 2 = RECARGAR
+  37.96  [PC] → POSE seq=247 payload=03
+  38.01  [MAESTRO] [POSE] 3 = ESCUDO
+  38.14  [PC] → POSE seq=248 payload=04
+  38.19  [MAESTRO] [POSE] 4 = ATAQUE
+  38.34  [PC] → POSE seq=249 payload=05
+  38.37  [MAESTRO] [POSE] 5 = FIN
+  38.51  [PC] → POSE seq=250 payload=01
+  38.55  [MAESTRO] [POSE] 1 = INICIO
+  38.68  [PC] → POSE seq=251 payload=02
+  38.71  [MAESTRO] [POSE] 2 = RECARGAR
+  38.85  [PC] → POSE seq=252 payload=03
+  38.89  [MAESTRO] [POSE] 3 = ESCUDO
+  39.03  [PC] → POSE seq=253 payload=04
+  39.07  [MAESTRO] [POSE] 4 = ATAQUE
+  39.20  [PC] → POSE seq=254 payload=05
+  39.25  [MAESTRO] [POSE] 5 = FIN
+  39.40  [PC] → POSE seq=255 payload=01
+  39.44  [MAESTRO] [POSE] 1 = INICIO
+  39.59  [PC] → POSE seq=0 payload=02
+  39.64  [MAESTRO] [POSE] 2 = RECARGAR
+  39.77  [PC] → POSE seq=1 payload=03
+  39.80  [MAESTRO] [POSE] 3 = ESCUDO
+  39.93  [PC] → POSE seq=2 payload=04
+  39.96  [MAESTRO] [POSE] 4 = ATAQUE
+  40.11  [PC] → POSE seq=3 payload=05
+  40.14  [MAESTRO] [POSE] 5 = FIN
+  40.28  [PC] → POSE seq=4 payload=01
+  40.32  [MAESTRO] [POSE] 1 = INICIO
+  40.47  [PC] → POSE seq=5 payload=02
+  40.50  [MAESTRO] [POSE] 2 = RECARGAR
+  40.64  [PC] → POSE seq=6 payload=03
+  40.68  [MAESTRO] [POSE] 3 = ESCUDO
+  40.81  [PC] → POSE seq=7 payload=04
+  40.86  [MAESTRO] [POSE] 4 = ATAQUE
+  41.01  [PC] → POSE seq=8 payload=05
+  41.05  [MAESTRO] [POSE] 5 = FIN
+  41.31  [PC] Sin ACK (intento 1/3)
+  41.31  [PC] → POSE seq=8 payload=05
+  41.49  [PC] → POSE seq=9 payload=01
+  41.53  [MAESTRO] [POSE] 1 = INICIO
+  41.79  [PC] Sin ACK (intento 1/3)
+  41.79  [PC] → POSE seq=9 payload=01
+  42.09  [PC] Sin ACK (intento 2/3)
+  42.09  [PC] → POSE seq=9 payload=01
+  42.27  [PC] → POSE seq=10 payload=02
+  42.30  [MAESTRO] [POSE] 2 = RECARGAR
+  42.44  [PC] → POSE seq=11 payload=03
+  42.48  [MAESTRO] [POSE] 3 = ESCUDO
+  42.62  [PC] → POSE seq=12 payload=04
+  42.66  [MAESTRO] [NACK] tipo=0x00 seq=12 error=0x03 (CRC incorrecto)
+  42.69  [PC] ← NACK POSE seq=12: CRC incorrecto
+  42.69  [PC] NACK (CRC incorrecto), reintentando
+  42.69  [PC] → POSE seq=12 payload=04
+  42.73  [MAESTRO] [POSE] 4 = ATAQUE
+  42.85  [PC] → POSE seq=13 payload=05
+  42.89  [MAESTRO] [POSE] 5 = FIN
+  43.02  [PC] → POSE seq=14 payload=01
+  43.05  [MAESTRO] [POSE] 1 = INICIO
+  43.19  [PC] → POSE seq=15 payload=02
+  43.23  [MAESTRO] [POSE] 2 = RECARGAR
+  43.37  [PC] → POSE seq=16 payload=03
+  43.41  [MAESTRO] [POSE] 3 = ESCUDO
+  43.55  [PC] → POSE seq=17 payload=04
+  43.59  [MAESTRO] [POSE] 4 = ATAQUE
+  43.73  [PC] → POSE seq=18 payload=05
+  43.77  [MAESTRO] [POSE] 5 = FIN
+  43.90  [PC] → POSE seq=19 payload=01
+  43.95  [MAESTRO] [POSE] 1 = INICIO
+  44.09  [PC] → POSE seq=20 payload=02
+  44.13  [MAESTRO] [POSE] 2 = RECARGAR
+  44.26  [PC] → POSE seq=21 payload=03
+  44.29  [MAESTRO] [POSE] 3 = ESCUDO
+  44.42  [PC] → POSE seq=22 payload=04
+  44.47  [MAESTRO] [POSE] 4 = ATAQUE
+  44.60  [PC] → POSE seq=23 payload=05
+  44.65  [MAESTRO] [NACK] tipo=0x40 seq=23 error=0x03 (CRC incorrecto)
+  44.68  [PC] ← NACK 64 seq=23: CRC incorrecto
+  44.90  [PC] Sin ACK (intento 1/3)
+  44.90  [PC] → POSE seq=23 payload=05
+  44.94  [MAESTRO] [POSE] 5 = FIN
+  45.07  [PC] → POSE seq=24 payload=01
+  45.12  [MAESTRO] [POSE] 1 = INICIO
+  45.25  [PC] → POSE seq=25 payload=02
+  45.28  [MAESTRO] [POSE] 2 = RECARGAR
+  45.42  [PC] → POSE seq=26 payload=03
+  45.46  [MAESTRO] [POSE] 3 = ESCUDO
+  45.60  [PC] → POSE seq=27 payload=04
+  45.64  [MAESTRO] [POSE] 4 = ATAQUE
+  45.78  [PC] → POSE seq=28 payload=05
+  45.82  [MAESTRO] [POSE] 5 = FIN
+  45.96  [PC] → POSE seq=29 payload=01
+  46.00  [MAESTRO] [POSE] 1 = INICIO
+  46.13  [PC] → POSE seq=30 payload=02
+  46.16  [MAESTRO] [POSE] 2 = RECARGAR
+  46.30  [PC] → POSE seq=31 payload=03
+  46.34  [MAESTRO] [POSE] 3 = ESCUDO
+  46.47  [PC] → POSE seq=32 payload=04
+  46.50  [MAESTRO] [POSE] 4 = ATAQUE
+  46.64  [PC] → POSE seq=33 payload=05
+  46.68  [MAESTRO] [POSE] 5 = FIN
+  46.81  [PC] → POSE seq=34 payload=01
+  46.84  [MAESTRO] [POSE] 1 = INICIO
+  46.98  [PC] → POSE seq=35 payload=02
+  47.04  [MAESTRO] [POSE] 2 = RECARGAR
+  47.17  [PC] → POSE seq=36 payload=03
+  47.20  [MAESTRO] [POSE] 3 = ESCUDO
+  47.35  [PC] → POSE seq=37 payload=04
+  47.39  [MAESTRO] [POSE] 4 = ATAQUE
+  47.52  [PC] → POSE seq=38 payload=05
+  47.56  [MAESTRO] [POSE] 5 = FIN
+  47.69  [PC] → POSE seq=39 payload=01
+  47.74  [MAESTRO] [POSE] 1 = INICIO
+  47.87  [PC] → POSE seq=40 payload=02
+  47.91  [MAESTRO] [POSE] 2 = RECARGAR
+  48.05  [PC] → POSE seq=41 payload=03
+  48.09  [MAESTRO] [POSE] 3 = ESCUDO
+  48.23  [PC] → POSE seq=42 payload=04
+  48.26  [MAESTRO] [POSE] 4 = ATAQUE
+  48.40  [PC] → POSE seq=43 payload=05
+  48.43  [MAESTRO] [POSE] 5 = FIN
+  48.57  [PC] → POSE seq=44 payload=01
+  48.61  [MAESTRO] [POSE] 1 = INICIO
+  48.74  [PC] → POSE seq=45 payload=02
+  48.79  [MAESTRO] [POSE] 2 = RECARGAR
+  48.93  [PC] → POSE seq=46 payload=03
+  48.97  [MAESTRO] [POSE] 3 = ESCUDO
+  49.10  [PC] → POSE seq=47 payload=04
+  49.13  [MAESTRO] [POSE] 4 = ATAQUE
+  49.27  [PC] → POSE seq=48 payload=05
+  49.30  [MAESTRO] [POSE] 5 = FIN
+  49.43  [PC] → POSE seq=49 payload=01
+  49.46  [MAESTRO] [POSE] 1 = INICIO
+  49.60  [PC] → POSE seq=50 payload=02
+  49.64  [MAESTRO] [POSE] 2 = RECARGAR
+  49.78  [PC] → POSE seq=51 payload=03
+  49.82  [MAESTRO] [POSE] 3 = ESCUDO
+  49.95  [PC] → POSE seq=52 payload=04
+  49.99  [MAESTRO] [POSE] 4 = ATAQUE
+  50.13  [PC] → POSE seq=53 payload=05
+  50.17  [MAESTRO] [POSE] 5 = FIN
+  50.43  [PC] Sin ACK (intento 1/3)
+  50.43  [PC] → POSE seq=53 payload=05
+  50.62  [PC] → POSE seq=54 payload=01
+  50.92  [PC] Sin ACK (intento 1/3)
+  50.92  [PC] → POSE seq=54 payload=01
+  50.95  [MAESTRO] [POSE] 1 = INICIO
+  51.09  [PC] → POSE seq=55 payload=02
+  51.13  [MAESTRO] [POSE] 2 = RECARGAR
+  51.27  [PC] → POSE seq=56 payload=03
+  51.31  [MAESTRO] [NACK] tipo=0x00 seq=56 error=0x02 (Longitud inválida)
+  51.35  [PC] ← NACK POSE seq=56: Longitud inválida
+  51.45  [PC] → POSE seq=57 payload=04
+  51.47  [MAESTRO] [POSE] 4 = ATAQUE
+  51.60  [PC] → POSE seq=58 payload=05
+  51.63  [MAESTRO] [POSE] 5 = FIN
+  51.78  [PC] → POSE seq=59 payload=01
+  51.81  [MAESTRO] [POSE] 1 = INICIO
+  51.95  [PC] → POSE seq=60 payload=02
+  51.99  [MAESTRO] [POSE] 2 = RECARGAR
+  52.13  [PC] → POSE seq=61 payload=03
+  52.17  [MAESTRO] [POSE] 3 = ESCUDO
+  52.32  [PC] → POSE seq=62 payload=04
+  52.37  [MAESTRO] [POSE] 4 = ATAQUE
+  52.50  [PC] → POSE seq=63 payload=05
+  52.54  [MAESTRO] [POSE] 5 = FIN
+  52.68  [PC] → POSE seq=64 payload=01
+  52.72  [MAESTRO] [POSE] 1 = INICIO
+  52.75  [PC] Trama inválida de Webots: CRC incorrecto
+  52.98  [PC] Sin ACK (intento 1/3)
+  52.98  [PC] → POSE seq=64 payload=01
+  53.16  [PC] → POSE seq=65 payload=02
+  53.19  [MAESTRO] [POSE] 2 = RECARGAR
+  53.33  [PC] → POSE seq=66 payload=03
+  53.36  [MAESTRO] [POSE] 3 = ESCUDO
+  53.49  [PC] → POSE seq=67 payload=04
+  53.54  [MAESTRO] [POSE] 4 = ATAQUE
+  53.67  [PC] → POSE seq=68 payload=05
+  53.70  [MAESTRO] [POSE] 5 = FIN
+  53.84  [PC] → POSE seq=69 payload=01
+  53.88  [MAESTRO] [POSE] 1 = INICIO
+  54.01  [PC] → POSE seq=70 payload=02
+  54.04  [MAESTRO] [POSE] 2 = RECARGAR
+  54.18  [PC] → POSE seq=71 payload=03
+  54.22  [MAESTRO] [POSE] 3 = ESCUDO
+  54.36  [PC] → POSE seq=72 payload=04
+  54.40  [MAESTRO] [POSE] 4 = ATAQUE
+  54.54  [PC] → POSE seq=73 payload=05
+  54.58  [MAESTRO] [POSE] 5 = FIN
+  54.71  [PC] → POSE seq=74 payload=01
+  54.75  [MAESTRO] [POSE] 1 = INICIO
+  54.89  [PC] → POSE seq=75 payload=02
+  54.92  [MAESTRO] [POSE] 2 = RECARGAR
+  55.06  [PC] → POSE seq=76 payload=03
+  55.11  [MAESTRO] [POSE] 3 = ESCUDO
+  55.24  [PC] → POSE seq=77 payload=04
+  55.29  [MAESTRO] [POSE] 4 = ATAQUE
+  55.43  [PC] → POSE seq=78 payload=05
+  55.47  [MAESTRO] [POSE] 5 = FIN
+  55.61  [PC] → POSE seq=79 payload=01
+  55.65  [MAESTRO] [POSE] 1 = INICIO
+  55.78  [PC] → POSE seq=80 payload=02
+  55.81  [MAESTRO] [POSE] 2 = RECARGAR
+  55.94  [PC] → POSE seq=81 payload=03
+  55.99  [MAESTRO] [POSE] 3 = ESCUDO
+  56.12  [PC] → POSE seq=82 payload=04
+  56.15  [MAESTRO] [POSE] 4 = ATAQUE
+  56.29  [PC] → POSE seq=83 payload=05
+  56.33  [MAESTRO] [POSE] 5 = FIN
+  56.46  [PC] → POSE seq=84 payload=01
+  56.51  [MAESTRO] [POSE] 1 = INICIO
+  56.65  [PC] → POSE seq=85 payload=02
+  56.69  [MAESTRO] [POSE] 2 = RECARGAR
+  56.82  [PC] → POSE seq=86 payload=03
+  56.85  [MAESTRO] [NACK] tipo=0x00 seq=70 error=0x03 (CRC incorrecto)
+  56.88  [PC] ← NACK POSE seq=70: CRC incorrecto
+  57.12  [PC] Sin ACK (intento 1/3)
+  57.12  [PC] → POSE seq=86 payload=03
+  57.16  [MAESTRO] [POSE] 3 = ESCUDO
+  57.29  [PC] → POSE seq=87 payload=04
+  57.34  [MAESTRO] [POSE] 4 = ATAQUE
+  57.48  [PC] → POSE seq=88 payload=05
+  57.78  [PC] Sin ACK (intento 1/3)
+  57.78  [PC] → POSE seq=88 payload=05
+  57.82  [MAESTRO] [POSE] 5 = FIN
+  57.96  [PC] → POSE seq=89 payload=01
+  57.99  [MAESTRO] [POSE] 1 = INICIO
+  58.02  [PC] Trama inválida de Webots: CRC incorrecto
+  58.26  [PC] Sin ACK (intento 1/3)
+  58.26  [PC] → POSE seq=89 payload=01
+  58.43  [PC] → POSE seq=90 payload=02
+  58.47  [MAESTRO] [POSE] 2 = RECARGAR
+  58.62  [PC] → POSE seq=91 payload=03
+  58.67  [MAESTRO] [POSE] 3 = ESCUDO
+  58.81  [PC] → POSE seq=92 payload=04
+  58.85  [MAESTRO] [POSE] 4 = ATAQUE
+  58.97  [PC] → POSE seq=93 payload=05
+  59.27  [PC] Sin ACK (intento 1/3)
+  59.27  [PC] → POSE seq=93 payload=05
+  59.30  [MAESTRO] [POSE] 5 = FIN
+  59.43  [PC] → POSE seq=94 payload=01
+  59.46  [MAESTRO] [POSE] 1 = INICIO
+  59.60  [PC] → POSE seq=95 payload=02
+  59.64  [MAESTRO] [POSE] 2 = RECARGAR
+  59.78  [PC] → POSE seq=96 payload=03
+  59.82  [MAESTRO] [POSE] 3 = ESCUDO
+  59.96  [PC] → POSE seq=97 payload=04
+  60.02  [MAESTRO] [POSE] 4 = ATAQUE
+  60.16  [PC] → POSE seq=98 payload=05
+  60.19  [MAESTRO] [POSE] 5 = FIN
+  60.33  [PC] → POSE seq=99 payload=01
+  60.37  [MAESTRO] [POSE] 1 = INICIO
+  60.52  [PC] → POSE seq=100 payload=02
+  60.55  [MAESTRO] [NACK] tipo=0x00 seq=100 error=0x02 (Longitud inválida)
+  60.59  [PC] ← NACK POSE seq=100: Longitud inválida
+  60.70  [PC] → POSE seq=101 payload=03
+  60.75  [MAESTRO] [POSE] 3 = ESCUDO
+  60.88  [PC] → POSE seq=102 payload=04
+  60.93  [MAESTRO] [POSE] 4 = ATAQUE
+  61.05  [PC] → POSE seq=103 payload=05
+  61.09  [MAESTRO] [POSE] 5 = FIN
+  61.23  [PC] → POSE seq=104 payload=01
+  61.27  [MAESTRO] [POSE] 1 = INICIO
+  61.41  [PC] → POSE seq=105 payload=02
+  61.43  [MAESTRO] [POSE] 2 = RECARGAR
+  61.56  [PC] → POSE seq=106 payload=03
+  61.61  [MAESTRO] [POSE] 3 = ESCUDO
+  61.75  [PC] → POSE seq=107 payload=04
+  61.79  [MAESTRO] [POSE] 4 = ATAQUE
+  61.93  [PC] → POSE seq=108 payload=05
+  61.97  [MAESTRO] [POSE] 5 = FIN
+  62.10  [PC] → POSE seq=109 payload=01
+  62.15  [MAESTRO] [POSE] 1 = INICIO
+  62.29  [PC] → POSE seq=110 payload=02
+  62.31  [MAESTRO] [POSE] 2 = RECARGAR
+  62.45  [PC] → POSE seq=111 payload=03
+  62.49  [MAESTRO] [POSE] 3 = ESCUDO
+  62.64  [PC] → POSE seq=112 payload=04
+  62.67  [MAESTRO] [POSE] 4 = ATAQUE
+  62.80  [PC] → POSE seq=113 payload=05
+  62.83  [MAESTRO] [POSE] 5 = FIN
+  62.98  [PC] → POSE seq=114 payload=01
+  63.03  [MAESTRO] [POSE] 1 = INICIO
+  63.17  [PC] → POSE seq=115 payload=02
+  63.22  [MAESTRO] [POSE] 2 = RECARGAR
+  63.36  [PC] → POSE seq=116 payload=03
+  63.40  [MAESTRO] [POSE] 3 = ESCUDO
+  63.53  [PC] → POSE seq=117 payload=04
+  63.58  [MAESTRO] [POSE] 4 = ATAQUE
+  63.71  [PC] → POSE seq=118 payload=05
+  63.76  [MAESTRO] [POSE] 5 = FIN
+  63.89  [PC] → POSE seq=119 payload=01
+  63.94  [MAESTRO] [POSE] 1 = INICIO
+  64.08  [PC] → POSE seq=120 payload=02
+  64.12  [MAESTRO] [POSE] 2 = RECARGAR
+  64.24  [PC] → POSE seq=121 payload=03
+  64.28  [MAESTRO] [POSE] 3 = ESCUDO
+  64.54  [PC] Sin ACK (intento 1/3)
+  64.55  [PC] → POSE seq=121 payload=03
+  64.72  [PC] → POSE seq=122 payload=04
+  64.75  [MAESTRO] [POSE] 4 = ATAQUE
+  64.89  [PC] → POSE seq=123 payload=05
+  64.93  [MAESTRO] [POSE] 5 = FIN
+  65.06  [PC] → POSE seq=124 payload=01
+  65.09  [MAESTRO] [POSE] 1 = INICIO
+  65.22  [PC] → POSE seq=125 payload=02
+  65.25  [MAESTRO] [POSE] 2 = RECARGAR
+  65.39  [PC] → POSE seq=126 payload=03
+  65.42  [MAESTRO] [POSE] 3 = ESCUDO
+  65.56  [PC] → POSE seq=127 payload=04
+  65.60  [MAESTRO] [POSE] 4 = ATAQUE
+  65.73  [PC] → POSE seq=128 payload=05
+  65.76  [MAESTRO] [POSE] 5 = FIN
+  65.90  [PC] → POSE seq=129 payload=01
+  65.94  [MAESTRO] [POSE] 1 = INICIO
+  66.06  [PC] → POSE seq=130 payload=02
+  66.12  [MAESTRO] [POSE] 2 = RECARGAR
+  66.36  [PC] Sin ACK (intento 1/3)
+  66.36  [PC] → POSE seq=130 payload=02
+  66.67  [PC] Sin ACK (intento 2/3)
+  66.67  [PC] → POSE seq=130 payload=02
+  66.83  [PC] → POSE seq=131 payload=03
+  66.86  [MAESTRO] [POSE] 3 = ESCUDO
+  67.00  [PC] → POSE seq=132 payload=04
+  67.04  [MAESTRO] [POSE] 4 = ATAQUE
+  67.17  [PC] → POSE seq=133 payload=05
+  67.22  [MAESTRO] [POSE] 5 = FIN
+  67.35  [PC] → POSE seq=134 payload=01
+  67.40  [MAESTRO] [POSE] 1 = INICIO
+  67.53  [PC] → POSE seq=135 payload=02
+  67.58  [MAESTRO] [POSE] 2 = RECARGAR
+  67.83  [PC] Sin ACK (intento 1/3)
+  67.83  [PC] → POSE seq=135 payload=02
+  68.03  [PC] → POSE seq=136 payload=03
+  68.06  [MAESTRO] [POSE] 3 = ESCUDO
+  68.11  [PC] Trama inválida de Webots: CRC incorrecto
+  68.33  [PC] Sin ACK (intento 1/3)
+  68.33  [PC] → POSE seq=136 payload=03
+  68.51  [PC] → POSE seq=137 payload=04
+  68.55  [MAESTRO] [POSE] 4 = ATAQUE
+  68.70  [PC] → POSE seq=138 payload=05
+  68.75  [MAESTRO] [POSE] 5 = FIN
+  68.88  [PC] → POSE seq=139 payload=01
+  68.91  [MAESTRO] [POSE] 1 = INICIO
+  69.04  [PC] → POSE seq=140 payload=02
+  69.08  [MAESTRO] [POSE] 2 = RECARGAR
+  69.21  [PC] → POSE seq=141 payload=03
+  69.25  [MAESTRO] [POSE] 3 = ESCUDO
+  69.38  [PC] → POSE seq=142 payload=04
+  69.43  [MAESTRO] [POSE] 4 = ATAQUE
+  69.57  [PC] → POSE seq=143 payload=05
+  69.61  [MAESTRO] [POSE] 5 = FIN
+  69.75  ===== S3 cambios rapidos
+  69.75  [PC] → POSE seq=144 payload=01
+  69.79  [MAESTRO] [NACK] tipo=0x00 seq=144 error=0x03 (CRC incorrecto)
+  69.83  [PC] ← NACK POSE seq=144: CRC incorrecto
+  69.83  [PC] NACK (CRC incorrecto), reintentando
+  69.83  [PC] → POSE seq=144 payload=01
+  69.87  [MAESTRO] [POSE] 1 = INICIO
+  69.91  [PC] → POSE seq=145 payload=02
+  69.95  [MAESTRO] [POSE] 2 = RECARGAR
+  69.98  [PC] → POSE seq=146 payload=03
+  70.02  [MAESTRO] [POSE] 3 = ESCUDO
+  70.05  [PC] → POSE seq=147 payload=04
+  70.08  [MAESTRO] [POSE] 4 = ATAQUE
+  70.15  [PC] → POSE seq=148 payload=05
+  70.20  [MAESTRO] [POSE] 5 = FIN
+  70.25  [PC] → POSE seq=149 payload=01
+  70.30  [MAESTRO] [POSE] 1 = INICIO
+  70.35  [PC] → POSE seq=150 payload=02
+  70.38  [MAESTRO] [POSE] 2 = RECARGAR
+  70.45  [PC] → POSE seq=151 payload=03
+  70.47  [MAESTRO] [POSE] 3 = ESCUDO
+  70.55  [PC] → POSE seq=152 payload=04
+  70.59  [MAESTRO] [POSE] 4 = ATAQUE
+  70.65  [PC] → POSE seq=153 payload=05
+  70.70  [MAESTRO] [POSE] 5 = FIN
+  70.75  [PC] → POSE seq=154 payload=01
+  70.78  [MAESTRO] [POSE] 1 = INICIO
+  70.85  [PC] → POSE seq=155 payload=02
+  70.88  [MAESTRO] [POSE] 2 = RECARGAR
+  70.95  [PC] → POSE seq=156 payload=03
+  70.98  [MAESTRO] [POSE] 3 = ESCUDO
+  71.05  [PC] → POSE seq=157 payload=04
+  71.08  [MAESTRO] [POSE] 4 = ATAQUE
+  71.15  [PC] → POSE seq=158 payload=05
+  71.19  [MAESTRO] [POSE] 5 = FIN
+  71.25  [PC] → POSE seq=159 payload=01
+  71.29  [MAESTRO] [POSE] 1 = INICIO
+  71.35  [PC] → POSE seq=160 payload=02
+  71.40  [MAESTRO] [POSE] 2 = RECARGAR
+  71.45  [PC] → POSE seq=161 payload=03
+  71.48  [MAESTRO] [POSE] 3 = ESCUDO
+  71.55  [PC] → POSE seq=162 payload=04
+  71.60  [MAESTRO] [POSE] 4 = ATAQUE
+  71.65  [PC] → POSE seq=163 payload=05
+  71.70  [MAESTRO] [POSE] 5 = FIN
+  71.75  [PC] → POSE seq=164 payload=01
+  71.81  [MAESTRO] [POSE] 1 = INICIO
+  71.85  [PC] → POSE seq=165 payload=02
+  71.89  [MAESTRO] [POSE] 2 = RECARGAR
+  71.95  [PC] → POSE seq=166 payload=03
+  71.99  [MAESTRO] [POSE] 3 = ESCUDO
+  72.02  [PC] Trama inválida de Webots: CRC incorrecto
+  72.25  [PC] Sin ACK (intento 1/3)
+  72.25  [PC] → POSE seq=166 payload=03
+  72.32  [PC] → POSE seq=167 payload=04
+  72.38  [MAESTRO] [POSE] 4 = ATAQUE
+  72.41  [PC] → POSE seq=168 payload=05
+  72.46  [MAESTRO] [POSE] 5 = FIN
+  72.71  [PC] Sin ACK (intento 1/3)
+  72.71  [PC] → POSE seq=168 payload=05
+  72.90  [PC] → POSE seq=169 payload=01
+  72.95  [MAESTRO] [POSE] 1 = INICIO
+  72.97  [PC] → POSE seq=170 payload=02
+  72.99  [MAESTRO] [POSE] 2 = RECARGAR
+  73.02  [PC] → POSE seq=171 payload=03
+  73.08  [MAESTRO] [POSE] 3 = ESCUDO
+  73.11  [PC] → POSE seq=172 payload=04
+  73.16  [MAESTRO] [POSE] 4 = ATAQUE
+  73.20  [PC] → POSE seq=173 payload=05
+  73.24  [MAESTRO] [POSE] 5 = FIN
+  73.27  [PC] → POSE seq=174 payload=01
+  73.30  [MAESTRO] [POSE] 1 = INICIO
+  73.34  [PC] → POSE seq=175 payload=02
+  73.38  [MAESTRO] [POSE] 2 = RECARGAR
+  73.41  [PC] → POSE seq=176 payload=03
+  73.45  [MAESTRO] [POSE] 3 = ESCUDO
+  73.49  [PC] → POSE seq=177 payload=04
+  73.53  [MAESTRO] [NACK] tipo=0x10 seq=177 error=0x03 (CRC incorrecto)
+  73.56  [PC] ← NACK 16 seq=177: CRC incorrecto
+  73.79  [PC] Sin ACK (intento 1/3)
+  73.79  [PC] → POSE seq=177 payload=04
+  73.82  [MAESTRO] [NACK] tipo=0x08 seq=177 error=0x03 (CRC incorrecto)
+  73.86  [PC] ← NACK 8 seq=177: CRC incorrecto
+  74.09  [PC] Sin ACK (intento 2/3)
+  74.09  [PC] → POSE seq=177 payload=04
+  74.12  [MAESTRO] [POSE] 4 = ATAQUE
+  74.14  [PC] → POSE seq=178 payload=05
+  74.16  [MAESTRO] [POSE] 5 = FIN
+  74.20  [PC] → POSE seq=179 payload=01
+  74.25  [MAESTRO] [POSE] 1 = INICIO
+  74.28  [PC] → POSE seq=180 payload=02
+  74.31  [MAESTRO] [POSE] 2 = RECARGAR
+  74.35  [PC] → POSE seq=181 payload=03
+  74.38  [MAESTRO] [POSE] 3 = ESCUDO
+  74.41  [PC] Trama inválida de Webots: CRC incorrecto
+  74.65  [PC] Sin ACK (intento 1/3)
+  74.65  [PC] → POSE seq=181 payload=03
+  74.72  [PC] → POSE seq=182 payload=04
+  74.77  [MAESTRO] [POSE] 4 = ATAQUE
+  74.80  [PC] → POSE seq=183 payload=05
+  74.85  [MAESTRO] [POSE] 5 = FIN
+  74.88  [PC] → POSE seq=184 payload=01
+  74.93  [MAESTRO] [POSE] 1 = INICIO
+  74.95  [PC] → POSE seq=185 payload=02
+  74.99  [MAESTRO] [POSE] 2 = RECARGAR
+  75.03  [PC] → POSE seq=186 payload=03
+  75.06  [MAESTRO] [POSE] 3 = ESCUDO
+  75.08  [PC] → POSE seq=187 payload=04
+  75.12  [MAESTRO] [POSE] 4 = ATAQUE
+  75.15  [PC] → POSE seq=188 payload=05
+  75.19  [MAESTRO] [POSE] 5 = FIN
+  75.21  [PC] → POSE seq=189 payload=01
+  75.24  [MAESTRO] [POSE] 1 = INICIO
+  75.28  [PC] → POSE seq=190 payload=02
+  75.32  [MAESTRO] [POSE] 2 = RECARGAR
+  75.35  [PC] → POSE seq=191 payload=03
+  75.38  [MAESTRO] [POSE] 3 = ESCUDO
+  75.42  [PC] → POSE seq=192 payload=04
+  75.47  [MAESTRO] [POSE] 4 = ATAQUE
+  75.50  [PC] → POSE seq=193 payload=05
+  75.53  [MAESTRO] [POSE] 5 = FIN
+  75.56  [PC] → POSE seq=194 payload=01
+  75.60  [MAESTRO] [POSE] 1 = INICIO
+  75.63  [PC] → POSE seq=195 payload=02
+  75.68  [MAESTRO] [POSE] 2 = RECARGAR
+  75.70  [PC] → POSE seq=196 payload=03
+  75.74  [MAESTRO] [POSE] 3 = ESCUDO
+  75.77  [PC] → POSE seq=197 payload=04
+  75.81  [MAESTRO] [POSE] 4 = ATAQUE
+  75.85  [PC] → POSE seq=198 payload=05
+  75.89  [MAESTRO] [POSE] 5 = FIN
+  75.91  [PC] → POSE seq=199 payload=01
+  75.95  [MAESTRO] [POSE] 1 = INICIO
+  75.99  [PC] → POSE seq=200 payload=02
+  76.02  [MAESTRO] [POSE] 2 = RECARGAR
+  76.04  [PC] → POSE seq=201 payload=03
+  76.08  [MAESTRO] [POSE] 3 = ESCUDO
+  76.11  [PC] → POSE seq=202 payload=04
+  76.15  [MAESTRO] [POSE] 4 = ATAQUE
+  76.18  [PC] → POSE seq=203 payload=05
+  76.23  [MAESTRO] [POSE] 5 = FIN
+  76.26  [PC] → POSE seq=204 payload=01
+  76.29  [MAESTRO] [POSE] 1 = INICIO
+  76.32  [PC] → POSE seq=205 payload=02
+  76.36  [MAESTRO] [POSE] 2 = RECARGAR
+  76.38  [PC] → POSE seq=206 payload=03
+  76.42  [MAESTRO] [POSE] 3 = ESCUDO
+  76.46  [PC] → POSE seq=207 payload=04
+  76.51  [MAESTRO] [POSE] 4 = ATAQUE
+  76.55  [PC] → POSE seq=208 payload=05
+  76.59  [MAESTRO] [POSE] 5 = FIN
+  76.62  [PC] → POSE seq=209 payload=01
+  76.67  [MAESTRO] [POSE] 1 = INICIO
+  76.71  [PC] → POSE seq=210 payload=02
+  76.73  [MAESTRO] [POSE] 2 = RECARGAR
+  76.76  [PC] → POSE seq=211 payload=03
+  76.80  [MAESTRO] [POSE] 3 = ESCUDO
+  76.82  [PC] → POSE seq=212 payload=04
+  76.85  [MAESTRO] [POSE] 4 = ATAQUE
+  76.88  [PC] → POSE seq=213 payload=05
+  76.91  [MAESTRO] [POSE] 5 = FIN
+  76.95  [PC] → POSE seq=214 payload=01
+  76.99  [MAESTRO] [POSE] 1 = INICIO
+  77.02  [PC] → POSE seq=215 payload=02
+  77.08  [MAESTRO] [POSE] 2 = RECARGAR
+  77.11  [PC] → POSE seq=216 payload=03
+  77.16  [MAESTRO] [POSE] 3 = ESCUDO
+  77.19  [PC] → POSE seq=217 payload=04
+  77.22  [MAESTRO] [POSE] 4 = ATAQUE
+  77.25  [PC] → POSE seq=218 payload=05
+  77.29  [MAESTRO] [POSE] 5 = FIN
+  77.31  [PC] → POSE seq=219 payload=01
+  77.61  [PC] Sin ACK (intento 1/3)
+  77.61  [PC] → POSE seq=219 payload=01
+  77.64  [MAESTRO] [POSE] 1 = INICIO
+  77.68  [PC] → POSE seq=220 payload=02
+  77.71  [MAESTRO] [POSE] 2 = RECARGAR
+  77.73  [PC] → POSE seq=221 payload=03
+  77.77  [MAESTRO] [POSE] 3 = ESCUDO
+  77.80  [PC] → POSE seq=222 payload=04
+  77.84  [MAESTRO] [POSE] 4 = ATAQUE
+  77.87  [PC] → POSE seq=223 payload=05
+  77.92  [MAESTRO] [POSE] 5 = FIN
+  77.96  [PC] → POSE seq=224 payload=01
+  78.00  [MAESTRO] [POSE] 1 = INICIO
+  78.03  [PC] → POSE seq=225 payload=02
+  78.07  [MAESTRO] [POSE] 2 = RECARGAR
+  78.09  [PC] → POSE seq=226 payload=03
+  78.14  [MAESTRO] [POSE] 3 = ESCUDO
+  78.18  [PC] → POSE seq=227 payload=04
+  78.20  [MAESTRO] [POSE] 4 = ATAQUE
+  78.23  [PC] → POSE seq=228 payload=05
+  78.27  [MAESTRO] [POSE] 5 = FIN
+  78.31  [PC] → POSE seq=229 payload=01
+  78.35  [MAESTRO] [POSE] 1 = INICIO
+  78.61  [PC] Sin ACK (intento 1/3)
+  78.61  [PC] → POSE seq=229 payload=01
+  78.69  [PC] → POSE seq=230 payload=02
+  78.72  [MAESTRO] [POSE] 2 = RECARGAR
+  78.76  [PC] → POSE seq=231 payload=03
+  78.80  [MAESTRO] [POSE] 3 = ESCUDO
+  78.83  [PC] → POSE seq=232 payload=04
+  78.87  [MAESTRO] [POSE] 4 = ATAQUE
+  78.91  [PC] → POSE seq=233 payload=05
+  78.95  [MAESTRO] [POSE] 5 = FIN
+  78.97  [PC] → POSE seq=234 payload=01
+  79.01  [MAESTRO] [POSE] 1 = INICIO
+  79.05  [PC] → POSE seq=235 payload=02
+  79.08  [MAESTRO] [POSE] 2 = RECARGAR
+  79.10  [PC] → POSE seq=236 payload=03
+  79.13  [MAESTRO] [POSE] 3 = ESCUDO
+  79.16  [PC] → POSE seq=237 payload=04
+  79.21  [MAESTRO] [POSE] 4 = ATAQUE
+  79.23  [PC] → POSE seq=238 payload=05
+  79.26  [MAESTRO] [POSE] 5 = FIN
+  79.31  [PC] → POSE seq=239 payload=01
+  79.36  [MAESTRO] [POSE] 1 = INICIO
+  79.41  [PC] → POSE seq=240 payload=02
+  79.45  [MAESTRO] [POSE] 2 = RECARGAR
+  79.51  [PC] → POSE seq=241 payload=03
+  79.55  [MAESTRO] [POSE] 3 = ESCUDO
+  79.61  [PC] → POSE seq=242 payload=04
+  79.65  [MAESTRO] [POSE] 4 = ATAQUE
+  79.71  [PC] → POSE seq=243 payload=05
+  79.76  [MAESTRO] [POSE] 5 = FIN
+  79.82  [PC] → POSE seq=244 payload=01
+  79.85  [MAESTRO] [POSE] 1 = INICIO
+  79.92  [PC] → POSE seq=245 payload=02
+  79.96  [MAESTRO] [POSE] 2 = RECARGAR
+  80.02  [PC] → POSE seq=246 payload=03
+  80.04  [MAESTRO] [POSE] 3 = ESCUDO
+  80.12  [PC] → POSE seq=247 payload=04
+  80.15  [MAESTRO] [POSE] 4 = ATAQUE
+  80.22  [PC] → POSE seq=248 payload=05
+  80.25  [MAESTRO] [POSE] 5 = FIN
+  80.32  [PC] → POSE seq=249 payload=01
+  80.36  [MAESTRO] [POSE] 1 = INICIO
+  80.42  [PC] → POSE seq=250 payload=02
+  80.45  [MAESTRO] [POSE] 2 = RECARGAR
+  80.72  [PC] Sin ACK (intento 1/3)
+  80.72  [PC] → POSE seq=250 payload=02
+  80.79  [PC] → POSE seq=251 payload=03
+  80.84  [MAESTRO] [POSE] 3 = ESCUDO
+  80.87  [PC] → POSE seq=252 payload=04
+  80.92  [MAESTRO] [NACK] tipo=0x00 seq=252 error=0x02 (Longitud inválida)
+  80.95  [PC] ← NACK POSE seq=252: Longitud inválida
+  80.96  [PC] → POSE seq=253 payload=05
+  81.00  [MAESTRO] [POSE] 5 = FIN
+  81.04  [PC] → POSE seq=254 payload=01
+  81.08  [MAESTRO] [POSE] 1 = INICIO
+  81.11  [PC] → POSE seq=255 payload=02
+  81.14  [MAESTRO] [POSE] 2 = RECARGAR
+  81.18  [PC] → POSE seq=0 payload=03
+  81.23  [MAESTRO] [POSE] 3 = ESCUDO
+  81.25  [PC] → POSE seq=1 payload=04
+  81.29  [MAESTRO] [POSE] 4 = ATAQUE
+  81.33  [PC] → POSE seq=2 payload=05
+  81.36  [MAESTRO] [POSE] 5 = FIN
+  81.39  [PC] → POSE seq=3 payload=01
+  81.42  [MAESTRO] [POSE] 1 = INICIO
+  81.46  [PC] → POSE seq=4 payload=02
+  81.50  [MAESTRO] [POSE] 2 = RECARGAR
+  81.54  [PC] → POSE seq=5 payload=03
+  81.58  [MAESTRO] [POSE] 3 = ESCUDO
+  81.62  [PC] → POSE seq=6 payload=04
+  81.66  [MAESTRO] [POSE] 4 = ATAQUE
+  81.72  [PC] → POSE seq=7 payload=05
+  81.76  [MAESTRO] [POSE] 5 = FIN
+  81.82  [PC] → POSE seq=8 payload=01
+  81.88  [MAESTRO] [POSE] 1 = INICIO
+  81.92  [PC] → POSE seq=9 payload=02
+  81.96  [MAESTRO] [POSE] 2 = RECARGAR
+  82.02  [PC] → POSE seq=10 payload=03
+  82.06  [MAESTRO] [POSE] 3 = ESCUDO
+  82.12  [PC] → POSE seq=11 payload=04
+  82.17  [MAESTRO] [POSE] 4 = ATAQUE
+  82.22  [PC] → POSE seq=12 payload=05
+  82.27  [MAESTRO] [POSE] 5 = FIN
+  82.32  [PC] → POSE seq=13 payload=01
+  82.37  [MAESTRO] [POSE] 1 = INICIO
+  82.42  [PC] → POSE seq=14 payload=02
+  82.45  [MAESTRO] [POSE] 2 = RECARGAR
+  82.52  [PC] → POSE seq=15 payload=03
+  82.56  [MAESTRO] [POSE] 3 = ESCUDO
+  82.62  [PC] → POSE seq=16 payload=04
+  82.66  [MAESTRO] [POSE] 4 = ATAQUE
+  82.69  [PC] Trama inválida de Webots: Longitud inválida
+  82.92  [PC] Sin ACK (intento 1/3)
+  82.92  [PC] → POSE seq=16 payload=04
+  82.98  [PC] → POSE seq=17 payload=05
+  83.02  [MAESTRO] [POSE] 5 = FIN
+  83.05  [PC] → POSE seq=18 payload=01
+  83.10  [MAESTRO] [POSE] 1 = INICIO
+  83.12  [PC] → POSE seq=19 payload=02
+  83.16  [MAESTRO] [POSE] 2 = RECARGAR
+  83.20  [PC] → POSE seq=20 payload=03
+  83.23  [MAESTRO] [POSE] 3 = ESCUDO
+  83.25  [PC] → POSE seq=21 payload=04
+  83.29  [MAESTRO] [POSE] 4 = ATAQUE
+  83.33  [PC] → POSE seq=22 payload=05
+  83.37  [MAESTRO] [POSE] 5 = FIN
+  83.41  [PC] → POSE seq=23 payload=01
+  83.46  [MAESTRO] [POSE] 1 = INICIO
+  83.48  [PC] → POSE seq=24 payload=02
+  83.52  [MAESTRO] [POSE] 2 = RECARGAR
+  83.78  [PC] Sin ACK (intento 1/3)
+  83.78  [PC] → POSE seq=24 payload=02
+  83.86  [PC] → POSE seq=25 payload=03
+  83.88  [MAESTRO] [POSE] 3 = ESCUDO
+  83.91  [PC] → POSE seq=26 payload=04
+  83.96  [MAESTRO] [POSE] 4 = ATAQUE
+  83.98  [PC] → POSE seq=27 payload=05
+  84.02  [MAESTRO] [POSE] 5 = FIN
+  84.28  [PC] Sin ACK (intento 1/3)
+  84.28  [PC] → POSE seq=27 payload=05
+  84.36  [PC] → POSE seq=28 payload=01
+  84.40  [MAESTRO] [POSE] 1 = INICIO
+  84.43  [PC] → POSE seq=29 payload=02
+  84.46  [MAESTRO] [POSE] 2 = RECARGAR
+  84.50  [PC] → POSE seq=30 payload=03
+  84.55  [MAESTRO] [POSE] 3 = ESCUDO
+  84.57  [PC] → POSE seq=31 payload=04
+  84.61  [MAESTRO] [POSE] 4 = ATAQUE
+  84.65  [PC] → POSE seq=32 payload=05
+  84.68  [MAESTRO] [POSE] 5 = FIN
+  84.71  [PC] → POSE seq=33 payload=01
+  84.76  [MAESTRO] [POSE] 1 = INICIO
+  84.78  [PC] → POSE seq=34 payload=02
+  84.82  [MAESTRO] [POSE] 2 = RECARGAR
+  84.85  [PC] → POSE seq=35 payload=03
+  84.89  [MAESTRO] [POSE] 3 = ESCUDO
+  84.92  [PC] → POSE seq=36 payload=04
+  84.97  [MAESTRO] [POSE] 4 = ATAQUE
+  84.99  [PC] → POSE seq=37 payload=05
+  85.02  [MAESTRO] [POSE] 5 = FIN
+  85.05  [PC] → POSE seq=38 payload=01
+  85.10  [MAESTRO] [POSE] 1 = INICIO
+  85.14  [PC] → POSE seq=39 payload=02
+  85.18  [MAESTRO] [POSE] 2 = RECARGAR
+  85.22  [PC] → POSE seq=40 payload=03
+  85.26  [MAESTRO] [POSE] 3 = ESCUDO
+  85.29  [PC] → POSE seq=41 payload=04
+  85.59  [PC] Sin ACK (intento 1/3)
+  85.59  [PC] → POSE seq=41 payload=04
+  85.63  [MAESTRO] [POSE] 4 = ATAQUE
+  85.66  [PC] → POSE seq=42 payload=05
+  85.70  [MAESTRO] [POSE] 5 = FIN
+  85.73  [PC] → POSE seq=43 payload=01
+  85.76  [MAESTRO] [POSE] 1 = INICIO
+  85.79  [PC] → POSE seq=44 payload=02
+  85.83  [MAESTRO] [POSE] 2 = RECARGAR
+  85.86  [PC] → POSE seq=45 payload=03
+  85.90  [MAESTRO] [POSE] 3 = ESCUDO
+  85.92  [PC] → POSE seq=46 payload=04
+  86.23  [PC] Sin ACK (intento 1/3)
+  86.23  [PC] → POSE seq=46 payload=04
+  86.27  [MAESTRO] [POSE] 4 = ATAQUE
+  86.31  [PC] → POSE seq=47 payload=05
+  86.35  [MAESTRO] [POSE] 5 = FIN
+  86.39  [PC] → POSE seq=48 payload=01
+  86.43  [MAESTRO] [POSE] 1 = INICIO
+  86.45  [PC] → POSE seq=49 payload=02
+  86.48  [MAESTRO] [POSE] 2 = RECARGAR
+  86.51  [PC] → POSE seq=50 payload=03
+  86.55  [MAESTRO] [POSE] 3 = ESCUDO
+  86.57  [PC] → POSE seq=51 payload=04
+  86.61  [MAESTRO] [POSE] 4 = ATAQUE
+  86.65  [PC] → POSE seq=52 payload=05
+  86.95  [PC] Sin ACK (intento 1/3)
+  86.96  [PC] → POSE seq=52 payload=05
+  87.00  [MAESTRO] [POSE] 5 = FIN
+  87.03  [PC] → POSE seq=53 payload=01
+  87.06  [MAESTRO] [POSE] 1 = INICIO
+  87.10  [PC] → POSE seq=54 payload=02
+  87.13  [MAESTRO] [POSE] 2 = RECARGAR
+  87.16  [PC] → POSE seq=55 payload=03
+  87.20  [MAESTRO] [POSE] 3 = ESCUDO
+  87.23  [PC] → POSE seq=56 payload=04
+  87.26  [MAESTRO] [POSE] 4 = ATAQUE
+  87.29  [PC] → POSE seq=57 payload=05
+  87.33  [MAESTRO] [POSE] 5 = FIN
+  87.36  [PC] → POSE seq=58 payload=01
+  87.41  [MAESTRO] [POSE] 1 = INICIO
+  87.44  [PC] → POSE seq=59 payload=02
+  87.47  [MAESTRO] [POSE] 2 = RECARGAR
+  87.50  [PC] → POSE seq=60 payload=03
+  87.54  [MAESTRO] [POSE] 3 = ESCUDO
+  87.57  [PC] → POSE seq=61 payload=04
+  87.60  [MAESTRO] [POSE] 4 = ATAQUE
+  87.64  [PC] → POSE seq=62 payload=05
+  87.67  [MAESTRO] [POSE] 5 = FIN
+  87.70  [PC] → POSE seq=63 payload=01
+  87.73  [MAESTRO] [POSE] 1 = INICIO
+  87.76  [PC] → POSE seq=64 payload=02
+  87.80  [MAESTRO] [POSE] 2 = RECARGAR
+  87.84  [PC] → POSE seq=65 payload=03
+  87.88  [MAESTRO] [POSE] 3 = ESCUDO
+  87.92  [PC] → POSE seq=66 payload=04
+  87.94  [MAESTRO] [POSE] 4 = ATAQUE
+  87.98  [PC] → POSE seq=67 payload=05
+  88.03  [MAESTRO] [POSE] 5 = FIN
+  88.06  [PC] → POSE seq=68 payload=01
+  88.09  [MAESTRO] [POSE] 1 = INICIO
+  88.12  [PC] → POSE seq=69 payload=02
+  88.16  [MAESTRO] [POSE] 2 = RECARGAR
+  88.19  [PC] → POSE seq=70 payload=03
+  88.24  [MAESTRO] [POSE] 3 = ESCUDO
+  88.49  [PC] Sin ACK (intento 1/3)
+  88.49  [PC] → POSE seq=70 payload=03
+  88.56  [PC] → POSE seq=71 payload=04
+  88.59  [MAESTRO] [POSE] 4 = ATAQUE
+  88.63  [PC] → POSE seq=72 payload=05
+  88.66  [MAESTRO] [POSE] 5 = FIN
+  88.70  [PC] → POSE seq=73 payload=01
+  88.72  [MAESTRO] [POSE] 1 = INICIO
+  88.75  [PC] → POSE seq=74 payload=02
+  88.79  [MAESTRO] [POSE] 2 = RECARGAR
+  88.83  [PC] → POSE seq=75 payload=03
+  88.87  [MAESTRO] [POSE] 3 = ESCUDO
+  88.91  [PC] → POSE seq=76 payload=04
+  88.94  [MAESTRO] [POSE] 4 = ATAQUE
+  88.96  [PC] → POSE seq=77 payload=05
+  88.98  [MAESTRO] [POSE] 5 = FIN
+  89.02  [PC] → POSE seq=78 payload=01
+  89.07  [MAESTRO] [POSE] 1 = INICIO
+  89.11  [PC] → POSE seq=79 payload=02
+  89.15  [MAESTRO] [POSE] 2 = RECARGAR
+  89.18  [PC] → POSE seq=80 payload=03
+  89.21  [MAESTRO] [POSE] 3 = ESCUDO
+  89.25  [PC] → POSE seq=81 payload=04
+  89.29  [MAESTRO] [POSE] 4 = ATAQUE
+  89.33  [PC] → POSE seq=82 payload=05
+  89.36  [MAESTRO] [POSE] 5 = FIN
+  89.39  [PC] → POSE seq=83 payload=01
+  89.42  [MAESTRO] [POSE] 1 = INICIO
+  89.46  [PC] → POSE seq=84 payload=02
+  89.49  [MAESTRO] [POSE] 2 = RECARGAR
+  89.54  [PC] → POSE seq=85 payload=03
+  89.57  [MAESTRO] [POSE] 3 = ESCUDO
+  89.64  [PC] → POSE seq=86 payload=04
+  89.69  [MAESTRO] [POSE] 4 = ATAQUE
+  89.74  [PC] → POSE seq=87 payload=05
+  89.78  [MAESTRO] [POSE] 5 = FIN
+  89.84  [PC] → POSE seq=88 payload=01
+  89.88  [MAESTRO] [POSE] 1 = INICIO
+  89.94  [PC] → POSE seq=89 payload=02
+  89.99  [MAESTRO] [POSE] 2 = RECARGAR
+  90.04  [PC] → POSE seq=90 payload=03
+  90.08  [MAESTRO] [POSE] 3 = ESCUDO
+  90.17  [PC] → POSE seq=91 payload=04
+  90.20  [MAESTRO] [POSE] 4 = ATAQUE
+  90.27  [PC] → POSE seq=92 payload=05
+  90.31  [MAESTRO] [POSE] 5 = FIN
+  90.37  [PC] → POSE seq=93 payload=01
+  90.41  [MAESTRO] [POSE] 1 = INICIO
+  90.47  [PC] → POSE seq=94 payload=02
+  90.51  [MAESTRO] [POSE] 2 = RECARGAR
+  90.57  [PC] → POSE seq=95 payload=03
+  90.61  [MAESTRO] [POSE] 3 = ESCUDO
+  90.67  [PC] → POSE seq=96 payload=04
+  90.70  [MAESTRO] [POSE] 4 = ATAQUE
+  90.77  [PC] → POSE seq=97 payload=05
+  90.80  [MAESTRO] [POSE] 5 = FIN
+  90.87  [PC] → POSE seq=98 payload=01
+  90.92  [MAESTRO] [POSE] 1 = INICIO
+  90.97  [PC] → POSE seq=99 payload=02
+  91.01  [MAESTRO] [POSE] 2 = RECARGAR
+  91.07  [PC] → POSE seq=100 payload=03
+  91.09  [MAESTRO] [POSE] 3 = ESCUDO
+  91.17  [PC] → POSE seq=101 payload=04
+  91.21  [MAESTRO] [POSE] 4 = ATAQUE
+  91.27  [PC] → POSE seq=102 payload=05
+  91.30  [MAESTRO] [POSE] 5 = FIN
+  91.37  [PC] → POSE seq=103 payload=01
+  91.42  [MAESTRO] [POSE] 1 = INICIO
+  91.47  [PC] → POSE seq=104 payload=02
+  91.50  [MAESTRO] [POSE] 2 = RECARGAR
+  91.57  [PC] → POSE seq=105 payload=03
+  91.61  [MAESTRO] [POSE] 3 = ESCUDO
+  91.67  [PC] → POSE seq=106 payload=04
+  91.71  [MAESTRO] [POSE] 4 = ATAQUE
+  91.77  [PC] → POSE seq=107 payload=05
+  91.83  [MAESTRO] [NACK] tipo=0x80 seq=107 error=0x03 (CRC incorrecto)
+  91.86  [PC] ← NACK ACK seq=107: CRC incorrecto
+  92.07  [PC] Sin ACK (intento 1/3)
+  92.07  [PC] → POSE seq=107 payload=05
+  92.12  [MAESTRO] [POSE] 5 = FIN
+  92.15  [PC] → POSE seq=108 payload=01
+  92.18  [MAESTRO] [POSE] 1 = INICIO
+  92.21  [PC] → POSE seq=109 payload=02
+  92.25  [MAESTRO] [POSE] 2 = RECARGAR
+  92.28  [PC] → POSE seq=110 payload=03
+  92.33  [MAESTRO] [POSE] 3 = ESCUDO
+  92.35  [PC] → POSE seq=111 payload=04
+  92.38  [MAESTRO] [POSE] 4 = ATAQUE
+  92.42  [PC] → POSE seq=112 payload=05
+  92.44  [MAESTRO] [POSE] 5 = FIN
+  92.48  [PC] → POSE seq=113 payload=01
+  92.52  [MAESTRO] [POSE] 1 = INICIO
+  92.55  [PC] → POSE seq=114 payload=02
+  92.85  [PC] Sin ACK (intento 1/3)
+  92.85  [PC] → POSE seq=114 payload=02
+  92.88  [MAESTRO] [POSE] 2 = RECARGAR
+  92.92  [PC] → POSE seq=115 payload=03
+  92.95  [MAESTRO] [POSE] 3 = ESCUDO
+  92.98  [PC] → POSE seq=116 payload=04
+  93.03  [MAESTRO] [POSE] 4 = ATAQUE
+  93.06  [PC] → POSE seq=117 payload=05
+  93.09  [MAESTRO] [POSE] 5 = FIN
+  93.13  [PC] → POSE seq=118 payload=01
+  93.17  [MAESTRO] [POSE] 1 = INICIO
+  93.21  [PC] → POSE seq=119 payload=02
+  93.26  [MAESTRO] [POSE] 2 = RECARGAR
+  93.29  [PC] → POSE seq=120 payload=03
+  93.34  [MAESTRO] [POSE] 3 = ESCUDO
+  93.37  [PC] → POSE seq=121 payload=04
+  93.42  [MAESTRO] [POSE] 4 = ATAQUE
+  93.45  [PC] → POSE seq=122 payload=05
+  93.50  [MAESTRO] [POSE] 5 = FIN
+  93.54  [PC] → POSE seq=123 payload=01
+  93.58  [MAESTRO] [POSE] 1 = INICIO
+  93.61  [PC] → POSE seq=124 payload=02
+  93.65  [MAESTRO] [POSE] 2 = RECARGAR
+  93.68  [PC] → POSE seq=125 payload=03
+  93.71  [MAESTRO] [POSE] 3 = ESCUDO
+  93.74  [PC] → POSE seq=126 payload=04
+  93.78  [MAESTRO] [POSE] 4 = ATAQUE
+  93.82  [PC] → POSE seq=127 payload=05
+  93.86  [MAESTRO] [POSE] 5 = FIN
+  93.89  [PC] → POSE seq=128 payload=01
+  93.92  [MAESTRO] [POSE] 1 = INICIO
+  93.98  [PC] → POSE seq=129 payload=02
+  94.02  [MAESTRO] [POSE] 2 = RECARGAR
+  94.08  [PC] → POSE seq=130 payload=03
+  94.13  [MAESTRO] [POSE] 3 = ESCUDO
+  94.18  [PC] → POSE seq=131 payload=04
+  94.21  [MAESTRO] [POSE] 4 = ATAQUE
+  94.28  [PC] → POSE seq=132 payload=05
+  94.33  [MAESTRO] [POSE] 5 = FIN
+  94.38  [PC] → POSE seq=133 payload=01
+  94.43  [MAESTRO] [POSE] 1 = INICIO
+  94.48  [PC] → POSE seq=134 payload=02
+  94.52  [MAESTRO] [POSE] 2 = RECARGAR
+  94.58  [PC] → POSE seq=135 payload=03
+  94.62  [MAESTRO] [POSE] 3 = ESCUDO
+  94.65  [PC] Trama inválida de Webots: CRC incorrecto
+  94.88  [PC] Sin ACK (intento 1/3)
+  94.88  [PC] → POSE seq=135 payload=03
+  94.95  [PC] → POSE seq=136 payload=04
+  94.99  [MAESTRO] [POSE] 4 = ATAQUE
+  95.03  [PC] → POSE seq=137 payload=05
+  95.06  [MAESTRO] [POSE] 5 = FIN
+  95.09  [PC] → POSE seq=138 payload=01
+  95.12  [MAESTRO] [POSE] 1 = INICIO
+  95.16  [PC] → POSE seq=139 payload=02
+  95.19  [MAESTRO] [POSE] 2 = RECARGAR
+  95.23  [PC] → POSE seq=140 payload=03
+  95.27  [MAESTRO] [POSE] 3 = ESCUDO
+  95.30  [PC] → POSE seq=141 payload=04
+  95.35  [MAESTRO] [POSE] 4 = ATAQUE
+  95.38  [PC] → POSE seq=142 payload=05
+  95.42  [MAESTRO] [POSE] 5 = FIN
+  95.46  [PC] → POSE seq=143 payload=01
+  95.50  [MAESTRO] [POSE] 1 = INICIO
+  95.53  [PC] → POSE seq=144 payload=02
+  95.56  [MAESTRO] [POSE] 2 = RECARGAR
+  95.59  [PC] → POSE seq=145 payload=03
+  95.63  [MAESTRO] [POSE] 3 = ESCUDO
+  95.68  [PC] → POSE seq=146 payload=04
+  95.73  [MAESTRO] [POSE] 4 = ATAQUE
+  95.78  [PC] → POSE seq=147 payload=05
+  95.82  [MAESTRO] [POSE] 5 = FIN
+  95.88  [PC] → POSE seq=148 payload=01
+  95.92  [MAESTRO] [POSE] 1 = INICIO
+  95.99  [PC] → POSE seq=149 payload=02
+  96.02  [MAESTRO] [POSE] 2 = RECARGAR
+  96.09  [PC] → POSE seq=150 payload=03
+  96.12  [MAESTRO] [POSE] 3 = ESCUDO
+  96.19  [PC] → POSE seq=151 payload=04
+  96.23  [MAESTRO] [POSE] 4 = ATAQUE
+  96.29  [PC] → POSE seq=152 payload=05
+  96.31  [MAESTRO] [POSE] 5 = FIN
+  96.39  [PC] → POSE seq=153 payload=01
+  96.43  [MAESTRO] [POSE] 1 = INICIO
+  96.49  [PC] → POSE seq=154 payload=02
+  96.52  [MAESTRO] [POSE] 2 = RECARGAR
+  96.59  [PC] → POSE seq=155 payload=03
+  96.62  [MAESTRO] [POSE] 3 = ESCUDO
+  96.69  [PC] → POSE seq=156 payload=04
+  96.72  [MAESTRO] [POSE] 4 = ATAQUE
+  96.79  [PC] → POSE seq=157 payload=05
+  96.83  [MAESTRO] [POSE] 5 = FIN
+  96.89  [PC] → POSE seq=158 payload=01
+  96.93  [MAESTRO] [POSE] 1 = INICIO
+  96.99  [PC] → POSE seq=159 payload=02
+  97.03  [MAESTRO] [POSE] 2 = RECARGAR
+  97.09  [PC] → POSE seq=160 payload=03
+  97.13  [MAESTRO] [POSE] 3 = ESCUDO
+  97.19  [PC] → POSE seq=161 payload=04
+  97.21  [MAESTRO] [POSE] 4 = ATAQUE
+  97.29  [PC] → POSE seq=162 payload=05
+  97.32  [MAESTRO] [POSE] 5 = FIN
+  97.39  [PC] → POSE seq=163 payload=01
+  97.44  [MAESTRO] [POSE] 1 = INICIO
+  97.49  [PC] → POSE seq=164 payload=02
+  97.52  [MAESTRO] [POSE] 2 = RECARGAR
+  97.59  [PC] → POSE seq=165 payload=03
+  97.62  [MAESTRO] [POSE] 3 = ESCUDO
+  97.69  [PC] → POSE seq=166 payload=04
+  97.73  [MAESTRO] [POSE] 4 = ATAQUE
+  97.79  [PC] → POSE seq=167 payload=05
+  97.84  [MAESTRO] [POSE] 5 = FIN
+  97.89  [PC] → POSE seq=168 payload=01
+  97.93  [MAESTRO] [POSE] 1 = INICIO
+  97.99  [PC] → POSE seq=169 payload=02
+  98.02  [MAESTRO] [POSE] 2 = RECARGAR
+  98.09  [PC] → POSE seq=170 payload=03
+  98.14  [MAESTRO] [POSE] 3 = ESCUDO
+  98.19  [PC] → POSE seq=171 payload=04
+  98.23  [MAESTRO] [POSE] 4 = ATAQUE
+  98.29  [PC] → POSE seq=172 payload=05
+  98.33  [MAESTRO] [POSE] 5 = FIN
+  98.39  [PC] → POSE seq=173 payload=01
+  98.69  [PC] Sin ACK (intento 1/3)
+  98.69  [PC] → POSE seq=173 payload=01
+  98.74  [MAESTRO] [POSE] 1 = INICIO
+  98.76  [PC] → POSE seq=174 payload=02
+  98.80  [MAESTRO] [POSE] 2 = RECARGAR
+  98.83  [PC] → POSE seq=175 payload=03
+  98.87  [MAESTRO] [POSE] 3 = ESCUDO
+  98.89  [PC] → POSE seq=176 payload=04
+  98.93  [MAESTRO] [POSE] 4 = ATAQUE
+  98.97  [PC] → POSE seq=177 payload=05
+  99.00  [MAESTRO] [POSE] 5 = FIN
+  99.03  [PC] → POSE seq=178 payload=01
+  99.06  [MAESTRO] [POSE] 1 = INICIO
+  99.11  [PC] → POSE seq=179 payload=02
+  99.15  [MAESTRO] [POSE] 2 = RECARGAR
+  99.17  [PC] → POSE seq=180 payload=03
+  99.47  [PC] Sin ACK (intento 1/3)
+  99.47  [PC] → POSE seq=180 payload=03
+  99.50  [MAESTRO] [POSE] 3 = ESCUDO
+  99.77  [PC] Sin ACK (intento 2/3)
+  99.77  [PC] → POSE seq=180 payload=03
+  99.85  [PC] → POSE seq=181 payload=04
+  99.89  [MAESTRO] [POSE] 4 = ATAQUE
+  99.93  [PC] → POSE seq=182 payload=05
+  99.98  [MAESTRO] [POSE] 5 = FIN
+ 100.01  [PC] → POSE seq=183 payload=01
+ 100.04  [MAESTRO] [POSE] 1 = INICIO
+ 100.08  [PC] → POSE seq=184 payload=02
+ 100.12  [MAESTRO] [POSE] 2 = RECARGAR
+ 100.15  [PC] → POSE seq=185 payload=03
+ 100.19  [MAESTRO] [POSE] 3 = ESCUDO
+ 100.22  [PC] → POSE seq=186 payload=04
+ 100.25  [MAESTRO] [POSE] 4 = ATAQUE
+ 100.29  ===== S4 tracking 20 Hz + posturas
+ 100.29  [PC] → MODE seq=187 payload=02
+ 100.33  [MAESTRO] [MODE] TRACKING
+ 102.30  [MAESTRO] [NACK] tipo=0x01 seq=210 error=0x03 (CRC incorrecto)
+ 102.33  [PC] ← NACK TRACK seq=210: CRC incorrecto
+ 102.82  [PC] → POSE seq=220 payload=02
+ 102.85  [MAESTRO] [POSE] 2 = RECARGAR
+ 104.80  [PC] → POSE seq=251 payload=01
+ 104.84  [MAESTRO] [POSE] 1 = INICIO
+ 106.82  [PC] → POSE seq=27 payload=01
+ 106.87  [MAESTRO] [POSE] 1 = INICIO
+ 108.81  [PC] → POSE seq=59 payload=05
+ 108.85  [MAESTRO] [POSE] 5 = FIN
+ 108.98  [MAESTRO] [NACK] tipo=0x01 seq=61 error=0x03 (CRC incorrecto)
+ 109.01  [PC] ← NACK TRACK seq=61: CRC incorrecto
+ 109.71  [MAESTRO] [NACK] tipo=0x01 seq=72 error=0x03 (CRC incorrecto)
+ 109.74  [PC] ← NACK TRACK seq=72: CRC incorrecto
+ 110.82  [PC] → POSE seq=90 payload=05
+ 110.85  [MAESTRO] [POSE] 5 = FIN
+ 111.00  [MAESTRO] [NACK] tipo=0x01 seq=92 error=0x03 (CRC incorrecto)
+ 111.02  [PC] ← NACK TRACK seq=92: CRC incorrecto
+ 112.81  [PC] → POSE seq=121 payload=04
+ 112.83  [MAESTRO] [POSE] 4 = ATAQUE
+ 114.81  [PC] → POSE seq=153 payload=03
+ 114.85  [MAESTRO] [POSE] 3 = ESCUDO
+ 116.83  [PC] → POSE seq=185 payload=03
+ 116.86  [MAESTRO] [POSE] 3 = ESCUDO
+ 118.81  [PC] → POSE seq=217 payload=02
+ 118.84  [MAESTRO] [POSE] 2 = RECARGAR
+ 120.80  [PC] → POSE seq=248 payload=01
+ 120.83  [MAESTRO] [POSE] 1 = INICIO
+ 122.81  [PC] → POSE seq=24 payload=01
+ 122.85  [MAESTRO] [POSE] 1 = INICIO
+ 124.80  [PC] → POSE seq=56 payload=05
+ 124.83  [MAESTRO] [POSE] 5 = FIN
+ 124.87  [PC] Trama inválida de Webots: CRC incorrecto
+ 125.10  [PC] Sin ACK (intento 1/3)
+ 125.10  [PC] → POSE seq=56 payload=05
+ 125.85  [MAESTRO] [NACK] tipo=0x01 seq=71 error=0x03 (CRC incorrecto)
+ 125.88  [PC] ← NACK TRACK seq=71: CRC incorrecto
+ 126.81  [PC] → POSE seq=87 payload=05
+ 126.86  [MAESTRO] [POSE] 5 = FIN
+ 128.80  [PC] → POSE seq=118 payload=04
+ 128.84  [MAESTRO] [POSE] 4 = ATAQUE
+ 129.21  [MAESTRO] [NACK] tipo=0x01 seq=124 error=0x03 (CRC incorrecto)
+ 129.24  [PC] ← NACK TRACK seq=124: CRC incorrecto
+ 130.82  [PC] → POSE seq=150 payload=04
+ 130.87  [MAESTRO] [POSE] 4 = ATAQUE
+ 132.05  [MAESTRO] [NACK] tipo=0x02 seq=41 error=0x03 (CRC incorrecto)
+ 132.09  [PC] ← NACK PING seq=41: CRC incorrecto
+ 132.81  [PC] → POSE seq=182 payload=03
+ 132.85  [MAESTRO] [POSE] 3 = ESCUDO
+ 134.83  [PC] → POSE seq=214 payload=03
+ 134.87  [MAESTRO] [POSE] 3 = ESCUDO
+ 136.81  [PC] → POSE seq=245 payload=02
+ 136.86  [MAESTRO] [POSE] 2 = RECARGAR
+ 138.30  [MAESTRO] [NACK] tipo=0x01 seq=13 error=0x03 (CRC incorrecto)
+ 138.34  [PC] ← NACK TRACK seq=13: CRC incorrecto
+ 138.83  [PC] → POSE seq=21 payload=02
+ 138.87  [MAESTRO] [POSE] 2 = RECARGAR
+ 139.78  [MAESTRO] [NACK] tipo=0x01 seq=35 error=0x03 (CRC incorrecto)
+ 139.81  [PC] ← NACK TRACK seq=35: CRC incorrecto
+ 140.81  [PC] → POSE seq=52 payload=01
+ 140.86  [MAESTRO] [POSE] 1 = INICIO
+ 142.83  [PC] → POSE seq=84 payload=01
+ 142.86  [MAESTRO] [POSE] 1 = INICIO
+ 144.80  [PC] → POSE seq=115 payload=04
+ 144.83  [MAESTRO] [POSE] 4 = ATAQUE
+ 146.82  [PC] → POSE seq=147 payload=04
+ 146.85  [MAESTRO] [POSE] 4 = ATAQUE
+ 146.91  [MAESTRO] [NACK] tipo=0x01 seq=148 error=0x03 (CRC incorrecto)
+ 146.95  [PC] ← NACK TRACK seq=148: CRC incorrecto
+ 148.81  [PC] → POSE seq=178 payload=03
+ 148.84  [MAESTRO] [POSE] 3 = ESCUDO
+ 149.63  [MAESTRO] [NACK] tipo=0x01 seq=190 error=0x03 (CRC incorrecto)
+ 149.66  [PC] ← NACK TRACK seq=190: CRC incorrecto
+ 150.83  [PC] → POSE seq=209 payload=03
+ 150.86  [MAESTRO] [POSE] 3 = ESCUDO
+ 152.81  [PC] → POSE seq=241 payload=02
+ 152.86  [MAESTRO] [POSE] 2 = RECARGAR
+ 154.80  [PC] → POSE seq=16 payload=01
+ 154.82  [MAESTRO] [POSE] 1 = INICIO
+ 156.81  [PC] → POSE seq=48 payload=01
+ 156.85  [MAESTRO] [POSE] 1 = INICIO
+ 158.80  [PC] → POSE seq=80 payload=05
+ 158.84  [MAESTRO] [POSE] 5 = FIN
+ 160.45  [MAESTRO] [NACK] tipo=0x01 seq=105 error=0x03 (CRC incorrecto)
+ 160.49  [PC] ← NACK TRACK seq=105: CRC incorrecto
+ 162.82  [PC] → MODE seq=112 payload=00
+ 162.85  [MAESTRO] [MODE] JUEGO
+ 163.32  ===== S5 simulacion detenida
+ 163.32  [PC] Se perdió la conexión con Webots
+ 164.39  [PC] Reintentando conexión (intento 1)...
+ 164.39  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 164.39  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 164.39  [PC] Sin éxito; siguiente intento en 1 s
+ 165.39  [PC] Reintentando conexión (intento 2)...
+ 165.39  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 165.39  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 165.39  [PC] Sin éxito; siguiente intento en 2 s
+ 167.40  [PC] Reintentando conexión (intento 3)...
+ 167.40  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 167.40  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 167.40  [PC] Sin éxito; siguiente intento en 4 s
+ 168.32  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+ 171.41  [PC] Reintentando conexión (intento 4)...
+ 171.41  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 171.41  [PC] Conectado a Webots (127.0.0.1:5655)
+ 171.41  [PC] Reconectado tras 8.1 s sin enlace
+ 171.42  [PC] → POSE seq=113 payload=01
+ 171.42  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:42936
+ 171.42  [MAESTRO] [POSE] 1 = INICIO
+ 172.44  [PC] Se perdió la conexión con Webots
+ 173.67  [PC] Reintentando conexión (intento 1)...
+ 173.67  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 173.67  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 173.67  [PC] Sin éxito; siguiente intento en 1 s
+ 174.67  [PC] Reintentando conexión (intento 2)...
+ 174.67  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 174.67  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 174.67  [PC] Sin éxito; siguiente intento en 2 s
+ 176.67  [PC] Reintentando conexión (intento 3)...
+ 176.68  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 176.68  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 176.68  [PC] Sin éxito; siguiente intento en 4 s
+ 177.44  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+ 180.68  [PC] Reintentando conexión (intento 4)...
+ 180.68  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 180.68  [PC] Conectado a Webots (127.0.0.1:5655)
+ 180.68  [PC] Reconectado tras 8.2 s sin enlace
+ 180.69  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:34248
+ 180.69  [PC] → POSE seq=114 payload=02
+ 180.69  [MAESTRO] [POSE] 2 = RECARGAR
+ 181.71  [PC] Se perdió la conexión con Webots
+ 182.94  [PC] Reintentando conexión (intento 1)...
+ 182.94  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 182.94  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 182.94  [PC] Sin éxito; siguiente intento en 1 s
+ 183.94  [PC] Reintentando conexión (intento 2)...
+ 183.94  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 183.95  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 183.95  [PC] Sin éxito; siguiente intento en 2 s
+ 185.95  [PC] Reintentando conexión (intento 3)...
+ 185.95  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 185.95  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 185.95  [PC] Sin éxito; siguiente intento en 4 s
+ 186.71  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+ 189.96  [PC] Reintentando conexión (intento 4)...
+ 189.96  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 189.96  [PC] Conectado a Webots (127.0.0.1:5655)
+ 189.97  [PC] Reconectado tras 8.3 s sin enlace
+ 189.97  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:42320
+ 189.97  [PC] → POSE seq=115 payload=03
+ 189.99  [MAESTRO] [POSE] 3 = ESCUDO
+ 190.99  [PC] Se perdió la conexión con Webots
+ 192.22  [PC] Reintentando conexión (intento 1)...
+ 192.22  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 192.22  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 192.22  [PC] Sin éxito; siguiente intento en 1 s
+ 193.23  [PC] Reintentando conexión (intento 2)...
+ 193.23  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 193.23  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 193.23  [PC] Sin éxito; siguiente intento en 2 s
+ 195.23  [PC] Reintentando conexión (intento 3)...
+ 195.23  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 195.23  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 195.23  [PC] Sin éxito; siguiente intento en 4 s
+ 195.99  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+ 199.24  [PC] Reintentando conexión (intento 4)...
+ 199.24  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 199.24  [PC] Conectado a Webots (127.0.0.1:5655)
+ 199.24  [PC] Reconectado tras 8.2 s sin enlace
+ 199.25  [PC] → POSE seq=116 payload=04
+ 199.25  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:42140
+ 199.25  [MAESTRO] [POSE] 4 = ATAQUE
+ 200.26  [PC] Se perdió la conexión con Webots
+ 201.50  [PC] Reintentando conexión (intento 1)...
+ 201.50  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 201.50  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 201.50  [PC] Sin éxito; siguiente intento en 1 s
+ 202.50  [PC] Reintentando conexión (intento 2)...
+ 202.50  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 202.50  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 202.50  [PC] Sin éxito; siguiente intento en 2 s
+ 204.51  [PC] Reintentando conexión (intento 3)...
+ 204.51  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 204.51  [PC] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+ 204.51  [PC] Sin éxito; siguiente intento en 4 s
+ 205.26  [MAESTRO] [MAESTRO] Esperando la GUI en 127.0.0.1:5655...
+ 208.52  [PC] Reintentando conexión (intento 4)...
+ 208.52  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 208.52  [PC] Conectado a Webots (127.0.0.1:5655)
+ 208.52  [PC] Reconectado tras 8.3 s sin enlace
+ 208.52  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:46086
+ 208.52  [PC] → POSE seq=117 payload=05
+ 208.54  [MAESTRO] [POSE] 5 = FIN
+ 209.54  ===== S6 robot sin respuesta
+ 211.55  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
+ 211.78  [PC] Sin respuesta de Webots en 3.2 s: enlace perdido
+ 212.78  [PC] Reintentando conexión (intento 1)...
+ 212.78  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 212.78  [PC] Conectado a Webots (127.0.0.1:5655)
+ 212.78  [PC] Reconectado tras 1.0 s sin enlace
+ 215.55  [PC] → POSE seq=122 payload=01
+ 215.56  [MAESTRO] [MAESTRO] GUI desconectada
+ 215.57  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:51148
+ 215.57  [MAESTRO] [POSE] 1 = INICIO
+ 218.58  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
+ 218.80  [PC] Sin respuesta de Webots en 3.2 s: enlace perdido
+ 219.80  [PC] Reintentando conexión (intento 1)...
+ 219.80  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 219.80  [PC] Conectado a Webots (127.0.0.1:5655)
+ 219.80  [PC] Reconectado tras 1.0 s sin enlace
+ 222.58  [PC] → POSE seq=127 payload=02
+ 222.59  [MAESTRO] [MAESTRO] GUI desconectada
+ 222.60  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:51152
+ 222.60  [MAESTRO] [POSE] 2 = RECARGAR
+ 225.61  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
+ 225.81  [PC] Sin respuesta de Webots en 3.2 s: enlace perdido
+ 226.82  [PC] Reintentando conexión (intento 1)...
+ 226.82  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 226.82  [PC] Conectado a Webots (127.0.0.1:5655)
+ 226.82  [PC] Reconectado tras 1.0 s sin enlace
+ 229.61  [PC] → POSE seq=132 payload=03
+ 229.62  [MAESTRO] [MAESTRO] GUI desconectada
+ 229.63  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:58558
+ 229.63  [MAESTRO] [POSE] 3 = ESCUDO
+ 232.65  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
+ 232.83  [PC] Sin respuesta de Webots en 3.2 s: enlace perdido
+ 233.83  [PC] Reintentando conexión (intento 1)...
+ 233.83  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 233.83  [PC] Conectado a Webots (127.0.0.1:5655)
+ 233.84  [PC] Reconectado tras 1.0 s sin enlace
+ 236.64  [PC] → POSE seq=137 payload=04
+ 236.65  [MAESTRO] [MAESTRO] GUI desconectada
+ 236.66  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:60066
+ 236.66  [MAESTRO] [POSE] 4 = ATAQUE
+ 239.67  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
+ 239.85  [PC] Sin respuesta de Webots en 3.2 s: enlace perdido
+ 240.85  [PC] Reintentando conexión (intento 1)...
+ 240.85  [PC] Conectando a Webots en 127.0.0.1:5655...
+ 240.85  [PC] Conectado a Webots (127.0.0.1:5655)
+ 240.85  [PC] Reconectado tras 1.0 s sin enlace
+ 243.67  [PC] → POSE seq=142 payload=05
+ 243.67  [MAESTRO] [MAESTRO] GUI desconectada
+ 243.69  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:60082
+ 243.69  [MAESTRO] [POSE] 5 = FIN
+ 244.70  ===== S7 reglas del maestro
+ 244.70  [PC] Desconectado de Webots
+ 244.71  [MAESTRO] [MAESTRO] GUI desconectada
+ 244.71  [MAESTRO] [SEGURO] Estado seguro: desconexión
+ 245.23  [MAESTRO] [MAESTRO] GUI conectada desde 127.0.0.1:49402
+ 245.42  [MAESTRO] [POSE] 3 = ESCUDO
+ 246.43  [MAESTRO] [NACK] tipo=0x00 seq=78 error=0x03 (CRC incorrecto)
+ 247.23  [MAESTRO] [POSE] 4 = ATAQUE
+ 250.23  [MAESTRO] [SEGURO] Estado seguro: 3 s sin tramas
