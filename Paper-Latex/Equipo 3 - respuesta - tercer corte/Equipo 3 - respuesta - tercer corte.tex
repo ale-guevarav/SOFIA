@@ -73,12 +73,12 @@
 	{Los nombres de los gestos están en español: INICIO, FIN,
 		RECARGAR, ESCUDO y ATAQUE. También hay un error de
 		espacio: ``in thisstudy'' (Línea 162).}
-	{The gesture names were translated into English
-		(START, END, RELOAD, SHIELD, and ATTACK) to maintain
-		language consistency throughout the manuscript.
-		
-		Additionally, the typographical error ``in thisstudy''
-		was corrected to ``in this study''.}
+	{The five gesture names are consistently presented in
+		English (START, END, RELOAD, SHIELD, and ATTACK)
+		throughout the revised text, gesture-condition table,
+		and performance results. The manuscript was also
+		checked for the reported spacing error, and the
+		correct form ``in this study'' is used.}
 	
 	\LabDSTcomment{R1.3}{N}{}
 	{La Fig. 1 mide 6 cm de ancho y su texto interno (“CH 1”, “JST-PH (MALE)”) no se lee impreso. Tampoco muestra el riel
@@ -88,7 +88,7 @@
 	
 	\LabDSTcomment{R1.4}{P}{Page~1, affiliation footnote}
 	{La lista de autores no incluye a la profesora Graciela Baca, y la afiliación no indica el departamento.}
-	{The names of the course professors have been included in the author list. Additionally, the departmental affiliation has been updated to specify the Department of Electronics and Computer Systems (DESI).}
+	{The names of the course professors had already been included in the author list. Additionally, the affiliation has been updated to specify the Department of Electronics and Computer Systems (DESI), ITESO.}
 	
 	
 	\LabDSTcomment{R1.5}{P}{Table~\ref{tab:bom}}
@@ -187,11 +187,34 @@
 		power distribution capacity, and
 		decoupling requirements as future work.}
 	
-	\LabDSTcomment{R3.2}{N}{}
+	\LabDSTcomment{R3.2}{P}{\Rln{pcb}, \Rln{pcb-traces}, \Rln{pcb-revision}, Table~\ref{tab:mg90s_specs}, Table~\ref{tab:bom}}
 	{La sección de potencia usa “approximately 250 mA during movement” y “peak stall currents reaching up to 700 mA” sin
 		fuente, mientras la Tabla VI dice que la corriente de bloqueo “Not reported” requiere medición. No se dimensiona la fuente
 		ni se dice qué corriente soporta la PCB.}
-	{}
+	{The unsupported numerical estimates of
+		servomotor current consumption were removed
+		from the manuscript.
+		
+		The revised PCB documentation specifies
+		the use of an external regulated 5 V power
+		supply and identifies the actual trace
+		widths of the single-layer prototype:
+		0.7 mm for power distribution and 0.5 mm
+		for signal routing.
+		
+		The manuscript also clarifies that the
+		current-carrying capacity of the PCB traces
+		and connectors has not yet been validated.
+		
+		Future work will include experimental
+		characterization of MG90S current
+		consumption under representative operating
+		conditions, followed by verification of
+		the power supply requirements, connector
+		ratings, and PCB trace dimensions.
+		
+		Therefore, this observation is considered
+		partially addressed.}
 	
 	\LabDSTcomment{R3.3}{N}{}
 	{El dispositivo de corona con interruptores de límite, que es la base del diferenciador, solo se menciona: no hay CAD, figura,

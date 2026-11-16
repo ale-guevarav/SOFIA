@@ -301,7 +301,7 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-VH connectors.
+	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-PH connectors.
 	
 	
 	\begin{figure}[!t]
@@ -546,7 +546,7 @@
 	divider was incorporated into the PCB schematic between
 	the TTL485-V2.0 TXD output and the ESP32-C3 UART receive
 	input. The divider consists of a 10 kOhm series resistor
-	and an 18 kOhm resistor connected to ground, producing
+	and an 20 kOhm resistor connected to ground, producing
 	approximately 3.21 V from a nominal 5 V input.
 	
 	The ESP32-C3 UART transmit output remains directly
@@ -666,12 +666,12 @@
 			RGB status indicator &
 			Generic & Local \\
 			
-			-- & JST-VH Male & -- & 1 &
+			-- & JST-PH Male & -- & 1 &
 			2.0 mm-pitch PCB connector for power
 			and communication &
 			JTAREA & Local \\
 			
-			-- & JST-VH Female & -- & 1 &
+			-- & JST-PH Female & -- & 1 &
 			2.0 mm-pitch mating connector for power
 			and communication &
 			JTAREA & Local \\
@@ -897,11 +897,11 @@
 			\toprule
 			\textbf{Gesture} & \textbf{Type} & \textbf{Main recognition conditions} \\
 			\midrule
-			INICIO & Dynamic & Three wrist-to-hip contacts within 3s \\
-			FIN & Dynamic & One raised hand and two horizontal direction changes \\
-			RECARGAR & Static & Wrists near shoulders, approximately vertical forearms, no two recognized pistol hands \\
-			ESCUDO & Static & Crossed arms, wrists near opposite shoulders, elbow below shoulders \\
-			ATAQUE & Static & Elbow angles of 35$^\circ$--125$^\circ$ and two pistol-shaped hands \\
+			START & Dynamic & Three wrist-to-hip contacts within 3s \\
+			END & Dynamic & One raised hand and two horizontal direction changes \\
+			RELOAD & Static & Wrists near shoulders, approximately vertical forearms, no two recognized pistol hands \\
+			SHIELD & Static & Crossed arms, wrists near opposite shoulders, elbow below shoulders \\
+			ATTACK & Static & Elbow angles of 35$^\circ$--125$^\circ$ and two pistol-shaped hands \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
@@ -919,14 +919,14 @@
 		S_t = 0.3X_t + 0.7S_{t-1}
 	\end{equation} 
 	
-	\linelabel{ln:five-frame}Additionally, static gestures require a five-consecutive-valid-frame confirmation, and the system manages display priorities during simultaneous activations by prioritizing ESCUDO, ATAQUE, RECARGAR, INICIO, and FIN.
+	\linelabel{ln:five-frame}Additionally, static gestures require a five-consecutive-valid-frame confirmation, and the system manages display priorities during simultaneous activations by prioritizing SHIELD, ATTACK, RELOAD, START, and END.
 	
 	\subsection{Integration Challenges and Design Refinements}
 	
 	\linelabel{ln:chal-intro}During development, challenges in landmark stability, gesture overlap, and software integration prompted targeted algorithmic and architectural revisions. To prevent \texttt{AttributeError} crashes when users left the camera frame, missing-landmark validation was added prior to processing. Coordinate fluctuations near recognition thresholds were mitigated by incorporating an EMA filter ($\alpha = 0.3$) alongside a 5-consecutive-frame static confirmation requirement.
 	
-	\linelabel{ln:chal-recargar}RECARGAR was converted from a dynamic gesture to a static posture (bent arms, hands near shoulders), refined with constraints on wrist-to-shoulder proximity, vertical bounds, and vertical forearm orientation. 
-	To resolve spatial overlap with ATAQUE, RECARGAR classification is suppressed whenever both hands are detected in a pistol configuration. ATAQUE itself was redefined—discarding strict torso proximity, depth restrictions, and an ineffective $90^\circ$–$165^\circ$ elbow range—in favor of a W-shaped posture requiring elbow angles between $35^\circ$ and $125^\circ$, wrists above elbows, and outward hand orientation.
+	\linelabel{ln:chal-reload}RELOAD was converted from a dynamic gesture to a static posture (bent arms, hands near shoulders), refined with constraints on wrist-to-shoulder proximity, vertical bounds, and vertical forearm orientation. 
+	To resolve spatial overlap with ATTACK, RELOAD classification is suppressed whenever both hands are detected in a pistol configuration. ATTACK itself was redefined—discarding strict torso proximity, depth restrictions, and an ineffective $90^\circ$–$165^\circ$ elbow range—in favor of a W-shaped posture requiring elbow angles between $35^\circ$ and $125^\circ$, wrists above elbows, and outward hand orientation.
 	
 	\subsection{PCB Design and Electronic Integration}
 	\label{subsec:pcb_design}
@@ -1014,9 +1014,9 @@
 	
 	\linelabel{ln:vision-vis}The system successfully captured and processed video frames using OpenCV and MediaPipe, displaying the detected landmarks, recognized gesture labels, and approximate FPS in real time.
 	
-	\linelabel{ln:vision-func-tests}Functional tests confirmed the recognition of INICIO through three consecutive hand-to-thigh movements and FIN through two horizontal direction changes of a raised hand. For static gestures, ESCUDO was recognized through crossed-arm positioning, RECARGAR through the defined arm configuration near shoulder height, and ATAQUE through the combination of W-shaped arms and two pistol-shaped hands.
+	\linelabel{ln:vision-func-tests}Functional tests confirmed the recognition of START through three consecutive hand-to-thigh movements and END through two horizontal direction changes of a raised hand. For static gestures, SHIELD was recognized through crossed-arm positioning, RELOAD through the defined arm configuration near shoulder height, and ATTACK through the combination of W-shaped arms and two pistol-shaped hands.
 	
-	\linelabel{ln:vision-func-ema}The implementation of EMA filtering and five-frame temporal confirmation maintained the functionality of the recognition system while providing mechanisms to reduce unstable detections. Additionally, the final adjustments to RECARGAR and ATAQUE were verified, confirming that the updated gesture definitions could be recognized during functional testing.
+	\linelabel{ln:vision-func-ema}The implementation of EMA filtering and five-frame temporal confirmation maintained the functionality of the recognition system while providing mechanisms to reduce unstable detections. Additionally, the final adjustments to RELOAD and ATTACK were verified, confirming that the updated gesture definitions could be recognized during functional testing.
 	
 	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem as an independent software prototype. However, recognition accuracy, average response time, and robustness under different environmental conditions still require quantitative evaluation.
 	
@@ -1024,7 +1024,7 @@
 	
 	\linelabel{ln:res-vision-intro}Preliminary performance tests were conducted to evaluate gesture recognition and identify classification errors. These tests recorded the expected gesture, detected gesture, response time, and instantaneous frames per second (FPS).
 	
-	\linelabel{ln:vision-performance}Performance metrics across gesture classes are detailed in Table~\ref{tab:gesture_benchmark}. Dynamic gestures (INICIO and FIN) achieved $100\%$ accuracy with average response times of $1.33\text{ s}$ and $0.95\text{ s}$. Static gestures exhibited lower recall ($75.00\%$ for ESCUDO and ATAQUE, $88.89\%$ for RECARGAR) due to pose ambiguity near decision boundaries.
+	\linelabel{ln:vision-performance}Performance metrics across gesture classes are detailed in Table~\ref{tab:gesture_benchmark}. Dynamic gestures (START and END) achieved $100\%$ accuracy with average response times of $1.33\text{ s}$ and $0.95\text{ s}$. Static gestures exhibited lower recall ($75.00\%$ for SHIELD and ATTACK, $88.89\%$ for RELOAD) due to pose ambiguity near decision boundaries.
 	
 	\begin{table}[!t]
 		\centering
@@ -1037,21 +1037,21 @@
 			\toprule
 			\textbf{Gesture} & \textbf{Trials} & \textbf{Hits} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Resp. (s)} \\
 			\midrule
-			INICIO   & 6  & 6  & 100.00\% & 100.00\% & 100.00\% & 100.00\% & 1.33 \\
-			RECARGAR & 9  & 8  & 88.89\%  & 100.00\% & 88.89\%  & 94.12\%  & 4.17 \\
-			ESCUDO   & 12 & 9  & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.06 \\
-			ATAQUE   & 16 & 12 & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.14 \\
-			FIN      & 7  & 7  & 100.00\% & 70.00\%  & 100.00\% & 82.35\%  & 0.95 \\
+			START   & 6  & 6  & 100.00\% & 100.00\% & 100.00\% & 100.00\% & 1.33 \\
+			RELOAD & 9  & 8  & 88.89\%  & 100.00\% & 88.89\%  & 94.12\%  & 4.17 \\
+			SHIELD   & 12 & 9  & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.06 \\
+			ATTACK   & 16 & 12 & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.14 \\
+			END      & 7  & 7  & 100.00\% & 70.00\%  & 100.00\% & 82.35\%  & 0.95 \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
 	
-	\linelabel{ln:vision-escudo}During the initial evaluation of ESCUDO, four attempts were recorded. Two were correctly classified, while the other two were incorrectly identified as RECARGAR.
+	\linelabel{ln:vision-shield}During the initial evaluation of SHIELD, four attempts were recorded. Two were correctly classified, while the other two were incorrectly identified as RELOAD.
 	
 	\begin{table}[!t]
 		\centering
-		\caption{Preliminary Performance Evaluation for ESCUDO Gesture}
-		\label{tab:escudo_performance}
+		\caption{Preliminary Performance Evaluation for SHIELD Gesture}
+		\label{tab:shield_performance}
 		\scriptsize
 		\setlength{\tabcolsep}{3pt}
 		\renewcommand{\arraystretch}{1.1}
@@ -1059,10 +1059,10 @@
 			\toprule
 			\textbf{Attempt} & \textbf{Expected} & \textbf{Detected} & \textbf{Time (ms)} & \textbf{FPS} \\
 			\midrule
-			Initial & ESCUDO & RECARGAR & 1841.65 & 26.62 \\
-			1       & ESCUDO & ESCUDO   & 2072.08 & 21.95 \\
-			2       & ESCUDO & ESCUDO   & 2306.67 & 20.27 \\
-			3       & ESCUDO & RECARGAR & 2410.98 & 27.05 \\
+			Initial & SHIELD & RELOAD & 1841.65 & 26.62 \\
+			1       & SHIELD & SHIELD   & 2072.08 & 21.95 \\
+			2       & SHIELD & SHIELD   & 2306.67 & 20.27 \\
+			3       & SHIELD & RELOAD & 2410.98 & 27.05 \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
@@ -1071,7 +1071,7 @@
 	
 	\linelabel{ln-vision-latency}The recorded response times included user reaction and gesture execution, as well as software processing. Therefore, they do not represent the algorithm's computational latency.
 	
-	\linelabel{ln:vision-adjustments}Following these observations, the recognition conditions for RECARGAR and ATAQUE were adjusted and their final functionality was verified. However, the preliminary measurements correspond to an earlier implementation and cannot be used to calculate the final system's accuracy.
+	\linelabel{ln:vision-adjustments}Following these observations, the recognition conditions for RELOAD and ATTACK were adjusted and their final functionality was verified. However, the preliminary measurements correspond to an earlier implementation and cannot be used to calculate the final system's accuracy.
 	
 	\section{Discussion}
 	\label{sec:discussion}
