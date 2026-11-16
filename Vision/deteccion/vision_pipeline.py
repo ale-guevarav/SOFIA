@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 import cv2
 
 from .pose_detector import PoseDetector
-from .hand_detector import HandDetector
+from .hand_detector import HandDetector, hands_of_person
 from .hand_tracker import HandTracker
 from .gesture_recognition import GestureRecognition, NO_GESTURE
 
@@ -82,9 +82,15 @@ class VisionPipeline:
 
         self.pose_detector = PoseDetector()
 
-        # Detector de manos para JUEGO / TEST
-        # (umbrales normales, evita falsos ATAQUE)
-        self.hand_detector = HandDetector()
+        # Detector de manos para JUEGO / TEST. La detección se queda
+        # en 0.5 (evita manos inventadas) pero presencia y seguimiento
+        # bajan a 0.4 para no perder la mano al moverla; las manos que
+        # no son de la persona se descartan después (hands_of_person)
+        self.hand_detector = HandDetector(
+            min_detection_confidence=0.5,
+            min_presence_confidence=0.4,
+            min_tracking_confidence=0.4,
+        )
 
         # Detector de manos para TRACKING con umbrales
         # más bajos: no pierde la mano tan fácil cuando
@@ -258,7 +264,14 @@ class VisionPipeline:
                 timestamp_ms
             )
 
-        person_detected = bool(pose_result.pose_landmarks)
+        # Solo una persona real (cara y hombros visibles, cerca) y
+        # solo sus manos: fuera cuerpos y manos del fondo
+        person = self.pose_detector.person_landmarks(pose_result)
+        person_detected = person is not None
+
+        hand_result = hands_of_person(
+            hand_result, person, self.pose_detector.aspect
+        )
 
         if draw:
             with measure("dibujo"):

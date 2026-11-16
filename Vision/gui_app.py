@@ -472,6 +472,7 @@ class MainWindow(QMainWindow):
         self.worker.test_status.connect(self.show_test_status)
         self.worker.report_ready.connect(self.on_report_ready)
         self.worker.camera_event.connect(self.on_camera_event)
+        self.worker.info.connect(self.append_log)
         self.worker.finished.connect(self.on_worker_finished)
 
         self.worker.start()
