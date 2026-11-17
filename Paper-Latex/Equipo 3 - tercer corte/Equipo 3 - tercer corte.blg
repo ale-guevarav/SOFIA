@@ -14,6 +14,8 @@ Repeated entry---line 91 of file bibliography.bib
  : @misc{pca9685
  :              ,
 I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "aruco"
+Warning--I didn't find a database entry for "webots"
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
@@ -21,7 +23,7 @@ I'm skipping whatever remains of this entry
 Done.
 You've used 17 entries,
             4087 wiz_defined-function locations,
-            905 strings with 10633 characters,
+            907 strings with 10644 characters,
 and the built_in function-call counts, 10245 in all, are:
 = -- 786
 > -- 202
