@@ -21,6 +21,10 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{sofia_architecture}
+J.~A. Lizárraga, ``Presentación del labdst: Sesión 1 - contexto,
+  metodología d-lab y sofia,'' 2026, iTESO, 17 de agosto de 2026.
+
 \bibitem{leithinger2010relief}
 D.~Leithinger and H.~Ishii, ``Relief: A scalable actuated shape display,'' in
   \emph{Proceedings of the Fourth International Conference on Tangible,
@@ -61,10 +65,6 @@ K.~Nakagaki, A.~Dementyev, S.~Follmer, J.~A. Paradiso, and H.~Ishii,
   Interfaces},'' in \emph{Proceedings of the 29th Annual Symposium on User
   Interface Software and Technology}.\hskip 1em plus 0.5em minus 0.4em\relax
   Association for Computing Machinery, 2016, pp. 87--96.
-
-\bibitem{sofia_architecture}
-J.~A. Lizárraga, ``Presentación del labdst: Sesión 1 - contexto,
-  metodología d-lab y sofia,'' 2026, iTESO, 17 de agosto de 2026.
 
 \bibitem{mg90s}
 \BIBentryALTinterwordspacing
