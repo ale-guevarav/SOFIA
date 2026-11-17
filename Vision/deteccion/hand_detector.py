@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import cv2
 import mediapipe as mp
 
@@ -5,6 +7,69 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 from .hand_connections import HAND_CONNECTIONS
+
+
+# -----------------------------
+# MANOS DE LA PERSONA (JUEGO / TEST)
+# -----------------------------
+
+# Una mano cuenta solo si está cerca del cuerpo de la persona que
+# se detectó, medido en "anchos de hombros" (sw):
+#   - la muñeca a lo más HAND_REACH_SW a los lados del centro y
+#     arriba de los hombros (FIN levanta la mano sobre la cabeza),
+#   - y la mano mide al menos HAND_MIN_SIZE_SW (una mano de alguien
+#     al fondo se ve mucho más chica).
+HAND_REACH_SW = 2.2
+HAND_MIN_SIZE_SW = 0.12
+
+
+def hands_of_person(result, person, aspect):
+    """
+    Deja solo las manos que pertenecen a la persona detectada.
+    person: landmarks de Pose ya validados (o None = sin persona).
+    aspect: ancho / alto de la imagen.
+    """
+
+    kept = []
+
+    if person is not None and result.hand_landmarks:
+
+        left, right = person[11], person[12]
+        shoulder_width = abs(left.x - right.x)
+        center_x = (left.x + right.x) / 2
+        shoulder_y = min(left.y, right.y)
+
+        for index, hand in enumerate(result.hand_landmarks):
+
+            wrist = hand[0]
+
+            # A los lados: en unidades de x
+            if abs(wrist.x - center_x) > HAND_REACH_SW * shoulder_width:
+                continue
+
+            # Arriba de los hombros: la y se pasa a unidades de x
+            if (shoulder_y - wrist.y) / aspect > HAND_REACH_SW * shoulder_width:
+                continue
+
+            # Tamaño de la mano (lado mayor de su caja)
+            xs = [point.x for point in hand]
+            ys = [point.y / aspect for point in hand]
+            size = max(max(xs) - min(xs), max(ys) - min(ys))
+
+            if size < HAND_MIN_SIZE_SW * shoulder_width:
+                continue
+
+            kept.append(index)
+
+    def pick(items):
+        items = items or []
+        return [items[i] for i in kept if i < len(items)]
+
+    return SimpleNamespace(
+        hand_landmarks=pick(result.hand_landmarks),
+        hand_world_landmarks=pick(getattr(result, "hand_world_landmarks", None)),
+        handedness=pick(result.handedness),
+    )
 
 
 class HandDetector:

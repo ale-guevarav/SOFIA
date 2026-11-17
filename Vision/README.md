@@ -287,6 +287,12 @@ pose_landmarker.task
 hand_landmarker.task
 ```
 
+`pose_landmarker.task` es la versión **lite**. Para menos cuerpos falsos en el fondo y mejor seguimiento de los brazos, descarga la versión **full** y guárdala como `models/pose_landmarker_full.task`; si existe, se usa sola en lugar de la lite (la bitácora de la GUI dice cuál se cargó):
+
+https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task
+
+En Juego y Prueba solo se acepta como persona un cuerpo con la cara y los dos hombros visibles, cerca de la cámara y con la cara entre los hombros; las manos que no están cerca de esa persona se ignoran.
+
 ---
 
 # Posturas y gestos

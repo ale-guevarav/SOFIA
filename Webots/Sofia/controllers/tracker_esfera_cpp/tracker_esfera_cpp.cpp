@@ -37,7 +37,7 @@ const int MODO_TRACKING = 2;
 
 // Centro del arreglo 4x4 (promedio de las posiciones de los paneles)
 const double CENTRO_X = 0.0;
-const double CENTRO_Y = 0.035;
+const double CENTRO_Y = 0.0335;   // centro del arreglo (igual que geometria.py)
 
 // Altura de los ejes sobre el origen de la unidad (joint_1 y joint_2 del PROTO)
 const double ALTURA_PIVOTE = 0.022;

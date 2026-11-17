@@ -109,6 +109,7 @@ def draw_mode_label(frame, mode):
 # =============================================
 
 pipeline = VisionPipeline()
+print(f"Modelo de pose: {pipeline.pose_detector.model_name}")
 
 # Arranca en pausa: solo mide en modo TEST
 metrics = PerformanceMetrics(

@@ -1,0 +1,1127 @@
+13:40:30.883  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:40:30.883  [Webots] Verificando que el robot conteste...
+13:40:30.883  [Webots] → PING seq=0 payload=-
+13:40:30.887  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:40:30.891  [Webots] → POSE seq=1 payload=01
+13:40:30.962  [Webots] → POSE seq=2 payload=02
+13:40:31.023  [Webots] → POSE seq=3 payload=03
+13:40:31.093  [Webots] → POSE seq=4 payload=04
+13:40:31.153  [Webots] → POSE seq=5 payload=05
+13:40:31.224  [Webots] → POSE seq=6 payload=01
+13:40:31.285  [Webots] → POSE seq=7 payload=02
+13:40:31.355  [Webots] → POSE seq=8 payload=03
+13:40:31.416  [Webots] → POSE seq=9 payload=04
+13:40:31.476  [Webots] → POSE seq=10 payload=05
+13:40:31.547  [Webots] → POSE seq=11 payload=01
+13:40:31.617  [Webots] → POSE seq=12 payload=02
+13:40:31.678  [Webots] → POSE seq=13 payload=03
+13:40:31.749  [Webots] → POSE seq=14 payload=04
+13:40:31.810  [Webots] → POSE seq=15 payload=05
+13:40:31.880  [Webots] → POSE seq=16 payload=01
+13:40:31.940  [Webots] → POSE seq=17 payload=02
+13:40:32.011  [Webots] → POSE seq=18 payload=03
+13:40:32.071  [Webots] → POSE seq=19 payload=04
+13:40:32.132  [Webots] → POSE seq=20 payload=05
+13:40:32.202  [Webots] → POSE seq=21 payload=01
+13:40:32.263  [Webots] → POSE seq=22 payload=02
+13:40:32.333  [Webots] → POSE seq=23 payload=03
+13:40:32.394  [Webots] → POSE seq=24 payload=04
+13:40:32.465  [Webots] → POSE seq=25 payload=05
+13:40:32.525  [Webots] → POSE seq=26 payload=01
+13:40:32.596  [Webots] → POSE seq=27 payload=02
+13:40:32.656  [Webots] → POSE seq=28 payload=03
+13:40:32.727  [Webots] → POSE seq=29 payload=04
+13:40:32.787  [Webots] → POSE seq=30 payload=05
+13:40:32.858  [Webots] → POSE seq=31 payload=01
+13:40:32.918  [Webots] → POSE seq=32 payload=02
+13:40:32.979  [Webots] → POSE seq=33 payload=03
+13:40:33.050  [Webots] → POSE seq=34 payload=04
+13:40:33.110  [Webots] → POSE seq=35 payload=05
+13:40:33.181  [Webots] → POSE seq=36 payload=01
+13:40:33.242  [Webots] → POSE seq=37 payload=02
+13:40:33.312  [Webots] → POSE seq=38 payload=03
+13:40:33.374  [Webots] → POSE seq=39 payload=04
+13:40:33.435  [Webots] → POSE seq=40 payload=05
+13:40:33.505  [Webots] → POSE seq=41 payload=01
+13:40:33.566  [Webots] → POSE seq=42 payload=02
+13:40:33.636  [Webots] → POSE seq=43 payload=03
+13:40:33.696  [Webots] → POSE seq=44 payload=04
+13:40:33.767  [Webots] → POSE seq=45 payload=05
+13:40:33.827  [Webots] → POSE seq=46 payload=01
+13:40:33.898  [Webots] → POSE seq=47 payload=02
+13:40:33.958  [Webots] → POSE seq=48 payload=03
+13:40:34.029  [Webots] → POSE seq=49 payload=04
+13:40:34.090  [Webots] → POSE seq=50 payload=05
+13:40:34.150  [Webots] → POSE seq=51 payload=01
+13:40:34.221  [Webots] → POSE seq=52 payload=02
+13:40:34.281  [Webots] → POSE seq=53 payload=03
+13:40:34.352  [Webots] → POSE seq=54 payload=04
+13:40:34.412  [Webots] → POSE seq=55 payload=05
+13:40:34.483  [Webots] → POSE seq=56 payload=01
+13:40:34.543  [Webots] → POSE seq=57 payload=02
+13:40:34.614  [Webots] → POSE seq=58 payload=03
+13:40:34.675  [Webots] → POSE seq=59 payload=04
+13:40:34.745  [Webots] → POSE seq=60 payload=05
+13:40:34.805  [Webots] → POSE seq=61 payload=01
+13:40:34.876  [Webots] → POSE seq=62 payload=02
+13:40:34.936  [Webots] → POSE seq=63 payload=03
+13:40:35.007  [Webots] → POSE seq=64 payload=04
+13:40:35.068  [Webots] → POSE seq=65 payload=05
+13:40:35.128  [Webots] → POSE seq=66 payload=01
+13:40:35.199  [Webots] → POSE seq=67 payload=02
+13:40:35.259  [Webots] → POSE seq=68 payload=03
+13:40:35.330  [Webots] → POSE seq=69 payload=04
+13:40:35.390  [Webots] → POSE seq=70 payload=05
+13:40:35.461  [Webots] → POSE seq=71 payload=01
+13:40:35.521  [Webots] → POSE seq=72 payload=02
+13:40:35.592  [Webots] → POSE seq=73 payload=03
+13:40:35.653  [Webots] → POSE seq=74 payload=04
+13:40:35.723  [Webots] → POSE seq=75 payload=05
+13:40:35.783  [Webots] → POSE seq=76 payload=01
+13:40:35.854  [Webots] → POSE seq=77 payload=02
+13:40:35.915  [Webots] → POSE seq=78 payload=03
+13:40:35.975  [Webots] → POSE seq=79 payload=04
+13:40:36.045  [Webots] → POSE seq=80 payload=05
+13:40:36.106  [Webots] → POSE seq=81 payload=01
+13:40:36.177  [Webots] → POSE seq=82 payload=02
+13:40:36.237  [Webots] → POSE seq=83 payload=03
+13:40:36.308  [Webots] → POSE seq=84 payload=04
+13:40:36.369  [Webots] → POSE seq=85 payload=05
+13:40:36.439  [Webots] → POSE seq=86 payload=01
+13:40:36.510  [Webots] → POSE seq=87 payload=02
+13:40:36.570  [Webots] → POSE seq=88 payload=03
+13:40:36.631  [Webots] → POSE seq=89 payload=04
+13:40:36.701  [Webots] → POSE seq=90 payload=05
+13:40:36.762  [Webots] → POSE seq=91 payload=01
+13:40:36.833  [Webots] → POSE seq=92 payload=02
+13:40:36.893  [Webots] → POSE seq=93 payload=03
+13:40:36.964  [Webots] → POSE seq=94 payload=04
+13:40:37.024  [Webots] → POSE seq=95 payload=05
+13:40:37.095  [Webots] → POSE seq=96 payload=01
+13:40:37.155  [Webots] → POSE seq=97 payload=02
+13:40:37.226  [Webots] → POSE seq=98 payload=03
+13:40:37.286  [Webots] → POSE seq=99 payload=04
+13:40:37.357  [Webots] → POSE seq=100 payload=05
+13:40:37.418  [Webots] → POSE seq=101 payload=01
+13:40:37.590  [Webots] → POSE seq=102 payload=02
+13:40:37.751  [Webots] → POSE seq=103 payload=03
+13:40:37.933  [Webots] → POSE seq=104 payload=04
+13:40:38.114  [Webots] → POSE seq=105 payload=05
+13:40:38.295  [Webots] → POSE seq=106 payload=01
+13:40:38.467  [Webots] → POSE seq=107 payload=02
+13:40:38.628  [Webots] → POSE seq=108 payload=03
+13:40:38.800  [Webots] → POSE seq=109 payload=04
+13:40:39.002  [Webots] → POSE seq=110 payload=05
+13:40:39.173  [Webots] → POSE seq=111 payload=01
+13:40:39.345  [Webots] → POSE seq=112 payload=02
+13:40:39.536  [Webots] → POSE seq=113 payload=03
+13:40:39.728  [Webots] → POSE seq=114 payload=04
+13:40:40.029  [Webots] Sin ACK (intento 1/3)
+13:40:40.029  [Webots] → POSE seq=114 payload=04
+13:40:40.184  [Webots] → POSE seq=115 payload=05
+13:40:40.376  [Webots] → POSE seq=116 payload=01
+13:40:40.567  [Webots] → POSE seq=117 payload=02
+13:40:40.719  [Webots] → POSE seq=118 payload=03
+13:40:41.020  [Webots] Sin ACK (intento 1/3)
+13:40:41.020  [Webots] → POSE seq=118 payload=03
+13:40:41.205  [Webots] → POSE seq=119 payload=04
+13:40:41.386  [Webots] → POSE seq=120 payload=05
+13:40:41.547  [Webots] → POSE seq=121 payload=01
+13:40:41.709  [Webots] → POSE seq=122 payload=02
+13:40:42.011  [Webots] Sin ACK (intento 1/3)
+13:40:42.012  [Webots] → POSE seq=122 payload=02
+13:40:42.175  [Webots] → POSE seq=123 payload=03
+13:40:42.357  [Webots] → POSE seq=124 payload=04
+13:40:42.518  [Webots] → POSE seq=125 payload=05
+13:40:42.690  [Webots] → POSE seq=126 payload=01
+13:40:42.861  [Webots] → POSE seq=127 payload=02
+13:40:43.053  [Webots] → POSE seq=128 payload=03
+13:40:43.224  [Webots] → POSE seq=129 payload=04
+13:40:43.525  [Webots] Sin ACK (intento 1/3)
+13:40:43.525  [Webots] → POSE seq=129 payload=04
+13:40:43.710  [Webots] → POSE seq=130 payload=05
+13:40:43.872  [Webots] → POSE seq=131 payload=01
+13:40:44.063  [Webots] → POSE seq=132 payload=02
+13:40:44.245  [Webots] → POSE seq=133 payload=03
+13:40:44.437  [Webots] → POSE seq=134 payload=04
+13:40:44.618  [Webots] → POSE seq=135 payload=05
+13:40:44.810  [Webots] → POSE seq=136 payload=01
+13:40:44.878  [Webots] Trama inválida de Webots: CRC incorrecto
+13:40:45.111  [Webots] Sin ACK (intento 1/3)
+13:40:45.112  [Webots] → POSE seq=136 payload=01
+13:40:45.287  [Webots] → POSE seq=137 payload=02
+13:40:45.459  [Webots] → POSE seq=138 payload=03
+13:40:45.630  [Webots] → POSE seq=139 payload=04
+13:40:45.707  [Webots] Trama inválida de Webots: CRC incorrecto
+13:40:45.931  [Webots] Sin ACK (intento 1/3)
+13:40:45.931  [Webots] → POSE seq=139 payload=04
+13:40:46.096  [Webots] → POSE seq=140 payload=05
+13:40:46.257  [Webots] → POSE seq=141 payload=01
+13:40:46.439  [Webots] → POSE seq=142 payload=02
+13:40:46.621  [Webots] → POSE seq=143 payload=03
+13:40:46.812  [Webots] → POSE seq=144 payload=04
+13:40:46.994  [Webots] → POSE seq=145 payload=05
+13:40:47.176  [Webots] → POSE seq=146 payload=01
+13:40:47.347  [Webots] → POSE seq=147 payload=02
+13:40:47.529  [Webots] → POSE seq=148 payload=03
+13:40:47.710  [Webots] → POSE seq=149 payload=04
+13:40:47.891  [Webots] → POSE seq=150 payload=05
+13:40:48.073  [Webots] → POSE seq=151 payload=01
+13:40:48.245  [Webots] → POSE seq=152 payload=02
+13:40:48.427  [Webots] → POSE seq=153 payload=03
+13:40:48.609  [Webots] → POSE seq=154 payload=04
+13:40:48.909  [Webots] Sin ACK (intento 1/3)
+13:40:48.909  [Webots] → POSE seq=154 payload=04
+13:40:49.085  [Webots] → POSE seq=155 payload=05
+13:40:49.386  [Webots] Sin ACK (intento 1/3)
+13:40:49.386  [Webots] → POSE seq=155 payload=05
+13:40:49.573  [Webots] → POSE seq=156 payload=01
+13:40:49.744  [Webots] → POSE seq=157 payload=02
+13:40:49.925  [Webots] → POSE seq=158 payload=03
+13:40:50.087  [Webots] → POSE seq=159 payload=04
+13:40:50.268  [Webots] → POSE seq=160 payload=05
+13:40:50.440  [Webots] → POSE seq=161 payload=01
+13:40:50.611  [Webots] → POSE seq=162 payload=02
+13:40:50.913  [Webots] Sin ACK (intento 1/3)
+13:40:50.913  [Webots] → POSE seq=162 payload=02
+13:40:51.080  [Webots] → POSE seq=163 payload=03
+13:40:51.252  [Webots] → POSE seq=164 payload=04
+13:40:51.341  [Webots] ← NACK POSE seq=164: Longitud inválida
+13:40:51.342  [Webots] NACK (Longitud inválida), reintentando
+13:40:51.342  [Webots] → POSE seq=164 payload=04
+13:40:51.504  [Webots] → POSE seq=165 payload=05
+13:40:51.665  [Webots] → POSE seq=166 payload=01
+13:40:51.847  [Webots] → POSE seq=167 payload=02
+13:40:52.018  [Webots] → POSE seq=168 payload=03
+13:40:52.215  [Webots] → POSE seq=169 payload=04
+13:40:52.396  [Webots] → POSE seq=170 payload=05
+13:40:52.588  [Webots] → POSE seq=171 payload=01
+13:40:52.749  [Webots] → POSE seq=172 payload=02
+13:40:52.942  [Webots] → POSE seq=173 payload=03
+13:40:53.020  [Webots] ← NACK PING seq=173: CRC incorrecto
+13:40:53.243  [Webots] Sin ACK (intento 1/3)
+13:40:53.243  [Webots] → POSE seq=173 payload=03
+13:40:53.429  [Webots] → POSE seq=174 payload=04
+13:40:53.601  [Webots] → POSE seq=175 payload=05
+13:40:53.762  [Webots] → POSE seq=176 payload=01
+13:40:53.839  [Webots] ← NACK ACK seq=176: CRC incorrecto
+13:40:54.064  [Webots] Sin ACK (intento 1/3)
+13:40:54.064  [Webots] → POSE seq=176 payload=01
+13:40:54.239  [Webots] → POSE seq=177 payload=02
+13:40:54.541  [Webots] Sin ACK (intento 1/3)
+13:40:54.541  [Webots] → POSE seq=177 payload=02
+13:40:54.717  [Webots] → POSE seq=178 payload=03
+13:40:54.909  [Webots] → POSE seq=179 payload=04
+13:40:55.070  [Webots] → POSE seq=180 payload=05
+13:40:55.371  [Webots] Sin ACK (intento 1/3)
+13:40:55.371  [Webots] → POSE seq=180 payload=05
+13:40:55.547  [Webots] → POSE seq=181 payload=01
+13:40:55.614  [Webots] ← NACK POSE seq=181: Longitud inválida
+13:40:55.614  [Webots] NACK (Longitud inválida), reintentando
+13:40:55.614  [Webots] → POSE seq=181 payload=01
+13:40:55.789  [Webots] → POSE seq=182 payload=02
+13:40:55.951  [Webots] → POSE seq=183 payload=03
+13:40:56.112  [Webots] → POSE seq=184 payload=04
+13:40:56.304  [Webots] → POSE seq=185 payload=05
+13:40:56.485  [Webots] → POSE seq=186 payload=01
+13:40:56.657  [Webots] → POSE seq=187 payload=02
+13:40:56.839  [Webots] → POSE seq=188 payload=03
+13:40:57.010  [Webots] → POSE seq=189 payload=04
+13:40:57.171  [Webots] → POSE seq=190 payload=05
+13:40:57.335  [Webots] → POSE seq=191 payload=01
+13:40:57.516  [Webots] → POSE seq=192 payload=02
+13:40:57.687  [Webots] → POSE seq=193 payload=03
+13:40:57.859  [Webots] → POSE seq=194 payload=04
+13:40:58.051  [Webots] → POSE seq=195 payload=05
+13:40:58.352  [Webots] Sin ACK (intento 1/3)
+13:40:58.352  [Webots] → POSE seq=195 payload=05
+13:40:58.518  [Webots] → POSE seq=196 payload=01
+13:40:58.690  [Webots] → POSE seq=197 payload=02
+13:40:58.882  [Webots] → POSE seq=198 payload=03
+13:40:59.056  [Webots] → POSE seq=199 payload=04
+13:40:59.227  [Webots] → POSE seq=200 payload=05
+13:40:59.389  [Webots] → POSE seq=201 payload=01
+13:40:59.689  [Webots] Sin ACK (intento 1/3)
+13:40:59.689  [Webots] → POSE seq=201 payload=01
+13:40:59.875  [Webots] → POSE seq=202 payload=02
+13:41:00.047  [Webots] → POSE seq=203 payload=03
+13:41:00.228  [Webots] → POSE seq=204 payload=04
+13:41:00.389  [Webots] → POSE seq=205 payload=05
+13:41:00.561  [Webots] → POSE seq=206 payload=01
+13:41:00.734  [Webots] → POSE seq=207 payload=02
+13:41:00.914  [Webots] → POSE seq=208 payload=03
+13:41:01.075  [Webots] → POSE seq=209 payload=04
+13:41:01.267  [Webots] → POSE seq=210 payload=05
+13:41:01.428  [Webots] → POSE seq=211 payload=01
+13:41:01.589  [Webots] → POSE seq=212 payload=02
+13:41:01.771  [Webots] → POSE seq=213 payload=03
+13:41:01.963  [Webots] → POSE seq=214 payload=04
+13:41:02.135  [Webots] → POSE seq=215 payload=05
+13:41:02.306  [Webots] → POSE seq=216 payload=01
+13:41:02.477  [Webots] → POSE seq=217 payload=02
+13:41:02.638  [Webots] → POSE seq=218 payload=03
+13:41:02.940  [Webots] Sin ACK (intento 1/3)
+13:41:02.940  [Webots] → POSE seq=218 payload=03
+13:41:03.105  [Webots] → POSE seq=219 payload=04
+13:41:03.287  [Webots] → POSE seq=220 payload=05
+13:41:03.458  [Webots] → POSE seq=221 payload=01
+13:41:03.640  [Webots] → POSE seq=222 payload=02
+13:41:03.821  [Webots] → POSE seq=223 payload=03
+13:41:04.003  [Webots] → POSE seq=224 payload=04
+13:41:04.185  [Webots] → POSE seq=225 payload=05
+13:41:04.367  [Webots] → POSE seq=226 payload=01
+13:41:04.549  [Webots] → POSE seq=227 payload=02
+13:41:04.720  [Webots] → POSE seq=228 payload=03
+13:41:04.904  [Webots] → POSE seq=229 payload=04
+13:41:05.075  [Webots] → POSE seq=230 payload=05
+13:41:05.257  [Webots] → POSE seq=231 payload=01
+13:41:05.438  [Webots] → POSE seq=232 payload=02
+13:41:05.600  [Webots] → POSE seq=233 payload=03
+13:41:05.773  [Webots] → POSE seq=234 payload=04
+13:41:05.835  [Webots] ← NACK POSE seq=234: Longitud inválida
+13:41:05.836  [Webots] NACK (Longitud inválida), reintentando
+13:41:05.836  [Webots] → POSE seq=234 payload=04
+13:41:05.996  [Webots] → POSE seq=235 payload=05
+13:41:06.157  [Webots] → POSE seq=236 payload=01
+13:41:06.339  [Webots] → POSE seq=237 payload=02
+13:41:06.510  [Webots] → POSE seq=238 payload=03
+13:41:06.811  [Webots] Sin ACK (intento 1/3)
+13:41:06.811  [Webots] → POSE seq=238 payload=03
+13:41:06.986  [Webots] → POSE seq=239 payload=04
+13:41:07.066  [Webots] ← NACK POSE seq=239: CRC incorrecto
+13:41:07.066  [Webots] NACK (CRC incorrecto), reintentando
+13:41:07.066  [Webots] → POSE seq=239 payload=04
+13:41:07.238  [Webots] → POSE seq=240 payload=05
+13:41:07.412  [Webots] → POSE seq=241 payload=01
+13:41:07.591  [Webots] → POSE seq=242 payload=02
+13:41:07.763  [Webots] → POSE seq=243 payload=03
+13:41:07.945  [Webots] → POSE seq=244 payload=04
+13:41:08.116  [Webots] → POSE seq=245 payload=05
+13:41:08.288  [Webots] → POSE seq=246 payload=01
+13:41:08.469  [Webots] → POSE seq=247 payload=02
+13:41:08.651  [Webots] → POSE seq=248 payload=03
+13:41:08.822  [Webots] → POSE seq=249 payload=04
+13:41:08.984  [Webots] → POSE seq=250 payload=05
+13:41:09.176  [Webots] → POSE seq=251 payload=01
+13:41:09.338  [Webots] → POSE seq=252 payload=02
+13:41:09.541  [Webots] → POSE seq=253 payload=03
+13:41:09.732  [Webots] → POSE seq=254 payload=04
+13:41:09.914  [Webots] → POSE seq=255 payload=05
+13:41:10.086  [Webots] → POSE seq=0 payload=01
+13:41:10.267  [Webots] → POSE seq=1 payload=02
+13:41:10.439  [Webots] → POSE seq=2 payload=03
+13:41:10.641  [Webots] → POSE seq=3 payload=04
+13:41:10.822  [Webots] → POSE seq=4 payload=05
+13:41:10.994  [Webots] → POSE seq=5 payload=01
+13:41:11.196  [Webots] → POSE seq=6 payload=02
+13:41:11.497  [Webots] Sin ACK (intento 1/3)
+13:41:11.497  [Webots] → POSE seq=6 payload=02
+13:41:11.683  [Webots] → POSE seq=7 payload=03
+13:41:11.984  [Webots] Sin ACK (intento 1/3)
+13:41:11.984  [Webots] → POSE seq=7 payload=03
+13:41:12.285  [Webots] Sin ACK (intento 2/3)
+13:41:12.285  [Webots] → POSE seq=7 payload=03
+13:41:12.464  [Webots] → POSE seq=8 payload=04
+13:41:12.635  [Webots] → POSE seq=9 payload=05
+13:41:12.806  [Webots] → POSE seq=10 payload=01
+13:41:12.879  [Webots] ← NACK POSE seq=10: CRC incorrecto
+13:41:12.879  [Webots] NACK (CRC incorrecto), reintentando
+13:41:12.879  [Webots] → POSE seq=10 payload=01
+13:41:13.041  [Webots] → POSE seq=11 payload=02
+13:41:13.202  [Webots] → POSE seq=12 payload=03
+13:41:13.374  [Webots] → POSE seq=13 payload=04
+13:41:13.555  [Webots] → POSE seq=14 payload=05
+13:41:13.737  [Webots] → POSE seq=15 payload=01
+13:41:13.919  [Webots] → POSE seq=16 payload=02
+13:41:14.090  [Webots] → POSE seq=17 payload=03
+13:41:14.272  [Webots] → POSE seq=18 payload=04
+13:41:14.443  [Webots] → POSE seq=19 payload=05
+13:41:14.604  [Webots] → POSE seq=20 payload=01
+13:41:14.786  [Webots] → POSE seq=21 payload=02
+13:41:14.867  [Webots] ← NACK 64 seq=21: CRC incorrecto
+13:41:15.087  [Webots] Sin ACK (intento 1/3)
+13:41:15.087  [Webots] → POSE seq=21 payload=02
+13:41:15.252  [Webots] → POSE seq=22 payload=03
+13:41:15.434  [Webots] → POSE seq=23 payload=04
+13:41:15.605  [Webots] → POSE seq=24 payload=05
+13:41:15.787  [Webots] → POSE seq=25 payload=01
+13:41:15.968  [Webots] → POSE seq=26 payload=02
+13:41:16.140  [Webots] → POSE seq=27 payload=03
+13:41:16.312  [Webots] → POSE seq=28 payload=04
+13:41:16.483  [Webots] → POSE seq=29 payload=05
+13:41:16.644  [Webots] → POSE seq=30 payload=01
+13:41:16.826  [Webots] → POSE seq=31 payload=02
+13:41:16.998  [Webots] → POSE seq=32 payload=03
+13:41:17.179  [Webots] → POSE seq=33 payload=04
+13:41:17.361  [Webots] → POSE seq=34 payload=05
+13:41:17.542  [Webots] → POSE seq=35 payload=01
+13:41:17.713  [Webots] → POSE seq=36 payload=02
+13:41:17.885  [Webots] → POSE seq=37 payload=03
+13:41:18.066  [Webots] → POSE seq=38 payload=04
+13:41:18.238  [Webots] → POSE seq=39 payload=05
+13:41:18.419  [Webots] → POSE seq=40 payload=01
+13:41:18.591  [Webots] → POSE seq=41 payload=02
+13:41:18.773  [Webots] → POSE seq=42 payload=03
+13:41:18.954  [Webots] → POSE seq=43 payload=04
+13:41:19.146  [Webots] → POSE seq=44 payload=05
+13:41:19.317  [Webots] → POSE seq=45 payload=01
+13:41:19.489  [Webots] → POSE seq=46 payload=02
+13:41:19.650  [Webots] → POSE seq=47 payload=03
+13:41:19.822  [Webots] → POSE seq=48 payload=04
+13:41:20.003  [Webots] → POSE seq=49 payload=05
+13:41:20.175  [Webots] → POSE seq=50 payload=01
+13:41:20.366  [Webots] → POSE seq=51 payload=02
+13:41:20.668  [Webots] Sin ACK (intento 1/3)
+13:41:20.668  [Webots] → POSE seq=51 payload=02
+13:41:20.842  [Webots] → POSE seq=52 payload=03
+13:41:21.143  [Webots] Sin ACK (intento 1/3)
+13:41:21.143  [Webots] → POSE seq=52 payload=03
+13:41:21.318  [Webots] → POSE seq=53 payload=04
+13:41:21.489  [Webots] → POSE seq=54 payload=05
+13:41:21.568  [Webots] ← NACK POSE seq=54: Longitud inválida
+13:41:21.569  [Webots] NACK (Longitud inválida), reintentando
+13:41:21.569  [Webots] → POSE seq=54 payload=05
+13:41:21.732  [Webots] → POSE seq=55 payload=01
+13:41:21.903  [Webots] → POSE seq=56 payload=02
+13:41:22.074  [Webots] → POSE seq=57 payload=03
+13:41:22.246  [Webots] → POSE seq=58 payload=04
+13:41:22.427  [Webots] → POSE seq=59 payload=05
+13:41:22.609  [Webots] → POSE seq=60 payload=01
+13:41:22.790  [Webots] → POSE seq=61 payload=02
+13:41:22.863  [Webots] Trama inválida de Webots: CRC incorrecto
+13:41:23.111  [Webots] Sin ACK (intento 1/3)
+13:41:23.111  [Webots] → POSE seq=61 payload=02
+13:41:23.293  [Webots] → POSE seq=62 payload=03
+13:41:23.454  [Webots] → POSE seq=63 payload=04
+13:41:23.615  [Webots] → POSE seq=64 payload=05
+13:41:23.797  [Webots] → POSE seq=65 payload=01
+13:41:23.968  [Webots] → POSE seq=66 payload=02
+13:41:24.139  [Webots] → POSE seq=67 payload=03
+13:41:24.311  [Webots] → POSE seq=68 payload=04
+13:41:24.482  [Webots] → POSE seq=69 payload=05
+13:41:24.664  [Webots] → POSE seq=70 payload=01
+13:41:24.835  [Webots] → POSE seq=71 payload=02
+13:41:25.017  [Webots] → POSE seq=72 payload=03
+13:41:25.188  [Webots] → POSE seq=73 payload=04
+13:41:25.370  [Webots] → POSE seq=74 payload=05
+13:41:25.551  [Webots] → POSE seq=75 payload=01
+13:41:25.712  [Webots] → POSE seq=76 payload=02
+13:41:25.874  [Webots] → POSE seq=77 payload=03
+13:41:26.035  [Webots] → POSE seq=78 payload=04
+13:41:26.216  [Webots] → POSE seq=79 payload=05
+13:41:26.377  [Webots] → POSE seq=80 payload=01
+13:41:26.549  [Webots] → POSE seq=81 payload=02
+13:41:26.740  [Webots] → POSE seq=82 payload=03
+13:41:26.912  [Webots] → POSE seq=83 payload=04
+13:41:26.987  [Webots] ← NACK POSE seq=67: CRC incorrecto
+13:41:27.213  [Webots] Sin ACK (intento 1/3)
+13:41:27.213  [Webots] → POSE seq=83 payload=04
+13:41:27.388  [Webots] → POSE seq=84 payload=05
+13:41:27.559  [Webots] → POSE seq=85 payload=01
+13:41:27.860  [Webots] Sin ACK (intento 1/3)
+13:41:27.860  [Webots] → POSE seq=85 payload=01
+13:41:28.047  [Webots] → POSE seq=86 payload=02
+13:41:28.111  [Webots] Trama inválida de Webots: CRC incorrecto
+13:41:28.348  [Webots] Sin ACK (intento 1/3)
+13:41:28.348  [Webots] → POSE seq=86 payload=02
+13:41:28.513  [Webots] → POSE seq=87 payload=03
+13:41:28.705  [Webots] → POSE seq=88 payload=04
+13:41:28.887  [Webots] → POSE seq=89 payload=05
+13:41:29.048  [Webots] → POSE seq=90 payload=01
+13:41:29.349  [Webots] Sin ACK (intento 1/3)
+13:41:29.349  [Webots] → POSE seq=90 payload=01
+13:41:29.503  [Webots] → POSE seq=91 payload=02
+13:41:29.675  [Webots] → POSE seq=92 payload=03
+13:41:29.856  [Webots] → POSE seq=93 payload=04
+13:41:30.048  [Webots] → POSE seq=94 payload=05
+13:41:30.240  [Webots] → POSE seq=95 payload=01
+13:41:30.423  [Webots] → POSE seq=96 payload=02
+13:41:30.640  [Webots] → POSE seq=97 payload=03
+13:41:30.713  [Webots] ← NACK POSE seq=97: Longitud inválida
+13:41:30.713  [Webots] NACK (Longitud inválida), reintentando
+13:41:30.713  [Webots] → POSE seq=97 payload=03
+13:41:30.893  [Webots] → POSE seq=98 payload=04
+13:41:31.064  [Webots] → POSE seq=99 payload=05
+13:41:31.225  [Webots] → POSE seq=100 payload=01
+13:41:31.397  [Webots] → POSE seq=101 payload=02
+13:41:31.559  [Webots] → POSE seq=102 payload=03
+13:41:31.740  [Webots] → POSE seq=103 payload=04
+13:41:31.914  [Webots] → POSE seq=104 payload=05
+13:41:32.075  [Webots] → POSE seq=105 payload=01
+13:41:32.257  [Webots] → POSE seq=106 payload=02
+13:41:32.418  [Webots] → POSE seq=107 payload=03
+13:41:32.609  [Webots] → POSE seq=108 payload=04
+13:41:32.771  [Webots] → POSE seq=109 payload=05
+13:41:32.963  [Webots] → POSE seq=110 payload=01
+13:41:33.144  [Webots] → POSE seq=111 payload=02
+13:41:33.326  [Webots] → POSE seq=112 payload=03
+13:41:33.497  [Webots] → POSE seq=113 payload=04
+13:41:33.679  [Webots] → POSE seq=114 payload=05
+13:41:33.861  [Webots] → POSE seq=115 payload=01
+13:41:34.052  [Webots] → POSE seq=116 payload=02
+13:41:34.214  [Webots] → POSE seq=117 payload=03
+13:41:34.515  [Webots] Sin ACK (intento 1/3)
+13:41:34.515  [Webots] → POSE seq=117 payload=03
+13:41:34.691  [Webots] → POSE seq=118 payload=04
+13:41:34.864  [Webots] → POSE seq=119 payload=05
+13:41:35.034  [Webots] → POSE seq=120 payload=01
+13:41:35.196  [Webots] → POSE seq=121 payload=02
+13:41:35.357  [Webots] → POSE seq=122 payload=03
+13:41:35.529  [Webots] → POSE seq=123 payload=04
+13:41:35.690  [Webots] → POSE seq=124 payload=05
+13:41:35.872  [Webots] → POSE seq=125 payload=01
+13:41:36.033  [Webots] → POSE seq=126 payload=02
+13:41:36.335  [Webots] Sin ACK (intento 1/3)
+13:41:36.335  [Webots] → POSE seq=126 payload=02
+13:41:36.636  [Webots] Sin ACK (intento 2/3)
+13:41:36.636  [Webots] → POSE seq=126 payload=02
+13:41:36.797  [Webots] → POSE seq=127 payload=03
+13:41:36.969  [Webots] → POSE seq=128 payload=04
+13:41:37.140  [Webots] → POSE seq=129 payload=05
+13:41:37.322  [Webots] → POSE seq=130 payload=01
+13:41:37.504  [Webots] → POSE seq=131 payload=02
+13:41:37.805  [Webots] Sin ACK (intento 1/3)
+13:41:37.805  [Webots] → POSE seq=131 payload=02
+13:41:38.001  [Webots] → POSE seq=132 payload=03
+13:41:38.076  [Webots] Trama inválida de Webots: CRC incorrecto
+13:41:38.302  [Webots] Sin ACK (intento 1/3)
+13:41:38.302  [Webots] → POSE seq=132 payload=03
+13:41:38.486  [Webots] → POSE seq=133 payload=04
+13:41:38.677  [Webots] → POSE seq=134 payload=05
+13:41:38.857  [Webots] → POSE seq=135 payload=01
+13:41:39.029  [Webots] → POSE seq=136 payload=02
+13:41:39.201  [Webots] → POSE seq=137 payload=03
+13:41:39.372  [Webots] → POSE seq=138 payload=04
+13:41:39.564  [Webots] → POSE seq=139 payload=05
+13:41:39.735  [Webots] → POSE seq=140 payload=01
+13:41:39.817  [Webots] ← NACK POSE seq=140: CRC incorrecto
+13:41:39.817  [Webots] NACK (CRC incorrecto), reintentando
+13:41:39.817  [Webots] → POSE seq=140 payload=01
+13:41:39.998  [Webots] → POSE seq=141 payload=02
+13:41:40.170  [Webots] → POSE seq=142 payload=03
+13:41:40.321  [Webots] → POSE seq=143 payload=04
+13:41:40.492  [Webots] → POSE seq=144 payload=05
+13:41:40.684  [Webots] → POSE seq=145 payload=01
+13:41:40.784  [Webots] → POSE seq=146 payload=02
+13:41:40.885  [Webots] → POSE seq=147 payload=03
+13:41:40.985  [Webots] → POSE seq=148 payload=04
+13:41:41.085  [Webots] → POSE seq=149 payload=05
+13:41:41.185  [Webots] → POSE seq=150 payload=01
+13:41:41.285  [Webots] → POSE seq=151 payload=02
+13:41:41.386  [Webots] → POSE seq=152 payload=03
+13:41:41.486  [Webots] → POSE seq=153 payload=04
+13:41:41.586  [Webots] → POSE seq=154 payload=05
+13:41:41.686  [Webots] → POSE seq=155 payload=01
+13:41:41.787  [Webots] → POSE seq=156 payload=02
+13:41:41.887  [Webots] → POSE seq=157 payload=03
+13:41:41.987  [Webots] → POSE seq=158 payload=04
+13:41:42.087  [Webots] → POSE seq=159 payload=05
+13:41:42.188  [Webots] → POSE seq=160 payload=01
+13:41:42.288  [Webots] → POSE seq=161 payload=02
+13:41:42.388  [Webots] → POSE seq=162 payload=03
+13:41:42.465  [Webots] Trama inválida de Webots: CRC incorrecto
+13:41:42.689  [Webots] Sin ACK (intento 1/3)
+13:41:42.689  [Webots] → POSE seq=162 payload=03
+13:41:42.754  [Webots] → POSE seq=163 payload=04
+13:41:42.837  [Webots] → POSE seq=164 payload=05
+13:41:43.137  [Webots] Sin ACK (intento 1/3)
+13:41:43.137  [Webots] → POSE seq=164 payload=05
+13:41:43.201  [Webots] → POSE seq=165 payload=01
+13:41:43.269  [Webots] → POSE seq=166 payload=02
+13:41:43.325  [Webots] → POSE seq=167 payload=03
+13:41:43.406  [Webots] → POSE seq=168 payload=04
+13:41:43.493  [Webots] → POSE seq=169 payload=05
+13:41:43.547  [Webots] → POSE seq=170 payload=01
+13:41:43.628  [Webots] → POSE seq=171 payload=02
+13:41:43.698  [Webots] → POSE seq=172 payload=03
+13:41:43.770  [Webots] → POSE seq=173 payload=04
+13:41:43.844  [Webots] ← NACK 16 seq=173: CRC incorrecto
+13:41:44.071  [Webots] Sin ACK (intento 1/3)
+13:41:44.071  [Webots] → POSE seq=173 payload=04
+13:41:44.147  [Webots] ← NACK 8 seq=173: CRC incorrecto
+13:41:44.371  [Webots] Sin ACK (intento 2/3)
+13:41:44.371  [Webots] → POSE seq=173 payload=04
+13:41:44.423  [Webots] → POSE seq=174 payload=05
+13:41:44.479  [Webots] → POSE seq=175 payload=01
+13:41:44.562  [Webots] → POSE seq=176 payload=02
+13:41:44.634  [Webots] → POSE seq=177 payload=03
+13:41:44.692  [Webots] Trama inválida de Webots: CRC incorrecto
+13:41:44.934  [Webots] Sin ACK (intento 1/3)
+13:41:44.934  [Webots] → POSE seq=177 payload=03
+13:41:45.008  [Webots] → POSE seq=178 payload=04
+13:41:45.083  [Webots] → POSE seq=179 payload=05
+13:41:45.166  [Webots] → POSE seq=180 payload=01
+13:41:45.237  [Webots] → POSE seq=181 payload=02
+13:41:45.309  [Webots] → POSE seq=182 payload=03
+13:41:45.366  [Webots] → POSE seq=183 payload=04
+13:41:45.432  [Webots] → POSE seq=184 payload=05
+13:41:45.494  [Webots] → POSE seq=185 payload=01
+13:41:45.558  [Webots] → POSE seq=186 payload=02
+13:41:45.627  [Webots] → POSE seq=187 payload=03
+13:41:45.702  [Webots] → POSE seq=188 payload=04
+13:41:45.782  [Webots] → POSE seq=189 payload=05
+13:41:45.840  [Webots] → POSE seq=190 payload=01
+13:41:45.906  [Webots] → POSE seq=191 payload=02
+13:41:45.982  [Webots] → POSE seq=192 payload=03
+13:41:46.052  [Webots] → POSE seq=193 payload=04
+13:41:46.128  [Webots] → POSE seq=194 payload=05
+13:41:46.191  [Webots] → POSE seq=195 payload=01
+13:41:46.270  [Webots] → POSE seq=196 payload=02
+13:41:46.323  [Webots] → POSE seq=197 payload=03
+13:41:46.389  [Webots] → POSE seq=198 payload=04
+13:41:46.463  [Webots] → POSE seq=199 payload=05
+13:41:46.540  [Webots] → POSE seq=200 payload=01
+13:41:46.602  [Webots] → POSE seq=201 payload=02
+13:41:46.664  [Webots] → POSE seq=202 payload=03
+13:41:46.739  [Webots] → POSE seq=203 payload=04
+13:41:46.828  [Webots] → POSE seq=204 payload=05
+13:41:46.901  [Webots] → POSE seq=205 payload=01
+13:41:46.988  [Webots] → POSE seq=206 payload=02
+13:41:47.041  [Webots] → POSE seq=207 payload=03
+13:41:47.101  [Webots] → POSE seq=208 payload=04
+13:41:47.162  [Webots] → POSE seq=209 payload=05
+13:41:47.232  [Webots] → POSE seq=210 payload=01
+13:41:47.301  [Webots] → POSE seq=211 payload=02
+13:41:47.401  [Webots] → POSE seq=212 payload=03
+13:41:47.502  [Webots] → POSE seq=213 payload=04
+13:41:47.602  [Webots] → POSE seq=214 payload=05
+13:41:47.702  [Webots] → POSE seq=215 payload=01
+13:41:48.003  [Webots] Sin ACK (intento 1/3)
+13:41:48.003  [Webots] → POSE seq=215 payload=01
+13:41:48.069  [Webots] → POSE seq=216 payload=02
+13:41:48.123  [Webots] → POSE seq=217 payload=03
+13:41:48.193  [Webots] → POSE seq=218 payload=04
+13:41:48.258  [Webots] → POSE seq=219 payload=05
+13:41:48.349  [Webots] → POSE seq=220 payload=01
+13:41:48.420  [Webots] → POSE seq=221 payload=02
+13:41:48.479  [Webots] → POSE seq=222 payload=03
+13:41:48.562  [Webots] → POSE seq=223 payload=04
+13:41:48.610  [Webots] → POSE seq=224 payload=05
+13:41:48.705  [Webots] → POSE seq=225 payload=01
+13:41:49.006  [Webots] Sin ACK (intento 1/3)
+13:41:49.006  [Webots] → POSE seq=225 payload=01
+13:41:49.092  [Webots] → POSE seq=226 payload=02
+13:41:49.163  [Webots] → POSE seq=227 payload=03
+13:41:49.233  [Webots] → POSE seq=228 payload=04
+13:41:49.309  [Webots] → POSE seq=229 payload=05
+13:41:49.373  [Webots] → POSE seq=230 payload=01
+13:41:49.448  [Webots] → POSE seq=231 payload=02
+13:41:49.505  [Webots] → POSE seq=232 payload=03
+13:41:49.562  [Webots] → POSE seq=233 payload=04
+13:41:49.635  [Webots] → POSE seq=234 payload=05
+13:41:49.707  [Webots] → POSE seq=235 payload=01
+13:41:49.808  [Webots] → POSE seq=236 payload=02
+13:41:49.908  [Webots] → POSE seq=237 payload=03
+13:41:50.008  [Webots] → POSE seq=238 payload=04
+13:41:50.109  [Webots] → POSE seq=239 payload=05
+13:41:50.209  [Webots] → POSE seq=240 payload=01
+13:41:50.309  [Webots] → POSE seq=241 payload=02
+13:41:50.409  [Webots] → POSE seq=242 payload=03
+13:41:50.509  [Webots] → POSE seq=243 payload=04
+13:41:50.610  [Webots] → POSE seq=244 payload=05
+13:41:50.710  [Webots] → POSE seq=245 payload=01
+13:41:50.810  [Webots] → POSE seq=246 payload=02
+13:41:51.111  [Webots] Sin ACK (intento 1/3)
+13:41:51.111  [Webots] → POSE seq=246 payload=02
+13:41:51.172  [Webots] → POSE seq=247 payload=03
+13:41:51.257  [Webots] → POSE seq=248 payload=04
+13:41:51.339  [Webots] ← NACK POSE seq=248: Longitud inválida
+13:41:51.339  [Webots] NACK (Longitud inválida), reintentando
+13:41:51.339  [Webots] → POSE seq=248 payload=04
+13:41:51.424  [Webots] → POSE seq=249 payload=05
+13:41:51.491  [Webots] → POSE seq=250 payload=01
+13:41:51.565  [Webots] → POSE seq=251 payload=02
+13:41:51.637  [Webots] → POSE seq=252 payload=03
+13:41:51.708  [Webots] → POSE seq=253 payload=04
+13:41:51.768  [Webots] → POSE seq=254 payload=05
+13:41:51.843  [Webots] → POSE seq=255 payload=01
+13:41:51.922  [Webots] → POSE seq=0 payload=02
+13:41:52.007  [Webots] → POSE seq=1 payload=03
+13:41:52.083  [Webots] → POSE seq=2 payload=04
+13:41:52.160  [Webots] → POSE seq=3 payload=05
+13:41:52.250  [Webots] → POSE seq=4 payload=01
+13:41:52.327  [Webots] → POSE seq=5 payload=02
+13:41:52.414  [Webots] → POSE seq=6 payload=03
+13:41:52.515  [Webots] → POSE seq=7 payload=04
+13:41:52.615  [Webots] → POSE seq=8 payload=05
+13:41:52.715  [Webots] → POSE seq=9 payload=01
+13:41:52.815  [Webots] → POSE seq=10 payload=02
+13:41:52.916  [Webots] → POSE seq=11 payload=03
+13:41:52.990  [Webots] Trama inválida de Webots: Longitud inválida
+13:41:53.218  [Webots] Sin ACK (intento 1/3)
+13:41:53.218  [Webots] → POSE seq=11 payload=03
+13:41:53.278  [Webots] → POSE seq=12 payload=04
+13:41:53.349  [Webots] → POSE seq=13 payload=05
+13:41:53.417  [Webots] → POSE seq=14 payload=01
+13:41:53.496  [Webots] → POSE seq=15 payload=02
+13:41:53.548  [Webots] → POSE seq=16 payload=03
+13:41:53.624  [Webots] → POSE seq=17 payload=04
+13:41:53.709  [Webots] → POSE seq=18 payload=05
+13:41:53.780  [Webots] → POSE seq=19 payload=01
+13:41:54.081  [Webots] Sin ACK (intento 1/3)
+13:41:54.081  [Webots] → POSE seq=19 payload=01
+13:41:54.156  [Webots] → POSE seq=20 payload=02
+13:41:54.209  [Webots] → POSE seq=21 payload=03
+13:41:54.285  [Webots] → POSE seq=22 payload=04
+13:41:54.587  [Webots] Sin ACK (intento 1/3)
+13:41:54.587  [Webots] → POSE seq=22 payload=04
+13:41:54.663  [Webots] → POSE seq=23 payload=05
+13:41:54.735  [Webots] → POSE seq=24 payload=01
+13:41:54.797  [Webots] → POSE seq=25 payload=02
+13:41:54.873  [Webots] → POSE seq=26 payload=03
+13:41:54.945  [Webots] → POSE seq=27 payload=04
+13:41:55.014  [Webots] → POSE seq=28 payload=05
+13:41:55.085  [Webots] → POSE seq=29 payload=01
+13:41:55.152  [Webots] → POSE seq=30 payload=02
+13:41:55.223  [Webots] → POSE seq=31 payload=03
+13:41:55.290  [Webots] → POSE seq=32 payload=04
+13:41:55.352  [Webots] → POSE seq=33 payload=05
+13:41:55.438  [Webots] → POSE seq=34 payload=01
+13:41:55.517  [Webots] → POSE seq=35 payload=02
+13:41:55.585  [Webots] → POSE seq=36 payload=03
+13:41:55.886  [Webots] Sin ACK (intento 1/3)
+13:41:55.886  [Webots] → POSE seq=36 payload=03
+13:41:55.958  [Webots] → POSE seq=37 payload=04
+13:41:56.034  [Webots] → POSE seq=38 payload=05
+13:41:56.096  [Webots] → POSE seq=39 payload=01
+13:41:56.161  [Webots] → POSE seq=40 payload=02
+13:41:56.228  [Webots] → POSE seq=41 payload=03
+13:41:56.528  [Webots] Sin ACK (intento 1/3)
+13:41:56.529  [Webots] → POSE seq=41 payload=03
+13:41:56.614  [Webots] → POSE seq=42 payload=04
+13:41:56.695  [Webots] → POSE seq=43 payload=05
+13:41:56.758  [Webots] → POSE seq=44 payload=01
+13:41:56.828  [Webots] → POSE seq=45 payload=02
+13:41:56.888  [Webots] → POSE seq=46 payload=03
+13:41:56.973  [Webots] → POSE seq=47 payload=04
+13:41:57.273  [Webots] Sin ACK (intento 1/3)
+13:41:57.273  [Webots] → POSE seq=47 payload=04
+13:41:57.331  [Webots] → POSE seq=48 payload=05
+13:41:57.402  [Webots] → POSE seq=49 payload=01
+13:41:57.462  [Webots] → POSE seq=50 payload=02
+13:41:57.548  [Webots] → POSE seq=51 payload=03
+13:41:57.613  [Webots] → POSE seq=52 payload=04
+13:41:57.678  [Webots] → POSE seq=53 payload=05
+13:41:57.757  [Webots] → POSE seq=54 payload=01
+13:41:57.817  [Webots] → POSE seq=55 payload=02
+13:41:57.887  [Webots] → POSE seq=56 payload=03
+13:41:57.967  [Webots] → POSE seq=57 payload=04
+13:41:58.040  [Webots] → POSE seq=58 payload=05
+13:41:58.099  [Webots] → POSE seq=59 payload=01
+13:41:58.181  [Webots] → POSE seq=60 payload=02
+13:41:58.262  [Webots] → POSE seq=61 payload=03
+13:41:58.326  [Webots] → POSE seq=62 payload=04
+13:41:58.400  [Webots] → POSE seq=63 payload=05
+13:41:58.465  [Webots] → POSE seq=64 payload=01
+13:41:58.533  [Webots] → POSE seq=65 payload=02
+13:41:58.833  [Webots] Sin ACK (intento 1/3)
+13:41:58.833  [Webots] → POSE seq=65 payload=02
+13:41:58.905  [Webots] → POSE seq=66 payload=03
+13:41:58.974  [Webots] → POSE seq=67 payload=04
+13:41:59.041  [Webots] → POSE seq=68 payload=05
+13:41:59.093  [Webots] → POSE seq=69 payload=01
+13:41:59.169  [Webots] → POSE seq=70 payload=02
+13:41:59.257  [Webots] → POSE seq=71 payload=03
+13:41:59.303  [Webots] → POSE seq=72 payload=04
+13:41:59.371  [Webots] → POSE seq=73 payload=05
+13:41:59.451  [Webots] → POSE seq=74 payload=01
+13:41:59.525  [Webots] → POSE seq=75 payload=02
+13:41:59.596  [Webots] → POSE seq=76 payload=03
+13:41:59.672  [Webots] → POSE seq=77 payload=04
+13:41:59.732  [Webots] → POSE seq=78 payload=05
+13:41:59.799  [Webots] → POSE seq=79 payload=01
+13:41:59.874  [Webots] → POSE seq=80 payload=02
+13:41:59.936  [Webots] → POSE seq=81 payload=03
+13:42:00.035  [Webots] → POSE seq=82 payload=04
+13:42:00.135  [Webots] → POSE seq=83 payload=05
+13:42:00.235  [Webots] → POSE seq=84 payload=01
+13:42:00.336  [Webots] → POSE seq=85 payload=02
+13:42:00.436  [Webots] → POSE seq=86 payload=03
+13:42:00.536  [Webots] → POSE seq=87 payload=04
+13:42:00.636  [Webots] → POSE seq=88 payload=05
+13:42:00.737  [Webots] → POSE seq=89 payload=01
+13:42:00.837  [Webots] → POSE seq=90 payload=02
+13:42:00.937  [Webots] → POSE seq=91 payload=03
+13:42:01.037  [Webots] → POSE seq=92 payload=04
+13:42:01.137  [Webots] → POSE seq=93 payload=05
+13:42:01.238  [Webots] → POSE seq=94 payload=01
+13:42:01.338  [Webots] → POSE seq=95 payload=02
+13:42:01.438  [Webots] → POSE seq=96 payload=03
+13:42:01.538  [Webots] → POSE seq=97 payload=04
+13:42:01.639  [Webots] → POSE seq=98 payload=05
+13:42:01.739  [Webots] → POSE seq=99 payload=01
+13:42:01.839  [Webots] → POSE seq=100 payload=02
+13:42:01.939  [Webots] → POSE seq=101 payload=03
+13:42:02.040  [Webots] → POSE seq=102 payload=04
+13:42:02.125  [Webots] ← NACK ACK seq=102: CRC incorrecto
+13:42:02.340  [Webots] Sin ACK (intento 1/3)
+13:42:02.340  [Webots] → POSE seq=102 payload=04
+13:42:02.416  [Webots] → POSE seq=103 payload=05
+13:42:02.473  [Webots] → POSE seq=104 payload=01
+13:42:02.540  [Webots] → POSE seq=105 payload=02
+13:42:02.600  [Webots] → POSE seq=106 payload=03
+13:42:02.663  [Webots] → POSE seq=107 payload=04
+13:42:02.729  [Webots] → POSE seq=108 payload=05
+13:42:02.795  [Webots] → POSE seq=109 payload=01
+13:42:03.096  [Webots] Sin ACK (intento 1/3)
+13:42:03.096  [Webots] → POSE seq=109 payload=01
+13:42:03.162  [Webots] → POSE seq=110 payload=02
+13:42:03.227  [Webots] → POSE seq=111 payload=03
+13:42:03.306  [Webots] → POSE seq=112 payload=04
+13:42:03.377  [Webots] → POSE seq=113 payload=05
+13:42:03.453  [Webots] → POSE seq=114 payload=01
+13:42:03.540  [Webots] → POSE seq=115 payload=02
+13:42:03.616  [Webots] → POSE seq=116 payload=03
+13:42:03.699  [Webots] → POSE seq=117 payload=04
+13:42:03.785  [Webots] → POSE seq=118 payload=05
+13:42:03.857  [Webots] → POSE seq=119 payload=01
+13:42:03.922  [Webots] → POSE seq=120 payload=02
+13:42:03.985  [Webots] → POSE seq=121 payload=03
+13:42:04.061  [Webots] → POSE seq=122 payload=04
+13:42:04.149  [Webots] → POSE seq=123 payload=05
+13:42:04.249  [Webots] → POSE seq=124 payload=01
+13:42:04.349  [Webots] → POSE seq=125 payload=02
+13:42:04.449  [Webots] → POSE seq=126 payload=03
+13:42:04.550  [Webots] → POSE seq=127 payload=04
+13:42:04.650  [Webots] → POSE seq=128 payload=05
+13:42:04.750  [Webots] → POSE seq=129 payload=01
+13:42:04.850  [Webots] → POSE seq=130 payload=02
+13:42:04.913  [Webots] Trama inválida de Webots: CRC incorrecto
+13:42:05.151  [Webots] Sin ACK (intento 1/3)
+13:42:05.151  [Webots] → POSE seq=130 payload=02
+13:42:05.228  [Webots] → POSE seq=131 payload=03
+13:42:05.303  [Webots] → POSE seq=132 payload=04
+13:42:05.362  [Webots] → POSE seq=133 payload=05
+13:42:05.434  [Webots] → POSE seq=134 payload=01
+13:42:05.501  [Webots] → POSE seq=135 payload=02
+13:42:05.575  [Webots] → POSE seq=136 payload=03
+13:42:05.653  [Webots] → POSE seq=137 payload=04
+13:42:05.734  [Webots] → POSE seq=138 payload=05
+13:42:05.805  [Webots] → POSE seq=139 payload=01
+13:42:05.868  [Webots] → POSE seq=140 payload=02
+13:42:05.953  [Webots] → POSE seq=141 payload=03
+13:42:06.053  [Webots] → POSE seq=142 payload=04
+13:42:06.154  [Webots] → POSE seq=143 payload=05
+13:42:06.254  [Webots] → POSE seq=144 payload=01
+13:42:06.354  [Webots] → POSE seq=145 payload=02
+13:42:06.454  [Webots] → POSE seq=146 payload=03
+13:42:06.555  [Webots] → POSE seq=147 payload=04
+13:42:06.655  [Webots] → POSE seq=148 payload=05
+13:42:06.755  [Webots] → POSE seq=149 payload=01
+13:42:06.855  [Webots] → POSE seq=150 payload=02
+13:42:06.956  [Webots] → POSE seq=151 payload=03
+13:42:07.056  [Webots] → POSE seq=152 payload=04
+13:42:07.156  [Webots] → POSE seq=153 payload=05
+13:42:07.256  [Webots] → POSE seq=154 payload=01
+13:42:07.357  [Webots] → POSE seq=155 payload=02
+13:42:07.457  [Webots] → POSE seq=156 payload=03
+13:42:07.557  [Webots] → POSE seq=157 payload=04
+13:42:07.658  [Webots] → POSE seq=158 payload=05
+13:42:07.758  [Webots] → POSE seq=159 payload=01
+13:42:07.858  [Webots] → POSE seq=160 payload=02
+13:42:07.958  [Webots] → POSE seq=161 payload=03
+13:42:08.059  [Webots] → POSE seq=162 payload=04
+13:42:08.159  [Webots] → POSE seq=163 payload=05
+13:42:08.259  [Webots] → POSE seq=164 payload=01
+13:42:08.360  [Webots] → POSE seq=165 payload=02
+13:42:08.459  [Webots] → POSE seq=166 payload=03
+13:42:08.560  [Webots] → POSE seq=167 payload=04
+13:42:08.660  [Webots] → POSE seq=168 payload=05
+13:42:08.961  [Webots] Sin ACK (intento 1/3)
+13:42:08.961  [Webots] → POSE seq=168 payload=05
+13:42:09.020  [Webots] → POSE seq=169 payload=01
+13:42:09.089  [Webots] → POSE seq=170 payload=02
+13:42:09.150  [Webots] → POSE seq=171 payload=03
+13:42:09.239  [Webots] → POSE seq=172 payload=04
+13:42:09.298  [Webots] → POSE seq=173 payload=05
+13:42:09.395  [Webots] → POSE seq=174 payload=01
+13:42:09.458  [Webots] → POSE seq=175 payload=02
+13:42:09.760  [Webots] Sin ACK (intento 1/3)
+13:42:09.760  [Webots] → POSE seq=175 payload=02
+13:42:10.061  [Webots] Sin ACK (intento 2/3)
+13:42:10.062  [Webots] → POSE seq=175 payload=02
+13:42:10.135  [Webots] → POSE seq=176 payload=03
+13:42:10.218  [Webots] → POSE seq=177 payload=04
+13:42:10.298  [Webots] → POSE seq=178 payload=05
+13:42:10.365  [Webots] → POSE seq=179 payload=01
+13:42:10.441  [Webots] → POSE seq=180 payload=02
+13:42:10.507  [Webots] → POSE seq=181 payload=03
+13:42:10.582  [Webots] → POSE seq=182 payload=04
+13:42:10.659  [Webots] → POSE seq=183 payload=05
+13:42:10.726  [Webots] → POSE seq=184 payload=01
+13:42:10.786  [Webots] → POSE seq=185 payload=02
+13:42:11.088  [Webots] Sin ACK (intento 1/3)
+13:42:11.088  [Webots] → POSE seq=185 payload=02
+13:42:11.181  [Webots] → POSE seq=186 payload=03
+13:42:11.248  [Webots] → POSE seq=187 payload=04
+13:42:11.550  [Webots] Sin ACK (intento 1/3)
+13:42:11.550  [Webots] → POSE seq=187 payload=04
+13:42:11.632  [Webots] → POSE seq=188 payload=05
+13:42:11.693  [Webots] → MODE seq=189 payload=02
+13:42:11.994  [Webots] Sin ACK (intento 1/3)
+13:42:11.994  [Webots] → MODE seq=189 payload=02
+13:42:12.655  [Webots] ← NACK TRACK seq=197: CRC incorrecto
+13:42:14.211  [Webots] → POSE seq=222 payload=02
+13:42:16.227  [Webots] → POSE seq=254 payload=02
+13:42:18.211  [Webots] → POSE seq=29 payload=01
+13:42:19.461  [Webots] ← NACK TRACK seq=47: CRC incorrecto
+13:42:20.195  [Webots] ← NACK TRACK seq=58: CRC incorrecto
+13:42:20.197  [Webots] → POSE seq=60 payload=05
+13:42:21.474  [Webots] ← NACK TRACK seq=78: CRC incorrecto
+13:42:22.214  [Webots] → POSE seq=91 payload=05
+13:42:24.198  [Webots] → POSE seq=122 payload=04
+13:42:26.216  [Webots] → POSE seq=154 payload=04
+13:42:28.200  [Webots] → POSE seq=186 payload=03
+13:42:30.216  [Webots] → POSE seq=218 payload=03
+13:42:32.197  [Webots] → POSE seq=249 payload=02
+13:42:34.218  [Webots] → POSE seq=25 payload=02
+13:42:35.387  [Webots] ← NACK PING seq=46: CRC incorrecto
+13:42:36.200  [Webots] → POSE seq=57 payload=01
+13:42:36.261  [Webots] Trama inválida de Webots: Longitud inválida
+13:42:36.502  [Webots] Sin ACK (intento 1/3)
+13:42:36.502  [Webots] → POSE seq=57 payload=01
+13:42:38.216  [Webots] → POSE seq=89 payload=01
+13:42:39.555  [Webots] ← NACK TRACK seq=109: CRC incorrecto
+13:42:40.199  [Webots] → POSE seq=120 payload=05
+13:42:42.220  [Webots] → POSE seq=152 payload=05
+13:42:42.321  [Webots] ← NACK TRACK seq=153: CRC incorrecto
+13:42:43.457  [Webots] ← NACK TRACK seq=171: CRC incorrecto
+13:42:44.204  [Webots] → POSE seq=184 payload=04
+13:42:46.222  [Webots] → POSE seq=216 payload=04
+13:42:46.524  [Webots] Sin ACK (intento 1/3)
+13:42:46.524  [Webots] → POSE seq=216 payload=04
+13:42:48.211  [Webots] → POSE seq=247 payload=03
+13:42:48.400  [Webots] ← NACK TRACK seq=248: CRC incorrecto
+13:42:49.853  [Webots] ← NACK TRACK seq=16: CRC incorrecto
+13:42:50.193  [Webots] → POSE seq=23 payload=02
+13:42:52.210  [Webots] → POSE seq=55 payload=02
+13:42:54.226  [Webots] → POSE seq=87 payload=02
+13:42:56.210  [Webots] → POSE seq=118 payload=01
+13:42:57.048  [Webots] ← NACK TRACK seq=130: CRC incorrecto
+13:42:58.225  [Webots] → POSE seq=150 payload=01
+13:42:59.611  [Webots] ← NACK TRACK seq=171: CRC incorrecto
+13:43:00.210  [Webots] → POSE seq=182 payload=05
+13:43:02.194  [Webots] → POSE seq=213 payload=04
+13:43:04.213  [Webots] → POSE seq=245 payload=04
+13:43:06.197  [Webots] → POSE seq=21 payload=03
+13:43:08.213  [Webots] → POSE seq=53 payload=03
+13:43:10.194  [Webots] → POSE seq=84 payload=02
+13:43:10.282  [Webots] ← NACK TRACK seq=85: CRC incorrecto
+13:43:11.725  [Webots] ← NACK TRACK seq=107: CRC incorrecto
+13:43:14.210  [Webots] → MODE seq=118 payload=00
+13:43:14.726  [Webots] Se perdió la conexión con Webots
+13:43:15.946  [Webots] Reintentando conexión (intento 1)...
+13:43:15.947  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:15.947  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:15.947  [Webots] Sin éxito; siguiente intento en 1 s
+13:43:16.950  [Webots] Reintentando conexión (intento 2)...
+13:43:16.951  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:16.951  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:16.951  [Webots] Sin éxito; siguiente intento en 2 s
+13:43:18.957  [Webots] Reintentando conexión (intento 3)...
+13:43:18.957  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:18.958  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:18.958  [Webots] Sin éxito; siguiente intento en 4 s
+13:43:22.968  [Webots] Reintentando conexión (intento 4)...
+13:43:22.969  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:22.969  [Webots] Verificando que el robot conteste...
+13:43:22.970  [Webots] → PING seq=119 payload=-
+13:43:22.985  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:43:22.985  [Webots] Reconectado tras 8.3 s sin enlace
+13:43:22.990  [Webots] → POSE seq=120 payload=01
+13:43:24.026  [Webots] Se perdió la conexión con Webots
+13:43:25.244  [Webots] Reintentando conexión (intento 1)...
+13:43:25.244  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:25.244  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:25.245  [Webots] Sin éxito; siguiente intento en 1 s
+13:43:26.248  [Webots] Reintentando conexión (intento 2)...
+13:43:26.249  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:26.249  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:26.249  [Webots] Sin éxito; siguiente intento en 2 s
+13:43:28.257  [Webots] Reintentando conexión (intento 3)...
+13:43:28.257  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:28.257  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:28.257  [Webots] Sin éxito; siguiente intento en 4 s
+13:43:32.270  [Webots] Reintentando conexión (intento 4)...
+13:43:32.270  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:32.271  [Webots] Verificando que el robot conteste...
+13:43:32.271  [Webots] → PING seq=121 payload=-
+13:43:32.277  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:43:32.277  [Webots] Reconectado tras 8.3 s sin enlace
+13:43:32.285  [Webots] → POSE seq=122 payload=02
+13:43:33.300  [Webots] Se perdió la conexión con Webots
+13:43:34.535  [Webots] Reintentando conexión (intento 1)...
+13:43:34.535  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:34.536  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:34.536  [Webots] Sin éxito; siguiente intento en 1 s
+13:43:35.540  [Webots] Reintentando conexión (intento 2)...
+13:43:35.540  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:35.541  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:35.541  [Webots] Sin éxito; siguiente intento en 2 s
+13:43:37.549  [Webots] Reintentando conexión (intento 3)...
+13:43:37.549  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:37.549  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:37.549  [Webots] Sin éxito; siguiente intento en 4 s
+13:43:41.561  [Webots] Reintentando conexión (intento 4)...
+13:43:41.561  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:41.562  [Webots] Verificando que el robot conteste...
+13:43:41.562  [Webots] → PING seq=123 payload=-
+13:43:41.572  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:43:41.572  [Webots] Reconectado tras 8.3 s sin enlace
+13:43:41.576  [Webots] → POSE seq=124 payload=03
+13:43:42.611  [Webots] Se perdió la conexión con Webots
+13:43:43.830  [Webots] Reintentando conexión (intento 1)...
+13:43:43.830  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:43.831  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:43.831  [Webots] Sin éxito; siguiente intento en 1 s
+13:43:44.835  [Webots] Reintentando conexión (intento 2)...
+13:43:44.835  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:44.835  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:44.835  [Webots] Sin éxito; siguiente intento en 2 s
+13:43:46.843  [Webots] Reintentando conexión (intento 3)...
+13:43:46.843  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:46.843  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:46.843  [Webots] Sin éxito; siguiente intento en 4 s
+13:43:50.855  [Webots] Reintentando conexión (intento 4)...
+13:43:50.855  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:50.856  [Webots] Verificando que el robot conteste...
+13:43:50.856  [Webots] → PING seq=125 payload=-
+13:43:50.869  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:43:50.869  [Webots] Reconectado tras 8.3 s sin enlace
+13:43:50.873  [Webots] → POSE seq=126 payload=04
+13:43:51.903  [Webots] Se perdió la conexión con Webots
+13:43:53.128  [Webots] Reintentando conexión (intento 1)...
+13:43:53.128  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:53.128  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:53.128  [Webots] Sin éxito; siguiente intento en 1 s
+13:43:54.132  [Webots] Reintentando conexión (intento 2)...
+13:43:54.132  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:54.132  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:54.132  [Webots] Sin éxito; siguiente intento en 2 s
+13:43:56.140  [Webots] Reintentando conexión (intento 3)...
+13:43:56.140  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:43:56.140  [Webots] No se pudo conectar a Webots ([Errno 111] Connect call failed ('127.0.0.1', 5655)). ¿Está abierto el mundo y corriendo la simulación?
+13:43:56.140  [Webots] Sin éxito; siguiente intento en 4 s
+13:44:00.151  [Webots] Reintentando conexión (intento 4)...
+13:44:00.151  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:00.152  [Webots] Verificando que el robot conteste...
+13:44:00.152  [Webots] → PING seq=127 payload=-
+13:44:00.161  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:00.161  [Webots] Reconectado tras 8.3 s sin enlace
+13:44:00.168  [Webots] → POSE seq=128 payload=05
+13:44:03.353  [Webots] Sin respuesta de Webots en 3.2 s: enlace perdido
+13:44:04.425  [Webots] Reintentando conexión (intento 1)...
+13:44:04.425  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:04.426  [Webots] Verificando que el robot conteste...
+13:44:04.426  [Webots] → PING seq=131 payload=-
+13:44:04.728  [Webots] Sin ACK (intento 1/3)
+13:44:04.729  [Webots] → PING seq=131 payload=-
+13:44:05.029  [Webots] Sin ACK (intento 2/3)
+13:44:05.030  [Webots] → PING seq=131 payload=-
+13:44:05.331  [Webots] Sin ACK (intento 3/3)
+13:44:05.331  [Webots] Webots aceptó la conexión pero no contesta (Sin respuesta de Webots)
+13:44:05.331  [Webots] Sin éxito; siguiente intento en 1 s
+13:44:06.335  [Webots] Reintentando conexión (intento 2)...
+13:44:06.335  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:06.335  [Webots] Verificando que el robot conteste...
+13:44:06.336  [Webots] → PING seq=132 payload=-
+13:44:06.637  [Webots] Sin ACK (intento 1/3)
+13:44:06.637  [Webots] → PING seq=132 payload=-
+13:44:06.939  [Webots] Sin ACK (intento 2/3)
+13:44:06.939  [Webots] → PING seq=132 payload=-
+13:44:07.223  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:07.223  [Webots] Reconectado tras 3.9 s sin enlace
+13:44:07.234  [Webots] → POSE seq=133 payload=01
+13:44:10.377  [Webots] Sin respuesta de Webots en 3.1 s: enlace perdido
+13:44:11.491  [Webots] Reintentando conexión (intento 1)...
+13:44:11.491  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:11.492  [Webots] Verificando que el robot conteste...
+13:44:11.492  [Webots] → PING seq=136 payload=-
+13:44:11.793  [Webots] Sin ACK (intento 1/3)
+13:44:11.793  [Webots] → PING seq=136 payload=-
+13:44:12.094  [Webots] Sin ACK (intento 2/3)
+13:44:12.094  [Webots] → PING seq=136 payload=-
+13:44:12.396  [Webots] Sin ACK (intento 3/3)
+13:44:12.396  [Webots] Webots aceptó la conexión pero no contesta (Sin respuesta de Webots)
+13:44:12.396  [Webots] Sin éxito; siguiente intento en 1 s
+13:44:13.399  [Webots] Reintentando conexión (intento 2)...
+13:44:13.399  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:13.400  [Webots] Verificando que el robot conteste...
+13:44:13.400  [Webots] → PING seq=137 payload=-
+13:44:13.701  [Webots] Sin ACK (intento 1/3)
+13:44:13.701  [Webots] → PING seq=137 payload=-
+13:44:14.002  [Webots] Sin ACK (intento 2/3)
+13:44:14.002  [Webots] → PING seq=137 payload=-
+13:44:14.287  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:14.287  [Webots] Reconectado tras 3.9 s sin enlace
+13:44:14.295  [Webots] → POSE seq=138 payload=02
+13:44:17.403  [Webots] Sin respuesta de Webots en 3.1 s: enlace perdido
+13:44:18.552  [Webots] Reintentando conexión (intento 1)...
+13:44:18.552  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:18.553  [Webots] Verificando que el robot conteste...
+13:44:18.553  [Webots] → PING seq=141 payload=-
+13:44:18.854  [Webots] Sin ACK (intento 1/3)
+13:44:18.854  [Webots] → PING seq=141 payload=-
+13:44:19.155  [Webots] Sin ACK (intento 2/3)
+13:44:19.155  [Webots] → PING seq=141 payload=-
+13:44:19.456  [Webots] Sin ACK (intento 3/3)
+13:44:19.456  [Webots] Webots aceptó la conexión pero no contesta (Sin respuesta de Webots)
+13:44:19.456  [Webots] Sin éxito; siguiente intento en 1 s
+13:44:20.460  [Webots] Reintentando conexión (intento 2)...
+13:44:20.460  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:20.460  [Webots] Verificando que el robot conteste...
+13:44:20.460  [Webots] → PING seq=142 payload=-
+13:44:20.761  [Webots] Sin ACK (intento 1/3)
+13:44:20.762  [Webots] → PING seq=142 payload=-
+13:44:21.063  [Webots] Sin ACK (intento 2/3)
+13:44:21.063  [Webots] → PING seq=142 payload=-
+13:44:21.345  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:21.345  [Webots] Reconectado tras 3.9 s sin enlace
+13:44:21.347  [Webots] → POSE seq=143 payload=03
+13:44:24.432  [Webots] Sin respuesta de Webots en 3.1 s: enlace perdido
+13:44:25.608  [Webots] Reintentando conexión (intento 1)...
+13:44:25.609  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:25.609  [Webots] Verificando que el robot conteste...
+13:44:25.609  [Webots] → PING seq=146 payload=-
+13:44:25.910  [Webots] Sin ACK (intento 1/3)
+13:44:25.911  [Webots] → PING seq=146 payload=-
+13:44:26.212  [Webots] Sin ACK (intento 2/3)
+13:44:26.212  [Webots] → PING seq=146 payload=-
+13:44:26.513  [Webots] Sin ACK (intento 3/3)
+13:44:26.513  [Webots] Webots aceptó la conexión pero no contesta (Sin respuesta de Webots)
+13:44:26.513  [Webots] Sin éxito; siguiente intento en 1 s
+13:44:27.516  [Webots] Reintentando conexión (intento 2)...
+13:44:27.517  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:27.517  [Webots] Verificando que el robot conteste...
+13:44:27.517  [Webots] → PING seq=147 payload=-
+13:44:27.818  [Webots] Sin ACK (intento 1/3)
+13:44:27.819  [Webots] → PING seq=147 payload=-
+13:44:28.121  [Webots] Sin ACK (intento 2/3)
+13:44:28.121  [Webots] → PING seq=147 payload=-
+13:44:28.410  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:28.410  [Webots] Reconectado tras 4.0 s sin enlace
+13:44:28.419  [Webots] → POSE seq=148 payload=04
+13:44:31.457  [Webots] Sin respuesta de Webots en 3.0 s: enlace perdido
+13:44:32.674  [Webots] Reintentando conexión (intento 1)...
+13:44:32.674  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:32.674  [Webots] Verificando que el robot conteste...
+13:44:32.674  [Webots] → PING seq=151 payload=-
+13:44:32.976  [Webots] Sin ACK (intento 1/3)
+13:44:32.977  [Webots] → PING seq=151 payload=-
+13:44:33.277  [Webots] Sin ACK (intento 2/3)
+13:44:33.278  [Webots] → PING seq=151 payload=-
+13:44:33.579  [Webots] Sin ACK (intento 3/3)
+13:44:33.579  [Webots] Webots aceptó la conexión pero no contesta (Sin respuesta de Webots)
+13:44:33.580  [Webots] Sin éxito; siguiente intento en 1 s
+13:44:34.583  [Webots] Reintentando conexión (intento 2)...
+13:44:34.583  [Webots] Conectando a Webots en 127.0.0.1:5655...
+13:44:34.584  [Webots] Verificando que el robot conteste...
+13:44:34.584  [Webots] → PING seq=152 payload=-
+13:44:34.885  [Webots] Sin ACK (intento 1/3)
+13:44:34.885  [Webots] → PING seq=152 payload=-
+13:44:35.186  [Webots] Sin ACK (intento 2/3)
+13:44:35.186  [Webots] → PING seq=152 payload=-
+13:44:35.470  [Webots] Conectado a Webots (127.0.0.1:5655)
+13:44:35.470  [Webots] Reconectado tras 4.0 s sin enlace
+13:44:35.481  [Webots] → POSE seq=153 payload=05
+13:44:36.491  [Webots] Desconectado de Webots

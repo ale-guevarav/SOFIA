@@ -1,0 +1,17 @@
+﻿id,fecha,actividad,prueba,condicion,resultado,datos_medidos,archivo,entorno,estado
+EV-01,2026-11-06,3. Ciclo,S1 ciclo de las 5 posturas,"20 veces cada postura, canal limpio",100/100 con ACK y 100 figuras ejecutadas,"Comando->ACK prom. 9.7 ms, p95 14.4 ms",prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-02,2026-11-06,4. Estrés,S2 canal BLE simulado,"300 posturas, 3 % pérdidas, 2 % dañadas, 30±10 ms","300/300 con ACK, 300 ejecuciones (ninguna doble)","39 con reintento; prom. 105 ms, p95 371 ms; 8 NACK",prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-03,2026-11-06,4. Estrés,S3 cambios rápidos,"Postura nueva cada 100 ms durante 30 s, canal BLE","300/300 con ACK, 300 ejecuciones","22 con reintento; prom. 319 ms, p95 831 ms; 0 cola llena",prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-04,2026-11-06,4. Estrés,S4 tracking continuo,"TRACK 20 Hz (893 tramas) + postura cada 2 s, 60 s, canal BLE","29/29 con ACK, 0 caídas falsas","prom. 93 ms, p95 376 ms; 30 latidos",prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-05,2026-11-06,2. Errores,S5 simulación detenida,"Robot simulado apagado 5 s, 5 veces",5/5 reconexiones solas y postura con ACK después,Detección 0.02 s; sin servicio 8.3 s (3.3 s tras volver),prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-06,2026-11-06,2. Errores,S6 robot sin responder,"Conexión abierta sin respuestas 6 s, 5 veces",5/5 detectadas y recuperadas,Detección 2.0-2.2 s; reconexión 0.04 s tras volver,prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-07,2026-11-06,1. Protocolo,S7 reglas del robot,"Duplicado, CRC dañado, PC en silencio",Duplicado: 2 ACK y 1 ejecución; CRC: NACK y 0 ejecuciones; estado seguro,Estado seguro a 3.02 s,prueba_sim_2026-11-06/,Simulación automática,Verificado
+EV-08,2026-11-06,4. Estrés,Primera corrida (antes de corregir),Mismos escenarios,Encontró E-10 y E-11,"S2 98.3 %, S3 99.7 %; Reconectado 2.8 s antes de tiempo en S6",prueba_sim_2026-11-06_antes_de_corregir/,Simulación automática,Error encontrado
+EV-09,2026-10-28,2. Errores,Cámara no disponible,GUI iniciada sin cámara,Aviso y reintentos cada 2 s sin cerrar la app,3 intentos en 5 s,-,PC de desarrollo,Verificado
+EV-10,,1. Protocolo / 3. Ciclo,Conexión con el ESP32 real,"ESP32 conectado desde la GUI, 1 submódulo",Conexión y movimiento del submódulo,Llenar: fecha y postura(s) del video,Video del equipo,Robot real,Verificado (video)
+EV-11,,3. Ciclo,Ciclo con cámara y Webots,5 posturas x 10 frente a la webcam,,Llenar con resumen.md,sesión de la GUI + video,Webots + webcam,Pendiente
+EV-12,,4. Estrés,Varias personas,2 y 3 personas,,Llenar con resumen.md,sesión de la GUI + video,Webots + webcam,Pendiente
+EV-13,,4. Estrés,Cambios rápidos con persona,"Postura nueva cada segundo, 1 min",,Llenar con resumen.md,sesión de la GUI + video,Webots + webcam,Pendiente
+EV-14,,4. Estrés,Iluminación,"Luz baja, contraluz, luz cambiante",,Llenar con resumen.md,sesión de la GUI + video,Webots + webcam,Pendiente
+EV-15,,2. Errores,Reset de Webots y cámara desconectada,Reset de la simulación y webcam fuera 5 s,,Llenar con eventos.csv,sesión de la GUI + video,Webots + webcam,Pendiente
+EV-16,,3. Ciclo,Ciclo de las 5 posturas en el robot real,Con el ESP32,,,,Robot real,Pendiente (sin ESP32)

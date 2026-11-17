@@ -37,6 +37,10 @@ from PySide6.QtCore import QObject, Signal
 from . import protocol as p
 
 
+# NACK que se deben a la transmisión y no al comando: se reintentan
+TRANSMISSION_ERRORS = (p.ERR_SOF, p.ERR_LENGTH, p.ERR_CRC, p.ERR_BUSY)
+
+
 class BleLink(QObject):
 
     # Nombre del destino para los mensajes de la bitácora
@@ -86,6 +90,7 @@ class BleLink(QObject):
         # True mientras el usuario quiera estar conectado
         # (se activa con "Conectar" y se apaga con "Desconectar")
         self._want_connected = False
+        self._verifying = False
         self._reconnect_attempt = 0
         self._next_reconnect = 0.0
         # Momento en que se perdió la conexión (para medir caídas)
@@ -330,13 +335,47 @@ class BleLink(QObject):
             await self._client.connect()
             await self._client.start_notify(p.TX_CHAR_UUID, self._on_notify)
 
-            self._on_connected(f"{device.name} ({device.address})")
+            await self._confirm_link(f"{device.name} ({device.address})")
 
         except Exception as error:
             self.log.emit(f"Error al conectar: {error}")
             self.link_event.emit("error", f"Error al conectar: {error}")
             self._client = None
             self._set_state("desconectado")
+
+
+    async def _confirm_link(self, description):
+        """
+        El transporte ya abrió; la conexión cuenta como lista solo si el
+        robot contesta un PING. Sin esto, un robot colgado (o un socket
+        que el sistema aceptó sin que nadie lo atienda) se mostraba como
+        "Reconectado" sin que nadie respondiera (prueba de estrés).
+        """
+
+        self.log.emit("Verificando que el robot conteste...")
+        self._verifying = True
+        try:
+            ok, detail, *_ = await self._send_with_ack(p.TYPE_PING, b"")
+        finally:
+            self._verifying = False
+
+        if ok:
+            self._on_connected(description)
+            return
+
+        self.log.emit(f"{self.target_name} aceptó la conexión pero no contesta ({detail})")
+        self.link_event.emit("error", "Conectado sin respuesta")
+
+        client = self._client
+        self._client = None
+
+        if client is not None:
+            try:
+                await self._close_transport(client)
+            except Exception:
+                pass
+
+        self._set_state("desconectado")
 
 
     def _on_connected(self, description):
@@ -382,6 +421,11 @@ class BleLink(QObject):
         reason = getattr(self, "_mark_lost_reason", None)
         self._mark_lost_reason = None
 
+        # Comandos que esperaban en la cola: ya no tienen sentido (el
+        # robot regresó al centro); se reportan como fallidos.
+        # Se hace en el hilo del enlace (la cola no es segura entre hilos)
+        self._loop.call_soon_threadsafe(self._drain_commands)
+
         # Despertar al comando que esperaba ACK
         if self._pending is not None:
             future = self._pending[2]
@@ -399,6 +443,15 @@ class BleLink(QObject):
             return
 
         self._mark_lost(reason or f"Se perdió la conexión con {self.target_name}")
+
+
+    def _drain_commands(self):
+
+        while not self._commands.empty():
+            frame_type, _payload, queued_at, tag = self._commands.get_nowait()
+            name = p.TYPE_NAMES[frame_type]
+            self.command_result.emit(name, False, "Conexión perdida")
+            self._emit_done(name, None, False, "Conexión perdida", 0, None, queued_at, tag)
 
 
     def _mark_lost(self, reason):
@@ -459,7 +512,9 @@ class BleLink(QObject):
 
     async def _send_frame(self, frame_type, payload=b"", seq=None, log_it=True):
 
-        if self._client is None or not self.connected:
+        # Durante la verificación (_confirm_link) aún no está "conectado",
+        # pero el PING de prueba sí debe salir
+        if self._client is None or not (self.connected or self._verifying):
             return None
 
         seq = self._next_seq() if seq is None else seq
@@ -547,8 +602,10 @@ class BleLink(QObject):
 
             reason = p.ERROR_NAMES.get(error_code, f"0x{error_code:02X}")
 
-            # Un error de CRC se puede deber a ruido: reintentar
-            if error_code in (p.ERR_CRC, p.ERR_BUSY):
+            # Errores de transmisión (ruido que dañó SOF, LEN o CRC) u
+            # ocupado: reintentar. Antes solo se reintentaba el CRC y un
+            # bit dañado en LEN hacía fallar el comando (prueba de estrés)
+            if error_code in TRANSMISSION_ERRORS:
                 self.log.emit(f"NACK ({reason}), reintentando")
                 continue
 

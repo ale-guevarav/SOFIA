@@ -88,6 +88,9 @@ class VisionWorker(QThread):
     # "recuperada", "error_proceso"
     camera_event = Signal(str, str)
 
+    # Mensajes informativos para la bitácora (ej. modelo cargado)
+    info = Signal(str)
+
 
     def __init__(self, camera_index=0, mode=MODE_GAME, parent=None):
 
@@ -218,6 +221,13 @@ class VisionWorker(QThread):
         # MediaPipe se crea DENTRO del hilo que lo usa
         try:
             pipeline = VisionPipeline()
+            model = pipeline.pose_detector.model_name
+            self.info.emit(
+                f"Modelo de pose: {model}"
+                + ("" if model != "lite" else
+                   " (para menos falsos y mejor seguimiento de brazos, "
+                   "agrega models/pose_landmarker_full.task)")
+            )
         except Exception as error:
             cap.release()
             self.error.emit(f"No se pudieron cargar los modelos: {error}")

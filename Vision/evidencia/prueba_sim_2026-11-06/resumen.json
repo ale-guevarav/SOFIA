@@ -1,0 +1,265 @@
+{
+  "inicio": "2026-11-06T13:40:30",
+  "duracion_s": 251.4,
+  "por_etiqueta": {
+    "S1 ciclo 5 posturas": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 100,
+          "ack": 100,
+          "exito_pct": 100.0,
+          "intentos_prom": 1,
+          "rtt_ms_prom": 9.1,
+          "ciclo_ms_prom": 9.7,
+          "ciclo_ms_p95": 14.4,
+          "ciclo_ms_max": 17.5,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 20,
+              "ack": 20
+            },
+            "ESCUDO": {
+              "enviados": 20,
+              "ack": 20
+            },
+            "FIN": {
+              "enviados": 20,
+              "ack": 20
+            },
+            "INICIO": {
+              "enviados": 20,
+              "ack": 20
+            },
+            "RECARGAR": {
+              "enviados": 20,
+              "ack": 20
+            }
+          }
+        }
+      }
+    },
+    "S2 canal BLE simulado": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 300,
+          "ack": 300,
+          "exito_pct": 100.0,
+          "intentos_prom": 1.14,
+          "rtt_ms_prom": 69.5,
+          "ciclo_ms_prom": 105.3,
+          "ciclo_ms_p95": 371.3,
+          "ciclo_ms_max": 678.0,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "ESCUDO": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "FIN": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "INICIO": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "RECARGAR": {
+              "enviados": 60,
+              "ack": 60
+            }
+          }
+        }
+      }
+    },
+    "S3 cambios rapidos": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 300,
+          "ack": 300,
+          "exito_pct": 100.0,
+          "intentos_prom": 1.08,
+          "rtt_ms_prom": 70.0,
+          "ciclo_ms_prom": 318.9,
+          "ciclo_ms_p95": 831.4,
+          "ciclo_ms_max": 1115.7,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "ESCUDO": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "FIN": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "INICIO": {
+              "enviados": 60,
+              "ack": 60
+            },
+            "RECARGAR": {
+              "enviados": 60,
+              "ack": 60
+            }
+          }
+        }
+      }
+    },
+    "S4 tracking 20 Hz + posturas": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 29,
+          "ack": 29,
+          "exito_pct": 100.0,
+          "intentos_prom": 1.07,
+          "rtt_ms_prom": 71.5,
+          "ciclo_ms_prom": 92.8,
+          "ciclo_ms_p95": 375.8,
+          "ciclo_ms_max": 386.5,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 6,
+              "ack": 6
+            },
+            "ESCUDO": {
+              "enviados": 5,
+              "ack": 5
+            },
+            "FIN": {
+              "enviados": 5,
+              "ack": 5
+            },
+            "INICIO": {
+              "enviados": 5,
+              "ack": 5
+            },
+            "RECARGAR": {
+              "enviados": 8,
+              "ack": 8
+            }
+          }
+        }
+      }
+    },
+    "S5 simulacion detenida": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 5,
+          "ack": 5,
+          "exito_pct": 100.0,
+          "intentos_prom": 1,
+          "rtt_ms_prom": 10.7,
+          "ciclo_ms_prom": 11.0,
+          "ciclo_ms_p95": 13.2,
+          "ciclo_ms_max": 13.2,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "ESCUDO": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "FIN": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "INICIO": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "RECARGAR": {
+              "enviados": 1,
+              "ack": 1
+            }
+          }
+        }
+      }
+    },
+    "S6 robot sin respuesta": {
+      "cambios_de_postura": 0,
+      "posturas_detectadas": {},
+      "destinos": {
+        "Webots": {
+          "enviados": 5,
+          "ack": 5,
+          "exito_pct": 100.0,
+          "intentos_prom": 1,
+          "rtt_ms_prom": 7.6,
+          "ciclo_ms_prom": 8.1,
+          "ciclo_ms_p95": 14.6,
+          "ciclo_ms_max": 14.6,
+          "fallas": {},
+          "por_postura": {
+            "ATAQUE": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "ESCUDO": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "FIN": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "INICIO": {
+              "enviados": 1,
+              "ack": 1
+            },
+            "RECARGAR": {
+              "enviados": 1,
+              "ack": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "eventos": {
+    "Webots:conectado": 1,
+    "gui:etiqueta": 7,
+    "Webots:perdido": 10,
+    "Webots:reintento": 30,
+    "Webots:reconectado": 10,
+    "Webots:error": 5
+  },
+  "enlaces": {
+    "Webots": {
+      "tramas_track": 893,
+      "latidos": 40,
+      "reintentos_ack": 84,
+      "nacks": 9,
+      "caidas": 10,
+      "reconexiones": 10
+    }
+  },
+  "caidas": {
+    "Webots": {
+      "recuperaciones": 10,
+      "sin_servicio_prom_s": 6.1,
+      "sin_servicio_max_s": 8.3
+    }
+  }
+}
