@@ -25,8 +25,8 @@
 \newcommand{\status}[1]{\textbf{#1}}
 
 \begin{document}
-	\title{Servo Characterization for the SOFIA Modular Kinetic
-		Surface}
+	\title{Vision-Based Orientation Estimation and Correction for the
+	SOFIA Modular Kinetic Surface}
 	
 	\author{
 		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
@@ -39,19 +39,24 @@
 	
 	
 	\markboth{Laboratory for the Development of Technological Solutions}
-	{Servo Characterization for the SOFIA Modular Kinetic
-		Surface}
+	{Vision-Based Orientation Estimation and Correction for SOFIA}
 	
 	\maketitle
 	
 	
-	\begin{abstract}
-		\linelabel{ln:abstract}The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each actuated by two servomotors, requiring the coordinated control of 32 actuators. Differences in the dynamic response of these servomotors may affect the synchronization and positioning performance of the system. This work proposes an experimental methodology for characterizing the dynamic response of the two servomotors in a single SOFIA module, temporarily removed from the complete structure for testing. A removable crown-shaped measurement device incorporating limit switches is proposed to establish repeatable angular reference positions and record the time intervals associated with servo movement. The control architecture consists of an ESP32-C3 microcontroller and two PCA9685 PWM drivers, providing independent control of the 32 actuators in the complete system. The proposed methodology includes repeatedmovement tests under defined operating conditions, analysis of the measured response times, and evaluation of an appropriate dynamic model for
-		estimating effective servomotor time constants. The experimental scope is limited to the two servomotors of the selected module, with the aim of establishing a measurement procedure for evaluating their dynamic behavior.
-	\end{abstract}
+	
+\begin{abstract}
+    \linelabel{ln:abstract}The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom through servomotors. 
+	Accurate orientation control is essential for coordinated movement, as differences between commanded and actual platform orientations may affect the system's performance. This work presents a vision-based orientation 
+	estimation and correction system that uses a neural network to evaluate the physical inclination of the hexagonal platforms. The proposed approach integrates visual perception with the existing embedded control architecture, 
+	consisting of an ESP32-C3 microcontroller and PCA9685 PWM drivers. The estimated orientation is compared with the desired reference to determine angular deviations and generate corrective commands for the servomotors. 
+	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. Experimental evaluation is being developed to quantify angular estimation accuracy, 
+	residual orientation error, and correction performance under controlled operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
+\end{abstract}
+
 	
 	\begin{IEEEkeywords}
-		\linelabel{ln:keywords}Servomotor characterization, dynamic response, time constant estimation, limit switches, modular robotics, kinetic surfaces.
+		\linelabel{ln:keywords}Visual feedback control, orientation estimation, netral networks, computer vision, modular robotics, kinetic surfaces.
 	\end{IEEEkeywords}
 	
 	
