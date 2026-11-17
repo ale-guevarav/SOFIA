@@ -134,4 +134,32 @@ J.~A. Lizárraga, ``Sesión técnica 1 - análisis de componentes de hardware y
   \url{https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf}
 \BIBentrySTDinterwordspacing
 
+\bibitem{aruco}
+S.~Garrido-Jurado, R.~Mu{\~n}oz-Salinas, F.~J. Madrid-Cuevas, and M.~J.
+  Mar{\'i}n-Jim{\'e}nez, ``Automatic generation and detection of highly
+  reliable fiducial markers under occlusion,'' \emph{Pattern Recognition},
+  vol.~47, no.~6, pp. 2280--2292, 2014.
+
+\bibitem{webots}
+O.~Michel, ``Cyberbotics ltd. {Webots}: Professional mobile robot simulation,''
+  \emph{International Journal of Advanced Robotic Systems}, vol.~1, no.~1, pp.
+  39--42, 2004.
+
+\bibitem{urdf2webots}
+\BIBentryALTinterwordspacing
+{Cyberbotics Ltd.}, ``urdf2webots: Convert {URDF} robot descriptions to
+  {Webots} {PROTO} nodes,'' 2025. [Online]. Available:
+  \url{https://github.com/cyberbotics/urdf2webots}
+\BIBentrySTDinterwordspacing
+
+\bibitem{pytorch}
+A.~Paszke \emph{et~al.}, ``{PyTorch}: An imperative style, high-performance
+  deep learning library,'' in \emph{Advances in Neural Information Processing
+  Systems 32}, 2019, pp. 8024--8035.
+
+\bibitem{resnet}
+K.~He, X.~Zhang, S.~Ren, and J.~Sun, ``Deep residual learning for image
+  recognition,'' in \emph{Proc. IEEE Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, 2016, pp. 770--778.
+
 \end{thebibliography}

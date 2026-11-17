@@ -778,7 +778,7 @@
 	while two PCA9685 drivers as stated in Table~\ref{tab:alt_pwm} were selected to  provide the 32 PWM channels required by the system through a shared I2C bus. The ESP32-C3 SuperMini as stated in Table~\ref{tab:alt_processing} was selected as the main controller due to its integrated wireless connectivity and support for the required communication interfaces. \linelabel{ln:sel-rs485}Finally, RS-485 as stated in Table~\ref{tab:alt_comm} was selected for inter-module communication because its differential and multi-node architecture supports the future connection of multiple
 	SOFIA modules.
 	
-	\subsection{Obtaining samples for the Vision-based misalignment diagnosis}
+	\subsection{Obtaining Samples for the Vision-Based Misalignment Diagnosis}
 	\begin{figure}[!t]
 		\centering
 		\includegraphics[width=\columnwidth]{figures/Dataset generator}
@@ -789,14 +789,39 @@
 	
 	Four ArUco markers \cite{aruco} are placed around the module, at the height of the plates. From their centers, the photograph is \emph{rectified}: it is converted into a top view where 1~px equals 1~mm, no matter where the camera is. In that view, every plate at zero always falls on the same pixel, so a square crop of $128\times128$~px is cut around each plate. The 16 crops are what the methods receive.
 	
+	\vspace{1.5ex}
 	\subsubsection{The Generator in Webots}
 	
 	Taking thousands of real photographs with known angles is not practical, so the photographs were generated in Webots \cite{webots}, where the angles are known exactly. A supervisor controller and the 16 plate controllers follow the state machine of Fig.~\ref{fig:gen}. For each sample, the supervisor chooses random angles and a random scene (camera height of 1.30--1.40~m, tilt of up to $\pm4^\circ$, yaw of up to $\pm8^\circ$, lights, and floor), sends the angles, and waits until all 16 plates report that they are still. Only then it takes the photograph and saves, as the label, the angles \emph{measured} by the joint sensors, not the commanded ones. If a plate does not arrive within 3~s, the sample is discarded. Sample~0, with every plate at zero, is the reference.
 	
+	\vspace{1.5ex}
+	\subsubsection{The First and Second Run}
+	
+	Table~\ref{tab:runs} compares the two runs. The second run replaced the simplified plates with the PROTO of the real unit (generated from its CAD model with \texttt{urdf2webots} \cite{urdf2webots}), placed the units as close as possible without collisions, moved the markers closer, used five times more images, and changed how the angles are chosen: in the first run they were uniform, while in the second they follow what is expected in the robot, mostly small misalignments and sometimes large ones, as if a plate were moved by hand or jammed. In both runs the images were split \emph{by photograph} into training, validation, and test sets, so the 16 plates of one photograph never fall in different sets.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{The Two Runs}
+		\label{tab:runs}
+		\scriptsize
+		\setlength{\tabcolsep}{2pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}P{2.0cm} Y Y@{}}
+			\toprule
+			& First run & Second run\\
+			\midrule
+			Unit & Simplified plate, 69~mm, arm $L=58$~mm & Real unit (PROTO), 60~mm, arm $L=37$~mm\\
+			Markers & 0.76~m square & 0.60~m square\\
+			Images (train / val / test) & 2000 (1399 / 300 / 300) & 10\,000 (6999 / 1500 / 1500)\\
+			Angles per plate & 5\,\% zero, 50\,\% within $\pm3^\circ$, 45\,\% within $\pm27^\circ$ & 10\,\% zero, 60\,\% up to $5^\circ$, 20\,\% 5--$15^\circ$, 10\,\% $15^\circ$--limit\\
+			CNN training & 40 epochs, 84~min & 25 epochs, $\approx$4~h, in parts\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
 	
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
-	\subsection{Simulation of the 16 module SOFIA structure}
+	\subsection{Simulation of the 16 Module SOFIA Structure}
 	
 	Figure~\ref{fig2} \linelabel{ln:sim}shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
 	
@@ -864,7 +889,37 @@
 		\label{fig:sofia_expl_cad}
 	\end{figure}
 	
-	\subsection{Computer Vision System Architecture}
+	\subsection{Methods and Training of the Vision-Based Misalignment Diagnosis}
+	
+	\subsubsection{Geometric Method}
+	
+	It finds each plate in the top view and measures how far its center moved from the reference. With the plate at a distance $L$ from the joint axes, the shift is $\Delta v = L\sin\theta_2$ and $\Delta u = L\cos\theta_2\sin\theta_1$, which gives the two angles directly. It needs no training, but an error of 1~mm in the position becomes an error of $1/L$ radians: $1.0^\circ$ with $L=58$~mm and $1.5^\circ$ with $L=37$~mm.
+	
+	\vspace{1.5ex}
+	\subsubsection{CNN}
+	
+	A small CNN (five blocks of convolutions, 1.28~M parameters) receives one crop and returns the two angles. It was trained in PyTorch \cite{pytorch} with the training images, mirrored and with random changes of light and noise so that it does not depend on a single scene. After every epoch, its error is measured on the validation images, and only the best epoch is kept. The test images are used once, at the end, to report the results.
+	
+	Since the second run takes about 4~hours, training was split into sessions with the state machine of Fig.~\ref{fig:train}. The complete state (weights, optimizer, and learning rate) is saved after every epoch, so a session can stop after a time limit or with Ctrl+C and the next one resumes at the same epoch, as if it had not stopped.
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=\columnwidth]{figures/State_machine_training}
+		\caption{State machine of the training. The state is saved after every epoch, so training can be split into several sessions.}
+		\label{fig:train}
+	\end{figure}
+	
+	\vspace{1.5ex}
+	\subsubsection{Hybrid Rule}
+	
+	Both methods are run, and for each plate: if they differ by more than $2^\circ$, the CNN is used and the plate is marked for inspection; if they agree and the plate is near zero ($\le6^\circ$), the geometric value is used; otherwise, the CNN. It was designed in the first run, where the geometric method was the most accurate near zero.
+	
+	\vspace{1.5ex}
+	\subsubsection{Why ResNet18 Was Dropped}
+	
+	In the first run, a ResNet18 \cite{resnet} pretrained on ImageNet was also trained. Although it is ten times larger (13.3~M parameters), it was less accurate than the small CNN (Table~\ref{tab:results}): what it learned from everyday photographs does not help to measure a shift of a few pixels. For this reason, and to save training time, it was not used in the second run.
+	
+	\subsection{Computer Vision Gesture Recognition System Architecture}
 	
 	\linelabel{ln:intro-vis}The computer vision subsystem of SOFIA recognizes human gestures in real time and translates them into discrete action labels. Using a webcam, the modular Python application captures user movements to establish a gesture-based interaction method for future integration with the robot's control and actuation systems.
 	
@@ -1011,12 +1066,44 @@
 	\label{sec:results}
 	
 	\subsection{Preliminary Servomotor Dynamic Response}
-	\linelabel{ln:speed}Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, little mechanical chatter and motion desynchronization occurred, establishing $350^\circ/\text{s}$ as the maximum operational threshold for smooth servo motor actuation. This is a preliminary measure to prevent current spikes, before obtaining the mechanical time constant estimation.
+	\linelabel{ln:speed}Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, little mechanical chatter and motion desynchronization occurred, establishing $350^\circ/\text{s}$ as the maximum operational threshold for smooth servo motor actuation.
 	
-	\subsection{Time Constant Estimation Status}
-	\linelabel{ln:tau-status}Quantitative identification of individual time constants ($\tau_m$) is scheduled for the next iteration upon final assembly and wiring of the crown-shaped limit-switch fixture. Preliminary observations from the velocity sweeps confirm small timing variations between identical micro-servos, reinforcing the need for hardware-triggered time-constant calibration.
+	\subsection{Results for the Training Methods of Vision-Based Misalignment Diagnosis}
 	
-	\subsection{Functional Validation of the Vision Subsystem}
+	Table~\ref{tab:results_Vision_Train} shows the error on the test images of each run (300 and 1500 photographs). The two test sets are not the same, since the unit and the distribution of angles changed, so the comparison is between the two complete setups.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Test Error ($^\circ$) and State Accuracy}
+		\label{tab:results_Vision_Train}
+		\scriptsize
+		\setlength{\tabcolsep}{2.5pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c c c c@{}}
+			\toprule
+			Method & Mean & Max & $0$--$5^\circ$ & $>15^\circ$ & States\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{First run (simplified plates, 2000 images)}}\\
+			Geometric & 0.539 & 74.0 & \textbf{0.13} & 1.30 & 97.2\,\%\\
+			CNN & 0.248 & 4.4 & 0.18 & \textbf{0.36} & 96.3\,\%\\
+			ResNet18 & 0.293 & 4.1 & 0.21 & 0.43 & 95.9\,\%\\
+			Hybrid & \textbf{0.223} & 4.4 & \textbf{0.13} & \textbf{0.36} & \textbf{97.2\,\%}\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{Second run (real unit, 10\,000 images)}}\\
+			Geometric & 0.521 & 5.9 & 0.33 & 1.60 & 94.1\,\%\\
+			CNN & \textbf{0.204} & \textbf{3.3} & \textbf{0.17} & \textbf{0.41} & \textbf{96.8\,\%}\\
+			Hybrid & 0.329 & \textbf{3.3} & 0.33 & \textbf{0.41} & 94.1\,\%\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\textbf{First run.} Each method was good at something different. The geometric method was the most precise near zero ($0.13^\circ$), but sometimes failed badly (up to $74^\circ$) when a very tilted plate was confused with its neighbor. The CNN never failed badly (at most $4.4^\circ$). The hybrid rule took the best of both and was the best method ($0.223^\circ$).
+	
+	\textbf{Second run.} The CNN improved to $0.204^\circ$ with an error of at most $3.3^\circ$ in 24\,000 plates, and became the best method in every range, even near zero. The geometric method lost precision near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the arm of the real unit is shorter, so the plate moves less per degree and each pixel of error weighs more; on the other hand, it no longer fails badly (at most $5.9^\circ$). As a consequence, the hybrid rule \emph{fell} from the best to the middle ($0.329^\circ$): it uses the geometric value precisely near zero, where it is now the least precise. Its inspection marks are not useful either: 873 of its 901 marks were errors of the geometric method, not of the CNN. The CNN is therefore the default method; the geometric method remains as a fallback without a GPU.
+	
+	Two lessons follow. First, more and more realistic images made the CNN better, even with a harder unit. Second, a CNN must be retrained when the unit changes: the CNN of the first run, tested on the real unit, had an error of $1.6^\circ$.
+	
+	\subsection{Functional Validation of the Vision Gesture Recognition Subsystem}
 	
 	\linelabel{ln:res-func-intro}The computer vision subsystem was tested through real-time webcam experiments to verify its ability to recognize the five predefined gestures. The tests focused on body and hand landmark detection, geometric gesture classification, and temporal validation.
 	
