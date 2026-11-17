@@ -56,7 +56,7 @@
 
 	
 	\begin{IEEEkeywords}
-		\linelabel{ln:keywords}Visual feedback control, orientation estimation, netral networks, computer vision, modular robotics, kinetic surfaces.
+		\linelabel{ln:keywords}Visual feedback control, orientation estimation, neutral networks, computer vision, modular robotics, kinetic surfaces.
 	\end{IEEEkeywords}
 	
 	
@@ -1029,65 +1029,120 @@
 	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem as an independent software prototype. However, recognition accuracy, average response time, and robustness under different environmental conditions still require quantitative evaluation.
 	
 	\subsection{Gesture Recognition Performance Evaluation}
-	
-	\linelabel{ln:res-vision-intro}Preliminary performance tests were conducted to evaluate gesture recognition and identify classification errors. These tests recorded the expected gesture, detected gesture, response time, and instantaneous frames per second (FPS).
-	
-	\linelabel{ln:vision-performance}Performance metrics across gesture classes are detailed in Table~\ref{tab:gesture_benchmark}. Dynamic gestures (START and END) achieved $100\%$ accuracy with average response times of $1.33\text{ s}$ and $0.95\text{ s}$. Static gestures exhibited lower recall ($75.00\%$ for SHIELD and ATTACK, $88.89\%$ for RELOAD) due to pose ambiguity near decision boundaries.
-	
+
+	\linelabel{ln:res-vision-intro}Preliminary performance tests
+	were conducted with three participants under adequate lighting
+	conditions and at a comfortable distance from the webcam.
+	The exact distance and illumination levels were not recorded.
+	These tests evaluated an earlier version of the gesture
+	recognition system and recorded the expected gesture, detected
+	gesture, response time, and instantaneous frames per second
+	(FPS).
+
+	\linelabel{ln:vision-performance}As shown in
+	Table~\ref{tab:gesture_benchmark}, 42 out of 50 attempts were
+	correctly recognized, resulting in an overall accuracy of
+	84.0\%. Dynamic gestures (START and END) achieved 100\%
+	recall, while static gestures achieved recall values between
+	75.0\% and 88.9\%. Wilson confidence intervals at the 95\%
+	level were calculated assuming independent trials.
+
 	\begin{table}[!t]
 		\centering
-		\caption{Detailed Performance Metrics per Gesture Class}
+		\caption{Preliminary Gesture Recognition Performance}
 		\label{tab:gesture_benchmark}
 		\scriptsize
 		\setlength{\tabcolsep}{3pt}
 		\renewcommand{\arraystretch}{1.1}
-		\begin{tabularx}{\columnwidth}{@{}l c c c c c c c@{}}
+		\begin{tabular}{@{}l c c c c c@{}}
 			\toprule
-			\textbf{Gesture} & \textbf{Trials} & \textbf{Hits} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Resp. (s)} \\
+			\textbf{Gesture} &
+			\textbf{Trials} &
+			\textbf{Hits} &
+			\textbf{Recall (\%)} &
+			\textbf{95\% CI (\%)} &
+			\textbf{Resp. (s)} \\
 			\midrule
-			START   & 6  & 6  & 100.00\% & 100.00\% & 100.00\% & 100.00\% & 1.33 \\
-			RELOAD & 9  & 8  & 88.89\%  & 100.00\% & 88.89\%  & 94.12\%  & 4.17 \\
-			SHIELD   & 12 & 9  & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.06 \\
-			ATTACK   & 16 & 12 & 75.00\%  & 100.00\% & 75.00\%  & 85.71\%  & 1.14 \\
-			END      & 7  & 7  & 100.00\% & 70.00\%  & 100.00\% & 82.35\%  & 0.95 \\
+			START  & 6  & 6  & 100.0 & 61.0--100 & 1.33 \\
+			RELOAD & 9  & 8  & 88.9  & 56.5--98.0 & 4.17 \\
+			SHIELD & 12 & 9  & 75.0  & 46.8--91.1 & 1.06 \\
+			ATTACK & 16 & 12 & 75.0  & 50.5--89.8 & 1.14 \\
+			END    & 7  & 7  & 100.0 & 64.6--100 & 0.95 \\
 			\bottomrule
-		\end{tabularx}
+		\end{tabular}
 	\end{table}
-	
-	\linelabel{ln:vision-shield}During the initial evaluation of SHIELD, four attempts were recorded. Two were correctly classified, while the other two were incorrectly identified as RELOAD.
-	
-	\begin{table}[!t]
-		\centering
-		\caption{Preliminary Performance Evaluation for SHIELD Gesture}
-		\label{tab:shield_performance}
-		\scriptsize
-		\setlength{\tabcolsep}{3pt}
-		\renewcommand{\arraystretch}{1.1}
-		\begin{tabularx}{\columnwidth}{@{}l c c c c@{}}
-			\toprule
-			\textbf{Attempt} & \textbf{Expected} & \textbf{Detected} & \textbf{Time (ms)} & \textbf{FPS} \\
-			\midrule
-			Initial & SHIELD & RELOAD & 1841.65 & 26.62 \\
-			1       & SHIELD & SHIELD   & 2072.08 & 21.95 \\
-			2       & SHIELD & SHIELD   & 2306.67 & 20.27 \\
-			3       & SHIELD & RELOAD & 2410.98 & 27.05 \\
-			\bottomrule
-		\end{tabularx}
-	\end{table}
-	
-	\linelabel{ln:vision-overlap}These preliminary measurements helped identify overlapping recognition conditions between gestures, leading to refinements in the geometric classification rules.
-	
-	\linelabel{ln-vision-latency}The recorded response times included user reaction and gesture execution, as well as software processing. Therefore, they do not represent the algorithm's computational latency.
-	
-	\linelabel{ln:vision-adjustments}Following these observations, the recognition conditions for RELOAD and ATTACK were adjusted and their final functionality was verified. However, the preliminary measurements correspond to an earlier implementation and cannot be used to calculate the final system's accuracy.
-	
+
+	\linelabel{ln:vision-shield}During an initial evaluation of
+	SHIELD, two out of four attempts were correctly classified,
+	while the remaining two were incorrectly identified as RELOAD.
+	The relationship between these four attempts and the 50-trial
+	evaluation could not be verified.
+
+	\linelabel{ln:vision-overlap}These preliminary observations
+	helped identify overlapping recognition conditions, leading
+	to refinements in the geometric classification rules.
+
+	\linelabel{ln-vision-latency}The recorded response times
+	included user reaction, gesture execution, and software
+	processing. Therefore, they do not represent the algorithm's
+	computational latency alone.
+
+	\linelabel{ln:vision-adjustments}Following these observations,
+	the recognition conditions for RELOAD and ATTACK were adjusted
+	and their functionality was verified. However, individual
+	trial records were unavailable to reconstruct a complete
+	confusion matrix, preventing reliable calculation of
+	precision and F1-score. The limited number of participants
+	and potentially dependent trials also restrict the
+	generalizability of the results. Quantitative validation
+	of the final implementation remains pending.
+
+		
 	\section{Discussion}
 	\label{sec:discussion}
+
+	The preliminary gesture recognition results demonstrate the
+	feasibility of geometric classification for human-robot
+	interaction, achieving an overall accuracy of 84.0\%.
+	Dynamic gestures showed higher recall than static gestures
+	in the evaluated trials. However, the limited sample size,
+	overlapping recognition conditions, and wide confidence
+	intervals restrict the generalization of these results.
+
+	The electronic architecture supports the integration of
+	visual perception and servomotor control. Nevertheless,
+	the current-carrying capacity of the PCB and the electrical
+	performance of the revised design require further
+	experimental validation.
+
+	The implementation of vision-based orientation correction
+	introduces external feedback to the SOFIA control system,
+	allowing adjustments based on the estimated physical
+	orientation of the platforms. Its effectiveness in reducing
+	angular deviations remains to be quantified through
+	experimental comparison.
+
+	
 	
 	\section{Conclusions}
 	\label{sec:conclusions}
-	
-	
+
+	The development of SOFIA integrates mechanical actuation,
+	embedded control, and computer vision into a modular
+	robotic platform. Preliminary gesture recognition tests
+	achieved an overall accuracy of 84.0\%, demonstrating
+	the potential of geometric classification for human-robot
+	interaction.
+
+	The implementation of a vision-based orientation estimation
+	and correction system enables automatic servomotor
+	adjustments using external visual feedback. This approach
+	establishes a means of addressing deviations between
+	commanded and actual platform orientations. Further
+	experimental validation is required to quantify angular
+	estimation accuracy, correction performance, and the
+	effectiveness of the integrated control system.
+
 	
 	\balance
 	

@@ -63,11 +63,17 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{1}{Formato, LaTeX y cumplimiento de la plantilla}
 	
-	\LabDSTcomment{R1.1}{N}{}
+	\LabDSTcomment{R1.1}{P}{Sections~\ref{sec:discussion} and~\ref{sec:conclusions}}
 	{Discussion y Conclusions son solo encabezados, y no existen Author Contributions, Data Availability (con la URL del
 		repositorio), Acknowledgment (con la declaración de uso de IA) ni Conflicts of Interest. Era la observación R1.5 del primer
 		corte.}
-	{}
+	{The Discussion and Conclusions sections were added.
+	The Discussion addresses the preliminary gesture recognition
+	results, experimental limitations, and electrical validation
+	requirements. The Conclusions summarize the main achievements
+	of the project and introduce the vision-based orientation
+	correction system, whose quantitative evaluation remains
+	pending.}
 	
 	\LabDSTcomment{R1.2}{A}{\Rln{model-vis3}, \rln{only2}}
 	{Los nombres de los gestos están en español: INICIO, FIN,
@@ -237,7 +243,7 @@
 		pregunta. La Línea 445 pospone la medición al siguiente corte.}
 	{}
 	
-	\LabDSTcomment{R4.2}{N}{}
+	\LabDSTcomment{R4.2}{P}{Table~\ref{tab:gesture_benchmark}, \rlns{res-vision-intro}{vision-adjustments}}
 	{Las métricas de la Tabla XIV no son consistentes:
 		• La Línea 490 dice que ESCUDO se confundió con RECARGAR. Pero RECARGAR tiene precisión de 100%, lo que
 		no es posible si hubo ESCUDOs detectados como RECARGAR.
@@ -246,7 +252,18 @@
 		• La Tabla XV tiene 4 intentos de ESCUDO y la Tabla XIV 12, sin decir si son la misma prueba. La Línea 499 aclara
 		que las mediciones preliminares son de una versión anterior, pero no dice si la Tabla XIV lo es.
 		Con 6–16 intentos por clase y sin intervalos de confianza, los porcentajes tienen mucha incertidumbre}
-	{}
+	{The gesture recognition performance table was revised to
+	report per-class recall, response times, and 95\% Wilson
+	confidence intervals. Overall accuracy was calculated as
+	84.0\% based on 50 attempts.
+
+	Precision and F1-score were removed due to the unavailability
+	of individual trial records. The experimental conditions
+	and number of participants were specified, and the results
+	were identified as corresponding to an earlier implementation.
+
+	The preliminary SHIELD evaluation table was replaced by a
+	brief description of its findings.}
 	
 	\LabDSTcomment{R4.3}{N}{}
 	{La pregunta y el objetivo 3 hablan de “a 32-actuator kinetic surface” y de igualar los tiempos de asentamiento de todos
