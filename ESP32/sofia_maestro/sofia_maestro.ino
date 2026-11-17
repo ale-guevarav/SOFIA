@@ -539,6 +539,9 @@ void loop() {
       Serial.println("[SERIAL] Al centro");
       irAlCentro();
     } else if (c == 'u' || c == 'U') {
+      Serial.println("COMANDO U RECIBIDO");
+    Serial.print("PCA9685 detectados: ");
+    Serial.println(placasEncontradas);
       // Prueba de cableado: una unidad a la vez
       siguienteUnidadPrueba();
     }

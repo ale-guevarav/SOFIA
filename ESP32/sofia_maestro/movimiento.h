@@ -52,7 +52,7 @@
 //   GPIO 5 y 6 = RX/TX del MAX485 (no se usan aquí: no tocarlos)
 const int SDA_PIN = 0;
 const int SCL_PIN = 1;
-const int OE_PIN  = 3;     // LOW = salidas de los PCA9685 habilitadas
+const int OE_PIN  = 5;     // LOW = salidas de los PCA9685 habilitadas
 
 // 100 kHz, igual que las pruebas de mecatrónica (lo más seguro con
 // cables largos entre placas). Como solo se escriben las unidades que
@@ -63,7 +63,7 @@ const uint32_t I2C_HZ = 100000;
 // buscan los PCA9685 en el bus y se usan en orden de dirección
 // (la segunda placa debe tener puenteado A0 u otro jumper)
 const int NUM_PLACAS = 2;
-const uint8_t PCA_DIRECCIONES_DEFAULT[NUM_PLACAS] = {0x40, 0x60};
+const uint8_t PCA_DIRECCIONES_DEFAULT[NUM_PLACAS] = {0x40, 0x41};
 
 const int UNIDADES_POR_PLACA = 8;
 const int NUM_UNIDADES = NUM_PLACAS * UNIDADES_POR_PLACA;   // 16
@@ -94,7 +94,7 @@ const float AJUSTE_Y[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 // Al arrancar se centran las unidades de una en una con esta pausa,
 // para no pedir la corriente de los 32 servos al mismo tiempo
-const int PAUSA_ARRANQUE_MS = 40;
+const int PAUSA_ARRANQUE_MS = 1000;
 
 // =============================================
 // PARÁMETROS DE MOVIMIENTO
@@ -114,9 +114,9 @@ const float AMPLITUD = 20.0f;
 // Velocidades (grados/segundo). Las pruebas de mecatrónica
 // llegaron hasta 600 °/s. Con 240 °/s cada figura dura ~1-1.5 s
 // por unidad y la tanda de 16 unidades ~6-9 s
-const float VEL_PATRON  = 240.0f;
-const float VEL_REGRESO = 180.0f;
-const float VEL_TRACK   = 300.0f;
+const float VEL_PATRON  = 120.0f;
+const float VEL_REGRESO = 120.0f;
+const float VEL_TRACK   = 120.0f;
 
 // Cuántas unidades dibujan la figura al mismo tiempo (las que
 // regresan al centro no cuentan). Más = la tanda acaba antes
@@ -139,7 +139,7 @@ const float RANGO_TRACK = 45.0f;
 
 // Si en TRACKING no llega posición en este tiempo,
 // las unidades regresan al centro
-const unsigned long TRACK_TIMEOUT_MS = 1500UL;
+const unsigned long TRACK_TIMEOUT_MS = 3000UL;
 
 // No se reenvía al PCA9685 si el cambio es menor a esto
 const float E_QUANT = 0.10f;
