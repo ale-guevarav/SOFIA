@@ -79,12 +79,12 @@
 	generation of multiple PWM signals. The embedded controller must coordinate
 	the desired actuator positions, while the communication architecture should
 	support the future integration of additional SOFIA modules without
-	significantly increasing wiring and control complexity. This work proposes a vision-based closed loop angular misalignment diagnosis for 2 degrees of freedom.
+	significantly increasing wiring and control complexity. This work proposes a vision-based closed loop angular misalignment diagnosis for 16 modules with two-degree-of-freedom each.
 	
 	\subsection{Problem Statement and Research Question}
 	A SOFIA module consists of 16 hexagonal plates arranged in a honeycomb configuration, where each plate can tilt in two rotational directions actuated by low-cost micro-servomotors \cite{sofia_architecture}. These actuators commonly operate with gear backlash, mechanical wear, or accidental manual contact, and without external joint feedback these servo motors can introduce angular misalignment across the surface. Instrumenting all 16 units (32 degrees of freedom) with dedicated physical angle sensors would increase wiring complexity, moving mass, and hardware cost.
 	
-	To address this limitation, this work investigates the following research question: \textit{Can the two tilt angles of all 16 hexagonal plates be accurately estimated from a single overhead camera to classify each unit without per-module angle sensors?} This encompasses three primary objectives: (1) designing an embedded PCB integrating an ESP32-C3 microcontroller, dual PCA9685 PWM drivers, and RS-485 interfaces to coordinate the 32 actuators.(2) integrating the diagnosis pipeline onto the physical SOFIA module using an overhead camera, four coplanar ArUco markers, and sim-to-real fine-tuning.(3) integrating state-machine execution with real-time gesture recognition.
+	To address this limitation, this work investigates the following research question: \textit{Can the two tilt angles of all 16 hexagonal plates be accurately estimated from a single overhead camera to classify each unit without per-module angle sensors?} This encompasses three primary objectives: (1) designing an embedded PCB integrating an ESP32-C3 microcontroller, dual PCA9685 PWM drivers, and RS-485 interfaces to coordinate the 32 actuators. (2) integrating the diagnosis pipeline onto the physical SOFIA module using an overhead camera, four coplanar ArUco markers, and sim-to-real fine-tuning. (3) integrating state-machine execution with real-time gesture recognition.
 	\begin{table*}[!t]
 		\centering
 		\caption{Comparative matrix of related shape-changing interface systems}
@@ -238,27 +238,17 @@
 	software-defined motion limits and smoothing strategies to prevent abrupt
 	servo movements and reduce mechanical stress.
 	
-	\linelabel{ln:focus}Based on these opportunities, this work focuses on the proposed experimental
-	characterization of servomotor dynamic response, supported by a preliminary
-	electronic and control architecture for the SOFIA demonstrator. The selected
-	hardware provides the PWM generation, embedded processing, and communication
-	interfaces required by the test system, while the main research contribution
-	is the methodology for measuring and analyzing individual actuator response.
-	Automatic Modbus address assignment is outside the experimental scope.
+	\linelabel{ln:focus}Based on these opportunities, this work focuses on a vision-based misalignment diagnosis methodology for the 16-unit SOFIA array, supported by an embedded electronic and gesture-control architecture. The selected hardware provides the 32-channel PWM generation, wireless telemetry, and differential inter-module communication interfaces required by the demonstrator, while the primary research contribution is the metric overhead rectification and neural-network-based angular estimation evaluated across datasets and prepared for physical module deployment. Automatic Modbus address assignment is outside the experimental scope.
 	
 	
 	\section{Materials and Methods}
 	\label{sec:methods}
 	
-	\linelabel{ln:materials-intro}The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors \cite{sofia_architecture,mg90s}. Although the complete system incorporates 32 actuators, the experimental characterization proposed in this study is limited to the two servomotors of a single module removed from the SOFIA structure.
+	\linelabel{ln:materials-intro}The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors for a total of 32 actuators \cite{sofia_architecture,mg90s}. Rather than instrumenting individual actuators mechanically, this study evaluates the orientation of all 16 hexagonal top platforms simultaneously through an overhead computer vision pipeline.
 	
-	\linelabel{ln:hardware-config}The methodology is divided into three main stages: hardware configuration, experimental measurement, and dynamic response analysis. The first stage involves the selection and verification of the electronic components required for servomotor control, considering the established hardware requirements \cite{technical_session}. The second stage proposes the use of a removable crown-shaped measurement device equipped with limit switches to detect predefined angular positions during controlled movements. The third stage involves analyzing the recorded timing data and evaluating an appropriate dynamic model to estimate the effective time constant of each servomotor.
+	\linelabel{ln:hardware-config}The methodology is divided into three main stages: embedded hardware configuration, vision-based rectification with dataset generation in Webots, and comparative evaluation of angular estimation models. The first stage involves the selection and electrical verification of the electronic components required for 32-channel servomotor control and inter-module communication \cite{technical_session}. The second stage establishes an overhead camera calibration procedure using four coplanar ArUco markers to generate metric top-down crops ($1~\text{px} = 1~\text{mm}$) and automates the acquisition of labeled datasets in Webots. The third stage benchmarks a geometric displacement model, a lightweight convolutional neural network (CNN), and a hybrid decision rule to estimate platform tilt angles and classify each unit as \textit{OK} ($<2^\circ$), \textit{REVIEW} ($2^\circ\text{--}5^\circ$), or \textit{MISALIGNED} ($>5^\circ$).
 	
-	\linelabel{ln:methods-variables}The experimental procedure is intended to provide repeatable measurements under defined operating conditions. Relevant variables include the commanded angular displacement, movement direction, supply voltage, and measured time intervals.
-	These variables will be considered when evaluating differences in the dynamic response of the two servomotors.
-	
-	The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
-	\linelabel{ln:only2}However, only the two servomotors of the selected module will be evaluated experimentally in this study.
+	\linelabel{ln:methods-variables}The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
 	
 	\linelabel{ln:requirements-intro}The main electrical, communication, and mechanical requirements of the SOFIA demonstrator are summarized in Table~\ref{tab:sofia_requirements}. These requirements are based on the system architecture and the established technical verification criteria \cite{sofia_architecture,technical_session}.
 	
@@ -917,7 +907,7 @@
 	\vspace{1.5ex}
 	\subsubsection{Why ResNet18 Was Dropped}
 	
-	In the first run, a ResNet18 \cite{resnet} pretrained on ImageNet was also trained. Although it is ten times larger (13.3~M parameters), it was less accurate than the small CNN (Table~\ref{tab:results}): what it learned from everyday photographs does not help to measure a shift of a few pixels. For this reason, and to save training time, it was not used in the second run.
+	In the first run, a ResNet18 \cite{resnet} pretrained on ImageNet was also trained. Although it is ten times larger (13.3~M parameters), it was less accurate than the small CNN (Table~\ref{tab:results_Vision_Train}): what it learned from everyday photographs does not help to measure a shift of a few pixels. For this reason, and to save training time, it was not used in the second run.
 	
 	\subsection{Computer Vision Gesture Recognition System Architecture}
 	
@@ -931,7 +921,7 @@
 	
 	\linelabel{ln:model-vis3}The system recognizes five gestures divided into dynamic gestures (START and END, requiring movement sequences over time) and static gestures (RELOAD, SHIELD, and ATTACK, defined by specific body and hand configurations). Once recognized, the interface displays the gesture label, detected landmarks, and a real-time frames-per-second (FPS) indicator.
 	
-	\linelabel{ln:model-vis4}Currently, the subsystem operates as an independent perception prototype. Although designed for human-robot interaction, direct communication with the ESP32-C3 controller and physical module actuation have not yet been experimentally verified.
+	\linelabel{ln:model-vis4}The perception subsystem is integrated with the ESP32-C3 controller over wireless telemetry, translating recognized gestures into coordinated actuation commands across the 16 physical modules.
 	
 	\subsection{Geometric Gesture Recognition}
 	
