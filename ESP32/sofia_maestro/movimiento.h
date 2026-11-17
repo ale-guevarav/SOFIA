@@ -46,21 +46,24 @@
 // HARDWARE (igual que las pruebas de mecatrónica)
 // =============================================
 
-// ESP32-C3 + 2 PCA9685 en el mismo bus I2C
+// ESP32-C3 SuperMini + 2 PCA9685 en el mismo bus I2C.
+// Pines según la PCB de SOFIA (PCB/SOFIA_PCB en main):
+//   GPIO 0 = SDA, GPIO 1 = SCL, GPIO 3 = OE (conectores J1 y J2)
+//   GPIO 5 y 6 = RX/TX del MAX485 (no se usan aquí: no tocarlos)
 const int SDA_PIN = 0;
 const int SCL_PIN = 1;
-const int OE_PIN  = 5;     // LOW = salidas de los PCA9685 habilitadas
+const int OE_PIN  = 3;     // LOW = salidas de los PCA9685 habilitadas
 
-// 400 kHz: una actualización de las 16 unidades tarda ~3 ms.
-// Si los cables entre placas son largos y hay fallas, bajar a
-// 100000 (sigue alcanzando: ~12 ms de los 20 ms del periodo)
-const uint32_t I2C_HZ = 400000;
+// 100 kHz, igual que las pruebas de mecatrónica (lo más seguro con
+// cables largos entre placas). Como solo se escriben las unidades que
+// se mueven (~3), alcanza de sobra dentro de los 20 ms del periodo
+const uint32_t I2C_HZ = 100000;
 
 // Direcciones si no se pueden detectar solas. Al arrancar se
 // buscan los PCA9685 en el bus y se usan en orden de dirección
 // (la segunda placa debe tener puenteado A0 u otro jumper)
 const int NUM_PLACAS = 2;
-const uint8_t PCA_DIRECCIONES_DEFAULT[NUM_PLACAS] = {0x40, 0x41};
+const uint8_t PCA_DIRECCIONES_DEFAULT[NUM_PLACAS] = {0x40, 0x60};
 
 const int UNIDADES_POR_PLACA = 8;
 const int NUM_UNIDADES = NUM_PLACAS * UNIDADES_POR_PLACA;   // 16
@@ -226,12 +229,8 @@ int theta_a_pwm(float theta) {
   return (int)roundf(PWM_EN_THETA_MIN + m * (theta - THETA_MIN));
 }
 
-const uint8_t PCA_MODE1 = 0x00;
-const uint8_t PCA_LED0_ON_L = 0x06;
-const uint8_t PCA_MODE1_AI = 0x20;
-
-// Escribe los 2 canales de una unidad (X y Y son contiguos) en UNA
-// transacción I2C de 9 bytes, con el auto-incremento del PCA9685
+// Escribe los 2 canales de una unidad con setPWM de la librería
+// (lo mismo que usaban las pruebas de mecatrónica)
 void escribirUnidad(int u) {
   int b = u / UNIDADES_POR_PLACA;
   int k = u % UNIDADES_POR_PLACA;
@@ -243,15 +242,8 @@ void escribirUnidad(int u) {
   float thetaY = (INVERTIR_Y ? -un.y : un.y) + AJUSTE_Y[u];
   int cuentas[2] = {theta_a_pwm(thetaX), theta_a_pwm(thetaY)};
 
-  Wire.beginTransmission(direccionPlaca[b]);
-  Wire.write(PCA_LED0_ON_L + 4 * canalX(k));
-  for (int c = 0; c < 2; c++) {
-    Wire.write(0);                          // ON_L
-    Wire.write(0);                          // ON_H
-    Wire.write(cuentas[c] & 0xFF);          // OFF_L
-    Wire.write((cuentas[c] >> 8) & 0x0F);   // OFF_H
-  }
-  Wire.endTransmission();
+  placas[b]->setPWM(canalX(k), 0, cuentas[0]);
+  placas[b]->setPWM(canalY(k), 0, cuentas[1]);
 
   un.enviadoX = un.x;
   un.enviadoY = un.y;
@@ -317,17 +309,6 @@ bool iniciarServos() {
 
     placa->setOscillatorFrequency(27000000);
     placa->setPWMFreq(50);
-
-    // Asegurar el auto-incremento para escribirUnidad()
-    Wire.beginTransmission(encontradas[b]);
-    Wire.write(PCA_MODE1);
-    Wire.endTransmission();
-    Wire.requestFrom((int)encontradas[b], 1);
-    uint8_t mode1 = Wire.available() ? Wire.read() : 0;
-    Wire.beginTransmission(encontradas[b]);
-    Wire.write(PCA_MODE1);
-    Wire.write(mode1 | PCA_MODE1_AI);
-    Wire.endTransmission();
 
     placas[placasEncontradas] = placa;
     direccionPlaca[placasEncontradas] = encontradas[b];
@@ -523,7 +504,8 @@ bool enMovimiento() {
 }
 
 // Tecla 'u' del Monitor Serie: recorre las unidades de una en una
-// para revisar el cableado (1-5 dibujan la figura solo en esa)
+// para revisar el cableado. La unidad elegida hace la línea
+// arriba-abajo sola; con 1-5 dibuja cualquier figura
 void siguienteUnidadPrueba() {
   unidadPrueba++;
 
@@ -535,6 +517,7 @@ void siguienteUnidadPrueba() {
     int k = unidadPrueba % UNIDADES_POR_PLACA;
     Serial.printf("[PRUEBA] Solo la unidad %d (PCA 0x%02X, canales %d=X y %d=Y)\n",
                   unidadPrueba + 1, direccionPlaca[b], canalX(k), canalY(k));
+    iniciarPatron(4);   // se mueve para que se vea cuál es
   }
 }
 
