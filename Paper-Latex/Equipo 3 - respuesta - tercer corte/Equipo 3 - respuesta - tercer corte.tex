@@ -86,11 +86,11 @@
 		checked for the reported spacing error, and the
 		correct form ``in this study'' is used.}
 	
-	\LabDSTcomment{R1.3}{N}{}
+	\LabDSTcomment{R1.3}{A}{Section~\ref{sec:methods}, Fig.~\ref{fig:sofia_schematic}, Fig.~\ref{fig:sofia_pcb},Fig.~\ref{fig:SOFIA_DIAGRAM}, \rlns{pcb}{pcb-traces}}
 	{La Fig. 1 mide 6 cm de ancho y su texto interno (“CH 1”, “JST-PH (MALE)”) no se lee impreso. Tampoco muestra el riel
 		de 5 V, la fuente, el transceptor RS-485 ni el dispositivo de corona. El esquemático (Fig. 4) es ilegible a una columna, y la
 		PCB (Fig. 5) no tiene cotas ni identificación de pistas.}
-	{}
+	{The system block diagram (Fig.~1) was redesigned and enlarged with larger internal typography so that channel labels and connector identifiers are legible in print. The new diagram includes the external 5~V DC power supply and 5~V power rails, the MAX13487E RS-485 transceiver with Modbus routed to both JST-PH connectors, the I2C bus to both PCA9685 drivers, the separation between the overhead misalignment camera and the gesture webcam, and the four ArUco markers on the Master Module (replacing the discontinued crown device for servo characterization). The electronic schematic (Fig.~\ref{fig:SOFIA_DIAGRAM}) and single-layer PCB layout (Figure~\ref{fig:sofia_pcb}) were expanded to full two-column width with outer board dimensions ($63.5~\text{mm} \times 56.5~\text{mm}$), component designators, and trace widths ($0.7~\text{mm}$ power, $0.5~\text{mm}$ signal) specified in the text.}
 	
 	\LabDSTcomment{R1.4}{P}{Page~1, affiliation footnote}
 	{La lista de autores no incluye a la profesora Graciela Baca, y la afiliación no indica el departamento.}
@@ -132,13 +132,13 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{2}{Redacción científica e idioma}
 	
-	\LabDSTcomment{R2.1}{N}{}
+	\LabDSTcomment{R2.1}{A}{\Rln{abstract}, Section~\ref{sec:methods}, Section~\ref{sec:results}}
 	{El abstract describe el método propuesto, pero no da ningún resultado, aunque ya existen: la medición de 5.00 V y el divisor,
 		y las métricas de los gestos. Además, describe el dispositivo de corona como si fuera parte del trabajo, cuando no se ha
 		diseñado.}
-	{}
+	{All references to the crown-shaped limit-switch device were removed from the Abstract and throughout the manuscript following the transition vision-based misalignment diagnosis differentiator. The Abstract was rewritten to report the validated quantitative outcomes of the vision pipeline ($0.204^\circ$ mean angular error, $3.3^\circ$ maximum error, and $96.8\%$ state classification accuracy on the CAD-matched 16-module dataset) alongside its deployment on the physical prototype. In addition we added a revised materials and methods, and results.}
 	
-	\LabDSTcomment{R2.2}{N}{}
+	\LabDSTcomment{R2.2}{P}{Section~\ref{sec:results}, Table~\ref{tab:results_Vision_Train}}
 	{Hay afirmaciones que los datos no sostienen:
 		• “power supply stability and protection against voltage sags must be managed through software-level trajectory
 		smoothing” (Línea 424): el suavizado reduce los picos, pero no sustituye una fuente y una distribución de potencia dimensionadas;
@@ -147,7 +147,7 @@
 		threshold” (Línea 435): no hay tabla, gráfica ni criterio que defina el umbral;
 		• “Preliminary observations from the velocity sweeps confirm small timing variations between identical micro-servos”
 		(Línea 445): no se reporta ninguna medición de tiempo.}
-	{}
+	{All three unsupported statements were removed from the manuscript. Section~\ref{sec:results} now reports only quantitatively supported findings backed by explicit test metrics and confidence intervals in Table~\ref{tab:results_Vision_Train} and Table~\ref{tab:gesture_benchmark}.}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
@@ -222,12 +222,12 @@
 		Therefore, this observation is considered
 		partially addressed.}
 	
-	\LabDSTcomment{R3.3}{N}{}
+	\LabDSTcomment{R3.3}{N}{Section~\ref{sec:methods}, Table~\ref{tab:runs}, Table~\ref{tab:results_Vision_Train}}
 	{El dispositivo de corona con interruptores de límite, que es la base del diferenciador, solo se menciona: no hay CAD, figura,
 		número ni posición de los interruptores, resolución angular, ni cómo se registra el tiempo (interrupciones de la ESP32-C3,
 		timer, frecuencia). Además, el protocolo (Línea 244) habla de medir el “transient velocity profile”, pero unos interruptores
 		en posiciones fijas dan tiempos de paso, no un perfil continuo. No se explica cómo se ajusta $\tau_m$m a esos tiempos.}
-	{}
+	{This observation has been superseded by a methodological revision of the project's primary differentiator. Rather than characterizing individual servo time constants with a mechanical limit-switch crown, the manuscript now implements and validates a vision-based misalignment diagnosis methodology across all 16 hexagonal plates. Section~\ref{sec:methods} and Section~III-C detail the physical ArUco setup (four coplanar markers at plate height, $1~\text{px} = 1~\text{mm}$ homographic rectification, $128 \times 128~\text{px}$ plate crops), the automated Webots dataset generator state machine (Fig.~2 and Table~\ref{tab:runs}), the checkpointed training state machine (Fig.~5), and the analytical, lightweight CNN ($1.28\text{M}$ parameters), and hybrid estimation models.}
 	
 	\LabDSTcomment{R3.4}{N}{}
 	{No se describe la arquitectura del firmware de la ESP32-C3 ni el formato de los mensajes entre la PC y la ESP32-C3 (Wi-Fi

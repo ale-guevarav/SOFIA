@@ -50,7 +50,7 @@
 	Accurate orientation control is essential for coordinated movement, as differences between commanded and actual platform orientations may affect the system's performance. This work presents a vision-based orientation 
 	estimation and correction system that uses a neural network to evaluate the physical inclination of the hexagonal platforms. The proposed approach integrates visual perception with the existing embedded control architecture, 
 	consisting of an ESP32-C3 microcontroller and PCA9685 PWM drivers. The estimated orientation is compared with the desired reference to determine angular deviations and generate corrective commands for the servomotors. 
-	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. Experimental evaluation is being developed to quantify angular estimation accuracy, 
+	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. Experimental evaluation is being developed to quantify angular estimation accuracy with $0.204^\circ$ mean angular error and $3.3^\circ$ maximum error, 
 	residual orientation error, and correction performance under controlled operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
 \end{abstract}
 
@@ -293,14 +293,14 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig1} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-PH connectors.
+	Figure~\ref{fig:SOFIA_DIAGRAM} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-PH connectors.
 	
 	
 	\begin{figure}[!t]
 		\centering
-		\includegraphics[width=\columnwidth]{figures/SOFIA_DIAGRAM}
+		\includegraphics[width=\columnwidth]{figures/SOFIA_DIAGRAM_3}
 		\caption{Block diagram describing SOFIA components and connections.}
-		\label{fig1}
+		\label{fig:SOFIA_DIAGRAM}
 	\end{figure}
 	
 	\subsection{ESP32-C3 Technical Analysis}
