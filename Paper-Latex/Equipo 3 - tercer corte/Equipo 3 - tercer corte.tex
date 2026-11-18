@@ -50,13 +50,13 @@
 	Accurate orientation control is essential for coordinated movement, as differences between commanded and actual platform orientations may affect the system's performance. This work presents a vision-based orientation 
 	estimation and correction system that uses a neural network to evaluate the physical inclination of the hexagonal platforms. The proposed approach integrates visual perception with the existing embedded control architecture, 
 	consisting of an ESP32-C3 microcontroller and PCA9685 PWM drivers. The estimated orientation is compared with the desired reference to determine angular deviations and generate corrective commands for the servomotors. 
-	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. Experimental evaluation is being developed to quantify angular estimation accuracy with $0.204^\circ$ mean angular error and $3.3^\circ$ maximum error, 
-	residual orientation error, and correction performance under controlled operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
+	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. The CNN achieved a mean angular estimation error of $0.204^\circ$ and a maximum error of $3.3^\circ$ on the simulated test dataset.
+	Further experimental evaluation is required to quantify residual orientation error and correction performance under physical operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
 \end{abstract}
 
 	
 	\begin{IEEEkeywords}
-		\linelabel{ln:keywords}Visual feedback control, orientation estimation, neutral networks, computer vision, modular robotics, kinetic surfaces.
+		\linelabel{ln:keywords}Visual feedback control, orientation estimation, neural networks, computer vision, modular robotics, kinetic surfaces.
 	\end{IEEEkeywords}
 	
 	
@@ -74,17 +74,17 @@
 	
 	\linelabel{ln:intro-cap}The SOFIA system requires the
 	integration of mechanical actuation, servo control, embedded processing, and
-	communication subsystems. \linelabel{ln:intro-32}Since each of the 16 units uses two servomotors, the
-	complete demonstrator requires the coordinated control of 32 actuators and the
-	generation of multiple PWM signals. The embedded controller must coordinate
+	communication subsystems. \linelabel{ln:intro-32}The complete demonstrator
+	requires the coordinated control of 32 actuators through
+	multiple PWM signals. The embedded controller must coordinate
 	the desired actuator positions, while the communication architecture should
 	support the future integration of additional SOFIA modules without
-	significantly increasing wiring and control complexity. This work proposes a vision-based closed loop angular misalignment diagnosis for 16 modules with two-degree-of-freedom each.
+	significantly increasing wiring and control complexity. This work proposes a vision-based approach for angular misalignment diagnosis and closed-loop orientation correction.
 	
 	\subsection{Problem Statement and Research Question}
-	A SOFIA module consists of 16 hexagonal plates arranged in a honeycomb configuration, where each plate can tilt in two rotational directions actuated by low-cost micro-servomotors \cite{sofia_architecture}. These actuators commonly operate with gear backlash, mechanical wear, or accidental manual contact, and without external joint feedback these servo motors can introduce angular misalignment across the surface. Instrumenting all 16 units (32 degrees of freedom) with dedicated physical angle sensors would increase wiring complexity, moving mass, and hardware cost.
+	The hexagonal platforms of SOFIA are actuated by low-cost micro-servomotors \cite{sofia_architecture}. Gear backlash, mechanical wear, and accidental manual contact may introduce angular misalignment across the surface, particularly in the absence of external joint feedback. Instrumenting all 16 units with dedicated angle sensors would increase wiring complexity, moving mass, and hardware cost.
 	
-	To address this limitation, this work investigates the following research question: \textit{Can the two tilt angles of all 16 hexagonal plates be accurately estimated from a single overhead camera to classify each unit without per-module angle sensors?} This encompasses three primary objectives: (1) designing an embedded PCB integrating an ESP32-C3 microcontroller, dual PCA9685 PWM drivers, and RS-485 interfaces to coordinate the 32 actuators. (2) integrating the diagnosis pipeline onto the physical SOFIA module using an overhead camera, four coplanar ArUco markers, and sim-to-real fine-tuning. (3) integrating state-machine execution with real-time gesture recognition.
+	To address this limitation, this work investigates the following research question: \textit{Can the two tilt angles of all 16 hexagonal plates be accurately estimated from a single overhead camera to classify each unit without per-module angle sensors?} This encompasses three primary objectives: (1) designing an embedded PCB integrating an ESP32-C3 microcontroller, dual PCA9685 PWM drivers, and RS-485 interfaces to coordinate the 32 actuators; (2) integrating the diagnosis pipeline onto the physical SOFIA module using an overhead camera, four coplanar ArUco markers, and sim-to-real fine-tuning; and (3) integrating state-machine execution with real-time gesture recognition.
 	\begin{table*}[!t]
 		\centering
 		\caption{Comparative matrix of related shape-changing interface systems}
@@ -142,7 +142,7 @@
 		\end{tabularx}
 	\end{table*}
 	
-	\subsection{Related shape-changing interface systems}
+	\subsection{Related Shape-Changing Interface Systems}
 	\linelabel{ln:rw1}Motorized arrays have been widely explored as a mechanism for generating
 	dynamic physical surfaces. Relief introduced an actuated tabletop composed of
 	120 individually addressable motorized pins and emphasized a scalable hardware
@@ -183,9 +183,9 @@
 	control architecture, electrical integration, and communication. Based on the
 	reviewed literature, these characteristics were identified as relevant criteria
 	for evaluating the technological architecture of the demonstrator.
-	Table~\ref{tab:related_work_matrix} summarizes the comparative analysis of the
-	reviewed systems, while Table~\ref{tab:benchmarking} contrasts SOFIA with the
-	reviewed solutions using the established comparison criteria.
+	Table~\ref{tab:benchmarking} contrasts SOFIA
+	with the reviewed solutions using the
+	established comparison criteria.
 	
 	\begin{table}[!t]
 		\centering
@@ -244,8 +244,8 @@
 	\section{Materials and Methods}
 	\label{sec:methods}
 	
-	\linelabel{ln:materials-intro}The SOFIA kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom actuated by MG90S servomotors for a total of 32 actuators \cite{sofia_architecture,mg90s}. Rather than instrumenting individual actuators mechanically, this study evaluates the orientation of all 16 hexagonal top platforms simultaneously through an overhead computer vision pipeline.
-	
+	\linelabel{ln:materials-intro}The SOFIA kinetic surface uses 32 MG90S servomotors for platform actuation \cite{sofia_architecture,mg90s}. Rather than instrumenting individual actuators mechanically, this study evaluates the orientation of all 16 hexagonal platforms simultaneously through an overhead computer vision pipeline.
+
 	\linelabel{ln:hardware-config}The methodology is divided into three main stages: embedded hardware configuration, vision-based rectification with dataset generation in Webots, and comparative evaluation of angular estimation models. The first stage involves the selection and electrical verification of the electronic components required for 32-channel servomotor control and inter-module communication \cite{technical_session}. The second stage establishes an overhead camera calibration procedure using four coplanar ArUco markers to generate metric top-down crops ($1~\text{px} = 1~\text{mm}$) and automates the acquisition of labeled datasets in Webots. The third stage benchmarks a geometric displacement model, a lightweight convolutional neural network (CNN), and a hybrid decision rule to estimate platform tilt angles and classify each unit as \textit{OK} ($<2^\circ$), \textit{REVIEW} ($2^\circ\text{--}5^\circ$), or \textit{MISALIGNED} ($>5^\circ$).
 	
 	\linelabel{ln:methods-variables}The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
@@ -538,7 +538,7 @@
 	divider was incorporated into the PCB schematic between
 	the TTL485-V2.0 TXD output and the ESP32-C3 UART receive
 	input. The divider consists of a 10 kOhm series resistor
-	and an 20 kOhm resistor connected to ground, producing
+	and a 20 kOhm resistor connected to ground, producing
 	approximately 3.21 V from a nominal 5 V input.
 	
 	The ESP32-C3 UART transmit output remains directly
@@ -764,8 +764,8 @@
 	\linelabel{ln:sel}The technological
 	architecture was selected according to the functional and scalability
 	requirements of the SOFIA demonstrator. 
-	\linelabel{ln:sel-mg}MG90S servomotors as stated in Table~\ref{tab:alt_actuation} were selected to provide controlled angular positioning for each degree of freedom,
-	while two PCA9685 drivers as stated in Table~\ref{tab:alt_pwm} were selected to  provide the 32 PWM channels required by the system through a shared I2C bus. The ESP32-C3 SuperMini as stated in Table~\ref{tab:alt_processing} was selected as the main controller due to its integrated wireless connectivity and support for the required communication interfaces. \linelabel{ln:sel-rs485}Finally, RS-485 as stated in Table~\ref{tab:alt_comm} was selected for inter-module communication because its differential and multi-node architecture supports the future connection of multiple
+	\linelabel{ln:sel-mg}MG90S servomotors (Table~\ref{tab:alt_actuation}) were selected to provide controlled angular positioning for each degree of freedom,
+	while two PCA9685 drivers (Table~\ref{tab:alt_pwm}) provide the 32 PWM channels required by the system through a shared I2C bus. The ESP32-C3 SuperMini (Table~\ref{tab:alt_processing}) was selected as the main controller due to its integrated wireless connectivity and support for the required communication interfaces. \linelabel{ln:sel-rs485}Finally, RS-485 (Table~\ref{tab:alt_comm}) was chosen for inter-module communication because its differential and multi-node architecture supports the future connection of multiple
 	SOFIA modules.
 	
 	\subsection{Obtaining Samples for the Vision-Based Misalignment Diagnosis}
@@ -777,18 +777,18 @@
 	\end{figure}
 	\subsubsection{The Photograph}
 	
-	Four ArUco markers \cite{aruco} are placed around the module, at the height of the plates. From their centers, the photograph is \emph{rectified}: it is converted into a top view where 1~px equals 1~mm, no matter where the camera is. In that view, every plate at zero always falls on the same pixel, so a square crop of $128\times128$~px is cut around each plate. The 16 crops are what the methods receive.
+	Four ArUco markers \cite{aruco} are placed around the module at the height of the plates. Using their centers, the photograph is \emph{rectified} to obtain a top-down view with a scale of 1~px per 1~mm. In this view, each plate at its zero-angle position corresponds to a fixed pixel location, allowing a square crop of $128\times128$~px to be extracted around each plate. The 16 crops serve as inputs to the estimation methods.
 	
 	\vspace{1.5ex}
 	\subsubsection{The Generator in Webots}
 	
-	Taking thousands of real photographs with known angles is not practical, so the photographs were generated in Webots \cite{webots}, where the angles are known exactly. A supervisor controller and the 16 plate controllers follow the state machine of Fig.~\ref{fig:gen}. For each sample, the supervisor chooses random angles and a random scene (camera height of 1.30--1.40~m, tilt of up to $\pm4^\circ$, yaw of up to $\pm8^\circ$, lights, and floor), sends the angles, and waits until all 16 plates report that they are still. Only then it takes the photograph and saves, as the label, the angles \emph{measured} by the joint sensors, not the commanded ones. If a plate does not arrive within 3~s, the sample is discarded. Sample~0, with every plate at zero, is the reference.
-	
+	Taking thousands of real photographs with known angles is not practical, so the images were generated in Webots \cite{webots}, where the angles are known exactly. A supervisor controller and the 16 plate controllers follow the state machine of Fig.~\ref{fig:gen}. For each sample, the supervisor chooses random angles and scene parameters (camera height of 1.30--1.40~m, tilt of up to $\pm4^\circ$, yaw of up to $\pm8^\circ$, lighting, and floor), sends the angles, and waits until all 16 plates report that they are stationary. Only then does it capture the photograph and save the angles \emph{measured} by the joint sensors as labels, rather than the commanded angles. If a plate does not reach its target within 3~s, the sample is discarded. Sample~0, with all plates at their zero-angle positions, serves as the reference.
+
 	\vspace{1.5ex}
-	\subsubsection{The First and Second Run}
+	\subsubsection{The First and Second Runs}
 	
-	Table~\ref{tab:runs} compares the two runs. The second run replaced the simplified plates with the PROTO of the real unit (generated from its CAD model with \texttt{urdf2webots} \cite{urdf2webots}), placed the units as close as possible without collisions, moved the markers closer, used five times more images, and changed how the angles are chosen: in the first run they were uniform, while in the second they follow what is expected in the robot, mostly small misalignments and sometimes large ones, as if a plate were moved by hand or jammed. In both runs the images were split \emph{by photograph} into training, validation, and test sets, so the 16 plates of one photograph never fall in different sets.
-	
+	Table~\ref{tab:runs} compares the two runs. The second run replaced the simplified plates with the PROTO of the real unit (generated from its CAD model with \texttt{urdf2webots} \cite{urdf2webots}), placed the units as close as possible without collisions, moved the markers closer, used five times as many images, and modified the angular distribution. In the first run, the angles followed a uniform distribution, while the second run represented expected operating conditions, primarily small misalignments with occasional larger deviations caused by manual contact or mechanical obstruction. In both runs, the images were split \emph{by photograph} into training, validation, and test sets, ensuring that all 16 plates from the same photograph were assigned to the same set.
+
 	\begin{table}[!t]
 		\centering
 		\caption{The Two Runs}
@@ -811,10 +811,10 @@
 	
 	\section{Design and Implementation of the Technological Solution}
 	\label{sec:design}
-	\subsection{Simulation of the 16 Module SOFIA Structure}
+	\subsection{Simulation of the 16-Module SOFIA Structure}
 	
-	Figure~\ref{fig2} \linelabel{ln:sim}shows the simulated response of the sixteen-module SOFIA structure while tracking the moving point. The sequence illustrates each module reorientation at different instants, where each module adjusts its two rotational degrees of freedom to maintain alignment with  reference position.
-	
+	Figure~\ref{fig2} \linelabel{ln:sim}shows the simulated response of the SOFIA structure while tracking a moving reference point. The sequence illustrates the reorientation of each module at different instants to maintain alignment with the target.
+
 	\begin{figure}[!t]
 		\centering
 		\subfloat[Step 1]{\includegraphics[width=1.1in]{figures/Sim_a}}
@@ -865,7 +865,7 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
-	\subsection{Mechanical assembly}
+	\subsection{Mechanical Assembly}
 	\linelabel{ln:cad}The mechanical assembly was documented using an exploded
 	view generated in SolidWorks, as shown in
 	Fig.~\ref{fig:sofia_expl_cad}. The drawing illustrates
@@ -885,15 +885,15 @@
 	
 	\subsubsection{Geometric Method}
 	
-	It finds each plate in the top view and measures how far its center moved from the reference. With the plate at a distance $L$ from the joint axes, the shift is $\Delta v = L\sin\theta_2$ and $\Delta u = L\cos\theta_2\sin\theta_1$, which gives the two angles directly. It needs no training, but an error of 1~mm in the position becomes an error of $1/L$ radians: $1.0^\circ$ with $L=58$~mm and $1.5^\circ$ with $L=37$~mm.
-	
+	The geometric method identifies each plate in the top view and measures the displacement of its center relative to the reference position. With the plate at a distance $L$ from the joint axes, the displacement is given by $\Delta v = L\sin\theta_2$ and $\Delta u = L\cos\theta_2\sin\theta_1$, from which both angles are obtained. This method requires no training, but a position error of 1~mm results in an approximate angular error of $1/L$ radians: $1.0^\circ$ with $L=58$~mm and $1.5^\circ$ with $L=37$~mm.
+
 	\vspace{1.5ex}
 	\subsubsection{CNN}
 	
-	A small CNN (five blocks of convolutions, 1.28~M parameters) receives one crop and returns the two angles. It was trained in PyTorch \cite{pytorch} with the training images, mirrored and with random changes of light and noise so that it does not depend on a single scene. After every epoch, its error is measured on the validation images, and only the best epoch is kept. The test images are used once, at the end, to report the results.
-	
-	Since the second run takes about 4~hours, training was split into sessions with the state machine of Fig.~\ref{fig:train}. The complete state (weights, optimizer, and learning rate) is saved after every epoch, so a session can stop after a time limit or with Ctrl+C and the next one resumes at the same epoch, as if it had not stopped.
-	
+	A lightweight CNN (five convolutional blocks, 1.28~M parameters) receives one crop and estimates both angles. It was trained in PyTorch \cite{pytorch} using images augmented through mirroring, random lighting variations, and noise to improve generalization. After each epoch, the model is evaluated on the validation images, and only the best-performing model is retained. The test images are used exclusively for the final performance evaluation.
+
+	Since the second run required approximately 4~hours, training was divided into sessions using the state machine shown in Fig.~\ref{fig:train}. The complete training state (weights, optimizer, and learning rate) is saved after each epoch, allowing training to resume from the last saved checkpoint after a time limit or manual interruption.
+
 	\begin{figure}[!t]
 		\centering
 		\includegraphics[width=\columnwidth]{figures/State_machine_training}
@@ -904,17 +904,17 @@
 	\vspace{1.5ex}
 	\subsubsection{Hybrid Rule}
 	
-	Both methods are run, and for each plate: if they differ by more than $2^\circ$, the CNN is used and the plate is marked for inspection; if they agree and the plate is near zero ($\le6^\circ$), the geometric value is used; otherwise, the CNN. It was designed in the first run, where the geometric method was the most accurate near zero.
-	
+	Both methods are evaluated for each plate. If their estimates differ by more than $2^\circ$, the CNN estimate is selected and the plate is marked for inspection. If the estimates agree and the plate is near zero ($\le6^\circ$), the geometric estimate is selected; otherwise, the CNN estimate is used. This rule was developed during the first run, in which the geometric method achieved the highest accuracy near zero.
+
 	\vspace{1.5ex}
-	\subsubsection{Why ResNet18 Was Dropped}
+	\subsubsection{Exclusion ofResNet18}
 	
-	In the first run, a ResNet18 \cite{resnet} pretrained on ImageNet was also trained. Although it is ten times larger (13.3~M parameters), it was less accurate than the small CNN (Table~\ref{tab:results_Vision_Train}): what it learned from everyday photographs does not help to measure a shift of a few pixels. For this reason, and to save training time, it was not used in the second run.
-	
+	In the first run, a ResNet18 model \cite{resnet} pretrained on ImageNet was also evaluated. Despite having approximately ten times more parameters (13.3~M), it was less accurate than the lightweight CNN (Table~\ref{tab:results_Vision_Train}). This suggests that features learned from ImageNet may offer limited advantages when estimating small pixel displacements. Due to its lower performance and higher computational cost, ResNet18 was excluded from the second run.
+
 	\subsection{Computer Vision Gesture Recognition System Architecture}
 	
-	\linelabel{ln:intro-vis}The computer vision subsystem of SOFIA recognizes human gestures in real time and translates them into discrete action labels. Using a webcam, the modular Python application captures user movements to establish a gesture-based interaction method for future integration with the robot's control and actuation systems.
-	
+	\linelabel{ln:intro-vis}The computer vision subsystem of SOFIA recognizes human gestures in real time and translates them into discrete action labels. Using a webcam, the modular Python application captures user movements to enable gesture-based interaction with the robot's control and actuation systems.
+
 	\linelabel{ln:explain-vis}The implementation combines OpenCV for image acquisition and visualization with MediaPipe Tasks for landmark detection. It utilizes two pretrained models—Pose Landmarker (33 body landmarks) and Hand Landmarker (up to two hands with 21 landmarks each)—bypassing custom neural network training by classifying gestures through predefined geometric rules.
 	
 	\linelabel{ln:model-vis}Organized within the \texttt{Vision/} directory, the modular architecture uses \texttt{main.py} to orchestrate frame capture, model execution, evaluation, and visualization. Landmark detection is handled by \texttt{pose\_detector.py} and \texttt{hand\_detector.py}, while \texttt{gesture\_detector.py} performs classification using \texttt{geometry\_utils.py} for geometric calculations and \texttt{smoothing.py} for temporal stabilization.
@@ -927,8 +927,8 @@
 	
 	\subsection{Geometric Gesture Recognition}
 	
-	\linelabel{ln:Geo-ges-rec-intro}The gesture recognition system was designed to identify five predefined human gestures through geometric analysis of body and hand landmarks. Instead of training a custom classification model, the implementation uses deterministic rules based on normalized distances, joint angles, relative positions, and movement sequences. This approach allows each gesture to be defined through specific conditions while keeping the recognition process modular and interpretable.
-	
+	\linelabel{ln:Geo-ges-rec-intro}Gesture classification is based on deterministic rules that use normalized distances, joint angles, relative positions, and movement sequences. This approach keeps the recognition process modular and interpretable.
+
 	\linelabel{ln:Geo-ges-rec2}To reduce the influence of the user's distance from the camera, several geometric measurements are normalized using anatomical references, such as shoulder width and torso height. The normalized distance between two landmarks is calculated as:
 	\begin{equation}
 		D_{\text{norm}} = \frac{\sqrt{(x_A - x_B)^2 + (y_A - y_B)^2}}{d_{\text{ref}}}
@@ -941,8 +941,8 @@
 	\end{equation}
 	\linelabel{ln:Geo-ges-rec4}These angles are calculated from the two-dimensional projection of the detected landmarks and are used to evaluate arm configurations.
 	
-	\linelabel{ln:Geo-ges-rec5}The five gestures are divided into two dynamic gestures and three static gestures, depending on whether recognition requires a movement sequence or a specific body configuration described in Table~\ref{tab:gesture_conditions}.
-	
+	\linelabel{ln:Geo-ges-rec5}The recognition conditions for the five gestures are summarized in Table~\ref{tab:gesture_conditions}.
+
 	\begin{table}[!t]
 		\centering
 		\caption{Summary of Gesture Recognition Conditions}
@@ -965,17 +965,17 @@
 	
 	\subsection{Temporal Filtering and Gesture Validation}
 	
-	To optimize stability, an Exponential Moving Average (EMA) filter is applied to body landmarks using the next equation: 
+	To improve stability, an exponential moving average (EMA) filter is applied to body landmarks using the following equation:
 	\begin{equation}
 		S_t = \alpha X_t + (1 - \alpha)S_{t-1}
 	\end{equation} 
-	implemented with $\alpha = 0.3$ resulting in:
+	With $\alpha = 0.3$, the equation becomes:
 	\begin{equation}
 		S_t = 0.3X_t + 0.7S_{t-1}
 	\end{equation} 
 	
-	\linelabel{ln:five-frame}Additionally, static gestures require a five-consecutive-valid-frame confirmation, and the system manages display priorities during simultaneous activations by prioritizing SHIELD, ATTACK, RELOAD, START, and END.
-	
+	\linelabel{ln:five-frame}Additionally, static gestures require confirmation across five consecutive valid frames. During simultaneous activations, the system applies the following priority order: SHIELD, ATTACK, RELOAD, START, and END.
+
 	\subsection{Integration Challenges and Design Refinements}
 	
 	\linelabel{ln:chal-intro}During development, challenges in landmark stability, gesture overlap, and software integration prompted targeted algorithmic and architectural revisions. To prevent \texttt{AttributeError} crashes when users left the camera frame, missing-landmark validation was added prior to processing. Coordinate fluctuations near recognition thresholds were mitigated by incorporating an EMA filter ($\alpha = 0.3$) alongside a 5-consecutive-frame static confirmation requirement.
@@ -1058,8 +1058,8 @@
 	\label{sec:results}
 	
 	\subsection{Preliminary Servomotor Dynamic Response}
-	\linelabel{ln:speed}Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, little mechanical chatter and motion desynchronization occurred, establishing $350^\circ/\text{s}$ as the maximum operational threshold for smooth servo motor actuation.
-	
+	\linelabel{ln:speed}Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, mechanical chatter and motion desynchronization were observed. Based on these preliminary tests, $350^\circ/\text{s}$ was selected as the operating limit for smooth servomotor actuation.
+
 	\subsection{Results for the Training Methods of Vision-Based Misalignment Diagnosis}
 	
 	Table~\ref{tab:results_Vision_Train} shows the error on the test images of each run (300 and 1500 photographs). The two test sets are not the same, since the unit and the distribution of angles changed, so the comparison is between the two complete setups.
@@ -1089,12 +1089,12 @@
 		\end{tabularx}
 	\end{table}
 	
-	\textbf{First run.} Each method was good at something different. The geometric method was the most precise near zero ($0.13^\circ$), but sometimes failed badly (up to $74^\circ$) when a very tilted plate was confused with its neighbor. The CNN never failed badly (at most $4.4^\circ$). The hybrid rule took the best of both and was the best method ($0.223^\circ$).
-	
-	\textbf{Second run.} The CNN improved to $0.204^\circ$ with an error of at most $3.3^\circ$ in 24\,000 plates, and became the best method in every range, even near zero. The geometric method lost precision near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the arm of the real unit is shorter, so the plate moves less per degree and each pixel of error weighs more; on the other hand, it no longer fails badly (at most $5.9^\circ$). As a consequence, the hybrid rule \emph{fell} from the best to the middle ($0.329^\circ$): it uses the geometric value precisely near zero, where it is now the least precise. Its inspection marks are not useful either: 873 of its 901 marks were errors of the geometric method, not of the CNN. The CNN is therefore the default method; the geometric method remains as a fallback without a GPU.
-	
-	Two lessons follow. First, more and more realistic images made the CNN better, even with a harder unit. Second, a CNN must be retrained when the unit changes: the CNN of the first run, tested on the real unit, had an error of $1.6^\circ$.
-	
+	\textbf{First run.} Each method exhibited different strengths. The geometric method was the most accurate near zero ($0.13^\circ$), but occasionally produced large estimation errors (up to $74^\circ$) when a highly tilted plate was confused with an adjacent one. The CNN maintained a lower maximum error ($4.4^\circ$). The hybrid rule combined the advantages of both methods and achieved the lowest mean error ($0.223^\circ$).
+
+	\textbf{Second run.} The CNN achieved a mean error of $0.204^\circ$ and a maximum error of $3.3^\circ$ across 24\,000 plate samples, outperforming the other methods in overall mean error. The geometric method became less accurate near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the shorter arm of the real unit reduces displacement per degree, increasing the impact of pixel-level errors. However, its maximum error decreased to $5.9^\circ$. Consequently, the hybrid rule ranked second in overall mean error ($0.329^\circ$), as it relies on the geometric estimate near zero. Its inspection flags also showed limited reliability: 873 of the 901 flags corresponded to errors of the geometric method rather than the CNN. The CNN was therefore selected as the default method, while the geometric method remains an alternative when a GPU is unavailable.
+
+	Two main findings were identified. First, increasing the number and realism of training images improved CNN performance despite the more challenging geometry. Second, changes in the module geometry may require model retraining, as the CNN from the first run achieved an error of $1.6^\circ$ when evaluated on the second unit configuration.
+
 	\subsection{Functional Validation of the Vision Gesture Recognition Subsystem}
 	
 	\linelabel{ln:res-func-intro}The computer vision subsystem was tested through real-time webcam experiments to verify its ability to recognize the five predefined gestures. The tests focused on body and hand landmark detection, geometric gesture classification, and temporal validation.
@@ -1105,8 +1105,8 @@
 	
 	\linelabel{ln:vision-func-ema}The implementation of EMA filtering and five-frame temporal confirmation maintained the functionality of the recognition system while providing mechanisms to reduce unstable detections. Additionally, the final adjustments to RELOAD and ATTACK were verified, confirming that the updated gesture definitions could be recognized during functional testing.
 	
-	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem as an independent software prototype. However, recognition accuracy, average response time, and robustness under different environmental conditions still require quantitative evaluation.
-	
+	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem. Quantitative validation of the final implementation and its robustness under different environmental conditions remains pending.
+
 	\subsection{Gesture Recognition Performance Evaluation}
 
 	\linelabel{ln:res-vision-intro}Preliminary performance tests
@@ -1140,7 +1140,7 @@
 			\textbf{Hits} &
 			\textbf{Recall (\%)} &
 			\textbf{95\% CI (\%)} &
-			\textbf{Resp. (s)} \\
+			\textbf{Response (s)} \\
 			\midrule
 			START  & 6  & 6  & 100.0 & 61.0--100 & 1.33 \\
 			RELOAD & 9  & 8  & 88.9  & 56.5--98.0 & 4.17 \\
@@ -1195,11 +1195,11 @@
 	experimental validation.
 
 	The implementation of vision-based orientation correction
-	introduces external feedback to the SOFIA control system,
-	allowing adjustments based on the estimated physical
-	orientation of the platforms. Its effectiveness in reducing
-	angular deviations remains to be quantified through
-	experimental comparison.
+	introduces external feedback to the SOFIA control system.
+	The CNN achieved a mean angular estimation error of
+	$0.204^\circ$ on the second simulated dataset, outperforming
+	the geometric and hybrid methods in mean error. However,
+	its effectiveness in correcting physical misalignment remains to be quantified.
 
 	
 	
@@ -1215,14 +1215,13 @@
 
 	The implementation of a vision-based orientation estimation
 	and correction system enables automatic servomotor
-	adjustments using external visual feedback. This approach
-	establishes a means of addressing deviations between
-	commanded and actual platform orientations. Further
-	experimental validation is required to quantify angular
-	estimation accuracy, correction performance, and the
-	effectiveness of the integrated control system.
-
-	
+	adjustments using external visual feedback. In simulation,
+	the CNN achieved a mean angular estimation error of
+	$0.204^\circ$ and a maximum error of $3.3^\circ$.
+	Further experimental validation is required to assess
+	physical orientation estimation accuracy, correction
+	performance, and the effectiveness of the integrated system.
+		
 	\balance
 	
 	\bibliographystyle{IEEEtran}
