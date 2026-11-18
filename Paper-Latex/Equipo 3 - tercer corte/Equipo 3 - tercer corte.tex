@@ -293,7 +293,7 @@
 		\end{tabularx}
 	\end{table}
 	
-	Figure~\ref{fig:SOFIA_DIAGRAM} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (equipped with an external vision camera) and the main PCB via Wi-Fi or Bluetooth protocols. Onboard processing is handled by an ESP32 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is planned using JST-PH connectors.
+	Figure~\ref{fig:SOFIA_DIAGRAM} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (connected to a gesture capture camera and an overhead misalignment camera viewing the Master Module framed by four corner ArUco markers) and the Control PCB via Wi-Fi or Bluetooth protocols, while an external 5~V DC power supply feeds the board through a 5~V rail. Onboard processing is handled by an ESP32-C3 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is provided through an RS-485 transceiver connected via UART to the ESP32-C3, routing a Modbus bus through JST-PH male and female connectors.
 	
 	
 	\begin{figure}[!t]
@@ -833,6 +833,8 @@
 	\end{figure}
 	
 	Algorithm~\ref{alg:sofia_tracking} \linelabel{ln:alg}summarizes the inverse kinematics and smoothing strategy used by each SOFIA module to orient its platform toward the moving target.
+	
+	\linelabel{ln:alg1-alpha}In the implemented tracking controller, the EMA smoothing factor in Algorithm~1 was set to $\alpha = 0.25$ at a 50~Hz update rate, attenuating abrupt step changes in target angles.
 	
 	\begin{algorithm}[!t]
 		\caption{SOFIA module target tracking control}

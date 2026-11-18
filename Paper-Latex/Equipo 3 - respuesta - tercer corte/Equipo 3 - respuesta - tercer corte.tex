@@ -222,26 +222,26 @@
 		Therefore, this observation is considered
 		partially addressed.}
 	
-	\LabDSTcomment{R3.3}{N}{Section~\ref{sec:methods}, Table~\ref{tab:runs}, Table~\ref{tab:results_Vision_Train}}
+	\LabDSTcomment{R3.3}{P}{Section~\ref{sec:methods}, Table~\ref{tab:runs}, Table~\ref{tab:results_Vision_Train}}
 	{El dispositivo de corona con interruptores de límite, que es la base del diferenciador, solo se menciona: no hay CAD, figura,
 		número ni posición de los interruptores, resolución angular, ni cómo se registra el tiempo (interrupciones de la ESP32-C3,
 		timer, frecuencia). Además, el protocolo (Línea 244) habla de medir el “transient velocity profile”, pero unos interruptores
 		en posiciones fijas dan tiempos de paso, no un perfil continuo. No se explica cómo se ajusta $\tau_m$m a esos tiempos.}
-	{This observation has been superseded by a methodological revision of the project's primary differentiator. Rather than characterizing individual servo time constants with a mechanical limit-switch crown, the manuscript now implements and validates a vision-based misalignment diagnosis methodology across all 16 hexagonal plates. Section~\ref{sec:methods} and Section~III-C detail the physical ArUco setup (four coplanar markers at plate height, $1~\text{px} = 1~\text{mm}$ homographic rectification, $128 \times 128~\text{px}$ plate crops), the automated Webots dataset generator state machine (Fig.~2 and Table~\ref{tab:runs}), the checkpointed training state machine (Fig.~5), and the analytical, lightweight CNN ($1.28\text{M}$ parameters), and hybrid estimation models.}
+	{We made a revision of the project differentiator . Rather than characterizing individual servo time constants with a mechanical limit-switch crown, the manuscript now implements and validates a vision-based misalignment diagnosis methodology across all 16 hexagonal plates. Section~\ref{sec:methods} and Section~III-C detail the physical ArUco setup (four coplanar markers at plate height, $1~\text{px} = 1~\text{mm}$ homographic rectification, $128 \times 128~\text{px}$ plate crops), the automated Webots dataset generator state machine (Fig.~2 and Table~\ref{tab:runs}), the checkpointed training state machine (Fig.~5), and the analytical, lightweight CNN ($1.28\text{M}$ parameters), and hybrid estimation models.}
 	
-	\LabDSTcomment{R3.4}{N}{}
+	\LabDSTcomment{R3.4}{P}{\Rln{alg1-alpha}}
 	{No se describe la arquitectura del firmware de la ESP32-C3 ni el formato de los mensajes entre la PC y la ESP32-C3 (Wi-Fi
 		o Bluetooth), ni el uso del RS-485 entre placas (Línea 180). El valor de $\alpha_m$ del Algoritmo 1 no se da.}
-	{}
+	{The numerical value used for the smoothing factor $\alpha_m$ in Algorithm~1 has been added to the manuscript. The formal specification of the ESP32-C3 firmware architecture, the wireless message format (Wi-Fi/BLE), and the multi-board RS-485 communication protocol are planned as future work for subsequent development stages.}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{4}{Metodología D-Lab, resultados y validación}
 	
-	\LabDSTcomment{R4.1}{N}{}
+	\LabDSTcomment{R4.1}{P}{\Rln{intro-32}, Section~\ref{sec:results}, Table~\ref{tab:results_Vision_Train}}
 	{La pregunta de investigación es si estimar $\tau_m$m e integrarla al controlador mejora la sincronización. Ninguna de las dos partes
 		avanzó: no hay dispositivo ni $\tau_m$m medido, y el resultado que se reporta es el reconocimiento de gestos, que no responde la
 		pregunta. La Línea 445 pospone la medición al siguiente corte.}
-	{}
+	{The research question and technical differentiator were reformulated to align directly with the completed experimental work. Section~I-A now asks whether the two tilt angles of all 16 hexagonal plates can be accurately estimated from a single overhead camera to classify each unit (\textit{OK}, \textit{REVIEW}, or \textit{MISALIGNED}) without angle sensors. This question is answered in Section~\ref{sec:results} and Table~\ref{tab:results_Vision_Train} across $2{,}000$ and $10{,}000$ Webots renders, demonstrating that the lightweight CNN achieves $0.204^\circ$ mean angular error and $96.8\%$ state accuracy.}
 	
 	\LabDSTcomment{R4.2}{P}{Table~\ref{tab:gesture_benchmark}, \rlns{res-vision-intro}{vision-adjustments}}
 	{Las métricas de la Tabla XIV no son consistentes:
@@ -265,11 +265,11 @@
 	The preliminary SHIELD evaluation table was replaced by a
 	brief description of its findings.}
 	
-	\LabDSTcomment{R4.3}{N}{}
+	\LabDSTcomment{R4.3}{A}{\Rln{intro-32}, \rln{materials-intro}, Section~\ref{sec:results}}
 	{La pregunta y el objetivo 3 hablan de “a 32-actuator kinetic surface” y de igualar los tiempos de asentamiento de todos
 		los actuadores, pero el alcance declarado es de dos servos de un módulo (Línea 162). El objetivo 1 (diseñar la PCB) no se
 		relaciona con la pregunta, y los gestos no se relacionan con ningún objetivo.}
-	{}
+	{The entire list of objectives and problem statement was modified for our new differentiator, In addition the PCB design and gesture recognition was included in the problem statement}
 	
 	\LabDSTcomment{R4.4}{N}{}
 	{Sigue sin haber análisis Discover del demostrador: la Línea 113 habla de “the functional decomposition of the demonstrator”, pero no se muestra. No se declaran el repositorio en GitHub ni la bitácora, y no hay incrementos de integración
