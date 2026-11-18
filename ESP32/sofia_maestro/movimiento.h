@@ -11,24 +11,33 @@
  *      en cada placa: canal 0 = X y 1 = Y de su primera unidad,
  *                     canal 2 = X y 3 = Y de la segunda, etc.
  *
- *  Cada postura hace que las 16 unidades dibujen la misma figura
- *  POR TURNOS: unas 3 a la vez y desfasadas (una casi acabando,
- *  otra a la mitad, otra empezando) mientras la que ya terminó
- *  regresa al centro. Así nunca se mueven los 32 servos juntos
- *  (menos corriente) y por I2C solo viajan los canales de las
- *  unidades que se están moviendo. El servo X mueve en
- *  horizontal y el servo Y en vertical:
+ *  Las figuras son LAS MISMAS de la simulación (Webots,
+ *  tracker_esfera_cpp/patrones.hpp): misma forma, mismo tamaño
+ *  (±20°), misma velocidad y el mismo suavizado. El servo X hace
+ *  la "u" de la sim (derecha en la cámara) y el Y la "v" (arriba):
  *
- *      1 INICIO    -> círculo
- *      2 RECARGAR  -> cuadrado
- *      3 ESCUDO    -> una X
- *      4 ATAQUE    -> línea arriba-abajo (2 veces)
- *      5 FIN       -> zigzag de izquierda a derecha
+ *      1 INICIO    -> arriba-abajo
+ *      2 RECARGAR  -> "círculo de carga": solo las 12 unidades del
+ *                     borde, una tras otra en sentido horario,
+ *                     inclinándose hacia afuera (2 vueltas)
+ *      3 ESCUDO    -> rombo
+ *      4 ATAQUE    -> una L
+ *      5 FIN       -> izquierda-derecha (despedida)
+ *
+ *  En la sim las 16 unidades dibujan al unísono. Aquí, para no
+ *  pedir la corriente de 32 servos juntos, entran POR TURNOS
+ *  (SIMULTANEAS a la vez, desfasadas). Con SIMULTANEAS = 16
+ *  arrancan todas juntas, exactamente como en la sim.
+ *  RECARGAR siempre es como en la sim (ya mueve ~4 a la vez).
  *
  *  Todas las figuras son UNA lista de puntos compartida; cada
  *  unidad solo guarda en qué punto va (pocos bytes por unidad).
  *
- *  En modo TRACKING las 16 apuntan juntas hacia la mano.
+ *  En modo TRACKING las 16 apuntan hacia la mano POR TURNOS, como el
+ *  reloj de un CPU: cada 20 ms solo 4 unidades dan un salto corto y
+ *  ceden el turno a las siguientes 4. Avanzan casi juntas pero nunca
+ *  arrancan más de 8 servos a la vez. El regreso al centro (STOP,
+ *  estado seguro, fin del TRACKING) usa los mismos turnos.
  *
  *  Hardware y calibración tomados de las pruebas de
  *  mecatrónica (Prueba_Servos / SG90_WindowVelocity_PCA).
@@ -111,16 +120,39 @@ const float TS_S = 0.020f;
 // ~1.5 mm y a ±30° se tocan
 const float AMPLITUD = 20.0f;
 
-// Velocidades (grados/segundo). Las pruebas de mecatrónica
-// llegaron hasta 600 °/s. Con 240 °/s cada figura dura ~1-1.5 s
-// por unidad y la tanda de 16 unidades ~6-9 s
-const float VEL_PATRON  = 120.0f;
-const float VEL_REGRESO = 120.0f;
-const float VEL_TRACK   = 120.0f;
+// Velocidad de cada figura, igual que en la sim: en "AMPLITUDES por
+// segundo" (2.5 = recorre 2.5 x 20° = 50 °/s). Todas quedan por
+// debajo de los 120 °/s del ajuste fino
+//                         -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
+const float VEL_FIGURA[6] = {0, 2.5f,   0,        2.5f,   3.0f,   3.5f};
+
+// Suavizado de la sim (K = 0.15 cada 8 ms) pasado a pasos de 20 ms:
+// cada paso la unidad avanza este tanto de lo que le falta
+const float K_SUAVIZADO = 0.33f;
+
+// RECARGAR ("círculo de carga"), igual que en la sim
+const float RECARGA_VUELTA_S = 1.2f;   // segundos por vuelta
+const int   RECARGA_VUELTAS  = 2;
+const float RECARGA_COLA     = 2.2f;   // rad de "cola" encendida detrás de la cabeza
+
+const float VEL_REGRESO = 120.0f;   // °/s al volver al centro si se interrumpe
+const float VEL_TRACK   = 120.0f;   // °/s promedio de cada unidad en TRACKING
+
+// TRACKING POR TURNOS (como el reloj de un CPU): en cada paso de 20 ms
+// solo se mueven TRACK_POR_TURNO unidades, dan un salto corto hacia la
+// mano y le ceden el turno a las siguientes 4. Así las 16 avanzan casi
+// juntas pero nunca hay más de 4 unidades (8 servos) arrancando a la vez.
+// El salto se calcula para que el promedio sea VEL_TRACK; con 16
+// unidades: 120 °/s x 0.02 s x 4 turnos = 9.6° por salto, cada 80 ms
+const int   TRACK_POR_TURNO = 4;
+// Tope del salto: un SG90 recorre ~10° en los 20 ms de su turno, así
+// termina su salto antes de que le toque a las siguientes
+const float TRACK_SALTO_MAX = 10.0f;
 
 // Cuántas unidades dibujan la figura al mismo tiempo (las que
 // regresan al centro no cuentan). Más = la tanda acaba antes
-// pero se mueven más servos juntos (más corriente)
+// pero se mueven más servos juntos (más corriente).
+// 16 = todas al unísono, como en la sim
 const int SIMULTANEAS = 3;
 
 // Orden en que entran las unidades a la cola (1 = primera unidad).
@@ -129,9 +161,13 @@ const uint8_t ORDEN_UNIDADES[NUM_UNIDADES] = {
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 };
 
-// Veces que se repite cada figura (índice = postura)
-//                        -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
-const uint8_t REPETICIONES[6] = {0,  1,      1,        1,      2,      1};
+// Dónde está cada unidad en el módulo, como los paneles de la sim
+// ("Panel_<fila>_<columna>"). Sirve para RECARGAR (cuáles son del
+// borde y hacia dónde es "afuera"). Por defecto: placa 1 = filas 0 y
+// 1, placa 2 = filas 2 y 3. Si el cableado es otro, cámbialo aquí
+//                                    unidad: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+const uint8_t FILA_UNIDAD[NUM_UNIDADES]    = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+const uint8_t COLUMNA_UNIDAD[NUM_UNIDADES] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
 
 // TRACKING: grados de giro cuando la mano está
 // en el borde de la imagen (x_norm o y_norm = ±1)
@@ -167,17 +203,19 @@ enum FaseUnidad : uint8_t {
   U_FIGURA,     // dibujando la figura
   U_REGRESO,    // volviendo al centro
   U_MANO,       // siguiendo la mano (TRACKING)
+  U_RECARGA,    // haciendo el círculo de carga (RECARGAR)
 };
 
 struct Unidad {
   float x, y;                 // posición actual (grados)
   float enviadoX, enviadoY;   // última enviada al PCA9685
+  float ox, oy;               // punto de la figura (antes del suavizado)
   int16_t indice;             // punto de la ruta al que va
   FaseUnidad fase;
 };
 
 const char* NOMBRES_PATRON[] = {
-  "CENTRO", "CIRCULO", "CUADRADO", "X", "LINEA ARRIBA-ABAJO", "ZIGZAG"
+  "CENTRO", "ARRIBA-ABAJO", "CIRCULO DE CARGA", "ROMBO", "L", "IZQUIERDA-DERECHA"
 };
 
 Adafruit_PWMServoDriver* placas[NUM_PLACAS] = {nullptr, nullptr};
@@ -197,6 +235,8 @@ const int MAX_PUNTOS = 80;
 Punto ruta[MAX_PUNTOS];
 int numPuntos = 0;
 int patronActual = 0;
+float velocidadFigura = 50.0f;   // °/s de la figura actual
+unsigned long inicioRecargaMs = 0;
 
 // Cola de unidades que faltan por dibujar la figura
 uint8_t cola[NUM_UNIDADES];
@@ -284,7 +324,7 @@ bool iniciarServos() {
   Wire.setClock(I2C_HZ);
 
   for (int u = 0; u < NUM_UNIDADES; u++) {
-    unidades[u] = {0.0f, 0.0f, -1000.0f, -1000.0f, 0, U_QUIETA};
+    unidades[u] = {0.0f, 0.0f, -1000.0f, -1000.0f, 0.0f, 0.0f, 0, U_QUIETA};
   }
 
   uint8_t encontradas[NUM_PLACAS];
@@ -350,50 +390,73 @@ void agregarPunto(float x, float y) {
   }
 }
 
-// Agrega una figura (coordenadas de -1 a 1) escalada
-// a AMPLITUD, repetida 'vueltas' veces
-void agregarFigura(const Punto* figura, int n, int vueltas) {
-  for (int v = 0; v < vueltas; v++) {
-    for (int i = 0; i < n; i++) {
-      agregarPunto(figura[i].x * AMPLITUD, figura[i].y * AMPLITUD);
-    }
+// Agrega una figura (coordenadas de -1 a 1) escalada a AMPLITUD
+void agregarFigura(const Punto* figura, int n) {
+  for (int i = 0; i < n; i++) {
+    agregarPunto(figura[i].x * AMPLITUD, figura[i].y * AMPLITUD);
   }
 }
 
 // -----------------------------
-// FIGURAS (coordenadas normalizadas)
+// FIGURAS: copiadas de la sim (patrones.hpp), x = u, y = v.
+// Todas salen del centro y terminan en el centro
 // -----------------------------
 
-// 2 RECARGAR: cuadrado
-const Punto FIG_CUADRADO[] = {
-  {-1, -1}, {-1, 1}, {1, 1}, {1, -1}, {-1, -1},
-};
+// 1 INICIO: arriba-abajo
+const Punto FIG_INICIO[] = {{0, 1}, {0, -1}, {0, 0}};
 
-// 3 ESCUDO: X (las dos diagonales cruzando por el centro)
-const Punto FIG_X[] = {
-  {-1, 1}, {1, -1}, {0, 0}, {1, 1}, {-1, -1},
-};
+// 3 ESCUDO: rombo
+const Punto FIG_ESCUDO[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 1}, {0, 0}};
 
-// 4 ATAQUE: línea arriba-abajo
-const Punto FIG_LINEA[] = {
-  {0, 1}, {0, -1},
-};
+// 4 ATAQUE: una L
+const Punto FIG_ATAQUE[] = {{-0.5f, 1}, {-0.5f, -1}, {0.8f, -1}, {0, 0}};
 
-// 5 FIN: zigzag de izquierda a derecha
-const Punto FIG_ZIGZAG[] = {
-  {-1, 0}, {-0.6f, 0.7f}, {-0.2f, -0.7f}, {0.2f, 0.7f}, {0.6f, -0.7f}, {1, 0},
-};
+// 5 FIN: izquierda-derecha (despedida)
+const Punto FIG_FIN[] = {{-1, 0}, {1, 0}, {-1, 0}, {1, 0}, {0, 0}};
 
 #define N_FIG(f) ((int)(sizeof(f) / sizeof(f[0])))
 
-void agregarCirculo(int vueltas) {
-  const int PASOS = 36;   // un punto cada 10°
-  for (int v = 0; v < vueltas; v++) {
-    for (int i = 0; i <= PASOS; i++) {
-      float a = 2.0f * PI * i / PASOS;
-      agregarPunto(cosf(a) * AMPLITUD, sinf(a) * AMPLITUD);
-    }
-  }
+// -----------------------------
+// 2 RECARGAR: círculo de carga (igual que recarga() de la sim)
+// -----------------------------
+
+// Dirección de la unidad vista desde el centro del módulo, en la
+// imagen de la cámara (u = derecha, v = arriba). Mismas posiciones
+// que los paneles de sofia.wbt
+void direccionUnidad(int u, float& du, float& dv) {
+  const float FILAS_X[4] = {-0.1741f, -0.0580f, 0.0580f, 0.1741f};
+  int f = FILA_UNIDAD[u], c = COLUMNA_UNIDAD[u];
+  float y = -0.201f + 0.067f * (f % 2) + 0.134f * c;
+  du = -(y - 0.0335f);
+  dv = FILAS_X[f];
+}
+
+bool enBorde(int u) {
+  int f = FILA_UNIDAD[u], c = COLUMNA_UNIDAD[u];
+  return f == 0 || f == 3 || c == 0 || c == 3;
+}
+
+// Punto de la unidad u a los t segundos del círculo de carga
+void puntoRecarga(int u, float t, float& x, float& y) {
+  x = 0.0f;
+  y = 0.0f;
+
+  float du, dv;
+  direccionUnidad(u, du, dv);
+  float norma = sqrtf(du * du + dv * dv);
+  if (norma <= 0.0f) return;
+
+  float anguloUnidad = atan2f(dv, du);
+  float cabeza = -2.0f * PI * t / RECARGA_VUELTA_S;   // sentido horario
+
+  float atras = fmodf(anguloUnidad - cabeza, 2.0f * PI);
+  if (atras < 0.0f) atras += 2.0f * PI;
+
+  float intensidad = atras < RECARGA_COLA ? 1.0f - atras / RECARGA_COLA : 0.0f;
+
+  // Inclinarse hacia afuera del módulo
+  x = AMPLITUD * intensidad * du / norma;
+  y = AMPLITUD * intensidad * dv / norma;
 }
 
 // Tiempo que tarda una unidad en recorrer la ruta desde el centro
@@ -404,7 +467,7 @@ unsigned long duracionRutaMs() {
     x = ruta[i].x;
     y = ruta[i].y;
   }
-  return (unsigned long)(1000.0f * largo / VEL_PATRON);
+  return (unsigned long)(1000.0f * largo / velocidadFigura);
 }
 
 // =============================================
@@ -435,22 +498,44 @@ void iniciarPatron(uint8_t pose) {
   }
 
   numPuntos = 0;
-  int vueltas = REPETICIONES[pose];
 
   switch (pose) {
-    case 1: agregarCirculo(vueltas);                                    break;
-    case 2: agregarFigura(FIG_CUADRADO, N_FIG(FIG_CUADRADO), vueltas);  break;
-    case 3: agregarFigura(FIG_X, N_FIG(FIG_X), vueltas);                break;
-    case 4: agregarFigura(FIG_LINEA, N_FIG(FIG_LINEA), vueltas);        break;
-    case 5: agregarFigura(FIG_ZIGZAG, N_FIG(FIG_ZIGZAG), vueltas);      break;
+    case 1: agregarFigura(FIG_INICIO, N_FIG(FIG_INICIO)); break;
+    case 3: agregarFigura(FIG_ESCUDO, N_FIG(FIG_ESCUDO)); break;
+    case 4: agregarFigura(FIG_ATAQUE, N_FIG(FIG_ATAQUE)); break;
+    case 5: agregarFigura(FIG_FIN, N_FIG(FIG_FIN));       break;
   }
+  velocidadFigura = VEL_FIGURA[pose] * AMPLITUD;
 
   // Las que venían de la postura anterior regresan al centro;
   // si les toca turno antes de llegar, arrancan desde donde estén
   for (int u = 0; u < NUM_UNIDADES; u++) {
-    if (unidades[u].fase == U_FIGURA || unidades[u].fase == U_MANO) {
+    if (unidades[u].fase == U_FIGURA || unidades[u].fase == U_MANO ||
+        unidades[u].fase == U_RECARGA) {
       unidades[u].fase = U_REGRESO;
     }
+  }
+
+  patronActual = pose;
+  estado = PATRON;
+
+  // RECARGAR: como en la sim, las 12 del borde a la vez, cada una
+  // con su retraso según dónde está (no usa la cola)
+  if (pose == 2) {
+    largoCola = 0;
+    siguienteEnCola = 0;
+    inicioRecargaMs = millis();
+    int n = 0;
+    for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
+      bool participa = unidadPrueba >= 0 ? u == unidadPrueba : enBorde(u);
+      if (participa) {
+        unidades[u].fase = U_RECARGA;
+        n++;
+      }
+    }
+    Serial.printf("[MOV] Patron: %s (%d unidades, %.1f s)\n",
+                  NOMBRES_PATRON[pose], n, RECARGA_VUELTA_S * RECARGA_VUELTAS);
+    return;
   }
 
   // Cola: todas en ORDEN_UNIDADES, o solo la de la prueba de cableado
@@ -468,13 +553,11 @@ void iniciarPatron(uint8_t pose) {
   siguienteEnCola = 0;
 
   // Arrancar una cada (duración / SIMULTANEAS): así quedan desfasadas
-  // (una acabando, otra a la mitad, otra empezando)
+  // (una acabando, otra a la mitad, otra empezando).
+  // SIMULTANEAS >= 16: todas a la vez, como en la sim
   unsigned long duracion = duracionRutaMs();
-  intervaloArranqueMs = duracion / SIMULTANEAS;
+  intervaloArranqueMs = SIMULTANEAS >= NUM_UNIDADES ? 0 : duracion / SIMULTANEAS;
   ultimoArranqueMs = millis() - intervaloArranqueMs;   // la primera arranca ya
-
-  patronActual = pose;
-  estado = PATRON;
 
   Serial.printf("[MOV] Patron: %s (%d puntos, %lu ms por unidad, %d unidades, %d a la vez)\n",
                 NOMBRES_PATRON[pose], numPuntos, duracion, largoCola, SIMULTANEAS);
@@ -505,7 +588,7 @@ bool enMovimiento() {
 
 // Tecla 'u' del Monitor Serie: recorre las unidades de una en una
 // para revisar el cableado. La unidad elegida hace la línea
-// arriba-abajo sola; con 1-5 dibuja cualquier figura
+// arriba-abajo sola (INICIO); con 1-5 dibuja cualquier figura
 void siguienteUnidadPrueba() {
   unidadPrueba++;
 
@@ -517,7 +600,7 @@ void siguienteUnidadPrueba() {
     int k = unidadPrueba % UNIDADES_POR_PLACA;
     Serial.printf("[PRUEBA] Solo la unidad %d (PCA 0x%02X, canales %d=X y %d=Y)\n",
                   unidadPrueba + 1, direccionPlaca[b], canalX(k), canalY(k));
-    iniciarPatron(4);   // se mueve para que se vea cuál es
+    iniciarPatron(1);   // arriba-abajo, para que se vea cuál es
   }
 }
 
@@ -541,6 +624,57 @@ bool avanzarHacia(Unidad& un, float x, float y, float velocidad) {
   un.x += dx / distancia * paso;
   un.y += dy / distancia * paso;
   return false;
+}
+
+// -----------------------------
+// TURNOS (TRACKING y regreso al centro)
+// -----------------------------
+// Como el reloj de un CPU: cada paso de 20 ms solo TRACK_POR_TURNO
+// unidades que aún no llegan dan un salto corto; el siguiente paso les
+// toca a las siguientes, en ronda. Ninguna completa su movimiento de
+// golpe: todas avanzan "a saltitos" casi al mismo tiempo, pero nunca
+// arrancan más de 4 unidades (8 servos) juntas
+
+int siguienteTurno = 0;   // por qué unidad empieza la siguiente ronda
+
+void objetivoDe(const Unidad& un, float& x, float& y) {
+  if (un.fase == U_MANO) { x = objetivoMano.x; y = objetivoMano.y; }
+  else                   { x = 0.0f;           y = 0.0f; }
+}
+
+bool necesitaTurno(const Unidad& un) {
+  if (un.fase != U_MANO && un.fase != U_REGRESO) return false;
+  float x, y;
+  objetivoDe(un, x, y);
+  return fabsf(x - un.x) >= E_QUANT || fabsf(y - un.y) >= E_QUANT;
+}
+
+// Marca en 'turno' las unidades que se mueven en este paso y regresa
+// el tamaño del salto (grados)
+float elegirTurno(bool turno[]) {
+  int pendientes = 0;
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    turno[u] = false;
+    if (necesitaTurno(unidades[u])) pendientes++;
+  }
+  if (pendientes == 0) return 0.0f;
+
+  // Cada unidad se mueve 1 de cada 'rondas' pasos: el salto se agranda
+  // en esa proporción para que el promedio siga siendo VEL_TRACK
+  int rondas = (pendientes + TRACK_POR_TURNO - 1) / TRACK_POR_TURNO;
+  float salto = VEL_TRACK * TS_S * rondas;
+  if (salto > TRACK_SALTO_MAX) salto = TRACK_SALTO_MAX;
+
+  int elegidas = 0;
+  for (int i = 0; i < NUM_UNIDADES && elegidas < TRACK_POR_TURNO; i++) {
+    int u = (siguienteTurno + i) % NUM_UNIDADES;
+    if (necesitaTurno(unidades[u])) {
+      turno[u] = true;
+      elegidas++;
+      siguienteTurno = (u + 1) % NUM_UNIDADES;
+    }
+  }
+  return salto;
 }
 
 int unidadesEnFigura() {
@@ -574,12 +708,16 @@ void actualizarMovimiento() {
 
   if (estado == PATRON && siguienteEnCola < largoCola) {
     unsigned long ms = millis();
-    if (unidadesEnFigura() < SIMULTANEAS &&
-        ms - ultimoArranqueMs >= intervaloArranqueMs) {
+    while (siguienteEnCola < largoCola &&
+           unidadesEnFigura() < SIMULTANEAS &&
+           ms - ultimoArranqueMs >= intervaloArranqueMs) {
       Unidad& un = unidades[cola[siguienteEnCola++]];
       un.fase = U_FIGURA;
       un.indice = 0;
+      un.ox = un.x;   // la figura arranca desde donde esté
+      un.oy = un.y;
       ultimoArranqueMs = ms;
+      if (intervaloArranqueMs > 0) break;   // por turnos: una por paso
     }
   }
 
@@ -594,44 +732,72 @@ void actualizarMovimiento() {
 
   bool algunaActiva = false;
 
+  bool turno[NUM_UNIDADES];
+  float salto = elegirTurno(turno);
+
   for (int u = 0; u < NUM_UNIDADES; u++) {
     Unidad& un = unidades[u];
 
     switch (un.fase) {
 
       case U_FIGURA: {
-        // Recorre la ruta sin frenar en cada punto: lo que sobra del
-        // paso al llegar a un punto se usa hacia el siguiente
-        float paso = VEL_PATRON * TS_S;
+        // El punto de la figura (ox, oy) recorre la ruta a velocidad
+        // constante sin frenar en las esquinas, como en la sim
+        float paso = velocidadFigura * TS_S;
         while (paso > 0.0f && un.indice < numPuntos) {
-          float dx = ruta[un.indice].x - un.x;
-          float dy = ruta[un.indice].y - un.y;
+          float dx = ruta[un.indice].x - un.ox;
+          float dy = ruta[un.indice].y - un.oy;
           float d = sqrtf(dx * dx + dy * dy);
           if (d <= paso) {
-            un.x = ruta[un.indice].x;
-            un.y = ruta[un.indice].y;
+            un.ox = ruta[un.indice].x;
+            un.oy = ruta[un.indice].y;
             un.indice++;
             paso -= d;
           } else {
-            un.x += dx / d * paso;
-            un.y += dy / d * paso;
+            un.ox += dx / d * paso;
+            un.oy += dy / d * paso;
             paso = 0.0f;
           }
         }
+        // ...y la unidad lo sigue con el mismo suavizado de la sim
+        un.x += (un.ox - un.x) * K_SUAVIZADO;
+        un.y += (un.oy - un.y) * K_SUAVIZADO;
         if (un.indice >= numPuntos) {
           un.fase = U_REGRESO;
         }
         break;
       }
 
+      case U_RECARGA: {
+        float t = (millis() - inicioRecargaMs) / 1000.0f;
+        if (t > RECARGA_VUELTA_S * RECARGA_VUELTAS) {
+          un.fase = U_REGRESO;
+        } else {
+          puntoRecarga(u, t, un.ox, un.oy);
+          un.x += (un.ox - un.x) * K_SUAVIZADO;
+          un.y += (un.oy - un.y) * K_SUAVIZADO;
+        }
+        break;
+      }
+
       case U_REGRESO:
-        if (avanzarHacia(un, 0.0f, 0.0f, VEL_REGRESO)) {
+        // Por turnos, para que un STOP o el fin del TRACKING no
+        // regrese las 16 de golpe. El salto se escala a VEL_REGRESO
+        if (!necesitaTurno(un)) {
+          un.x = 0.0f;
+          un.y = 0.0f;
+          un.fase = U_QUIETA;
+        } else if (turno[u] &&
+                   avanzarHacia(un, 0.0f, 0.0f, salto * (VEL_REGRESO / VEL_TRACK) / TS_S)) {
           un.fase = U_QUIETA;
         }
         break;
 
       case U_MANO:
-        avanzarHacia(un, objetivoMano.x, objetivoMano.y, VEL_TRACK);
+        // Solo se mueve cuando le toca turno (salto corto hacia la mano)
+        if (turno[u]) {
+          avanzarHacia(un, objetivoMano.x, objetivoMano.y, salto / TS_S);
+        }
         break;
 
       case U_QUIETA:
