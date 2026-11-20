@@ -1,0 +1,270 @@
+\documentclass[letterpaper,journal]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amsfonts}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{cite}
+
+\begin{document}
+
+\title{Manual de Usuario del Sistema SOFIA}
+\maketitle
+
+\begin{abstract}
+El presente manual de usuario describe la arquitectura, los
+componentes, la configuración y el procedimiento de operación
+de SOFIA, una superficie cinética modular diseñada para la
+interacción humano-robot mediante visión artificial. El sistema
+está compuesto por 16 unidades mecánicas de dos grados de
+libertad, un sistema electrónico de control y una interfaz
+gráfica que permite el reconocimiento de gestos y el seguimiento
+de manos en tiempo real.
+
+Este documento proporciona las instrucciones necesarias para
+la instalación del software, la conexión con el prototipo
+físico, la utilización de los modos de operación y el uso de
+la simulación en Webots. También incluye consideraciones de
+seguridad, procedimientos de mantenimiento y recomendaciones
+para la solución de problemas durante su funcionamiento.
+\end{abstract}
+
+\begin{IEEEkeywords}
+SOFIA, manual de usuario, superficie cinética, visión artificial,
+interacción humano-robot, Bluetooth Low Energy, gemelo digital.
+\end{IEEEkeywords}
+
+\section{Introducción}
+\label{sec:introduccion}
+
+SOFIA es una superficie cinética modular desarrollada para
+explorar la interacción entre las personas y los sistemas
+robóticos mediante movimientos físicos controlados por
+visión artificial. El sistema está conformado por 16 unidades
+hexagonales, cada una con dos grados de libertad rotacionales,
+accionadas mediante servomotores.
+
+La interacción se realiza a través de una cámara que captura
+los movimientos del usuario. Un sistema de visión artificial
+procesa las imágenes y reconoce gestos corporales o posiciones
+de las manos. Esta información se transmite mediante Bluetooth
+Low Energy (BLE) a un controlador ESP32, encargado de coordinar
+los movimientos de la superficie.
+
+SOFIA cuenta con tres modos de operación: Juego, Tracking y
+Test. Adicionalmente, dispone de una simulación en Webots que
+permite utilizar el sistema de manera virtual o en conjunto
+con el prototipo físico mediante una arquitectura de gemelo
+digital.
+
+\subsection{Objetivo del manual}
+
+El objetivo de este manual es proporcionar al usuario las
+instrucciones necesarias para configurar, conectar y operar
+SOFIA correctamente, así como facilitar la identificación de
+sus componentes y funcionalidades.
+
+El documento está dirigido a estudiantes, operadores y
+personas interesadas en utilizar el sistema, sin requerir
+conocimientos avanzados sobre su implementación interna.
+
+\subsection{Alcance del manual}
+
+Este manual comprende la descripción general del sistema,
+sus componentes mecánicos y electrónicos, la instalación del
+software, los procedimientos de encendido y apagado, el uso
+de la interfaz gráfica, los modos de operación y la conexión
+con la simulación.
+
+Asimismo, se presentan recomendaciones para el mantenimiento,
+la solución de problemas y la utilización segura del prototipo.
+El sistema experimental de diagnóstico y corrección de
+orientación se describe únicamente dentro de su alcance
+validado en simulación.
+
+\section{Arquitectura general del sistema}
+\label{sec:arquitectura}
+
+La arquitectura de SOFIA se divide en cuatro subsistemas
+principales: visión artificial, comunicación, control
+electrónico y actuación mecánica. Estos subsistemas trabajan
+de manera conjunta para interpretar los movimientos del
+usuario y transformarlos en una respuesta física.
+
+El proceso comienza con la captura de imágenes mediante una
+cámara conectada a una computadora. El software de visión
+artificial identifica los gestos corporales o la posición de
+la mano, dependiendo del modo de operación seleccionado.
+
+Los resultados se transmiten mediante Bluetooth Low Energy
+(BLE) al ESP32 maestro, el cual interpreta los comandos y
+controla los servomotores mediante dos controladores PWM
+PCA9685. De esta manera, las 16 unidades de SOFIA generan
+movimientos coordinados sobre la superficie.
+
+Adicionalmente, el sistema dispone de una simulación en
+Webots que utiliza el mismo protocolo de comunicación
+mediante una conexión TCP local. Esto permite operar el
+prototipo físico, la simulación o ambos simultáneamente.
+
+\subsection{Subsistemas principales}
+
+\begin{itemize}
+    \item \textbf{Visión artificial:} captura y procesa las
+    imágenes para reconocer gestos corporales y realizar
+    el seguimiento de las manos.
+
+    \item \textbf{Interfaz gráfica:} permite al usuario
+    seleccionar el modo de operación, controlar la detección,
+    establecer conexiones y visualizar los resultados.
+
+    \item \textbf{Comunicación:} transmite los comandos al
+    ESP32 mediante BLE o a Webots mediante TCP, utilizando
+    un protocolo común.
+
+    \item \textbf{Control electrónico:} interpreta los
+    comandos recibidos y genera las señales necesarias
+    para controlar los servomotores.
+
+    \item \textbf{Actuación mecánica:} ejecuta los movimientos
+    de las 16 unidades hexagonales de la superficie.
+
+    \item \textbf{Simulación:} reproduce el comportamiento
+    de SOFIA en un entorno virtual mediante Webots.
+\end{itemize}
+
+\subsection{Flujo de funcionamiento}
+
+El funcionamiento general de SOFIA se desarrolla mediante
+la siguiente secuencia:
+
+\begin{enumerate}
+    \item La cámara captura los movimientos del usuario.
+    \item El sistema de visión procesa las imágenes.
+    \item Se identifica un gesto o la posición de la mano.
+    \item La interfaz gráfica presenta el resultado.
+    \item Se transmite el comando al destino conectado.
+    \item El controlador interpreta el comando recibido.
+    \item La superficie ejecuta el movimiento correspondiente.
+\end{enumerate}
+
+Este proceso se realiza continuamente durante la operación
+del sistema, permitiendo una interacción en tiempo real
+entre el usuario y SOFIA.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.95\columnwidth]{figuras/arquitectura_sofia.png}
+    \caption{Arquitectura general del sistema SOFIA.}
+    \label{fig:arquitectura_sofia}
+\end{figure}
+
+\section{Componentes del sistema}
+\label{sec:componentes}
+
+SOFIA está integrado por componentes mecánicos,
+electrónicos y de software que permiten el funcionamiento
+coordinado de la superficie cinética. Cada componente
+cumple una función específica dentro del proceso de
+detección, comunicación, control y ejecución de movimientos.
+
+\subsection{Componentes mecánicos}
+
+La estructura de SOFIA está conformada por 16 unidades
+hexagonales distribuidas en un arreglo modular. Cada unidad
+cuenta con dos grados de libertad rotacionales que permiten
+modificar la orientación de su superficie mediante dos
+servomotores.
+
+Los principales elementos mecánicos son:
+
+\begin{itemize}
+    \item Base hexagonal de soporte.
+    \item Placa superior móvil.
+    \item Mecanismos de transmisión y articulaciones.
+    \item Dos servomotores MG90S por unidad.
+    \item Elementos de fijación y ensamble.
+\end{itemize}
+
+La coordinación de las unidades permite generar patrones
+de movimiento sobre la superficie completa, así como
+orientar las placas hacia un objetivo determinado.
+
+\subsection{Componentes electrónicos}
+
+El sistema electrónico se encarga de recibir los comandos
+provenientes de la computadora y controlar los actuadores
+de la superficie cinética.
+
+Los componentes principales se presentan en la
+Tabla~\ref{tab:componentes_electronicos}.
+
+\begin{table}[!t]
+    \caption{Componentes electrónicos de SOFIA}
+    \label{tab:componentes_electronicos}
+    \centering
+    \footnotesize
+    \begin{tabularx}{\columnwidth}{l c X}
+        \toprule
+        \textbf{Componente} & \textbf{Cant.} & \textbf{Función} \\
+        \midrule
+        ESP32-C3 & 1 & Control y comunicación BLE. \\
+        PCA9685 & 2 & Generación de señales PWM. \\
+        MG90S & 32 & Movimiento de las unidades. \\
+        PCB & 1 & Interconexión electrónica. \\
+        Fuente de 5 V, 2 A & 1 & Alimentación del sistema. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El ESP32 actúa como controlador maestro y se comunica con
+los dos PCA9685 mediante el protocolo I2C. Estos dispositivos
+generan las señales PWM necesarias para controlar los
+32 servomotores del sistema.
+
+\subsection{Componentes de software}
+
+El software de SOFIA permite interpretar los movimientos
+del usuario, administrar la comunicación con el controlador
+electrónico y proporcionar una interfaz de operación.
+
+Las principales herramientas utilizadas se presentan en
+la Tabla~\ref{tab:componentes_software}.
+
+\begin{table}[!t]
+    \caption{Componentes de software de SOFIA}
+    \label{tab:componentes_software}
+    \centering
+    \footnotesize
+    \begin{tabularx}{\columnwidth}{l X}
+        \toprule
+        \textbf{Herramienta} & \textbf{Función} \\
+        \midrule
+        Python 3.12 & Lenguaje principal del sistema de visión. \\
+        OpenCV & Captura y procesamiento de imágenes. \\
+        MediaPipe & Detección corporal y de manos. \\
+        NumPy & Operaciones matemáticas y geométricas. \\
+        PySide6 & Desarrollo de la interfaz gráfica. \\
+        Bleak & Comunicación Bluetooth Low Energy. \\
+        Webots & Simulación del sistema robótico. \\
+        Matplotlib & Generación de gráficas de desempeño. \\
+        Openpyxl & Generación de reportes en Excel. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El software se encuentra organizado en módulos de detección,
+interfaz, comunicación y evaluación. Esta organización
+permite ejecutar los diferentes modos de operación y
+registrar información sobre el desempeño del sistema.
+
+
+
+\end{document}
