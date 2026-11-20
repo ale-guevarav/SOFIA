@@ -75,8 +75,9 @@ int main(int argc, char **argv) {
     int fila = -1, columna = -1;
     std::sscanf(robot->getName().c_str(), "Panel_%d_%d", &fila, &columna);
 
-    // Los 12 paneles del borde participan en RECARGAR
-    bool en_borde = fila == 0 || fila == 3 || columna == 0 || columna == 3;
+    // Número de unidad (1-16) como en el módulo real: 1 abajo a la
+    // izquierda, 16 arriba a la derecha (ver patrones.hpp)
+    int unidad = patrones::unidad_del_panel(fila, columna);
 
     std::string ultimo_comando;
     int modo = 0;            // sin maestro: como JUEGO (paneles en 0,0)
@@ -122,15 +123,10 @@ int main(int argc, char **argv) {
         double theta_1 = 0.0;
         double theta_2 = 0.0;
 
-        // Direccion del panel desde el centro, en la imagen cenital:
-        // derecha (u) = -Y del mundo, arriba (v) = +X del mundo
-        double dir_u = -(my_pos[1] - CENTRO_Y);
-        double dir_v = my_pos[0] - CENTRO_X;
-
         patrones::Punto punto;
         bool en_patron = postura_activa != 0 &&
             patrones::patron(postura_activa, robot->getTime() - inicio_patron,
-                             dir_u, dir_v, en_borde, punto);
+                             unidad, punto);
 
         if (en_patron) {
             // Patron de la postura: u -> gdl1, v -> gdl2

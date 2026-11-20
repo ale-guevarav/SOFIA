@@ -544,6 +544,12 @@ void loop() {
     Serial.println(placasEncontradas);
       // Prueba de cableado: una unidad a la vez
       siguienteUnidadPrueba();
+    } else if (c == 's' || c == 'S') {
+      cambiarSuavizador();          // EMA -> sin -> frena en esquinas -> suave
+    } else if (c == '+') {
+      cambiarEscalaVelocidad(1.25f);
+    } else if (c == '-') {
+      cambiarEscalaVelocidad(0.8f);
     }
   }
 

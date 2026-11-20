@@ -17,23 +17,31 @@ ESP32/
 
 | Comando que llega de la PC | Qué hacen las 16 unidades |
 |---|---|
-| POSE 1 · INICIO | **Arriba-abajo**, por turnos (tanda de ~9.7 s) |
-| POSE 2 · RECARGAR | **Círculo de carga**: las 12 del borde, una tras otra en sentido horario, se inclinan hacia afuera (2 vueltas, 2.4 s) |
-| POSE 3 · ESCUDO | **Rombo**, por turnos (~18.5 s) |
-| POSE 4 · ATAQUE | Una **L**, por turnos (~11.5 s) |
-| POSE 5 · FIN | **Izquierda-derecha** (despedida), por turnos (~14 s) |
+| POSE 1 · INICIO | El módulo dibuja **arriba-abajo** por el centro (~2.0 s) |
+| POSE 2 · RECARGAR | **Círculo de carga**, como antes: una cabeza gira por el borde en sentido horario y las unidades se inclinan hacia afuera con una cola (2 vueltas, 2.4 s) |
+| POSE 3 · ESCUDO | El módulo dibuja un **rombo** (~2.1 s) |
+| POSE 4 · ATAQUE | El módulo dibuja una **L** (~1.8 s) |
+| POSE 5 · FIN | El módulo dibuja **izquierda-derecha** (despedida, ~3.0 s) |
 | TRACK (solo en modo TRACKING) | **Apuntan hacia la mano**, por turnos de 4 |
 | STOP | Regresan al centro (por turnos de 4) |
 | PING | Solo responde ACK (comando de prueba) |
 
-- **Por turnos:** las unidades entran a una cola y dibujan la figura **3 a la vez, desfasadas** (una casi acabando, otra a la mitad, otra empezando); la que termina regresa al centro mientras entra la siguiente. Nunca se mueven los 32 servos juntos.
-- Las figuras son **las mismas de la simulación** (`Webots/.../tracker_esfera_cpp/patrones.hpp`): misma forma, ±20°, misma velocidad (50–70 °/s, ~1.6–3.1 s por unidad) y el mismo suavizado. El servo X hace la "u" de la sim (derecha en la cámara) y el Y la "v" (arriba).
-- En la sim se mueven las 16 **al unísono**; aquí van por turnos para no pedir la corriente de 32 servos juntos. Con `SIMULTANEAS = 16` arrancan todas juntas, igual que la sim, y cada tanda dura lo que una figura (1.6–3.1 s).
-- Todas las figuras miden ±20° desde el centro. Son 20° y no más porque, al moverse desfasadas, dos vecinas pueden inclinarse una hacia la otra: con 30 mm entre aristas, a ±20° quedan ~6 mm entre placas y a ±30° se tocan.
-- Al terminar, cada unidad **regresa al centro**.
-- Una postura nueva vacía la cola: las que se movían regresan al centro y empieza la tanda nueva.
+- **La figura la forma el módulo completo, con unidades fijas:** cada figura tiene un **grupo fijo** de unidades (`GRUPO_ESCUDO`…, las que quedan sobre la figura) y una **esfera virtual** recorre la figura a velocidad constante (`VEL_ESFERA`). Las unidades del grupo **siguen a la esfera como en el tracking**: se inclinan hacia ella (con la esfera encima quedan planas y la siguen cuando pasa), así que el movimiento es continuo.
+- Solo se mueven las **3 unidades del grupo más cercanas a la esfera** (`SIMULTANEAS`). El relevo es gradual: la que va a salir se apaga conforme se le acerca la que entra (`RELEVO_MM`).
+- **RECARGAR es el círculo de carga de siempre** (la cabeza gira continua por el borde, 1.2 s por vuelta), pero solo se mueven las `SIMULTANEAS` unidades más inclinadas: la cola se acorta a lo que ocupan 3 unidades del borde.
+- Unidad 1 = abajo a la izquierda, 16 = arriba a la derecha (visto desde la cámara):
+
+  ```
+    13  14  15  16    fila de arriba
+  9  10  11  12
+    5   6   7   8
+  1   2   3   4       fila de abajo
+  ```
+- Las mismas figuras están en la sim (`Webots/.../tracker_esfera_cpp/patrones.hpp`).
+- Todas las inclinaciones miden ±20° como máximo: con 30 mm entre aristas, a ±20° quedan ~6 mm entre placas vecinas y a ±30° se tocan.
+- Una postura nueva reemplaza a la anterior: la esfera empieza otra vez desde el principio de la figura.
 - **TRACKING por turnos (como el reloj de un CPU):** cada 20 ms solo 4 unidades dan un salto corto hacia la mano (máx. 10°) y ceden el turno a las siguientes 4. Ninguna completa su movimiento de golpe: las 16 avanzan casi juntas (llegan en ~0.3 s), pero nunca arrancan más de 8 servos a la vez, para no subir la corriente. El regreso al centro (STOP, estado seguro, fin del TRACKING) usa los mismos turnos. Se ajusta con `TRACK_POR_TURNO`, `TRACK_SALTO_MAX` y `VEL_TRACK`.
-- Se ajusta al inicio de `movimiento.h`: `SIMULTANEAS` (cuántas a la vez), `ORDEN_UNIDADES` (orden de la cola), `VEL_FIGURA` (velocidad de cada figura), y `FILA_UNIDAD` / `COLUMNA_UNIDAD` (dónde está cada unidad en el módulo, para RECARGAR; por defecto placa 1 = filas 0–1 y placa 2 = filas 2–3).
+- Se ajusta al inicio de `movimiento.h`: `SIMULTANEAS` (cuántas a la vez, 3), `FIG_*` (camino de la esfera), `GRUPO_*` (unidades que pueden moverse en cada figura), `VEL_ESFERA` (mm/s), `DIST_LLENA` / `RADIO_LLENO` / `RADIO_ESFERA` / `RELEVO_MM` (cómo siguen a la esfera), `suavizador` y `escalaVelocidad`, y `FILA_UNIDAD` / `COLUMNA_UNIDAD` (dónde está cada unidad: fila 0 = abajo, columna 0 = izquierda).
 - Si se pierde la conexión o pasan 3 s sin mensajes, las unidades van al centro (estado seguro).
 
 ---
@@ -92,7 +100,9 @@ En el Monitor Serie, con *"Sin ajuste de línea"*, escribe:
 |---|---|
 | `1` – `5` | Dibuja la figura de esa postura |
 | `0` | Regresa al centro |
-| `u` | Prueba de cableado: deja moverse **solo una unidad** (cada `u` pasa a la siguiente, del 1 al 16, y al final vuelven todas). La unidad elegida hace arriba-abajo; el Monitor Serie dice su placa y canales; con `1`–`5` esa unidad sola dibuja la figura |
+| `u` | Prueba de cableado: deja moverse **solo una unidad** (cada `u` pasa a la siguiente, del 1 al 16, y al final vuelven todas). La unidad elegida hace arriba-abajo sola (con cualquier postura, mientras esté elegida); el Monitor Serie dice su placa y canales |
+| `s` | Cambia el **suavizador** de las unidades: EMA (como la sim) → sin suavizado → arranca de golpe y frena al llegar → suave (2º orden). Manda una figura después para verlo |
+| `+` / `-` | Sube / baja la velocidad de las figuras (×1.25 / ×0.8, de ×0.25 a ×4). Aplica desde la siguiente figura |
 
 ### Con la PC (comunicación)
 
@@ -128,9 +138,9 @@ También se puede usar la GUI (`python gui_app.py`): **Conectar → Enviar PING 
 
 ### `movimiento.h`: servos (16 unidades)
 
-1. Cada figura es **una sola lista de puntos** (x, y) compartida por las 16 unidades; cada unidad solo guarda su posición, en qué punto va y su fase (quieta, figura, regreso, mano). Todo el movimiento ocupa ~1 KB de RAM.
-2. Al llegar una postura se arma la ruta y una **cola** con las unidades en `ORDEN_UNIDADES`. Cada 20 ms, `actualizarMovimiento()` arranca la siguiente unidad si hay menos de `SIMULTANEAS` dibujando y ya pasó *duración de la figura / SIMULTANEAS* desde la anterior: eso las deja desfasadas.
-3. Cada unidad avanza por la ruta a **velocidad constante** sin frenar en los puntos y, al acabar, regresa al centro.
+1. Cada figura es **un camino** (`FIG_*`) y **un grupo fijo de unidades** (`GRUPO_*`). Cada unidad solo guarda su posición, su velocidad y su fase (quieta, figura, regreso, mano). Todo el movimiento ocupa menos de 1 KB de RAM.
+2. Cada 20 ms, `posicionEsfera()` calcula dónde va la esfera y `objetivoFigura()` decide, para cada unidad del grupo, si es de las `SIMULTANEAS` más cercanas. Si lo es, se inclina hacia la esfera (como en el tracking); si no, va a 0. RECARGAR usa `objetivoRecarga()`: la cabeza gira por el borde y solo se mueven las 3 más inclinadas.
+3. `seguirObjetivo()` la lleva a esa inclinación con el suavizador elegido. Cuando la esfera termina el camino y todas vuelven al centro, la postura termina.
 4. **Solo viajan por I2C las unidades que se movieron** (más de 0.1°): sus dos canales van en una transacción de 9 bytes, ~3 por ciclo. Las quietas no reciben nada; el PCA9685 las mantiene en su posición.
 5. En modo TRACKING, el objetivo es la posición de la mano (x, y normalizadas × 45°) y las 16 unidades la siguen por turnos de 4, a 120 °/s en promedio.
 6. Si el Arduino IDE marca *Sketch too big*, es por la librería de Bluetooth, no por el movimiento: elige *Herramientas → Partition Scheme → Huge APP (3MB No OTA)*.

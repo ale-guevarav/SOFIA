@@ -11,27 +11,26 @@
  *      en cada placa: canal 0 = X y 1 = Y de su primera unidad,
  *                     canal 2 = X y 3 = Y de la segunda, etc.
  *
- *  Las figuras son LAS MISMAS de la simulación (Webots,
- *  tracker_esfera_cpp/patrones.hpp): misma forma, mismo tamaño
- *  (±20°), misma velocidad y el mismo suavizado. El servo X hace
- *  la "u" de la sim (derecha en la cámara) y el Y la "v" (arriba):
+ *  Las figuras las forma EL MÓDULO COMPLETO, como el círculo de carga:
+ *  cada figura tiene un GRUPO FIJO de unidades (las que quedan sobre
+ *  la figura) y una "esfera" virtual recorre la figura a velocidad
+ *  constante. Las unidades del grupo SIGUEN a la esfera, igual que en
+ *  el tracking: se inclinan hacia ella, así que el movimiento es
+ *  continuo y suave. Solo se mueven las SIMULTANEAS (3) unidades del
+ *  grupo más cercanas a la esfera; las demás esperan en el centro.
  *
- *      1 INICIO    -> arriba-abajo
- *      2 RECARGAR  -> "círculo de carga": solo las 12 unidades del
- *                     borde, una tras otra en sentido horario,
- *                     inclinándose hacia afuera (2 vueltas)
+ *      1 INICIO    -> arriba-abajo por el centro del módulo
+ *      2 RECARGAR  -> círculo de carga, como siempre: una cabeza gira
+ *                     por el borde en sentido horario (2 vueltas) y las
+ *                     unidades del borde se inclinan hacia afuera con
+ *                     una cola que se apaga (máximo SIMULTANEAS)
  *      3 ESCUDO    -> rombo
  *      4 ATAQUE    -> una L
  *      5 FIN       -> izquierda-derecha (despedida)
  *
- *  En la sim las 16 unidades dibujan al unísono. Aquí, para no
- *  pedir la corriente de 32 servos juntos, entran POR TURNOS
- *  (SIMULTANEAS a la vez, desfasadas). Con SIMULTANEAS = 16
- *  arrancan todas juntas, exactamente como en la sim.
- *  RECARGAR siempre es como en la sim (ya mueve ~4 a la vez).
- *
- *  Todas las figuras son UNA lista de puntos compartida; cada
- *  unidad solo guarda en qué punto va (pocos bytes por unidad).
+ *  El servo X inclina hacia la derecha de la cámara y el Y hacia
+ *  arriba. Unidad 1 = abajo a la izquierda, 16 = arriba a la derecha.
+ *  Las mismas figuras están en la sim (patrones.hpp).
  *
  *  En modo TRACKING las 16 apuntan hacia la mano POR TURNOS, como el
  *  reloj de un CPU: cada 20 ms solo 4 unidades dan un salto corto y
@@ -120,20 +119,87 @@ const float TS_S = 0.020f;
 // ~1.5 mm y a ±30° se tocan
 const float AMPLITUD = 20.0f;
 
-// Velocidad de cada figura, igual que en la sim: en "AMPLITUDES por
-// segundo" (2.5 = recorre 2.5 x 20° = 50 °/s). Todas quedan por
-// debajo de los 120 °/s del ajuste fino
-//                         -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
-const float VEL_FIGURA[6] = {0, 2.5f,   0,        2.5f,   3.0f,   3.5f};
+// FIGURAS DEL MÓDULO (las mismas que la sim, patrones.hpp)
+// Cuántas unidades se mueven a la vez en una figura (las más cercanas
+// a la esfera)
+const int SIMULTANEAS = 3;
 
-// Suavizado de la sim (K = 0.15 cada 8 ms) pasado a pasos de 20 ms:
-// cada paso la unidad avanza este tanto de lo que le falta
-const float K_SUAVIZADO = 0.33f;
+struct Punto {
+  float x;
+  float y;
+};
 
-// RECARGAR ("círculo de carga"), igual que en la sim
+// Camino de la esfera en cada figura, de -1 a 1 (1 = borde del
+// arreglo): x = derecha de la cámara, y = arriba
+const Punto FIG_INICIO[] = {{0, 0}, {0, 1}, {0, -1}, {0, 0}};                 // arriba-abajo
+const Punto FIG_ESCUDO[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 1}};        // rombo
+const Punto FIG_ATAQUE[] = {{-0.5f, 1}, {-0.5f, -1}, {0.8f, -1}};             // L
+const Punto FIG_FIN[] = {{-1, 0}, {1, 0}, {-1, 0}, {1, 0}};                   // izq-der
+
+// Medio ancho y medio alto del arreglo (mm): tamaño de la figura
+const float TAM_FIGURA_X = 234.5f;
+const float TAM_FIGURA_Y = 174.1f;
+
+// Velocidad de la esfera en cada figura (mm/s)
+//                            -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
+const float VEL_ESFERA[6] = {0, 350,    0,        550,    360,    470};
+
+// GRUPO FIJO de cada figura: las unidades que quedan a menos de ~85 mm
+// del camino (1 = abajo a la izquierda, 16 = arriba a la derecha).
+// Se pueden quitar o agregar unidades aquí
+//
+//        13  14  15  16      fila de arriba
+//      9  10  11  12
+//        5   6   7   8
+//      1   2   3   4         fila de abajo
+//
+const uint8_t GRUPO_INICIO[] = {3, 6, 11, 14};
+const uint8_t GRUPO_ESCUDO[] = {2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15};
+const uint8_t GRUPO_ATAQUE[] = {2, 3, 4, 5, 6, 10, 13, 14};
+const uint8_t GRUPO_FIN[] = {5, 6, 7, 8, 9, 10, 11, 12};
+
+// Cómo sigue cada unidad a la esfera:
+//  - se inclina HACIA la esfera; con la esfera encima queda plana y la
+//    sigue cuando pasa (como en el tracking)
+//  - a menos de DIST_LLENA de la esfera se inclina completa (±20°)
+//  - se apaga poco a poco entre RADIO_LLENO y RADIO_ESFERA
+const float DIST_LLENA   = 70.0f;    // mm
+const float RADIO_LLENO  = 100.0f;   // mm
+const float RADIO_ESFERA = 200.0f;   // mm
+// Relevo: cuando la unidad que va a entrar queda a menos de esto de una
+// de las 3 que se mueven, la de adentro empieza a apagarse
+const float RELEVO_MM    = 70.0f;    // mm
+
+// RECARGAR ("círculo de carga"), como en la sim original
 const float RECARGA_VUELTA_S = 1.2f;   // segundos por vuelta
 const int   RECARGA_VUELTAS  = 2;
 const float RECARGA_COLA     = 2.2f;   // rad de "cola" encendida detrás de la cabeza
+
+// Suavizado de la sim (K = 0.15 cada 8 ms) pasado a pasos de 20 ms
+const float K_SUAVIZADO = 0.33f;
+
+// SUAVIZADOR: cómo llega cada unidad a su inclinación (se cambia en
+// vivo con 's' en el Monitor Serie, para probar cuál se ve mejor):
+//   S_EMA     avanza el 33 % de lo que le falta cada 20 ms (como la sim)
+//   S_SIN     salta directo; el servo va a toda su velocidad
+//   S_FRENA   arranca de golpe (ACELERACION alta) y frena justo antes
+//             de llegar o de cambiar de dirección
+//   S_SUAVE   2º orden críticamente amortiguado: arranca y frena sin
+//             tirones, sin pasarse
+enum Suavizador { S_EMA, S_SIN, S_FRENA, S_SUAVE, NUM_SUAVIZADORES };
+const char* NOMBRES_SUAVIZADOR[] = {
+  "EMA (como la sim)", "SIN SUAVIZADO", "ARRANCA DE GOLPE Y FRENA AL LLEGAR", "SUAVE (2o orden)"
+};
+int suavizador = S_EMA;
+
+const float ACELERACION  = 4000.0f;   // S_FRENA: °/s² (llega a 300 °/s en 0.075 s)
+const float VEL_UNIDAD   = 300.0f;    // S_FRENA: °/s máximo
+const float OMEGA_SUAVE  = 30.0f;     // S_SUAVE: rad/s (llega en ~0.15 s)
+
+// Multiplica la velocidad de las figuras (se cambia en vivo con '+' y
+// '-'): 2.0 = la cabeza pasa el doble de rápido. Aplica desde la
+// siguiente figura
+float escalaVelocidad = 1.0f;
 
 const float VEL_REGRESO = 120.0f;   // °/s al volver al centro si se interrumpe
 const float VEL_TRACK   = 120.0f;   // °/s promedio de cada unidad en TRACKING
@@ -149,22 +215,10 @@ const int   TRACK_POR_TURNO = 4;
 // termina su salto antes de que le toque a las siguientes
 const float TRACK_SALTO_MAX = 10.0f;
 
-// Cuántas unidades dibujan la figura al mismo tiempo (las que
-// regresan al centro no cuentan). Más = la tanda acaba antes
-// pero se mueven más servos juntos (más corriente).
-// 16 = todas al unísono, como en la sim
-const int SIMULTANEAS = 3;
-
-// Orden en que entran las unidades a la cola (1 = primera unidad).
-// Se puede cambiar para seguir el acomodo físico del módulo
-const uint8_t ORDEN_UNIDADES[NUM_UNIDADES] = {
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
-};
-
-// Dónde está cada unidad en el módulo, como los paneles de la sim
-// ("Panel_<fila>_<columna>"). Sirve para RECARGAR (cuáles son del
-// borde y hacia dónde es "afuera"). Por defecto: placa 1 = filas 0 y
-// 1, placa 2 = filas 2 y 3. Si el cableado es otro, cámbialo aquí
+// Dónde está cada unidad en el módulo, VISTO DESDE LA CÁMARA:
+// fila 0 = abajo, columna 0 = izquierda. Por defecto la unidad 1 está
+// abajo a la izquierda y la 16 arriba a la derecha (placa 1 = las dos
+// filas de abajo). Si el cableado es otro, cámbialo aquí
 //                                    unidad: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
 const uint8_t FILA_UNIDAD[NUM_UNIDADES]    = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
 const uint8_t COLUMNA_UNIDAD[NUM_UNIDADES] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
@@ -184,11 +238,6 @@ const float E_QUANT = 0.10f;
 // TIPOS Y ESTADO
 // =============================================
 
-struct Punto {
-  float x;
-  float y;
-};
-
 // Estado general del módulo
 enum EstadoMovimiento {
   QUIETO,
@@ -203,14 +252,12 @@ enum FaseUnidad : uint8_t {
   U_FIGURA,     // dibujando la figura
   U_REGRESO,    // volviendo al centro
   U_MANO,       // siguiendo la mano (TRACKING)
-  U_RECARGA,    // haciendo el círculo de carga (RECARGAR)
 };
 
 struct Unidad {
   float x, y;                 // posición actual (grados)
   float enviadoX, enviadoY;   // última enviada al PCA9685
-  float ox, oy;               // punto de la figura (antes del suavizado)
-  int16_t indice;             // punto de la ruta al que va
+  float vx, vy;               // velocidad (°/s), para S_FRENA y S_SUAVE
   FaseUnidad fase;
 };
 
@@ -223,27 +270,16 @@ uint8_t direccionPlaca[NUM_PLACAS] = {0, 0};
 int placasEncontradas = 0;
 
 // Prueba de cableado: -1 = todas las unidades;
-// 0-15 = solo esa unidad entra a la cola y se mueve
+// 0-15 = solo esa unidad participa en las figuras y se mueve
 int unidadPrueba = -1;
 
 EstadoMovimiento estado = QUIETO;
 Unidad unidades[NUM_UNIDADES];
 
-// Ruta de la figura actual, COMPARTIDA por todas las unidades
-// (sin el regreso al centro: eso lo hace cada unidad al acabar)
-const int MAX_PUNTOS = 80;
-Punto ruta[MAX_PUNTOS];
-int numPuntos = 0;
+// Figura actual
 int patronActual = 0;
-float velocidadFigura = 50.0f;   // °/s de la figura actual
-unsigned long inicioRecargaMs = 0;
-
-// Cola de unidades que faltan por dibujar la figura
-uint8_t cola[NUM_UNIDADES];
-int largoCola = 0;
-int siguienteEnCola = 0;
-unsigned long ultimoArranqueMs = 0;
-unsigned long intervaloArranqueMs = 0;   // duración de la figura / SIMULTANEAS
+unsigned long inicioPatronMs = 0;
+float escalaPatron = 1.0f;  // escalaVelocidad al empezar la figura
 
 // Objetivo en TRACKING
 Punto objetivoMano = {0.0f, 0.0f};
@@ -324,7 +360,7 @@ bool iniciarServos() {
   Wire.setClock(I2C_HZ);
 
   for (int u = 0; u < NUM_UNIDADES; u++) {
-    unidades[u] = {0.0f, 0.0f, -1000.0f, -1000.0f, 0.0f, 0.0f, 0, U_QUIETA};
+    unidades[u] = {0.0f, 0.0f, -1000.0f, -1000.0f, 0.0f, 0.0f, U_QUIETA};
   }
 
   uint8_t encontradas[NUM_PLACAS];
@@ -381,53 +417,18 @@ bool iniciarServos() {
 }
 
 // =============================================
-// CONSTRUCCIÓN DE LA RUTA (compartida)
+// FIGURAS DEL MÓDULO
 // =============================================
-
-void agregarPunto(float x, float y) {
-  if (numPuntos < MAX_PUNTOS) {
-    ruta[numPuntos++] = {x, y};
-  }
-}
-
-// Agrega una figura (coordenadas de -1 a 1) escalada a AMPLITUD
-void agregarFigura(const Punto* figura, int n) {
-  for (int i = 0; i < n; i++) {
-    agregarPunto(figura[i].x * AMPLITUD, figura[i].y * AMPLITUD);
-  }
-}
-
-// -----------------------------
-// FIGURAS: copiadas de la sim (patrones.hpp), x = u, y = v.
-// Todas salen del centro y terminan en el centro
-// -----------------------------
-
-// 1 INICIO: arriba-abajo
-const Punto FIG_INICIO[] = {{0, 1}, {0, -1}, {0, 0}};
-
-// 3 ESCUDO: rombo
-const Punto FIG_ESCUDO[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 1}, {0, 0}};
-
-// 4 ATAQUE: una L
-const Punto FIG_ATAQUE[] = {{-0.5f, 1}, {-0.5f, -1}, {0.8f, -1}, {0, 0}};
-
-// 5 FIN: izquierda-derecha (despedida)
-const Punto FIG_FIN[] = {{-1, 0}, {1, 0}, {-1, 0}, {1, 0}, {0, 0}};
-
-#define N_FIG(f) ((int)(sizeof(f) / sizeof(f[0])))
-
-// -----------------------------
-// 2 RECARGAR: círculo de carga (igual que recarga() de la sim)
-// -----------------------------
 
 // Dirección de la unidad vista desde el centro del módulo, en la
 // imagen de la cámara (u = derecha, v = arriba). Mismas posiciones
 // que los paneles de sofia.wbt
 void direccionUnidad(int u, float& du, float& dv) {
   const float FILAS_X[4] = {-0.1741f, -0.0580f, 0.0580f, 0.1741f};
+  // Como el módulo real: 134 mm entre centros y las filas 2 y 4
+  // (unidades 5-8 y 13-16) corridas 67 mm a la derecha
   int f = FILA_UNIDAD[u], c = COLUMNA_UNIDAD[u];
-  float y = -0.201f + 0.067f * (f % 2) + 0.134f * c;
-  du = -(y - 0.0335f);
+  du = -0.2345f + 0.067f * (f % 2) + 0.134f * c;
   dv = FILAS_X[f];
 }
 
@@ -436,48 +437,223 @@ bool enBorde(int u) {
   return f == 0 || f == 3 || c == 0 || c == 3;
 }
 
-// Punto de la unidad u a los t segundos del círculo de carga
-void puntoRecarga(int u, float t, float& x, float& y) {
+#define N_ARR(a) ((int)(sizeof(a) / sizeof(a[0])))
+
+void figuraDe(int pose, const Punto*& fig, int& n, const uint8_t*& grupo, int& ng) {
+  switch (pose) {
+    case 1: fig = FIG_INICIO; n = N_ARR(FIG_INICIO); grupo = GRUPO_INICIO; ng = N_ARR(GRUPO_INICIO); break;
+    case 3: fig = FIG_ESCUDO; n = N_ARR(FIG_ESCUDO); grupo = GRUPO_ESCUDO; ng = N_ARR(GRUPO_ESCUDO); break;
+    case 4: fig = FIG_ATAQUE; n = N_ARR(FIG_ATAQUE); grupo = GRUPO_ATAQUE; ng = N_ARR(GRUPO_ATAQUE); break;
+    case 5: fig = FIG_FIN;    n = N_ARR(FIG_FIN);    grupo = GRUPO_FIN;    ng = N_ARR(GRUPO_FIN);    break;
+    default: fig = nullptr; n = 0; grupo = nullptr; ng = 0; break;
+  }
+}
+
+// Dónde va la esfera (mm) a los t segundos. Regresa false si ya acabó
+bool posicionEsfera(int pose, float t, float& ex, float& ey) {
+  const Punto* fig; const uint8_t* grupo; int n, ng;
+  figuraDe(pose, fig, n, grupo, ng);
+  if (n == 0) return false;
+  float recorrido = VEL_ESFERA[pose] * escalaPatron * t;
+  for (int i = 1; i < n; i++) {
+    float ax = fig[i - 1].x * TAM_FIGURA_X, ay = fig[i - 1].y * TAM_FIGURA_Y;
+    float bx = fig[i].x * TAM_FIGURA_X,     by = fig[i].y * TAM_FIGURA_Y;
+    float tramo = hypotf(bx - ax, by - ay);
+    if (recorrido <= tramo) {
+      float f = tramo > 0.0f ? recorrido / tramo : 1.0f;
+      ex = ax + f * (bx - ax);
+      ey = ay + f * (by - ay);
+      return true;
+    }
+    recorrido -= tramo;
+  }
+  return false;
+}
+
+bool enGrupo(int u, const uint8_t* grupo, int ng) {
+  for (int k = 0; k < ng; k++) if (grupo[k] == u + 1) return true;
+  return false;
+}
+
+// Distancia (mm) de la unidad u a la esfera
+float distanciaEsfera(int u, float ex, float ey) {
+  float du, dv;
+  direccionUnidad(u, du, dv);
+  return hypotf(ex - du * 1000.0f, ey - dv * 1000.0f);
+}
+
+// RECARGAR: qué tanto se inclina la unidad u (0-1) a los t segundos.
+// Una cabeza gira por el borde en sentido horario y deja una cola
+// que se apaga (igual que la sim original)
+float intensidadRecarga(int u, float t) {
+  if (!enBorde(u)) return 0.0f;
+  float du, dv;
+  direccionUnidad(u, du, dv);
+  float anguloUnidad = atan2f(dv, du);
+  float cabeza = -2.0f * PI * t / RECARGA_VUELTA_S;   // sentido horario
+  float atras = fmodf(anguloUnidad - cabeza, 2.0f * PI);
+  if (atras < 0.0f) atras += 2.0f * PI;
+  // La cola se acorta para que quepan SIMULTANEAS unidades del borde
+  // (12 unidades = una cada 2π/12 rad) y la última se apague antes de
+  // que entre la siguiente
+  float cola = (SIMULTANEAS - 0.5f) * 2.0f * PI / 12.0f;
+  if (cola > RECARGA_COLA) cola = RECARGA_COLA;
+  return atras < cola ? 1.0f - atras / cola : 0.0f;
+}
+
+bool objetivoRecarga(int u, float t, float& x, float& y) {
+  if (t > RECARGA_VUELTA_S * RECARGA_VUELTAS) return false;
+
+  float mia = intensidadRecarga(u, t);
+  if (mia <= 0.0f) return true;
+
+  // La cola alcanza a ~4 unidades: solo se mueven las SIMULTANEAS más
+  // inclinadas (las más cercanas a la cabeza); la del final de la cola
+  // se queda en el centro
+  int masInclinadas = 0;
+  for (int k = 0; k < placasEncontradas * UNIDADES_POR_PLACA; k++) {
+    if (k == u) continue;
+    float otra = intensidadRecarga(k, t);
+    if (otra > mia || (otra == mia && k < u)) masInclinadas++;
+  }
+  if (masInclinadas >= SIMULTANEAS) return true;
+
+  // Inclinarse hacia afuera del módulo
+  float du, dv;
+  direccionUnidad(u, du, dv);
+  float norma = hypotf(du, dv);
+  x = AMPLITUD * mia * du / norma;
+  y = AMPLITUD * mia * dv / norma;
+  return true;
+}
+
+// Inclinación que le toca a la unidad u a los t segundos de la figura.
+// Regresa false cuando la figura ya terminó
+bool objetivoFigura(int pose, int u, float t, float& x, float& y) {
   x = 0.0f;
   y = 0.0f;
 
+  // Prueba de cableado ('u'): la unidad sola hace arriba-abajo 2 veces
+  if (unidadPrueba >= 0) {
+    if (t > 2.0f) return false;
+    y = AMPLITUD * sinf(2.0f * PI * t);
+    return true;
+  }
+
+  if (pose == 2) return objetivoRecarga(u, t * escalaPatron, x, y);
+
+  // Figura con esfera: solo el grupo fijo, y de él las SIMULTANEAS
+  // unidades más cercanas a la esfera
+  const Punto* fig; const uint8_t* grupo; int n, ng;
+  figuraDe(pose, fig, n, grupo, ng);
+  if (n == 0) return false;
+
+  float ex, ey;
+  if (!posicionEsfera(pose, t, ex, ey)) return false;
+  if (!enGrupo(u, grupo, ng)) return true;
+
+  float d = distanciaEsfera(u, ex, ey);
+  int masCercanas = 0;
+  // Distancia de la primera unidad que se queda FUERA (la número
+  // SIMULTANEAS + 1 más cercana). Entre más se le acerca una unidad de
+  // las de adentro, menos se inclina: así el relevo entre la que sale y
+  // la que entra es suave y nunca brinca
+  float fuera[SIMULTANEAS + 1];
+  int nf = 0;
+  for (int k = 0; k < ng; k++) {
+    int otra = grupo[k] - 1;
+    if (otra == u || otra >= placasEncontradas * UNIDADES_POR_PLACA) continue;
+    float dOtra = distanciaEsfera(otra, ex, ey);
+    if (dOtra < d || (dOtra == d && otra < u)) masCercanas++;
+    // guardar las SIMULTANEAS + 1 distancias más chicas (ordenadas)
+    int j;
+    if (nf < SIMULTANEAS + 1) {
+      j = nf++;
+    } else {
+      if (dOtra >= fuera[SIMULTANEAS]) continue;
+      j = SIMULTANEAS;
+    }
+    while (j > 0 && fuera[j - 1] > dOtra) { fuera[j] = fuera[j - 1]; j--; }
+    fuera[j] = dOtra;
+  }
+  if (masCercanas >= SIMULTANEAS) return true;
+  // Sin contar a esta unidad, la que queda fuera es la SIMULTANEAS-ésima
+  // de las otras (índice SIMULTANEAS - 1)
+  float relevo = nf >= SIMULTANEAS ? saturar((fuera[SIMULTANEAS - 1] - d) / RELEVO_MM, 0.0f, 1.0f) : 1.0f;
+
+  // Inclinarse HACIA la esfera (como el tracking): completa a partir de
+  // DIST_LLENA, proporcional si la esfera está casi encima, y se apaga
+  // entre RADIO_LLENO y RADIO_ESFERA
   float du, dv;
   direccionUnidad(u, du, dv);
-  float norma = sqrtf(du * du + dv * dv);
-  if (norma <= 0.0f) return;
-
-  float anguloUnidad = atan2f(dv, du);
-  float cabeza = -2.0f * PI * t / RECARGA_VUELTA_S;   // sentido horario
-
-  float atras = fmodf(anguloUnidad - cabeza, 2.0f * PI);
-  if (atras < 0.0f) atras += 2.0f * PI;
-
-  float intensidad = atras < RECARGA_COLA ? 1.0f - atras / RECARGA_COLA : 0.0f;
-
-  // Inclinarse hacia afuera del módulo
-  x = AMPLITUD * intensidad * du / norma;
-  y = AMPLITUD * intensidad * dv / norma;
+  float vx = ex - du * 1000.0f, vy = ey - dv * 1000.0f;
+  float envolvente = saturar((RADIO_ESFERA - d) / (RADIO_ESFERA - RADIO_LLENO), 0.0f, 1.0f);
+  float escala = AMPLITUD * envolvente * relevo / (d > DIST_LLENA ? d : DIST_LLENA);
+  x = vx * escala;
+  y = vy * escala;
+  return true;
 }
 
-// Tiempo que tarda una unidad en recorrer la ruta desde el centro
-unsigned long duracionRutaMs() {
-  float largo = 0.0f, x = 0.0f, y = 0.0f;
-  for (int i = 0; i < numPuntos; i++) {
-    largo += sqrtf((ruta[i].x - x) * (ruta[i].x - x) + (ruta[i].y - y) * (ruta[i].y - y));
-    x = ruta[i].x;
-    y = ruta[i].y;
+// Lleva la unidad hacia (tx, ty) con el suavizador elegido
+void seguirObjetivo(Unidad& un, float tx, float ty) {
+  switch (suavizador) {
+
+    case S_EMA:
+      un.x += (tx - un.x) * K_SUAVIZADO;
+      un.y += (ty - un.y) * K_SUAVIZADO;
+      break;
+
+    case S_SIN:
+      un.x = tx;
+      un.y = ty;
+      break;
+
+    case S_FRENA: {
+      // Trapecio: acelera hasta VEL_UNIDAD y frena para llegar justo
+      float dx = tx - un.x, dy = ty - un.y, d = hypotf(dx, dy);
+      if (d < 0.01f) { un.vx = 0.0f; break; }
+      float v = un.vx + ACELERACION * TS_S;
+      if (v > VEL_UNIDAD) v = VEL_UNIDAD;
+      float vFrenado = sqrtf(2.0f * ACELERACION * d);   // la más rápida que aún frena a tiempo
+      if (v > vFrenado) v = vFrenado;
+      float paso = v * TS_S;
+      if (paso >= d) { un.x = tx; un.y = ty; }
+      else { un.x += dx / d * paso; un.y += dy / d * paso; }
+      un.vx = v;   // aquí vx guarda la rapidez
+      break;
+    }
+
+    case S_SUAVE: {
+      // Resorte críticamente amortiguado: a = w²(objetivo - x) - 2w v
+      un.vx += (OMEGA_SUAVE * OMEGA_SUAVE * (tx - un.x) - 2.0f * OMEGA_SUAVE * un.vx) * TS_S;
+      un.vy += (OMEGA_SUAVE * OMEGA_SUAVE * (ty - un.y) - 2.0f * OMEGA_SUAVE * un.vy) * TS_S;
+      un.x += un.vx * TS_S;
+      un.y += un.vy * TS_S;
+      break;
+    }
   }
-  return (unsigned long)(1000.0f * largo / velocidadFigura);
+}
+
+// Para probar desde el Monitor Serie
+void cambiarSuavizador() {
+  suavizador = (suavizador + 1) % NUM_SUAVIZADORES;
+  Serial.printf("[MOV] Suavizador: %s\n", NOMBRES_SUAVIZADOR[suavizador]);
+}
+
+void cambiarEscalaVelocidad(float factor) {
+  escalaVelocidad *= factor;
+  if (escalaVelocidad < 0.25f) escalaVelocidad = 0.25f;
+  if (escalaVelocidad > 4.0f)  escalaVelocidad = 4.0f;
+  Serial.printf("[MOV] Velocidad x%.2f (esfera del ESCUDO a %.0f mm/s; aplica desde la siguiente figura)\n",
+                escalaVelocidad, VEL_ESFERA[3] * escalaVelocidad);
 }
 
 // =============================================
 // COMANDOS DE MOVIMIENTO
 // =============================================
 
-// Toda unidad fuera del centro (o moviéndose) regresa; se vacía la cola
+// Toda unidad fuera del centro (o moviéndose) regresa
 void irAlCentro() {
-  largoCola = 0;
-  siguienteEnCola = 0;
   patronActual = 0;
 
   for (int u = 0; u < NUM_UNIDADES; u++) {
@@ -497,70 +673,38 @@ void iniciarPatron(uint8_t pose) {
     return;
   }
 
-  numPuntos = 0;
-
-  switch (pose) {
-    case 1: agregarFigura(FIG_INICIO, N_FIG(FIG_INICIO)); break;
-    case 3: agregarFigura(FIG_ESCUDO, N_FIG(FIG_ESCUDO)); break;
-    case 4: agregarFigura(FIG_ATAQUE, N_FIG(FIG_ATAQUE)); break;
-    case 5: agregarFigura(FIG_FIN, N_FIG(FIG_FIN));       break;
-  }
-  velocidadFigura = VEL_FIGURA[pose] * AMPLITUD;
-
-  // Las que venían de la postura anterior regresan al centro;
-  // si les toca turno antes de llegar, arrancan desde donde estén
-  for (int u = 0; u < NUM_UNIDADES; u++) {
-    if (unidades[u].fase == U_FIGURA || unidades[u].fase == U_MANO ||
-        unidades[u].fase == U_RECARGA) {
-      unidades[u].fase = U_REGRESO;
-    }
-  }
-
   patronActual = pose;
   estado = PATRON;
+  inicioPatronMs = millis();
+  escalaPatron = escalaVelocidad;
 
-  // RECARGAR: como en la sim, las 12 del borde a la vez, cada una
-  // con su retraso según dónde está (no usa la cola)
-  if (pose == 2) {
-    largoCola = 0;
-    siguienteEnCola = 0;
-    inicioRecargaMs = millis();
-    int n = 0;
-    for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
-      bool participa = unidadPrueba >= 0 ? u == unidadPrueba : enBorde(u);
-      if (participa) {
-        unidades[u].fase = U_RECARGA;
-        n++;
-      }
+  // Todas entran a la figura desde donde estén (las que venían de la
+  // postura anterior regresan solas cuando la cabeza no les toca).
+  // En la prueba de cableado solo entra esa unidad
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    Unidad& un = unidades[u];
+    bool participa = u < placasEncontradas * UNIDADES_POR_PLACA &&
+                     (unidadPrueba < 0 || u == unidadPrueba);
+    if (participa) {
+      un.fase = U_FIGURA;
+    } else if (un.fase != U_QUIETA) {
+      un.fase = U_REGRESO;
     }
-    Serial.printf("[MOV] Patron: %s (%d unidades, %.1f s)\n",
-                  NOMBRES_PATRON[pose], n, RECARGA_VUELTA_S * RECARGA_VUELTAS);
+  }
+
+  if (pose == 2) {
+    Serial.printf("[MOV] Patron: %s (%d vueltas de %.1f s, %d a la vez)\n",
+                  NOMBRES_PATRON[pose], RECARGA_VUELTAS, RECARGA_VUELTA_S, SIMULTANEAS);
     return;
   }
-
-  // Cola: todas en ORDEN_UNIDADES, o solo la de la prueba de cableado
-  largoCola = 0;
-  if (unidadPrueba >= 0) {
-    cola[largoCola++] = unidadPrueba;
-  } else {
-    for (int i = 0; i < NUM_UNIDADES; i++) {
-      int u = ORDEN_UNIDADES[i] - 1;
-      if (u >= 0 && u < placasEncontradas * UNIDADES_POR_PLACA) {
-        cola[largoCola++] = u;
-      }
-    }
+  const Punto* fig; const uint8_t* grupo; int n, ng;
+  figuraDe(pose, fig, n, grupo, ng);
+  float largo = 0.0f;
+  for (int i = 1; i < n; i++) {
+    largo += hypotf((fig[i].x - fig[i - 1].x) * TAM_FIGURA_X, (fig[i].y - fig[i - 1].y) * TAM_FIGURA_Y);
   }
-  siguienteEnCola = 0;
-
-  // Arrancar una cada (duración / SIMULTANEAS): así quedan desfasadas
-  // (una acabando, otra a la mitad, otra empezando).
-  // SIMULTANEAS >= 16: todas a la vez, como en la sim
-  unsigned long duracion = duracionRutaMs();
-  intervaloArranqueMs = SIMULTANEAS >= NUM_UNIDADES ? 0 : duracion / SIMULTANEAS;
-  ultimoArranqueMs = millis() - intervaloArranqueMs;   // la primera arranca ya
-
-  Serial.printf("[MOV] Patron: %s (%d puntos, %lu ms por unidad, %d unidades, %d a la vez)\n",
-                NOMBRES_PATRON[pose], numPuntos, duracion, largoCola, SIMULTANEAS);
+  Serial.printf("[MOV] Patron: %s (grupo de %d unidades, %d a la vez, ~%.1f s)\n",
+                NOMBRES_PATRON[pose], ng, SIMULTANEAS, largo / (VEL_ESFERA[pose] * escalaPatron));
 }
 
 // x_norm, y_norm: -1 a 1 (centro de la imagen = 0)
@@ -570,8 +714,6 @@ void seguirMano(float xNorm, float yNorm) {
   ultimoTrackMs = millis();
 
   if (estado != SIGUIENDO_MANO) {
-    largoCola = 0;
-    siguienteEnCola = 0;
     for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
       if (unidadPrueba < 0 || u == unidadPrueba) {
         unidades[u].fase = U_MANO;
@@ -587,8 +729,8 @@ bool enMovimiento() {
 }
 
 // Tecla 'u' del Monitor Serie: recorre las unidades de una en una
-// para revisar el cableado. La unidad elegida hace la línea
-// arriba-abajo sola (INICIO); con 1-5 dibuja cualquier figura
+// para revisar el cableado. La unidad elegida hace arriba-abajo sola
+// (con cualquier postura, mientras esté elegida)
 void siguienteUnidadPrueba() {
   unidadPrueba++;
 
@@ -677,14 +819,6 @@ float elegirTurno(bool turno[]) {
   return salto;
 }
 
-int unidadesEnFigura() {
-  int n = 0;
-  for (int u = 0; u < NUM_UNIDADES; u++) {
-    if (unidades[u].fase == U_FIGURA) n++;
-  }
-  return n;
-}
-
 // =============================================
 // ACTUALIZAR (llamar en cada loop; corre cada 20 ms)
 // =============================================
@@ -702,24 +836,7 @@ void actualizarMovimiento() {
     tControlUs = ahora;
   }
 
-  // -----------------------------
-  // COLA: arrancar la siguiente unidad
-  // -----------------------------
-
-  if (estado == PATRON && siguienteEnCola < largoCola) {
-    unsigned long ms = millis();
-    while (siguienteEnCola < largoCola &&
-           unidadesEnFigura() < SIMULTANEAS &&
-           ms - ultimoArranqueMs >= intervaloArranqueMs) {
-      Unidad& un = unidades[cola[siguienteEnCola++]];
-      un.fase = U_FIGURA;
-      un.indice = 0;
-      un.ox = un.x;   // la figura arranca desde donde esté
-      un.oy = un.y;
-      ultimoArranqueMs = ms;
-      if (intervaloArranqueMs > 0) break;   // por turnos: una por paso
-    }
-  }
+  float tPatron = (millis() - inicioPatronMs) / 1000.0f;
 
   if (estado == SIGUIENDO_MANO && millis() - ultimoTrackMs > TRACK_TIMEOUT_MS) {
     Serial.println("[MOV] Sin posicion de mano: regreso al centro");
@@ -741,41 +858,15 @@ void actualizarMovimiento() {
     switch (un.fase) {
 
       case U_FIGURA: {
-        // El punto de la figura (ox, oy) recorre la ruta a velocidad
-        // constante sin frenar en las esquinas, como en la sim
-        float paso = velocidadFigura * TS_S;
-        while (paso > 0.0f && un.indice < numPuntos) {
-          float dx = ruta[un.indice].x - un.ox;
-          float dy = ruta[un.indice].y - un.oy;
-          float d = sqrtf(dx * dx + dy * dy);
-          if (d <= paso) {
-            un.ox = ruta[un.indice].x;
-            un.oy = ruta[un.indice].y;
-            un.indice++;
-            paso -= d;
-          } else {
-            un.ox += dx / d * paso;
-            un.oy += dy / d * paso;
-            paso = 0.0f;
-          }
-        }
-        // ...y la unidad lo sigue con el mismo suavizado de la sim
-        un.x += (un.ox - un.x) * K_SUAVIZADO;
-        un.y += (un.oy - un.y) * K_SUAVIZADO;
-        if (un.indice >= numPuntos) {
-          un.fase = U_REGRESO;
-        }
-        break;
-      }
-
-      case U_RECARGA: {
-        float t = (millis() - inicioRecargaMs) / 1000.0f;
-        if (t > RECARGA_VUELTA_S * RECARGA_VUELTAS) {
-          un.fase = U_REGRESO;
-        } else {
-          puntoRecarga(u, t, un.ox, un.oy);
-          un.x += (un.ox - un.x) * K_SUAVIZADO;
-          un.y += (un.oy - un.y) * K_SUAVIZADO;
+        float tx, ty;
+        bool sigue = objetivoFigura(patronActual, u, tPatron, tx, ty);
+        seguirObjetivo(un, tx, ty);
+        if (!sigue && fabsf(un.x) < E_QUANT && fabsf(un.y) < E_QUANT) {
+          un.x = 0.0f;
+          un.y = 0.0f;
+          un.vx = 0.0f;
+          un.vy = 0.0f;
+          un.fase = U_QUIETA;
         }
         break;
       }
@@ -810,7 +901,7 @@ void actualizarMovimiento() {
   }
 
   // ¿Terminó la tanda?
-  if ((estado == PATRON && siguienteEnCola >= largoCola && !algunaActiva) ||
+  if ((estado == PATRON && !algunaActiva) ||
       (estado == REGRESANDO && !algunaActiva)) {
     if (estado == PATRON) {
       Serial.printf("[MOV] Patron %s terminado\n", NOMBRES_PATRON[patronActual]);
