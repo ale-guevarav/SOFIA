@@ -244,6 +244,7 @@ enum EstadoMovimiento {
   PATRON,
   SIGUIENDO_MANO,
   REGRESANDO,
+  PRUEBA,           // movimiento de prueba de una unidad (teclas u / e / p)
 };
 
 // Estado de cada unidad
@@ -252,6 +253,7 @@ enum FaseUnidad : uint8_t {
   U_FIGURA,     // dibujando la figura
   U_REGRESO,    // volviendo al centro
   U_MANO,       // siguiendo la mano (TRACKING)
+  U_PRUEBA,     // haciendo el movimiento de prueba
 };
 
 struct Unidad {
@@ -270,8 +272,24 @@ uint8_t direccionPlaca[NUM_PLACAS] = {0, 0};
 int placasEncontradas = 0;
 
 // Prueba de cableado: -1 = todas las unidades;
-// 0-15 = solo esa unidad participa en las figuras y se mueve
+// 0-15 = unidad elegida con 'u' (solo esa participa en las figuras)
 int unidadPrueba = -1;
+
+// MOVIMIENTO DE PRUEBA (teclas u / e / p): la unidad elegida va a cada
+// punto, espera un momento y sigue, en ciclo, hasta que se pausa
+const float VEL_PRUEBA = 60.0f;                 // °/s
+const unsigned long PAUSA_PRUEBA_MS = 300UL;    // espera en cada punto
+const float DIAG = 0.7071f;                     // en diagonal, ±20° en total
+struct PuntoPrueba { float x, y; const char* nombre; };
+const PuntoPrueba PASOS_PRUEBA[] = {
+  {0, 1, "arriba"}, {0, -1, "abajo"}, {0, 0, "centro"},
+  {-1, 0, "izquierda"}, {1, 0, "derecha"}, {0, 0, "centro"},
+  {DIAG, DIAG, "diagonal arriba-derecha"}, {-DIAG, -DIAG, "diagonal abajo-izquierda"}, {0, 0, "centro"},
+  {-DIAG, DIAG, "diagonal arriba-izquierda"}, {DIAG, -DIAG, "diagonal abajo-derecha"}, {0, 0, "centro"},
+};
+const int NUM_PASOS_PRUEBA = sizeof(PASOS_PRUEBA) / sizeof(PASOS_PRUEBA[0]);
+int pasoPrueba = 0;
+unsigned long llegoPruebaMs = 0;   // 0 = va en camino al punto
 
 EstadoMovimiento estado = QUIETO;
 Unidad unidades[NUM_UNIDADES];
@@ -533,13 +551,6 @@ bool objetivoFigura(int pose, int u, float t, float& x, float& y) {
   x = 0.0f;
   y = 0.0f;
 
-  // Prueba de cableado ('u'): la unidad sola hace arriba-abajo 2 veces
-  if (unidadPrueba >= 0) {
-    if (t > 2.0f) return false;
-    y = AMPLITUD * sinf(2.0f * PI * t);
-    return true;
-  }
-
   if (pose == 2) return objetivoRecarga(u, t * escalaPatron, x, y);
 
   // Figura con esfera: solo el grupo fijo, y de él las SIMULTANEAS
@@ -652,6 +663,15 @@ void cambiarEscalaVelocidad(float factor) {
 // COMANDOS DE MOVIMIENTO
 // =============================================
 
+// Termina el movimiento de prueba (la unidad regresa al centro)
+void detenerPrueba() {
+  if (estado != PRUEBA) return;
+  for (int u = 0; u < NUM_UNIDADES; u++) {
+    if (unidades[u].fase == U_PRUEBA) unidades[u].fase = U_REGRESO;
+  }
+  estado = REGRESANDO;
+}
+
 // Toda unidad fuera del centro (o moviéndose) regresa
 void irAlCentro() {
   patronActual = 0;
@@ -673,6 +693,7 @@ void iniciarPatron(uint8_t pose) {
     return;
   }
 
+  detenerPrueba();
   patronActual = pose;
   estado = PATRON;
   inicioPatronMs = millis();
@@ -713,6 +734,7 @@ void seguirMano(float xNorm, float yNorm) {
   objetivoMano.y = saturar(yNorm, -1.0f, 1.0f) * RANGO_TRACK;
   ultimoTrackMs = millis();
 
+  detenerPrueba();
   if (estado != SIGUIENDO_MANO) {
     for (int u = 0; u < placasEncontradas * UNIDADES_POR_PLACA; u++) {
       if (unidadPrueba < 0 || u == unidadPrueba) {
@@ -728,22 +750,56 @@ bool enMovimiento() {
   return estado == PATRON || estado == REGRESANDO;
 }
 
-// Tecla 'u' del Monitor Serie: recorre las unidades de una en una
-// para revisar el cableado. La unidad elegida hace arriba-abajo sola
-// (con cualquier postura, mientras esté elegida)
-void siguienteUnidadPrueba() {
-  unidadPrueba++;
+// PRUEBA UNIDAD POR UNIDAD (Monitor Serie)
+//   u  elige la siguiente unidad (1, 2, ... 16, y luego "todas")
+//   e  empieza el movimiento de prueba de la unidad elegida
+//   p  lo pausa: la unidad regresa al centro
+// El movimiento de prueba es arriba, abajo, izquierda, derecha y las
+// dos diagonales, en ciclo
 
+void empezarPrueba() {
+  if (placasEncontradas == 0) {
+    Serial.println("[PRUEBA] No hay placas PCA9685 conectadas");
+    return;
+  }
+  if (unidadPrueba < 0) {
+    unidadPrueba = 0;   // si no se eligió ninguna, empieza con la 1
+  }
+  irAlCentro();   // las demás regresan al centro
+  Unidad& un = unidades[unidadPrueba];
+  un.fase = U_PRUEBA;
+  pasoPrueba = 0;
+  llegoPruebaMs = 0;
+  estado = PRUEBA;
+  Serial.printf("[PRUEBA] Movimiento de prueba de la unidad %d (p = pausar)\n", unidadPrueba + 1);
+}
+
+void pausarPrueba() {
+  if (estado != PRUEBA) {
+    Serial.println("[PRUEBA] No hay movimiento de prueba en curso (e = empezar)");
+    return;
+  }
+  detenerPrueba();
+  Serial.println("[PRUEBA] Pausa: la unidad regresa al centro");
+}
+
+void siguienteUnidadPrueba() {
+  bool estabaProbando = estado == PRUEBA;
+  detenerPrueba();
+
+  unidadPrueba++;
   if (unidadPrueba >= placasEncontradas * UNIDADES_POR_PLACA) {
     unidadPrueba = -1;
-    Serial.println("[PRUEBA] Todas las unidades se mueven");
-  } else {
-    int b = unidadPrueba / UNIDADES_POR_PLACA;
-    int k = unidadPrueba % UNIDADES_POR_PLACA;
-    Serial.printf("[PRUEBA] Solo la unidad %d (PCA 0x%02X, canales %d=X y %d=Y)\n",
-                  unidadPrueba + 1, direccionPlaca[b], canalX(k), canalY(k));
-    iniciarPatron(1);   // arriba-abajo, para que se vea cuál es
+    Serial.println("[PRUEBA] Todas las unidades (e = empezar con la unidad 1)");
+    return;
   }
+
+  int b = unidadPrueba / UNIDADES_POR_PLACA;
+  int k = unidadPrueba % UNIDADES_POR_PLACA;
+  Serial.printf("[PRUEBA] Unidad %d elegida (PCA 0x%02X, canales %d=X y %d=Y)%s\n",
+                unidadPrueba + 1, direccionPlaca[b], canalX(k), canalY(k),
+                estabaProbando ? "" : "  e = empezar");
+  if (estabaProbando) empezarPrueba();   // si ya estaba probando, sigue con la nueva
 }
 
 // =============================================
@@ -867,6 +923,20 @@ void actualizarMovimiento() {
           un.vx = 0.0f;
           un.vy = 0.0f;
           un.fase = U_QUIETA;
+        }
+        break;
+      }
+
+      case U_PRUEBA: {
+        const PuntoPrueba& pp = PASOS_PRUEBA[pasoPrueba];
+        if (llegoPruebaMs == 0) {
+          if (avanzarHacia(un, pp.x * AMPLITUD, pp.y * AMPLITUD, VEL_PRUEBA)) {
+            llegoPruebaMs = millis();
+            Serial.printf("[PRUEBA] Unidad %d: %s\n", u + 1, pp.nombre);
+          }
+        } else if (millis() - llegoPruebaMs >= PAUSA_PRUEBA_MS) {
+          pasoPrueba = (pasoPrueba + 1) % NUM_PASOS_PRUEBA;
+          llegoPruebaMs = 0;
         }
         break;
       }

@@ -540,10 +540,14 @@ void loop() {
       irAlCentro();
     } else if (c == 'u' || c == 'U') {
       Serial.println("COMANDO U RECIBIDO");
-    Serial.print("PCA9685 detectados: ");
-    Serial.println(placasEncontradas);
-      // Prueba de cableado: una unidad a la vez
+      Serial.print("PCA9685 detectados: ");
+      Serial.println(placasEncontradas);
+      // Prueba de cableado: elegir la siguiente unidad
       siguienteUnidadPrueba();
+    } else if (c == 'e' || c == 'E') {
+      empezarPrueba();              // arriba, abajo, izq, der y diagonales
+    } else if (c == 'p' || c == 'P') {
+      pausarPrueba();               // la unidad regresa al centro
     } else if (c == 's' || c == 'S') {
       cambiarSuavizador();          // EMA -> sin -> frena en esquinas -> suave
     } else if (c == '+') {

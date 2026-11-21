@@ -100,7 +100,9 @@ En el Monitor Serie, con *"Sin ajuste de línea"*, escribe:
 |---|---|
 | `1` – `5` | Dibuja la figura de esa postura |
 | `0` | Regresa al centro |
-| `u` | Prueba de cableado: deja moverse **solo una unidad** (cada `u` pasa a la siguiente, del 1 al 16, y al final vuelven todas). La unidad elegida hace arriba-abajo sola (con cualquier postura, mientras esté elegida); el Monitor Serie dice su placa y canales |
+| `u` | Prueba unidad por unidad: **elige la siguiente unidad** (1, 2… 16 y al final "todas"). El Monitor Serie dice su placa y canales. No la mueve sola: con `e` empieza su prueba. Si ya había una prueba en curso, sigue con la nueva unidad |
+| `e` | **Empieza el movimiento de prueba** de la unidad elegida (si no hay ninguna, la 1): arriba, abajo, izquierda, derecha, diagonal ↗ ↙ y diagonal ↖ ↘, a 60 °/s con una pausa en cada punto, en ciclo (~9 s por vuelta). Las demás se quedan al centro |
+| `p` | **Pausa** el movimiento de prueba: la unidad regresa al centro |
 | `s` | Cambia el **suavizador** de las unidades: EMA (como la sim) → sin suavizado → arranca de golpe y frena al llegar → suave (2º orden). Manda una figura después para verlo |
 | `+` / `-` | Sube / baja la velocidad de las figuras (×1.25 / ×0.8, de ×0.25 a ×4). Aplica desde la siguiente figura |
 
