@@ -36,22 +36,22 @@ Solid {
 # a cualquier vecino -> 134 mm entre centros en la fila, filas a 116 mm
 # y las filas impares desplazadas 67 mm. El PROTO es 1 a 1 con la unidad
 # real (104 mm de lado a lado de la placa).
-DEF PANEL_0_0 sofia { translation -0.1741 -0.201 0 name "Panel_0_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_0_1 sofia { translation -0.1741 -0.067 0 name "Panel_0_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_0_2 sofia { translation -0.1741 0.067 0 name "Panel_0_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_0_3 sofia { translation -0.1741 0.201 0 name "Panel_0_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_1_0 sofia { translation -0.0580 -0.134 0 name "Panel_1_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_1_1 sofia { translation -0.0580 0.000 0 name "Panel_1_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_1_2 sofia { translation -0.0580 0.134 0 name "Panel_1_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_1_3 sofia { translation -0.0580 0.268 0 name "Panel_1_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_2_0 sofia { translation 0.0580 -0.201 0 name "Panel_2_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_2_1 sofia { translation 0.0580 -0.067 0 name "Panel_2_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_2_2 sofia { translation 0.0580 0.067 0 name "Panel_2_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_2_3 sofia { translation 0.0580 0.201 0 name "Panel_2_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_3_0 sofia { translation 0.1741 -0.134 0 name "Panel_3_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_3_1 sofia { translation 0.1741 0.000 0 name "Panel_3_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_3_2 sofia { translation 0.1741 0.134 0 name "Panel_3_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
-DEF PANEL_3_3 sofia { translation 0.1741 0.268 0 name "Panel_3_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_0 sofia { translation -0.1741 -0.134 0 name "Panel_0_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_1 sofia { translation -0.1741 0.000 0 name "Panel_0_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_2 sofia { translation -0.1741 0.134 0 name "Panel_0_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_0_3 sofia { translation -0.1741 0.268 0 name "Panel_0_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_0 sofia { translation -0.0580 -0.201 0 name "Panel_1_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_1 sofia { translation -0.0580 -0.067 0 name "Panel_1_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_2 sofia { translation -0.0580 0.067 0 name "Panel_1_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_1_3 sofia { translation -0.0580 0.201 0 name "Panel_1_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_0 sofia { translation 0.0580 -0.134 0 name "Panel_2_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_1 sofia { translation 0.0580 0.000 0 name "Panel_2_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_2 sofia { translation 0.0580 0.134 0 name "Panel_2_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_2_3 sofia { translation 0.0580 0.268 0 name "Panel_2_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_0 sofia { translation 0.1741 -0.201 0 name "Panel_3_0" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_1 sofia { translation 0.1741 -0.067 0 name "Panel_3_1" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_2 sofia { translation 0.1741 0.067 0 name "Panel_3_2" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
+DEF PANEL_3_3 sofia { translation 0.1741 0.201 0 name "Panel_3_3" colorPlaca 0.92 0.92 0.92 controller "panel_dataset" supervisor TRUE }
 
 
 # =============================================

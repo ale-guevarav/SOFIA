@@ -41,8 +41,10 @@ COLUMNAS = 4
 # cualquier vecino -> 134 mm entre centros en la fila, 116 mm entre
 # filas y las filas impares desplazadas 67 mm.
 FILAS_X = [-0.1741, -0.0580, 0.0580, 0.1741]
-COLUMNAS_Y_PAR = [-0.201, -0.067, 0.067, 0.201]
-COLUMNAS_Y_IMPAR = [-0.134, 0.000, 0.134, 0.268]
+# Como el módulo real: las filas impares (unidades 5-8 y 13-16) quedan
+# corridas hacia la derecha de la cámara (-Y), no hacia afuera
+COLUMNAS_Y_PAR = [-0.134, 0.000, 0.134, 0.268]
+COLUMNAS_Y_IMPAR = [-0.201, -0.067, 0.067, 0.201]
 
 # Centro del arreglo (promedio de los 16 paneles)
 CENTRO_X = 0.0

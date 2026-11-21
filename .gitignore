@@ -1,2 +1,7 @@
 .history/
 *.kicad_prl
+
+# Ejecutable del controlador de Webots: cada quien lo compila (make)
+Webots/Sofia/controllers/tracker_esfera_cpp/tracker_esfera_cpp
+Webots/Sofia/controllers/tracker_esfera_cpp/tracker_esfera_cpp.exe
+Webots/Sofia/controllers/tracker_esfera_cpp/build/

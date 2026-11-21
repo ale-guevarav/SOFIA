@@ -6,6 +6,6 @@ minimizedPerspectives: 000000ff00000000fd0000000300000000000001ca0000039ffc02000
 maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
-textFiles: 0 "controllers/esfera_control/esfera_control.cpp"
+textFiles: 0 "controllers/tracker_esfera_cpp/tracker_esfera_cpp.cpp"
 consoles: Console:All:All
 renderingDevicePerspectives: camara_cenital:camara;1;1;0;0
