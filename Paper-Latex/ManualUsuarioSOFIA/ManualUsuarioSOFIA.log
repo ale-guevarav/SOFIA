@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.11.16)  20 NOV 2026 12:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.11.16)  20 NOV 2026 19:36
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -375,7 +375,16 @@ File: figuras/arquitectura_sofia.png Graphic file (type png)
 <use figuras/arquitectura_sofia.png>
 Package pdftex.def Info: figuras/arquitectura_sofia.png  used on input line 164.
 (pdftex.def)             Requested size: 239.39923pt x 179.53816pt.
- (C:\Users\alegu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd) (C:\Users\alegu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd) [2 <./figuras/arquitectura_sofia.png (PNG copy)>] (ManualUsuarioSOFIA.aux
+ (C:\Users\alegu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd) (C:\Users\alegu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd)
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 307.
+ (C:\Users\alegu\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+) [2 <./figuras/arquitectura_sofia.png (PNG copy)>] [3] [4] [5] [6] [7] [8] [9] [10]
+Underfull \hbox (badness 2486) in paragraph at lines 1894--1897
+[]\T1/pcr/m/n/10 comandos.csv\T1/ptm/m/n/10 : co-man-dos en-via-dos, res-pues-tas y
+ []
+
+[11] [12] [13] [14] (ManualUsuarioSOFIA.aux
 LaTeX Info: Redefining \. on input line 8.
 LaTeX Info: Redefining \% on input line 8.
 )
@@ -385,17 +394,17 @@ L3 programming layer <2026-08-10>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5899 strings out of 467441
- 100173 string characters out of 5407590
- 539341 words of memory out of 5000000
- 35132 multiletter control sequences out of 15000+600000
- 738995 words of font info for 147 fonts, out of 8000000 for 9000
+ 5954 strings out of 467441
+ 101060 string characters out of 5407590
+ 541693 words of memory out of 5000000
+ 35182 multiletter control sequences out of 15000+600000
+ 740670 words of font info for 154 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,9n,65p,333b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on ManualUsuarioSOFIA.pdf (2 pages, 1222733 bytes).
+<C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/alegu/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on ManualUsuarioSOFIA.pdf (14 pages, 1299586 bytes).
 PDF statistics:
- 31 PDF objects out of 1000 (max. 8388607)
+ 75 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
