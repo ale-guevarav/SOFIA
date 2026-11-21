@@ -3,4 +3,5 @@ build/
 *.exe
 *.o
 *.d
+*.wbproj
 __pycache__/
