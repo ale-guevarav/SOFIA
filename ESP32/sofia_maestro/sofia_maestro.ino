@@ -1,35 +1,9 @@
-/*
- * =============================================================
- *  SOFIA - ESP32 MAESTRO (BLE + Modbus RTU master por RS485)
- *  Recibe comandos de la PC (visión) por BLE, mueve sus propias
- *  16 unidades (2 PCA9685) y reenvía cada comando a los ESP32
- *  esclavos por RS485 / Modbus RTU.
- * =============================================================
- *
- *  Protocolo con la PC (BLE) -> sin cambios:
- *    +------+------+------+------+-----------------+------+
- *    | SOF  | TYPE | SEQ  | LEN  | PAYLOAD (0-14)  | CRC8 |
- *    | 0xA5 | 1 B  | 1 B  | 1 B  | LEN bytes       | 1 B  |
- *    +------+------+------+------+-----------------+------+
- *
- *  Hacia los esclavos (Modbus RTU, holding registers):
- *    0 POSE   1 MODE   2 STOP   3..7 TRACK(mano,x,y,mag,ang)
- *    8 HEARTBEAT (cada 1 s si no hay otro tráfico)
- *
- *  LIBRERÍAS:
- *    - "modbus-esp8266" (Emelianov)
- *    - "Adafruit PWM Servo Driver Library"
- *
- *  PRUEBA SIN PC (Monitor Serie, 115200, "Sin ajuste de línea"):
- *    1-5 patrón, 0 centro, u/e/p/s/+/- pruebas de movimiento.
- * =============================================================
- */
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include <ModbusRTU.h>
+#include <HardwareSerial.h>
 
 #include "movimiento.h"
 
@@ -47,24 +21,30 @@
 // CONFIGURACIÓN RS485 / MODBUS
 // =============================================
 
+#define PIN_RS485_RX     4        // <- MAX485 RO
+#define PIN_RS485_TX     5        // -> MAX485 DI
+#define PIN_DE_RE        6        // -> MAX485 DE + RE (HIGH = transmite)
+
+// Debe ser IGUAL en maestro y esclavos. La práctica usaba 9600;
+// 115200 hace el TRACK mucho más fluido.
 #define MODBUS_BAUD      115200
-#define MODBUS_CONFIG    SERIAL_8N1
 
-#define RS485_RX_PIN     4        // <- RO   (ajusta a tu placa)
-#define RS485_TX_PIN     5        // -> DI
-#define RS485_DE_RE_PIN  6        // DE + RE unidos (-1 si es automático)
-
-// Esclavos: pon aquí los ID de cada uno (deben coincidir con SLAVE_ID)
+// Esclavos: ID de cada uno (deben coincidir con SLAVE_ID de cada esclavo)
 const uint8_t SLAVE_IDS[] = {1};
 #define NUM_SLAVES  (sizeof(SLAVE_IDS) / sizeof(SLAVE_IDS[0]))
 
-// 1 = una sola escritura a ID 0 (broadcast) que oyen todos los esclavos
-// 0 = una escritura por esclavo (con ID propio)
+// 1 = una sola trama a la dirección 0 (broadcast), la oyen todos y
+//     nadie responde. 0 = una trama por esclavo, con confirmación.
 #define USE_BROADCAST    0
 
-#define MB_TIMEOUT_MS    100      // máx. espera por transacción
-#define MB_BROADCAST_GAP 20       // pausa tras un broadcast (no hay respuesta)
+// Espera máxima por la respuesta (incluye el tiempo en el cable)
+#define MB_TIMEOUT_MS    (40UL + (30UL * 11UL * 1000UL) / MODBUS_BAUD)
+#define MB_RETRIES       2        // reintentos para POSE/MODE/STOP
+#define MB_BROADCAST_GAP 10       // pausa tras una trama broadcast
 #define HEARTBEAT_MS     1000
+
+// 1 = imprime cada trama TX/RX en hexadecimal (como en la práctica)
+#define DEBUG_MODBUS     0
 
 // Registros (mismo mapa que el esclavo)
 #define HREG_POSE        0
@@ -82,18 +62,15 @@ const uint8_t SLAVE_IDS[] = {1};
 #define MAX_PAYLOAD   14
 #define MAX_FRAME     (HEADER_SIZE + MAX_PAYLOAD + 1)
 
-// Tipos PC -> ESP32
 #define TYPE_POSE     0x00
 #define TYPE_TRACK    0x01
 #define TYPE_PING     0x02
 #define TYPE_MODE     0x03
 #define TYPE_STOP     0x04
 
-// Tipos ESP32 -> PC
 #define TYPE_ACK      0x80
 #define TYPE_NACK     0x81
 
-// Códigos de error
 #define ERR_SOF          0x01
 #define ERR_LENGTH       0x02
 #define ERR_CRC          0x03
@@ -145,19 +122,11 @@ struct TrackData {
 
 uint32_t lastTrackPrintMs = 0;
 
-void enterSafeState(const char* reason);
+// ---- Estado del master Modbus ----
 
-// =============================================
-// MODBUS MASTER
-// Cola propia: Modbus RTU solo atiende una
-// transacción a la vez.
-//  - Comandos (POSE/MODE/STOP): FIFO, no se pierden.
-//  - TRACK: un solo hueco, siempre el más reciente.
-//  - HEARTBEAT: solo si no hay nada más que mandar.
-// =============================================
+HardwareSerial RS485(1);
 
-ModbusRTU mb;
-
+// Un trabajo = escribir 'count' registros desde 'reg' (1 -> 0x06, >1 -> 0x10)
 struct Job {
   uint16_t reg;
   uint8_t count;
@@ -168,16 +137,26 @@ struct Job {
 Job fifo[FIFO_SIZE];
 uint8_t fifoHead = 0, fifoTail = 0;
 
-Job trackJob;
+Job trackJob;                 // solo el TRACK más reciente
 bool trackPending = false;
 
-Job curJob;
+Job curJob;                   // trabajo en curso
 bool curActive = false;
+bool curCritical = false;     // POSE/MODE/STOP: se reintenta
 uint8_t targetIdx = 0;
+uint8_t attempt = 0;
 
-volatile bool mbBusy = false;
-uint32_t mbBusySince = 0;
+enum MbState : uint8_t { MB_IDLE, MB_WAIT, MB_GAP };
+MbState mbState = MB_IDLE;
+
+uint8_t txFrame[24];
+uint8_t txLen = 0;
+uint8_t rxBuf[8];
+uint8_t rxLen = 0;
+uint8_t rxExpected = 8;
+uint32_t mbSentMs = 0;
 uint32_t lastMbSendMs = 0;
+uint32_t lastMbErrMs = 0;
 uint16_t heartbeatCounter = 0;
 
 #if USE_BROADCAST
@@ -186,10 +165,88 @@ uint16_t heartbeatCounter = 0;
   #define TARGET_COUNT NUM_SLAVES
 #endif
 
-// Termina una transacción (con o sin error)
-bool onModbusDone(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  mbBusy = false;
-  return true;
+void enterSafeState(const char* reason);
+
+// =============================================
+// CRC-8 (BLE con la PC: polinomio 0x07, init 0x00)
+// =============================================
+
+uint8_t crc8(const uint8_t* data, size_t length) {
+  uint8_t crc = 0x00;
+  for (size_t i = 0; i < length; i++) {
+    crc ^= data[i];
+    for (uint8_t bit = 0; bit < 8; bit++) {
+      crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ 0x07) : (uint8_t)(crc << 1);
+    }
+  }
+  return crc;
+}
+
+// =============================================
+// MODBUS RTU (a mano)
+// =============================================
+
+// CRC16 Modbus (polinomio 0xA001, semilla 0xFFFF)
+uint16_t crc16Modbus(const uint8_t* buf, uint8_t len) {
+  uint16_t crc = 0xFFFF;
+  for (uint8_t i = 0; i < len; i++) {
+    crc ^= buf[i];
+    for (uint8_t bit = 0; bit < 8; bit++) {
+      crc = (crc & 0x0001) ? (crc >> 1) ^ 0xA001 : crc >> 1;
+    }
+  }
+  return crc;
+}
+
+#if DEBUG_MODBUS
+void printFrame(const char* label, const uint8_t* buf, uint8_t len) {
+  Serial.printf("%-6s [", label);
+  for (uint8_t i = 0; i < len; i++) {
+    Serial.printf("%02X", buf[i]);
+    if (i < len - 1) Serial.print(' ');
+  }
+  Serial.println("]");
+}
+#endif
+
+void rs485Transmit(const uint8_t* buf, uint8_t len) {
+  digitalWrite(PIN_DE_RE, HIGH);
+  delayMicroseconds(50);
+  RS485.write(buf, len);
+  RS485.flush();
+  delayMicroseconds(50);
+  digitalWrite(PIN_DE_RE, LOW);
+}
+
+// 0x06: [addr][06][regH][regL][valH][valL][crcL][crcH]               (8 B)
+// 0x10: [addr][10][regH][regL][qtyH][qtyL][bytes][datos...][crcL][crcH]
+uint8_t buildFrame(uint8_t* out, uint8_t addr, const Job& job) {
+  uint8_t n;
+  out[0] = addr;
+  out[2] = highByte(job.reg);
+  out[3] = lowByte(job.reg);
+
+  if (job.count == 1) {
+    out[1] = 0x06;
+    out[4] = highByte(job.val[0]);
+    out[5] = lowByte(job.val[0]);
+    n = 6;
+  } else {
+    out[1] = 0x10;
+    out[4] = 0;
+    out[5] = job.count;
+    out[6] = job.count * 2;
+    n = 7;
+    for (uint8_t i = 0; i < job.count; i++) {
+      out[n++] = highByte(job.val[i]);
+      out[n++] = lowByte(job.val[i]);
+    }
+  }
+
+  uint16_t crc = crc16Modbus(out, n);
+  out[n++] = lowByte(crc);
+  out[n++] = highByte(crc);
+  return n;
 }
 
 void fifoPush(uint16_t reg, uint16_t value) {
@@ -222,72 +279,131 @@ void queueStop() {
   fifoPush(HREG_STOP, 1);
 }
 
-void modbusPump() {
-  mb.task();
-
-  // Libera la línea si la transacción no terminó
-  uint32_t timeout = USE_BROADCAST ? MB_BROADCAST_GAP : MB_TIMEOUT_MS;
-  if (mbBusy && millis() - mbBusySince > timeout) {
-    mbBusy = false;
+// Pasa al siguiente esclavo del trabajo; si era el último, lo termina
+void advanceTarget() {
+  attempt = 0;
+  mbState = MB_IDLE;
+  if (++targetIdx >= TARGET_COUNT) {
+    curActive = false;
   }
-  if (mbBusy) return;
+}
 
-  // Elegir el siguiente trabajo
-  if (!curActive) {
-    if (fifoTail != fifoHead) {
-      curJob = fifo[fifoTail];
-      fifoTail = (fifoTail + 1) % FIFO_SIZE;
-    } else if (trackPending) {
-      curJob = trackJob;
-      trackPending = false;
-    } else if (millis() - lastMbSendMs >= HEARTBEAT_MS) {
-      curJob.reg = HREG_HEARTBEAT;
-      curJob.count = 1;
-      curJob.val[0] = ++heartbeatCounter;
-    } else {
-      return;
-    }
-    curActive = true;
-    targetIdx = 0;
-  }
-
-  // Enviar al siguiente esclavo del trabajo actual
+void sendCurrent() {
 #if USE_BROADCAST
   uint8_t id = 0;
 #else
   uint8_t id = SLAVE_IDS[targetIdx];
 #endif
 
-  uint16_t t;
-  if (curJob.count == 1) {
-    t = mb.writeHreg(id, curJob.reg, curJob.val[0], onModbusDone);
-  } else {
-    t = mb.writeHreg(id, curJob.reg, curJob.val, curJob.count, onModbusDone);
-  }
-  if (!t) return;   // la librería no pudo aceptarla: se reintenta
+  txLen = buildFrame(txFrame, id, curJob);
 
-  mbBusy = true;
-  mbBusySince = millis();
-  lastMbSendMs = millis();
+  while (RS485.available()) RS485.read();   // limpia basura vieja
 
-  if (++targetIdx >= TARGET_COUNT) {
-    curActive = false;
-  }
+#if DEBUG_MODBUS
+  printFrame("TX ->", txFrame, txLen);
+#endif
+  rs485Transmit(txFrame, txLen);
+
+  mbSentMs = millis();
+  lastMbSendMs = mbSentMs;
+  rxLen = 0;
+  rxExpected = 8;
+  mbState = (id == 0) ? MB_GAP : MB_WAIT;   // broadcast: nadie responde
 }
 
-// =============================================
-// CRC-8 (polinomio 0x07, init 0x00)
-// =============================================
-
-uint8_t crc8(const uint8_t* data, size_t length) {
-  uint8_t crc = 0x00;
-  for (size_t i = 0; i < length; i++) {
-    crc ^= data[i];
-    for (uint8_t bit = 0; bit < 8; bit++) {
-      crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ 0x07) : (uint8_t)(crc << 1);
-    }
+// La transacción falló (timeout, CRC malo, respuesta rara)
+void failTransaction(const char* why) {
+  if (curCritical && attempt < MB_RETRIES) {
+    attempt++;
+    mbState = MB_IDLE;          // curActive sigue en true: se reenvía igual
+    return;
   }
-  return crc;
+
+  if (curCritical || millis() - lastMbErrMs > 2000) {
+    lastMbErrMs = millis();
+    Serial.printf("[MODBUS] Fallo con nodo 0x%02X (reg %u): %s\n",
+                  txFrame[0], curJob.reg, why);
+  }
+  advanceTarget();
+}
+
+void finishRx() {
+#if DEBUG_MODBUS
+  printFrame("RX <-", rxBuf, rxLen);
+#endif
+
+  uint16_t crc = crc16Modbus(rxBuf, rxLen - 2);
+  bool crcOk = (lowByte(crc) == rxBuf[rxLen - 2]) && (highByte(crc) == rxBuf[rxLen - 1]);
+
+  if (!crcOk)                 { failTransaction("CRC invalido"); return; }
+  if (rxBuf[0] != txFrame[0]) { failTransaction("responde otro nodo"); return; }
+
+  // Excepción Modbus: [addr][fc|0x80][codigo][crc]
+  if (rxBuf[1] == (txFrame[1] | 0x80)) {
+    Serial.printf("[MODBUS] Nodo 0x%02X rechazo reg %u (excepcion 0x%02X)\n",
+                  txFrame[0], curJob.reg, rxBuf[2]);
+    advanceTarget();          // el nodo entendió: no sirve reintentar
+    return;
+  }
+
+  // Confirmación: repite addr, función, registro y valor/cantidad
+  if (memcmp(rxBuf, txFrame, 6) != 0) {
+    failTransaction("confirmacion distinta a lo enviado");
+    return;
+  }
+
+  advanceTarget();
+}
+
+// Se llama en cada vuelta de loop(): nunca bloquea
+void modbusPump() {
+
+  // ---- pausa tras un broadcast ----
+  if (mbState == MB_GAP) {
+    if (millis() - mbSentMs >= MB_BROADCAST_GAP) advanceTarget();
+    return;
+  }
+
+  // ---- esperando la respuesta del esclavo ----
+  if (mbState == MB_WAIT) {
+    while (RS485.available() && rxLen < rxExpected) {
+      rxBuf[rxLen++] = RS485.read();
+      if (rxLen == 2) {
+        rxExpected = (rxBuf[1] & 0x80) ? 5 : 8;   // excepción = 5 bytes
+      }
+    }
+    if (rxLen >= 2 && rxLen == rxExpected) {
+      finishRx();
+    } else if (millis() - mbSentMs > MB_TIMEOUT_MS) {
+      failTransaction("timeout");
+    }
+    return;
+  }
+
+  // ---- libre: elegir el siguiente trabajo ----
+  if (!curActive) {
+    if (fifoTail != fifoHead) {
+      curJob = fifo[fifoTail];
+      fifoTail = (fifoTail + 1) % FIFO_SIZE;
+      curCritical = true;
+    } else if (trackPending) {
+      curJob = trackJob;
+      trackPending = false;
+      curCritical = false;
+    } else if (millis() - lastMbSendMs >= HEARTBEAT_MS) {
+      curJob.reg = HREG_HEARTBEAT;
+      curJob.count = 1;
+      curJob.val[0] = ++heartbeatCounter;
+      curCritical = false;
+    } else {
+      return;
+    }
+    curActive = true;
+    targetIdx = 0;
+    attempt = 0;
+  }
+
+  sendCurrent();
 }
 
 // =============================================
@@ -387,7 +503,7 @@ void enterSafeState(const char* reason) {
 }
 
 // =============================================
-// INTERPRETAR UNA TRAMA
+// INTERPRETAR UNA TRAMA BLE
 // =============================================
 
 bool isDuplicate(uint8_t type, uint8_t seq) {
@@ -554,7 +670,7 @@ class RxCallbacks : public BLECharacteristicCallbacks {
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("\n=== SOFIA ESP32 MAESTRO (BLE + Modbus) ===");
+  Serial.println("\n=== SOFIA ESP32 MAESTRO (BLE + Modbus RTU) ===");
 
   // -----------------------------
   // SERVOS (2 x PCA9685)
@@ -567,13 +683,14 @@ void setup() {
   }
 
   // -----------------------------
-  // RS485 / MODBUS MASTER
+  // RS485
   // -----------------------------
-  Serial1.begin(MODBUS_BAUD, MODBUS_CONFIG, RS485_RX_PIN, RS485_TX_PIN);
-  mb.begin(&Serial1, RS485_DE_RE_PIN);
-  mb.master();
-  Serial.printf("Modbus master listo: %u esclavo(s)%s\n",
-                (unsigned)NUM_SLAVES, USE_BROADCAST ? " (broadcast)" : "");
+  pinMode(PIN_DE_RE, OUTPUT);
+  digitalWrite(PIN_DE_RE, LOW);
+  RS485.begin(MODBUS_BAUD, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  Serial.printf("Modbus RTU master a %lu baud: %u esclavo(s)%s\n",
+                (unsigned long)MODBUS_BAUD, (unsigned)NUM_SLAVES,
+                USE_BROADCAST ? " (broadcast)" : "");
 
   // -----------------------------
   // BLE
