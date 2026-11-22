@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  17 NOV 2026 23:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  17 NOV 2026 23:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -491,7 +491,7 @@ File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
 
 
 ] [2]
-<figures/SOFIA_DIAGRAM_3.png, id=17, 452.69125pt x 443.6575pt>
+<figures/SOFIA_DIAGRAM_3.png, id=19, 452.69125pt x 443.6575pt>
 File: figures/SOFIA_DIAGRAM_3.png Graphic file (type png)
 <use figures/SOFIA_DIAGRAM_3.png>
 Package pdftex.def Info: figures/SOFIA_DIAGRAM_3.png  used on input line 301.
@@ -902,9 +902,16 @@ File: figures/Dataset generator.png Graphic file (type png)
 Package pdftex.def Info: figures/Dataset generator.png  used on input line 774.
 
 (pdftex.def)             Requested size: 252.0pt x 132.7053pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 7
 90.
- (C:\Users\10002\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
+
+(C:\Users\10002\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 <figures/Sim_a.jpeg, id=32, 537.00626pt x 410.53375pt>
@@ -950,15 +957,9 @@ File: figures/State_machine_training.png Graphic file (type png)
 Package pdftex.def Info: figures/State_machine_training.png  used on input line
  899.
 (pdftex.def)             Requested size: 252.0pt x 131.84503pt.
-
-Underfull \hbox (badness 1852) in paragraph at lines 912--913
- \OT1/ptm/m/it/10 4) Why ResNet18 Was Dropped: [][] \OT1/ptm/m/n/10 In the firs
-t run, a
- []
-
-[6 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> <./figures/Sim_c.jpeg> <./figu
-res/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/Sim_f.jpeg> <./figures/sofia_
-expl_cad.jpg> <./figures/State_machine_training.png>]
+ [6 <./figures/Sim_a.jpeg> <./figures/Sim_b.jpeg> <./figures/Sim_c.jpeg> <./fig
+ures/Sim_d.jpeg> <./figures/Sim_e.jpeg> <./figures/Sim_f.jpeg> <./figures/sofia
+_expl_cad.jpg> <./figures/State_machine_training.png>]
 Underfull \hbox (badness 1783) in paragraph at lines 920--921
 []  \OT1/ptm/m/n/10 Or-ga-nized within the \OT1/pcr/m/n/10 Vision/ \OT1/ptm/m/n
 /10 di-rec-tory, the mod-u-
@@ -998,12 +999,12 @@ File: figures/sofia_pcb.png Graphic file (type png)
 <use figures/sofia_pcb.png>
 Package pdftex.def Info: figures/sofia_pcb.png  used on input line 1033.
 (pdftex.def)             Requested size: 516.0pt x 441.17267pt.
-
+ [8]
 Underfull \hbox (badness 1810) in paragraph at lines 1104--1105
 []  \OT1/ptm/m/n/10 Func-tional tests con-firmed the recog-ni-tion of START
  []
 
-[8] [9 <./figures/sofia_pcb_schematic.png>] [10 <./figures/sofia_pcb.png>]
+[9 <./figures/sofia_pcb_schematic.png>] [10 <./figures/sofia_pcb.png>]
 (Equipo 3 - tercer corte.bbl
 Underfull \hbox (badness 2142) in paragraph at lines 25--27
 []\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - 
@@ -1019,7 +1020,7 @@ L3 programming layer <2026-07-20>
 Here is how much of TeX's memory you used:
  7115 strings out of 467501
  121877 string characters out of 5408550
- 611381 words of memory out of 5000000
+ 610379 words of memory out of 5000000
  36238 multiletter control sequences out of 15000+600000
  679325 words of font info for 133 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1047,7 +1048,7 @@ ocal/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/10002/AppData/L
 ocal/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/10002/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/10002/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - tercer corte.pdf" (11 pages, 967825 bytes).
+Output written on "Equipo 3 - tercer corte.pdf" (11 pages, 967875 bytes).
 PDF statistics:
  162 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

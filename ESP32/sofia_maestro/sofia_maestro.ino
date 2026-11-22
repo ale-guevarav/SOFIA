@@ -1,45 +1,27 @@
 /*
  * =============================================================
- *  SOFIA - ESP32 MAESTRO
- *  Recibe comandos de la PC (visión) por BLE y mueve
- *  las 16 unidades del módulo (2 PCA9685) según la postura
+ *  SOFIA - ESP32 MAESTRO (BLE + Modbus RTU master por RS485)
+ *  Recibe comandos de la PC (visión) por BLE, mueve sus propias
+ *  16 unidades (2 PCA9685) y reenvía cada comando a los ESP32
+ *  esclavos por RS485 / Modbus RTU.
  * =============================================================
  *
- *  Implementa el Estándar de Comunicación
- *  (ver Vision/docs/PROTOCOLO_COMUNICACION.md):
- *
+ *  Protocolo con la PC (BLE) -> sin cambios:
  *    +------+------+------+------+-----------------+------+
  *    | SOF  | TYPE | SEQ  | LEN  | PAYLOAD (0-14)  | CRC8 |
  *    | 0xA5 | 1 B  | 1 B  | 1 B  | LEN bytes       | 1 B  |
  *    +------+------+------+------+-----------------+------+
  *
- *  - Recibe tramas por BLE (servicio tipo Nordic UART).
- *  - Valida SOF, longitud, CRC, tipo y payload.
- *  - Responde ACK o NACK (con código de error).
- *  - Ignora duplicados (reintentos) para no ejecutar dos veces.
- *  - Si deja de recibir tramas 3 s, entra a estado seguro.
+ *  Hacia los esclavos (Modbus RTU, holding registers):
+ *    0 POSE   1 MODE   2 STOP   3..7 TRACK(mano,x,y,mag,ang)
+ *    8 HEARTBEAT (cada 1 s si no hay otro tráfico)
  *
- *  MOVIMIENTO (ver movimiento.h):
- *    POSE 1 INICIO   -> círculo
- *    POSE 2 RECARGAR -> cuadrado
- *    POSE 3 ESCUDO   -> X
- *    POSE 4 ATAQUE   -> línea arriba-abajo
- *    POSE 5 FIN      -> zigzag izquierda a derecha
- *    TRACK (en modo TRACKING) -> apunta hacia la mano
- *    STOP / estado seguro     -> regresa al centro
+ *  LIBRERÍAS:
+ *    - "modbus-esp8266" (Emelianov)
+ *    - "Adafruit PWM Servo Driver Library"
  *
  *  PRUEBA SIN PC (Monitor Serie, 115200, "Sin ajuste de línea"):
- *    escribir 1-5 para dibujar un patrón, 0 para ir al centro.
- *
- *  ARDUINO IDE:
- *    - Core "esp32" de Espressif (Gestor de placas).
- *    - Librería "Adafruit PWM Servo Driver Library"
- *      (la misma de las pruebas de mecatrónica).
- *    - Placa: "ESP32C3 Dev Module" (o la que usen).
- *    - Herramientas > USB CDC On Boot: "Enabled"
- *      (si no, el Monitor Serie no muestra nada).
- *    - Monitor Serie a 115200 baudios.
- *    - Pines y calibración del PCA9685: movimiento.h
+ *    1-5 patrón, 0 centro, u/e/p/s/+/- pruebas de movimiento.
  * =============================================================
  */
 
@@ -47,6 +29,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <ModbusRTU.h>
 
 #include "movimiento.h"
 
@@ -56,13 +39,42 @@
 
 #define DEVICE_NAME   "SOFIA-ESP32"
 
-// Nordic UART Service (NUS)
 #define SERVICE_UUID  "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
-#define RX_CHAR_UUID  "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"  // La PC escribe aquí
-#define TX_CHAR_UUID  "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  // El ESP32 notifica aquí
+#define RX_CHAR_UUID  "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+#define TX_CHAR_UUID  "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
 // =============================================
-// PROTOCOLO
+// CONFIGURACIÓN RS485 / MODBUS
+// =============================================
+
+#define MODBUS_BAUD      115200
+#define MODBUS_CONFIG    SERIAL_8N1
+
+#define RS485_RX_PIN     4        // <- RO   (ajusta a tu placa)
+#define RS485_TX_PIN     5        // -> DI
+#define RS485_DE_RE_PIN  6        // DE + RE unidos (-1 si es automático)
+
+// Esclavos: pon aquí los ID de cada uno (deben coincidir con SLAVE_ID)
+const uint8_t SLAVE_IDS[] = {1};
+#define NUM_SLAVES  (sizeof(SLAVE_IDS) / sizeof(SLAVE_IDS[0]))
+
+// 1 = una sola escritura a ID 0 (broadcast) que oyen todos los esclavos
+// 0 = una escritura por esclavo (con ID propio)
+#define USE_BROADCAST    0
+
+#define MB_TIMEOUT_MS    100      // máx. espera por transacción
+#define MB_BROADCAST_GAP 20       // pausa tras un broadcast (no hay respuesta)
+#define HEARTBEAT_MS     1000
+
+// Registros (mismo mapa que el esclavo)
+#define HREG_POSE        0
+#define HREG_MODE        1
+#define HREG_STOP        2
+#define HREG_TRACK       3        // 3..7
+#define HREG_HEARTBEAT   8
+
+// =============================================
+// PROTOCOLO BLE
 // =============================================
 
 #define SOF           0xA5
@@ -89,9 +101,8 @@
 #define ERR_PAYLOAD      0x05
 #define ERR_BUSY         0x06
 
-// Reglas de tiempo
-#define LINK_TIMEOUT_MS      3000   // Sin tramas -> estado seguro
-#define DUPLICATE_WINDOW_MS  1000   // Ventana para detectar reintentos
+#define LINK_TIMEOUT_MS      3000
+#define DUPLICATE_WINDOW_MS  1000
 
 const char* POSE_NAMES[] = {"?", "INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN"};
 const char* MODE_NAMES[] = {"JUEGO", "TEST", "TRACKING"};
@@ -105,13 +116,11 @@ BLECharacteristic* txCharacteristic = nullptr;
 volatile bool deviceConnected = false;
 bool wasConnected = false;
 
-// Paquete crudo recibido por BLE
 struct RxPacket {
   uint8_t length;
-  uint8_t data[MAX_FRAME + 1];   // +1 para detectar tramas demasiado largas
+  uint8_t data[MAX_FRAME + 1];
 };
 
-// Cola entre el callback de BLE y loop()
 QueueHandle_t rxQueue;
 volatile uint32_t droppedPackets = 0;
 
@@ -119,26 +128,152 @@ uint8_t txSeq = 0;
 uint32_t lastRxMs = 0;
 bool safeState = true;
 
-// Último comando ejecutado (para detectar duplicados)
 uint8_t lastCmdType = 0xFF;
 uint8_t lastCmdSeq = 0xFF;
 uint32_t lastCmdMs = 0;
 
-// Último estado recibido (para que el resto del robot lo use)
 uint8_t currentPose = 0;
 uint8_t currentMode = 0;
 
 struct TrackData {
   uint8_t hand;
-  int16_t x;        // x normalizada × 1000
-  int16_t y;        // y normalizada × 1000
-  uint16_t mag;     // magnitud × 1000
-  uint16_t angle;   // grados × 10
+  int16_t x;
+  int16_t y;
+  uint16_t mag;
+  uint16_t angle;
 } currentTrack;
 
 uint32_t lastTrackPrintMs = 0;
 
 void enterSafeState(const char* reason);
+
+// =============================================
+// MODBUS MASTER
+// Cola propia: Modbus RTU solo atiende una
+// transacción a la vez.
+//  - Comandos (POSE/MODE/STOP): FIFO, no se pierden.
+//  - TRACK: un solo hueco, siempre el más reciente.
+//  - HEARTBEAT: solo si no hay nada más que mandar.
+// =============================================
+
+ModbusRTU mb;
+
+struct Job {
+  uint16_t reg;
+  uint8_t count;
+  uint16_t val[5];
+};
+
+#define FIFO_SIZE 8
+Job fifo[FIFO_SIZE];
+uint8_t fifoHead = 0, fifoTail = 0;
+
+Job trackJob;
+bool trackPending = false;
+
+Job curJob;
+bool curActive = false;
+uint8_t targetIdx = 0;
+
+volatile bool mbBusy = false;
+uint32_t mbBusySince = 0;
+uint32_t lastMbSendMs = 0;
+uint16_t heartbeatCounter = 0;
+
+#if USE_BROADCAST
+  #define TARGET_COUNT 1
+#else
+  #define TARGET_COUNT NUM_SLAVES
+#endif
+
+// Termina una transacción (con o sin error)
+bool onModbusDone(Modbus::ResultCode event, uint16_t transactionId, void* data) {
+  mbBusy = false;
+  return true;
+}
+
+void fifoPush(uint16_t reg, uint16_t value) {
+  uint8_t next = (fifoHead + 1) % FIFO_SIZE;
+  if (next == fifoTail) {
+    Serial.println("[MODBUS] Cola llena, comando descartado");
+    return;
+  }
+  fifo[fifoHead].reg = reg;
+  fifo[fifoHead].count = 1;
+  fifo[fifoHead].val[0] = value;
+  fifoHead = next;
+}
+
+void queueTrack(const TrackData& t) {
+  trackJob.reg = HREG_TRACK;
+  trackJob.count = 5;
+  trackJob.val[0] = t.hand;
+  trackJob.val[1] = (uint16_t)t.x;
+  trackJob.val[2] = (uint16_t)t.y;
+  trackJob.val[3] = t.mag;
+  trackJob.val[4] = t.angle;
+  trackPending = true;
+}
+
+// STOP urgente: descarta lo pendiente y manda STOP primero
+void queueStop() {
+  fifoHead = fifoTail = 0;
+  trackPending = false;
+  fifoPush(HREG_STOP, 1);
+}
+
+void modbusPump() {
+  mb.task();
+
+  // Libera la línea si la transacción no terminó
+  uint32_t timeout = USE_BROADCAST ? MB_BROADCAST_GAP : MB_TIMEOUT_MS;
+  if (mbBusy && millis() - mbBusySince > timeout) {
+    mbBusy = false;
+  }
+  if (mbBusy) return;
+
+  // Elegir el siguiente trabajo
+  if (!curActive) {
+    if (fifoTail != fifoHead) {
+      curJob = fifo[fifoTail];
+      fifoTail = (fifoTail + 1) % FIFO_SIZE;
+    } else if (trackPending) {
+      curJob = trackJob;
+      trackPending = false;
+    } else if (millis() - lastMbSendMs >= HEARTBEAT_MS) {
+      curJob.reg = HREG_HEARTBEAT;
+      curJob.count = 1;
+      curJob.val[0] = ++heartbeatCounter;
+    } else {
+      return;
+    }
+    curActive = true;
+    targetIdx = 0;
+  }
+
+  // Enviar al siguiente esclavo del trabajo actual
+#if USE_BROADCAST
+  uint8_t id = 0;
+#else
+  uint8_t id = SLAVE_IDS[targetIdx];
+#endif
+
+  uint16_t t;
+  if (curJob.count == 1) {
+    t = mb.writeHreg(id, curJob.reg, curJob.val[0], onModbusDone);
+  } else {
+    t = mb.writeHreg(id, curJob.reg, curJob.val, curJob.count, onModbusDone);
+  }
+  if (!t) return;   // la librería no pudo aceptarla: se reintenta
+
+  mbBusy = true;
+  mbBusySince = millis();
+  lastMbSendMs = millis();
+
+  if (++targetIdx >= TARGET_COUNT) {
+    curActive = false;
+  }
+}
 
 // =============================================
 // CRC-8 (polinomio 0x07, init 0x00)
@@ -156,7 +291,7 @@ uint8_t crc8(const uint8_t* data, size_t length) {
 }
 
 // =============================================
-// ENVÍO DE RESPUESTAS
+// ENVÍO DE RESPUESTAS A LA PC (BLE)
 // =============================================
 
 void sendFrame(uint8_t type, const uint8_t* payload, uint8_t length) {
@@ -187,22 +322,21 @@ void sendNack(uint8_t type, uint8_t seq, uint8_t error) {
 
 // =============================================
 // ACCIONES
-// Aquí se conecta la lógica del robot (motores,
-// enviar a los ESP32 esclavos, etc.)
+// Cada acción mueve las unidades de ESTE ESP32
+// y además la reenvía a los esclavos por Modbus.
 // =============================================
 
 void onPose(uint8_t pose) {
   currentPose = pose;
   Serial.printf("[POSE] %u = %s\n", pose, POSE_NAMES[pose]);
 
-  // Cada postura dibuja su patrón (interrumpe el anterior)
-  iniciarPatron(pose);
+  iniciarPatron(pose);          // local
+  fifoPush(HREG_POSE, pose);    // esclavos
 }
 
 void onTrack(const TrackData& track) {
   currentTrack = track;
 
-  // Se imprime cada 500 ms para no saturar el Monitor Serie
   if (millis() - lastTrackPrintMs >= 500) {
     lastTrackPrintMs = millis();
     Serial.printf("[TRACK] mano=%s x=%+.3f y=%+.3f |v|=%.3f ang=%.1f\n",
@@ -213,7 +347,8 @@ void onTrack(const TrackData& track) {
 
   // Solo se sigue la mano en modo TRACKING
   if (currentMode == 2) {
-    seguirMano(track.x / 1000.0f, track.y / 1000.0f);
+    seguirMano(track.x / 1000.0f, track.y / 1000.0f);   // local
+    queueTrack(track);                                   // esclavos
   }
 }
 
@@ -226,14 +361,14 @@ void onMode(uint8_t mode) {
   currentMode = mode;
   Serial.printf("[MODE] %s\n", MODE_NAMES[mode]);
 
-  // Al entrar o salir de TRACKING se empieza desde el centro
   if ((mode == 2) != (previousMode == 2)) {
     irAlCentro();
   }
+  fifoPush(HREG_MODE, mode);    // esclavos
 }
 
 void onStop() {
-  // STOP interrumpe cualquier patrón de inmediato
+  // enterSafeState también manda el STOP a los esclavos
   irAlCentro();
   enterSafeState("comando STOP");
 }
@@ -241,13 +376,11 @@ void onStop() {
 void enterSafeState(const char* reason) {
   if (!safeState) {
     Serial.printf("[SEGURO] Estado seguro: %s\n", reason);
+    queueStop();                // los esclavos también van a seguro
   }
   safeState = true;
   currentPose = 0;
 
-  // Un patrón en curso termina solo y acaba en el centro;
-  // cualquier otro movimiento (ej. seguir la mano) se
-  // detiene y la unidad regresa al centro
   if (estado != PATRON) {
     irAlCentro();
   }
@@ -273,13 +406,8 @@ void handleFrame(const RxPacket& packet) {
   const uint8_t* d = packet.data;
   uint8_t length = packet.length;
 
-  // Tipo y secuencia (si existen) para reportar errores
   uint8_t type = length > 1 ? d[1] : 0xFF;
   uint8_t seq  = length > 2 ? d[2] : 0xFF;
-
-  // -----------------------------
-  // VALIDACIONES
-  // -----------------------------
 
   if (length < HEADER_SIZE + 1 || length > MAX_FRAME) {
     sendNack(type, seq, ERR_LENGTH);
@@ -309,10 +437,6 @@ void handleFrame(const RxPacket& packet) {
 
   const uint8_t* payload = &d[HEADER_SIZE];
 
-  // -----------------------------
-  // COMANDOS
-  // -----------------------------
-
   switch (type) {
 
     case TYPE_POSE: {
@@ -329,7 +453,6 @@ void handleFrame(const RxPacket& packet) {
     }
 
     case TYPE_TRACK: {
-      // TRACK no lleva ACK (flujo continuo)
       if (payloadLength != 9) {
         sendNack(type, seq, ERR_PAYLOAD);
         return;
@@ -398,8 +521,6 @@ void handleFrame(const RxPacket& packet) {
 
 // =============================================
 // CALLBACKS BLE
-// (se ejecutan en la tarea de BLE: solo copian
-//  los datos a la cola; el trabajo se hace en loop)
 // =============================================
 
 class ServerCallbacks : public BLEServerCallbacks {
@@ -416,8 +537,6 @@ class RxCallbacks : public BLECharacteristicCallbacks {
     RxPacket packet;
     size_t length = characteristic->getLength();
 
-    // Si llega algo más largo que una trama, se marca con
-    // MAX_FRAME + 1 para que handleFrame responda ERR_LENGTH
     packet.length = length > MAX_FRAME ? MAX_FRAME + 1 : length;
     memcpy(packet.data, characteristic->getData(),
            length > sizeof(packet.data) ? sizeof(packet.data) : length);
@@ -435,20 +554,30 @@ class RxCallbacks : public BLECharacteristicCallbacks {
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("\n=== SOFIA ESP32 MAESTRO ===");
+  Serial.println("\n=== SOFIA ESP32 MAESTRO (BLE + Modbus) ===");
 
   // -----------------------------
   // SERVOS (2 x PCA9685)
   // -----------------------------
-
   if (iniciarServos()) {
     Serial.printf("Servos listos: %d unidades en el centro.\n",
                   placasEncontradas * UNIDADES_POR_PLACA);
   } else {
-    // Se sigue sin servos para poder probar la comunicación
-    Serial.println("ERROR: NINGUN PCA9685 DETECTADO (la comunicación BLE sigue funcionando)");
+    Serial.println("ERROR: NINGUN PCA9685 DETECTADO (la comunicación sigue funcionando)");
   }
 
+  // -----------------------------
+  // RS485 / MODBUS MASTER
+  // -----------------------------
+  Serial1.begin(MODBUS_BAUD, MODBUS_CONFIG, RS485_RX_PIN, RS485_TX_PIN);
+  mb.begin(&Serial1, RS485_DE_RE_PIN);
+  mb.master();
+  Serial.printf("Modbus master listo: %u esclavo(s)%s\n",
+                (unsigned)NUM_SLAVES, USE_BROADCAST ? " (broadcast)" : "");
+
+  // -----------------------------
+  // BLE
+  // -----------------------------
   rxQueue = xQueueCreate(16, sizeof(RxPacket));
 
   BLEDevice::init(DEVICE_NAME);
@@ -458,14 +587,12 @@ void setup() {
 
   BLEService* service = server->createService(SERVICE_UUID);
 
-  // TX: el ESP32 notifica ACK / NACK
   txCharacteristic = service->createCharacteristic(
     TX_CHAR_UUID,
     BLECharacteristic::PROPERTY_NOTIFY
   );
   txCharacteristic->addDescriptor(new BLE2902());
 
-  // RX: la PC escribe las tramas
   BLECharacteristic* rxCharacteristic = service->createCharacteristic(
     RX_CHAR_UUID,
     BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR
@@ -487,7 +614,6 @@ void loop() {
   // -----------------------------
   // CONEXIÓN / DESCONEXIÓN
   // -----------------------------
-
   if (deviceConnected && !wasConnected) {
     wasConnected = true;
     lastRxMs = millis();
@@ -498,20 +624,18 @@ void loop() {
     wasConnected = false;
     Serial.println("[BLE] PC desconectada");
     enterSafeState("desconexión");
-    BLEDevice::startAdvertising();   // Volver a anunciarse
+    BLEDevice::startAdvertising();
     Serial.println("[BLE] Anunciando de nuevo...");
   }
 
   // -----------------------------
   // PROCESAR TRAMAS RECIBIDAS
   // -----------------------------
-
   RxPacket packet;
   while (xQueueReceive(rxQueue, &packet, 0) == pdTRUE) {
     handleFrame(packet);
   }
 
-  // Paquetes que no cupieron en la cola
   if (droppedPackets > 0) {
     Serial.printf("[AVISO] %u tramas descartadas (cola llena)\n", (unsigned)droppedPackets);
     droppedPackets = 0;
@@ -521,7 +645,6 @@ void loop() {
   // -----------------------------
   // VIGILANCIA DEL ENLACE
   // -----------------------------
-
   if (deviceConnected && !safeState && millis() - lastRxMs > LINK_TIMEOUT_MS) {
     enterSafeState("sin tramas por 3 s");
   }
@@ -529,27 +652,27 @@ void loop() {
   // -----------------------------
   // PRUEBA DESDE EL MONITOR SERIE
   // -----------------------------
-
   while (Serial.available()) {
     char c = Serial.read();
     if (c >= '1' && c <= '5') {
       Serial.printf("[SERIAL] Prueba de %s\n", POSE_NAMES[c - '0']);
       iniciarPatron(c - '0');
+      fifoPush(HREG_POSE, c - '0');      // también a los esclavos
     } else if (c == '0') {
       Serial.println("[SERIAL] Al centro");
       irAlCentro();
+      queueStop();
     } else if (c == 'u' || c == 'U') {
       Serial.println("COMANDO U RECIBIDO");
       Serial.print("PCA9685 detectados: ");
       Serial.println(placasEncontradas);
-      // Prueba de cableado: elegir la siguiente unidad
       siguienteUnidadPrueba();
     } else if (c == 'e' || c == 'E') {
-      empezarPrueba();              // arriba, abajo, izq, der y diagonales
+      empezarPrueba();
     } else if (c == 'p' || c == 'P') {
-      pausarPrueba();               // la unidad regresa al centro
+      pausarPrueba();
     } else if (c == 's' || c == 'S') {
-      cambiarSuavizador();          // EMA -> sin -> frena en esquinas -> suave
+      cambiarSuavizador();
     } else if (c == '+') {
       cambiarEscalaVelocidad(1.25f);
     } else if (c == '-') {
@@ -558,9 +681,13 @@ void loop() {
   }
 
   // -----------------------------
-  // MOVIMIENTO (cada 20 ms)
+  // MODBUS (reenvío a esclavos + heartbeat)
   // -----------------------------
+  modbusPump();
 
+  // -----------------------------
+  // MOVIMIENTO LOCAL (cada 20 ms)
+  // -----------------------------
   actualizarMovimiento();
 
   delay(1);
