@@ -9,9 +9,11 @@ Alignment/app/nucleo; aquí solo se usa.
                  lo guarda en Alignment/results/ceros_esp32.json y se
                  lo manda al ESP32.
     ALINEAR      mide, y corrige UNA POR UNA las unidades que no están
-                 OK, de la menos a la más desalineada (cada una se
-                 reacomoda con su cero nuevo). Guarda los ceros nuevos y
-                 al final toma otra foto para revisar.
+                 OK, de la menos a la más desalineada. Con cada unidad:
+                 corrige, toma otra foto y vuelve a medirla, hasta que
+                 queda OK (máx. INTENTOS_MAX). Si un eje EMPEORA, ese servo
+                 está al revés: invierte su signo (solo esa unidad) y lo
+                 guarda. Al final toma otra foto para revisar.
 
 En los dos casos:
     - La GUI manda STOP antes (todas en 0,0) y deja de mandar posturas /
@@ -50,6 +52,9 @@ ESPERA_CEROS_S = 0.15           # TOMAR CEROS: entre unidad y unidad
 ESPERA_REVISION_S = 1.0         # antes de la foto de revisión
 FOTOS_CALENTAR = 15             # la cámara tarda unos cuadros en ajustar la luz
 PASOS_BARRA = 100               # resolución de la barra por unidad
+INTENTOS_MAX = 4                # ALINEAR: correcciones por unidad como máximo
+EMPEORA_GRADOS = 0.5            # un eje que crece más que esto (mismo lado) = servo al revés
+EJE_MINIMO_GRADOS = 1.0         # ejes más chicos no se usan para decidir
 
 # Colores (BGR) del dibujo, iguales a la app de alineación
 COLOR_ESTADO = {
@@ -216,12 +221,10 @@ class AlineacionWorker(QThread):
 
             if self.accion == TOMAR_CEROS:
                 unidades = list(range(cz.NUM_UNIDADES))
-                reacomodar, espera = False, ESPERA_CEROS_S
             else:
                 # Las que no están OK, de la menos a la más desalineada
                 unidades = sorted((n for n, m in medidos.items() if m[3] != "OK"),
                                   key=lambda n: medidos[n][2])
-                reacomodar, espera = True, ESPERA_POR_UNIDAD_S
 
             self.imagen.emit(a_qimage(dibujar(d, unidades if self.accion == ALINEAR else ())))
 
@@ -230,6 +233,8 @@ class AlineacionWorker(QThread):
                 self.terminado.emit("¡Todo alineado! Ninguna unidad necesita corrección.")
                 return
 
+            signos = cz.cargar_signos()
+
             # Una por una
             total = len(unidades)
             maximo = (total + 1) * PASOS_BARRA          # +1: la revisión final
@@ -237,22 +242,18 @@ class AlineacionWorker(QThread):
             for i, numero in enumerate(unidades):
                 if self._detener:
                     break
-                theta1, theta2, magnitud, _ = medidos[numero]
-                nuevo = cz.corregir(ceros[numero], theta1, theta2)
-                if self.accion == ALINEAR:
-                    texto = f"Alineando #{numero}: {magnitud:.1f}°  ({i + 1} de {total})"
-                else:
-                    texto = f"Tomando el cero de #{numero}  ({i + 1} de {total})"
-                self.progreso.emit(i * PASOS_BARRA, maximo, texto)
-                self.ajustar.emit(numero, nuevo[0], nuevo[1], reacomodar)
-                self.log.emit(f"  #{numero}: midió {theta1:+.1f} / {theta2:+.1f} -> cero "
-                              f"{ceros[numero][0]:+.1f},{ceros[numero][1]:+.1f} -> {nuevo[0]:+.1f},{nuevo[1]:+.1f}")
-                ceros[numero] = nuevo
                 hechas.append(numero)
-                self._esperar(espera, i * PASOS_BARRA, maximo, texto)
+                if self.accion == TOMAR_CEROS:
+                    if not self._tomar_cero(numero, medidos[numero], ceros, signos,
+                                            i, total, maximo):
+                        break
+                elif not self._alinear_unidad(diag, camara, numero, medidos[numero], ceros,
+                                              signos, i, total, maximo):
+                    cz.guardar(ceros, d.metodo, signos=signos)
+                    return                               # ya no se ve el SOFIA
 
             if hechas:
-                ruta = cz.guardar(ceros, d.metodo)
+                ruta = cz.guardar(ceros, d.metodo, signos=signos)
                 self.log.emit(f"Ceros guardados en {ruta}")
 
             # Revisión
@@ -267,6 +268,61 @@ class AlineacionWorker(QThread):
 
         finally:
             camara.release()
+
+    def _tomar_cero(self, numero, medido, ceros, signos, i, total, maximo):
+        import ceros as cz
+        theta1, theta2, _, _ = medido
+        nuevo = cz.corregir(ceros[numero], theta1, theta2, signos[numero])
+        texto = f"Tomando el cero de #{numero}  ({i + 1} de {total})"
+        self.progreso.emit(i * PASOS_BARRA, maximo, texto)
+        self.ajustar.emit(numero, nuevo[0], nuevo[1], False)
+        self.log.emit(f"  #{numero}: midió {theta1:+.1f} / {theta2:+.1f} -> cero {nuevo[0]:+.1f},{nuevo[1]:+.1f}")
+        ceros[numero] = nuevo
+        self._esperar(ESPERA_CEROS_S, i * PASOS_BARRA, maximo, texto)
+        return not self._detener
+
+    def _alinear_unidad(self, diag, camara, numero, medido, ceros, signos, i, total, maximo):
+        """Corrige una unidad midiéndola otra vez después de cada corrección."""
+        import ceros as cz
+
+        theta1, theta2, magnitud, _ = medido
+        paso_barra = PASOS_BARRA // INTENTOS_MAX
+
+        for intento in range(1, INTENTOS_MAX + 1):
+            if self._detener:
+                return True
+
+            nuevo = cz.corregir(ceros[numero], theta1, theta2, signos[numero])
+            texto = (f"Alineando #{numero}: {magnitud:.1f}°  ({i + 1} de {total}"
+                     + (f", intento {intento}" if intento > 1 else "") + ")")
+            base = i * PASOS_BARRA + (intento - 1) * paso_barra
+            self.progreso.emit(base, maximo, texto)
+            self.ajustar.emit(numero, nuevo[0], nuevo[1], True)
+            self.log.emit(f"  #{numero}: midió {theta1:+.1f} / {theta2:+.1f} -> cero "
+                          f"{ceros[numero][0]:+.1f},{ceros[numero][1]:+.1f} -> {nuevo[0]:+.1f},{nuevo[1]:+.1f}")
+            ceros[numero] = nuevo
+            self._esperar(ESPERA_POR_UNIDAD_S, base, maximo, texto)
+
+            # Medirla otra vez
+            d = self._analizar(diag, camara)
+            if d is None:
+                return False
+            self.imagen.emit(a_qimage(dibujar(d, [numero])))
+            n1, n2, n_mag, n_estado = por_numero(d)[numero]
+
+            # ¿Algún eje se fue más para el mismo lado? -> ese servo está al revés
+            for eje, (antes, ahora) in enumerate(((theta1, n1), (theta2, n2))):
+                if (abs(antes) >= EJE_MINIMO_GRADOS and antes * ahora > 0
+                        and abs(ahora) > abs(antes) + EMPEORA_GRADOS):
+                    signos[numero][eje] *= -1
+                    self.log.emit(f"  #{numero}: el eje {'XY'[eje]} empeoró "
+                                  f"({antes:+.1f} -> {ahora:+.1f}): se invierte su signo")
+
+            theta1, theta2, magnitud = n1, n2, n_mag
+            if n_estado == "OK":
+                break
+
+        return True
 
     def _resumen(self, hechas, antes, despues, conteo):
         accion = "Ceros tomados" if self.accion == TOMAR_CEROS else "Alineadas"

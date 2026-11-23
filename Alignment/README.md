@@ -86,7 +86,7 @@ Usa `results/modelo/cnn.pt` con la **CNN** (la más precisa: 0.20° de error en 
 
 ### Desde la GUI de visión (menú Alineación)
 
-La GUI de `Vision/` usa este mismo núcleo (`app/nucleo`) en su menú verde **Alineación**: *Tomar ceros* mide las 16 unidades y guarda el cero de cada servo en `results/ceros_esp32.json`; *Alinear* corrige una por una las que no están OK. La GUI manda esos ceros al ESP32 cada vez que se conecta. La conversión de ángulos a grados del servo (signos, ganancia y paso máximo) está en `app/nucleo/ceros.py`. Ver `Vision/README.md`.
+La GUI de `Vision/` usa este mismo núcleo (`app/nucleo`) en su menú verde **Alineación**: *Tomar ceros* mide las 16 unidades y guarda el cero de cada servo en `results/ceros_esp32.json`; *Alinear* corrige una por una las que no están OK. La GUI manda esos ceros al ESP32 cada vez que se conecta. La conversión de ángulos a grados del servo (signos, ganancia y paso máximo) está en `app/nucleo/ceros.py`. Si una unidad tiene un servo al revés, *Alinear* lo detecta y guarda su signo en el mismo JSON (`signo_x` / `signo_y`). Ver `Vision/README.md`.
 
 ### Webots en vivo
 

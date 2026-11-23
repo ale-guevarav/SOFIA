@@ -16,6 +16,11 @@ La GUI de visión (menú "Alineación"):
 
 Los ceros están en grados DEL SERVO (lo que suma el firmware), no en los
 ángulos de la app; corregir() hace la conversión.
+
+SIGNOS POR UNIDAD: si un servo está montado o conectado al revés, corregir
+lo empujaría para el lado contrario (cada "Alinear" lo deja peor). Alinear
+lo detecta (el eje empeora en vez de mejorar), invierte el signo de ese eje
+SOLO para esa unidad y lo guarda en el mismo JSON (signo_x / signo_y).
 """
 
 import json
@@ -48,6 +53,18 @@ def ceros_vacios():
     return [[0.0, 0.0] for _ in range(NUM_UNIDADES)]
 
 
+def signos_vacios():
+    return [[1, 1] for _ in range(NUM_UNIDADES)]
+
+
+def _leer(ruta):
+    try:
+        with open(ruta, encoding="utf-8") as archivo:
+            return json.load(archivo).get("unidades", [])
+    except (OSError, ValueError, AttributeError):
+        return []
+
+
 def existe(ruta=rutas.CEROS_ESP32):
     return os.path.isfile(ruta)
 
@@ -55,19 +72,31 @@ def existe(ruta=rutas.CEROS_ESP32):
 def cargar(ruta=rutas.CEROS_ESP32):
     """Lista de 16 [x, y] (grados del servo). Sin archivo o dañado: ceros."""
     ceros = ceros_vacios()
-    try:
-        with open(ruta, encoding="utf-8") as archivo:
-            datos = json.load(archivo)
-        for unidad in datos.get("unidades", []):
+    for unidad in _leer(ruta):
+        try:
             numero = int(unidad["numero"])
             if 0 <= numero < NUM_UNIDADES:
                 ceros[numero] = [float(unidad["x"]), float(unidad["y"])]
-    except (OSError, ValueError, KeyError, TypeError):
-        pass
+        except (ValueError, KeyError, TypeError):
+            pass
     return ceros
 
 
-def guardar(ceros, metodo="", ruta=rutas.CEROS_ESP32):
+def cargar_signos(ruta=rutas.CEROS_ESP32):
+    """Lista de 16 [signo_x, signo_y] (1 o -1). Sin archivo: todos 1."""
+    signos = signos_vacios()
+    for unidad in _leer(ruta):
+        try:
+            numero = int(unidad["numero"])
+            if 0 <= numero < NUM_UNIDADES:
+                signos[numero] = [-1 if unidad.get("signo_x", 1) < 0 else 1,
+                                  -1 if unidad.get("signo_y", 1) < 0 else 1]
+        except (ValueError, KeyError, TypeError):
+            pass
+    return signos
+
+
+def guardar(ceros, metodo="", ruta=rutas.CEROS_ESP32, signos=None):
     os.makedirs(os.path.dirname(ruta), exist_ok=True)
     datos = {
         "descripcion": "Ceros de los servos (grados que suma el ESP32 a X, Y). "
@@ -75,8 +104,9 @@ def guardar(ceros, metodo="", ruta=rutas.CEROS_ESP32):
         "fecha": datetime.now().isoformat(timespec="seconds"),
         "metodo": metodo,
         "unidades": [
-            {"numero": n, "x": round(x, 1), "y": round(y, 1)}
-            for n, (x, y) in enumerate(ceros)
+            {"numero": n, "x": round(x, 1), "y": round(y, 1),
+             "signo_x": sx, "signo_y": sy}
+            for n, ((x, y), (sx, sy)) in enumerate(zip(ceros, signos or signos_vacios()))
         ],
     }
     with open(ruta, "w", encoding="utf-8") as archivo:
@@ -84,10 +114,11 @@ def guardar(ceros, metodo="", ruta=rutas.CEROS_ESP32):
     return ruta
 
 
-def corregir(cero, theta1, theta2):
+def corregir(cero, theta1, theta2, signos=(1, 1)):
     """
     Cero nuevo de una unidad a partir de su cero actual y de lo que midió
-    el diagnóstico (theta1, theta2 en grados de la app).
+    el diagnóstico (theta1, theta2 en grados de la app). signos: los de
+    esa unidad (cargar_signos), por si tiene un servo al revés.
     """
     def limitar(v):
         return max(-CERO_MAX, min(CERO_MAX, v))
@@ -95,6 +126,6 @@ def corregir(cero, theta1, theta2):
     def paso(v):
         return max(-PASO_MAX, min(PASO_MAX, v))
 
-    x = cero[0] - paso(GANANCIA * SERVO_X_POR_THETA1 * theta1)
-    y = cero[1] - paso(GANANCIA * SERVO_Y_POR_THETA2 * theta2)
+    x = cero[0] - paso(GANANCIA * SERVO_X_POR_THETA1 * signos[0] * theta1)
+    y = cero[1] - paso(GANANCIA * SERVO_Y_POR_THETA2 * signos[1] * theta2)
     return [round(limitar(x), 1), round(limitar(y), 1)]
