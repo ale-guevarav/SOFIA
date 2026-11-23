@@ -227,6 +227,14 @@ const uint8_t COLUMNA_UNIDAD[NUM_UNIDADES] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3
 // en el borde de la imagen (x_norm o y_norm = ±1)
 const float RANGO_TRACK = 45.0f;
 
+// Sentido del TRACKING. La imagen de la PC llega en espejo (como selfie):
+// x_norm > 0 = mano a la derecha de la persona. En el módulo real las
+// unidades se iban al lado contrario, así que se invierte X (solo en el
+// TRACKING; las figuras no cambian). Si arriba/abajo también sale al
+// revés, pon TRACK_INVERTIR_Y en true
+const bool TRACK_INVERTIR_X = true;
+const bool TRACK_INVERTIR_Y = false;
+
 // Si en TRACKING no llega posición en este tiempo,
 // las unidades regresan al centro
 const unsigned long TRACK_TIMEOUT_MS = 3000UL;
@@ -730,8 +738,8 @@ void iniciarPatron(uint8_t pose) {
 
 // x_norm, y_norm: -1 a 1 (centro de la imagen = 0)
 void seguirMano(float xNorm, float yNorm) {
-  objetivoMano.x = saturar(xNorm, -1.0f, 1.0f) * RANGO_TRACK;
-  objetivoMano.y = saturar(yNorm, -1.0f, 1.0f) * RANGO_TRACK;
+  objetivoMano.x = saturar(xNorm, -1.0f, 1.0f) * RANGO_TRACK * (TRACK_INVERTIR_X ? -1.0f : 1.0f);
+  objetivoMano.y = saturar(yNorm, -1.0f, 1.0f) * RANGO_TRACK * (TRACK_INVERTIR_Y ? -1.0f : 1.0f);
   ultimoTrackMs = millis();
 
   detenerPrueba();
