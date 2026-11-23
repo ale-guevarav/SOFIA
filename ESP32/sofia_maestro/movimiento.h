@@ -117,7 +117,7 @@ const float TS_S = 0.020f;
 // inclinarse una hacia la otra. Con 134 mm entre centros (30 mm entre
 // aristas) a ±20° por eje quedan ~6 mm entre placas; a ±25° solo
 // ~1.5 mm y a ±30° se tocan
-const float AMPLITUD = 20.0f;
+const float AMPLITUD = 30.0f;
 
 // FIGURAS DEL MÓDULO (las mismas que la sim, patrones.hpp)
 // Cuántas unidades se mueven a la vez en una figura (las más cercanas
