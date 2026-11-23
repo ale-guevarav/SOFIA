@@ -87,9 +87,10 @@ from interfaz.alineacion_worker import (
     ALINEAR,
     TOMAR_CEROS,
     AlineacionWorker,
+    BuscarCamarasWorker,
     ceros_guardados,
 )
-from interfaz.alineacion_ventana import AlineacionVentana
+from interfaz.alineacion_ventana import AlineacionVentana, CamarasVentana
 from evaluacion.session_logger import SessionLogger
 
 
@@ -203,6 +204,7 @@ class MainWindow(QMainWindow):
         # ALINEACIÓN (mientras corre no se mandan posturas / TRACK)
         self.align_worker = None
         self.align_window = None
+        self.camera_search = None
         self._aligning = False
 
         # Evidencia de las pruebas (CSV + resumen)
@@ -340,14 +342,18 @@ class MainWindow(QMainWindow):
 
         # Cámara que ve al módulo (la 0 es la de la persona)
         camera_menu = menu.addMenu("Cámara del módulo")
+        camera_menu.addAction("🔍  Buscar cámaras...", self.search_cameras)
+        camera_menu.addSeparator()
         self.align_camera = 1
+        self.align_camera_actions = []
         group = QActionGroup(self)
         for index in range(5):
             action = camera_menu.addAction(f"Cámara {index}")
             action.setCheckable(True)
             action.setChecked(index == self.align_camera)
-            action.triggered.connect(lambda _=False, i=index: setattr(self, "align_camera", i))
+            action.triggered.connect(lambda _=False, i=index: self.set_align_camera(i))
             group.addAction(action)
+            self.align_camera_actions.append(action)
 
         self.btn_align.setMenu(menu)
         return self.btn_align
@@ -1123,6 +1129,40 @@ class MainWindow(QMainWindow):
         self.append_log("Ceros guardados enviados al ESP32 (16 unidades)")
 
 
+    def set_align_camera(self, index):
+        self.align_camera = index
+        for i, action in enumerate(self.align_camera_actions):
+            action.setChecked(i == index)
+        self.append_log(f"Alineación: cámara del módulo = {index}")
+
+
+    def search_cameras(self):
+        """Prueba las cámaras y muestra una foto de cada una para elegir."""
+        if self.camera_search is not None or self.align_worker is not None:
+            return
+        busy = [0] if self.worker is not None else []    # la 0 la usa la detección
+        self.btn_align.setEnabled(False)
+        self.statusBar().showMessage("Buscando cámaras...")
+        self.camera_search = BuscarCamarasWorker(busy, parent=self)
+        self.camera_search.listas.connect(self.on_cameras_found)
+        self.camera_search.finished.connect(self._on_camera_search_finished)
+        self.camera_search.start()
+
+
+    @Slot(list)
+    def on_cameras_found(self, cameras):
+        self.statusBar().showMessage(f"{sum(q is not None for _, q, _ in cameras)} cámaras con imagen")
+        window = CamarasVentana(cameras, self.align_camera, self)
+        window.elegida.connect(self.set_align_camera)
+        window.exec()
+
+
+    @Slot()
+    def _on_camera_search_finished(self):
+        self.camera_search = None
+        self.btn_align.setEnabled(self.align_worker is None)
+
+
     def _align_popup(self, title, text, critical=False):
         box = QMessageBox(self)
         box.setWindowTitle("SOFIA - Alineación")
@@ -1187,10 +1227,15 @@ class MainWindow(QMainWindow):
 
     @Slot(str)
     def on_align_no_sofia(self, reason):
-        self._close_align_window()
+        # La ventana se queda abierta con la foto, para ver qué vio la cámara
+        if self.align_window is not None:
+            self.align_window.fallar(f"¡No hay un SOFIA a la vista! (cámara {self.align_camera})")
         self.append_log(f"Alineación: no hay un SOFIA a la vista ({reason})")
         self._align_popup("⚠  ¡NO HAY UN SOFIA A LA VISTA!",
-                          f"La cámara del módulo no ve los 4 ArUco.<br><small>{reason}</small>",
+                          f"La cámara {self.align_camera} no ve los 4 ArUco "
+                          "(atrás de este aviso está la foto que tomó).<br>"
+                          "Si es la cámara equivocada: <b>Alineación → Cámara del módulo → "
+                          f"Buscar cámaras</b>.<br><small>{reason}</small>",
                           critical=True)
 
 
@@ -1198,6 +1243,9 @@ class MainWindow(QMainWindow):
     def on_align_error(self, message):
         self._close_align_window()
         self.append_log(f"Alineación: {message}")
+        if "cámara" in message.lower():
+            message += ("<br><br>Para ver qué cámaras hay y cuál ve al SOFIA: <b>Alineación → "
+                        "Cámara del módulo → Buscar cámaras</b>.")
         self._align_popup("No se pudo alinear", message, critical=True)
 
 
@@ -1218,6 +1266,9 @@ class MainWindow(QMainWindow):
         if self.align_worker is not None:
             self.align_worker.detener()
             self.align_worker.wait(5000)
+
+        if self.camera_search is not None:
+            self.camera_search.wait(10000)
 
         if self.worker is not None:
             self.worker.stop()

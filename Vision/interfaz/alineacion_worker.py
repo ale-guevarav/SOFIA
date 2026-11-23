@@ -292,3 +292,44 @@ def ceros_guardados():
     """Ceros de Alignment/results/ceros_esp32.json, o None si no hay archivo."""
     import ceros as cz
     return cz.cargar() if cz.existe() else None
+
+
+# =============================================
+# BUSCAR CÁMARAS (menú Alineación -> Cámara del módulo)
+# =============================================
+
+MAX_CAMARAS = 5
+
+
+class BuscarCamarasWorker(QThread):
+    """Prueba las cámaras 0..MAX_CAMARAS-1 y regresa una foto de cada una."""
+
+    # lista de (indice, QImage o None, texto)
+    listas = Signal(list)
+
+    def __init__(self, ocupadas=(), parent=None):
+        super().__init__(parent)
+        self.ocupadas = set(ocupadas)
+
+    def run(self):
+        resultado = []
+        for indice in range(MAX_CAMARAS):
+            if indice in self.ocupadas:
+                resultado.append((indice, None, "en uso por la detección (ve a la persona)"))
+                continue
+            camara = cv2.VideoCapture(indice)
+            try:
+                if not camara.isOpened():
+                    continue                       # no existe: no se muestra
+                foto = None
+                for _ in range(10):                # unos cuadros para que ajuste la luz
+                    ok, cuadro = camara.read()
+                    if ok:
+                        foto = cuadro
+                if foto is None:
+                    resultado.append((indice, None, "abre pero no manda imagen"))
+                else:
+                    resultado.append((indice, a_qimage(foto), f"{foto.shape[1]}x{foto.shape[0]}"))
+            finally:
+                camara.release()
+        self.listas.emit(resultado)

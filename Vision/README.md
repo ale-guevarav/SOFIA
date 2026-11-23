@@ -210,6 +210,7 @@ Menú verde **Alineación** de la GUI (debajo de Iniciar / Detener). Une la visi
 | **Tomar ceros** | Mide las 16 unidades con la **cámara del módulo** (la que ve al SOFIA, no a la persona; se elige en el mismo menú, por defecto la 1), calcula el cero de cada servo, lo guarda en `Alignment/results/ceros_esp32.json` y se lo manda al ESP32 |
 | **Alinear** | Mide y corrige **una por una** las unidades que no están OK, de la menos a la más desalineada (cada una se reacomoda con su cero nuevo). Guarda los ceros y toma otra foto para revisar |
 
+- **¿Cuál cámara es?** La de la GUI (la persona) es siempre la 0. En *Alineación → Cámara del módulo → Buscar cámaras* sale una foto de cada cámara conectada y con *Usar esta* se elige la que ve al SOFIA.
 - Antes de medir, la GUI manda STOP (todas a 0,0) y deja de mandar posturas / TRACK.
 - El progreso sale en una **ventana emergente** con la foto analizada y la barra; si no se ven los 4 ArUco sale el aviso **"¡NO HAY UN SOFIA A LA VISTA!"**.
 - **Cada vez que se conecta al ESP32**, la GUI le manda los ceros guardados (comando `AJUSTE`, `0x05`), en lugar de los de fábrica del firmware.

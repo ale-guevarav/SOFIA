@@ -80,6 +80,14 @@ class AlineacionVentana(QDialog):
         self._pixmap = QPixmap.fromImage(qimage)
         self._mostrar_foto()
 
+    def fallar(self, texto):
+        """Se queda abierta (con la foto) para ver qué vio la cámara."""
+        self._terminada = True
+        self.barra.setRange(0, 1)
+        self.barra.setValue(0)
+        self.estado.setText(f"<span style='color:#ff7b72; font-size:16px'><b>{texto}</b></span>")
+        self.boton.setText("Cerrar")
+
     def terminar(self, resumen_html):
         self._terminada = True
         self.barra.setRange(0, 1)
@@ -116,3 +124,72 @@ class AlineacionVentana(QDialog):
         if not self._terminada:
             self.cancelar.emit()
         super().reject()
+
+
+# =============================================
+# CÁMARAS DISPONIBLES
+# =============================================
+
+class CamarasVentana(QDialog):
+    """Una foto de cada cámara conectada; 'Usar esta' elige la del módulo."""
+
+    elegida = Signal(int)
+
+    def __init__(self, camaras, actual, parent=None):
+        from PySide6.QtWidgets import QGridLayout, QWidget
+
+        super().__init__(parent)
+        self.setWindowTitle("SOFIA - Cámaras disponibles")
+        self.setModal(True)
+
+        box = QVBoxLayout(self)
+        titulo = QLabel("¿CUÁL VE AL SOFIA?")
+        titulo.setObjectName("alignTitle")
+        titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        box.addWidget(titulo)
+
+        if not camaras:
+            aviso = QLabel("No se encontró ninguna cámara. Conecta la cámara del módulo y vuelve a buscar.")
+            aviso.setObjectName("alignStatus")
+            aviso.setWordWrap(True)
+            box.addWidget(aviso)
+
+        rejilla = QGridLayout()
+        rejilla.setSpacing(12)
+        for k, (indice, qimage, texto) in enumerate(camaras):
+            celda = QVBoxLayout()
+            foto = QLabel()
+            foto.setObjectName("video")
+            foto.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            foto.setFixedSize(300, 200)
+            if qimage is not None:
+                foto.setPixmap(QPixmap.fromImage(qimage).scaled(
+                    foto.size(), Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation))
+            else:
+                foto.setText("Sin imagen")
+            marca = "  ✔ (la elegida)" if indice == actual else ""
+            nombre = QLabel(f"<b>Cámara {indice}</b>{marca}<br><small>{texto}</small>")
+            nombre.setTextFormat(Qt.TextFormat.RichText)
+            boton = QPushButton("Usar esta")
+            boton.setObjectName("primary")
+            boton.setEnabled(qimage is not None)
+            boton.clicked.connect(lambda _=False, i=indice: self._elegir(i))
+            celda.addWidget(foto)
+            celda.addWidget(nombre)
+            celda.addWidget(boton)
+            contenedor = QWidget()
+            contenedor.setLayout(celda)
+            rejilla.addWidget(contenedor, k // 2, k % 2)
+        box.addLayout(rejilla)
+
+        cerrar = QPushButton("Cerrar")
+        cerrar.clicked.connect(self.close)
+        fila = QHBoxLayout()
+        fila.addStretch(1)
+        fila.addWidget(cerrar)
+        box.addLayout(fila)
+
+    def _elegir(self, indice):
+        self.elegida.emit(indice)
+        self.close()
