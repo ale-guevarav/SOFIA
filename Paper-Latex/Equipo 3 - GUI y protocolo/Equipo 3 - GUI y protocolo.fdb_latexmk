@@ -1,19 +1,19 @@
 # Fdb version 4
-["bibtex Equipo 3 - GUI y protocolo"] 1793229024.53848 "Equipo 3 - GUI y protocolo.aux" "Equipo 3 - GUI y protocolo.bbl" "Equipo 3 - GUI y protocolo" 1793229026.13251 0
-  "./bibliography.bib" 1792991590 2542 ede5436185f3d6a9b32b0e1d9295546c ""
-  "Equipo 3 - GUI y protocolo.aux" 1793229025 4669 2db036ce966b8df8adf0eaf24021b3e4 "pdflatex"
+["bibtex Equipo 3 - GUI y protocolo"] 1795239218.9471 "Equipo 3 - GUI y protocolo.aux" "Equipo 3 - GUI y protocolo.bbl" "Equipo 3 - GUI y protocolo" 1795239220.6558 0
+  "./bibliography.bib" 1794007083 2542 ede5436185f3d6a9b32b0e1d9295546c ""
+  "Equipo 3 - GUI y protocolo.aux" 1795239220 4669 2db036ce966b8df8adf0eaf24021b3e4 "pdflatex"
   "O:/MikTex/bibtex/bst/ieeetran/IEEEtran.bst" 1440622569 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
   (generated)
   "Equipo 3 - GUI y protocolo.bbl"
   "Equipo 3 - GUI y protocolo.blg"
   (rewritten before read)
-["pdflatex"] 1793229024.76657 "o:/VsCode/SOFIA/Paper-Latex/Equipo 3 - GUI y protocolo/Equipo 3 - GUI y protocolo.tex" "Equipo 3 - GUI y protocolo.pdf" "Equipo 3 - GUI y protocolo" 1793229026.13311 0
+["pdflatex"] 1795239219.19131 "o:/VsCode/SOFIA/Paper-Latex/Equipo 3 - GUI y protocolo/Equipo 3 - GUI y protocolo.tex" "Equipo 3 - GUI y protocolo.pdf" "Equipo 3 - GUI y protocolo" 1795239220.65659 0
   "C:/Users/Jp/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1792142241 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/Jp/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1792142197 13316644 c07d7c3917a731f28b6ef3716ad91c3b ""
-  "Equipo 3 - GUI y protocolo.aux" 1793229025 4669 2db036ce966b8df8adf0eaf24021b3e4 "pdflatex"
-  "Equipo 3 - GUI y protocolo.bbl" 1793229024 2014 cd44ecf2bf7534815fc2b7cf94064dec "bibtex Equipo 3 - GUI y protocolo"
-  "Equipo 3 - GUI y protocolo.tex" 1793228983 15550 5e788779b99c2d6215e7d4ac29fc0158 ""
-  "IEEEtran.cls" 1792970935 289933 e811c6f9cc8f2ee2a22f25b0dfea9f6a ""
+  "Equipo 3 - GUI y protocolo.aux" 1795239220 4669 2db036ce966b8df8adf0eaf24021b3e4 "pdflatex"
+  "Equipo 3 - GUI y protocolo.bbl" 1795239219 2014 cd44ecf2bf7534815fc2b7cf94064dec "bibtex Equipo 3 - GUI y protocolo"
+  "Equipo 3 - GUI y protocolo.tex" 1794007083 15550 5e788779b99c2d6215e7d4ac29fc0158 ""
+  "IEEEtran.cls" 1794007083 289933 e811c6f9cc8f2ee2a22f25b0dfea9f6a ""
   "O:/MikTex/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
   "O:/MikTex/fonts/tfm/adobe/courier/pcrr7t.tfm" 1136765053 960 379cc0019370a9e0208a0a3f949f847a ""
   "O:/MikTex/fonts/tfm/adobe/courier/pcrr8r.tfm" 1136765053 1292 bd42be2f344128bff6d35d98474adfe3 ""
@@ -173,7 +173,7 @@
   "O:/MikTex/tex/latex/tools/tabularx.sty" 1761901070 7243 a2c17f18e2c9b702b84fad03d5f9c78b ""
   "O:/MikTex/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "O:/MikTex/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "o:/VsCode/SOFIA/Paper-Latex/Equipo 3 - GUI y protocolo/Equipo 3 - GUI y protocolo.tex" 1793228983 15550 5e788779b99c2d6215e7d4ac29fc0158 ""
+  "o:/VsCode/SOFIA/Paper-Latex/Equipo 3 - GUI y protocolo/Equipo 3 - GUI y protocolo.tex" 1794007083 15550 5e788779b99c2d6215e7d4ac29fc0158 ""
   (generated)
   "Equipo 3 - GUI y protocolo.aux"
   "Equipo 3 - GUI y protocolo.log"

@@ -194,7 +194,7 @@ class VentanaDiagnostico(QMainWindow):
             spin.setSuffix("°")
         btn_panel = QPushButton("Mover panel")
         btn_panel.clicked.connect(lambda: self.worker.ordenar_webots(
-            "panel", panel=self.spin_panel.value(), theta1=self.spin_t1.value(), theta2=self.spin_t2.value()))
+            "panel", panel=g.indice_de_numero(self.spin_panel.value()), theta1=self.spin_t1.value(), theta2=self.spin_t2.value()))
 
         btn_escena = QPushButton("Cámara y luz al azar")
         btn_escena.setToolTip("Mueve la cámara (±4 cm, ±4°, ±8° de giro) y cambia la luz, como en el dataset")
@@ -305,7 +305,7 @@ class VentanaDiagnostico(QMainWindow):
                 encabezado += ["theta1_real", "theta2_real", "error_deg"]
             escritor.writerow(encabezado)
             for indice, fila, columna, _ in g.paneles():
-                renglon = [indice, fila, columna, round(float(d.theta1[indice]), 3),
+                renglon = [g.numero_panel(fila, columna), fila, columna, round(float(d.theta1[indice]), 3),
                            round(float(d.theta2[indice]), 3), round(d.magnitud[indice], 3),
                            round(d.porcentaje[indice], 1), d.estado[indice], d.fuente[indice],
                            bool(d.desacuerdo[indice])]
@@ -396,7 +396,7 @@ class VentanaDiagnostico(QMainWindow):
         self.lbl_resumen.setText("<br>".join(partes))
 
         for indice, fila, columna, _ in g.paneles():
-            texto = (f"#{indice}  {d.estado[indice]}\n"
+            texto = (f"#{g.numero_panel(fila, columna)}  {d.estado[indice]}\n"
                      f"{d.theta1[indice]:+.1f} / {d.theta2[indice]:+.1f}")
             if info["error"] is not None:
                 real = info["reales"][indice]

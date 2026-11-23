@@ -73,6 +73,24 @@ def panel_xy(fila, columna):
     return FILAS_X[fila], columnas_y[columna]
 
 
+def numero_panel(fila, columna):
+    """
+    Número que se MUESTRA (0-15), como se cuenta en el módulo real:
+    de izquierda a derecha y de abajo hacia arriba (abajo-izq. = 0).
+    Internamente la columna 0 queda a la DERECHA de la imagen, así que
+    solo se invierte la columna para mostrarlo; el índice interno
+    (fila * 4 + columna) no cambia: el modelo y las sesiones de Webots
+    siguen igual.
+    """
+    return fila * COLUMNAS + (COLUMNAS - 1 - columna)
+
+
+def indice_de_numero(numero):
+    """Número mostrado (0-15) -> índice interno (fila * 4 + columna)."""
+    fila, columna_mostrada = divmod(numero, COLUMNAS)
+    return fila * COLUMNAS + (COLUMNAS - 1 - columna_mostrada)
+
+
 def mundo_a_imagen(x, y):
     """(x, y) del mundo -> (u, v) de la imagen enderezada, en metros."""
     return -(y - CENTRO_Y), x - CENTRO_X

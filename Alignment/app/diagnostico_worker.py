@@ -94,7 +94,7 @@ def dibujar(d, reales=None):
             cv2.putText(vista, "?", (centro[0] + 30, centro[1] - 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2, cv2.LINE_AA)
 
-        texto = f"{indice}: {d.magnitud[indice]:.1f}"
+        texto = f"{g.numero_panel(fila, columna)}: {d.magnitud[indice]:.1f}"
         cv2.putText(vista, texto, (centro[0] - 40, centro[1] + 62),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 4, cv2.LINE_AA)
         cv2.putText(vista, texto, (centro[0] - 40, centro[1] + 62),

@@ -179,7 +179,7 @@ def dibujar_guia(enderezada):
         p2 = (int(cx + mitad), int(cy + mitad))
         cv2.rectangle(vista, p1, p2, (0, 200, 255), 1)
         cv2.drawMarker(vista, (int(cx), int(cy)), (0, 0, 255), cv2.MARKER_CROSS, 14, 2)
-        cv2.putText(vista, str(indice), (p1[0] + 4, p1[1] + 18),
+        cv2.putText(vista, str(g.numero_panel(fila, columna)), (p1[0] + 4, p1[1] + 18),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 200, 255), 2)
 
     for u, v in g.ESQUINAS_UV.values():
