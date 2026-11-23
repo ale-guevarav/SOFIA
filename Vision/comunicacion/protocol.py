@@ -59,6 +59,7 @@ TYPE_TRACK = 0x01   # Posición de la mano (x, y, vector)
 TYPE_PING = 0x02    # Comando de prueba / latido
 TYPE_MODE = 0x03    # Modo activo del sistema de visión
 TYPE_STOP = 0x04    # Detener: el robot pasa a estado seguro
+TYPE_ADJUST = 0x05  # Nuevo cero de una unidad (alineación)
 
 # ESP32 -> PC
 TYPE_ACK = 0x80     # Confirmación
@@ -70,13 +71,14 @@ TYPE_NAMES = {
     TYPE_PING: "PING",
     TYPE_MODE: "MODE",
     TYPE_STOP: "STOP",
+    TYPE_ADJUST: "AJUSTE",
     TYPE_ACK: "ACK",
     TYPE_NACK: "NACK",
 }
 
 # Comandos que exigen ACK. TRACK no lo exige porque
 # se envía en flujo continuo (gana el más reciente).
-REQUIRES_ACK = {TYPE_POSE, TYPE_PING, TYPE_MODE, TYPE_STOP}
+REQUIRES_ACK = {TYPE_POSE, TYPE_PING, TYPE_MODE, TYPE_STOP, TYPE_ADJUST}
 
 
 # -----------------------------
@@ -280,6 +282,31 @@ def decode_track_payload(payload: bytes):
 
 def mode_payload(mode_name: str) -> bytes:
     return bytes([MODE_IDS[mode_name]])
+
+
+NUM_UNITS = 16
+ADJUST_MAX_DEG = 20.0       # el ESP32 rechaza ceros más grandes
+ADJUST_SETTLE = 0x01        # flag: reacomodar la unidad (sacudida corta)
+
+
+def adjust_payload(unit: int, x_deg: float, y_deg: float, settle: bool) -> bytes:
+    """
+    Nuevo cero de una unidad (6 bytes):
+
+        unit   u8   0 = abajo-izquierda ... 15 = arriba-derecha
+        flags  u8   bit 0 = reacomodar (sacudida corta y se asienta)
+        x      i16  cero del servo X en décimas de grado (±200)
+        y      i16  cero del servo Y en décimas de grado (±200)
+    """
+
+    if not 0 <= unit < NUM_UNITS:
+        raise ValueError(f"Unidad inválida: {unit} (debe ser 0-{NUM_UNITS - 1})")
+
+    def tenths(value):
+        value = max(-ADJUST_MAX_DEG, min(ADJUST_MAX_DEG, value))
+        return int(round(value * 10))
+
+    return struct.pack("<BBhh", unit, ADJUST_SETTLE if settle else 0, tenths(x_deg), tenths(y_deg))
 
 
 # =============================================

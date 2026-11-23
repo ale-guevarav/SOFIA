@@ -67,6 +67,7 @@ const uint8_t SLAVE_IDS[] = {1};
 #define TYPE_PING     0x02
 #define TYPE_MODE     0x03
 #define TYPE_STOP     0x04
+#define TYPE_ADJUST   0x05   // AJUSTE: nuevo "cero" de una unidad (alineación)
 
 #define TYPE_ACK      0x80
 #define TYPE_NACK     0x81
@@ -489,6 +490,15 @@ void onStop() {
   enterSafeState("comando STOP");
 }
 
+// AJUSTE (desde la GUI): nuevo cero de una unidad, medido con la app de
+// alineación ("Alinear" / "Tomar ceros", o los ceros guardados que manda
+// la PC al conectarse). Solo las unidades de ESTE ESP32
+void onAdjust(uint8_t unit, bool sacudir, float ajusteX, float ajusteY) {
+  Serial.printf("[AJUSTE] Unidad %u (numero %u de la app): X %+.1f  Y %+.1f%s\n",
+                unit + 1, unit, ajusteX, ajusteY, sacudir ? "  (reacomodando)" : "");
+  fijarAjuste(unit, ajusteX, ajusteY, sacudir);
+}
+
 void enterSafeState(const char* reason) {
   if (!safeState) {
     Serial.printf("[SEGURO] Estado seguro: %s\n", reason);
@@ -623,6 +633,27 @@ void handleFrame(const RxPacket& packet) {
       }
       if (!isDuplicate(type, seq)) {
         onStop();
+        rememberCommand(type, seq);
+      }
+      sendAck(type, seq);
+      break;
+    }
+
+    case TYPE_ADJUST: {
+      // unit u8 · flags u8 (bit 0 = reacomodar) · X i16 · Y i16 (décimas de grado)
+      if (payloadLength != 6 || payload[0] >= NUM_UNIDADES) {
+        sendNack(type, seq, ERR_PAYLOAD);
+        return;
+      }
+      int16_t ax = (int16_t)(payload[2] | (payload[3] << 8));
+      int16_t ay = (int16_t)(payload[4] | (payload[5] << 8));
+      if (ax < -AJUSTE_MAX_DECIMAS || ax > AJUSTE_MAX_DECIMAS ||
+          ay < -AJUSTE_MAX_DECIMAS || ay > AJUSTE_MAX_DECIMAS) {
+        sendNack(type, seq, ERR_PAYLOAD);
+        return;
+      }
+      if (!isDuplicate(type, seq)) {
+        onAdjust(payload[0], payload[1] & 0x01, ax / 10.0f, ay / 10.0f);
         rememberCommand(type, seq);
       }
       sendAck(type, seq);

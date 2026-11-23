@@ -99,10 +99,11 @@ uint8_t crc8(const uint8_t* data, size_t length) {
 | `0x02` | **PING** | PC → ESP32 | 0 B | Sí |
 | `0x03` | **MODE** | PC → ESP32 | 1 B | Sí |
 | `0x04` | **STOP** | PC → ESP32 | 0 B | Sí |
+| `0x05` | **AJUSTE** | PC → ESP32 | 6 B | Sí |
 | `0x80` | **ACK** | ESP32 → PC | 2 B | — |
 | `0x81` | **NACK** | ESP32 → PC | 3 B | — |
 
-Los tipos `0x05–0x7F` quedan reservados para comandos futuros de la PC, y `0x82–0xFF` para respuestas futuras del ESP32.
+Los tipos `0x06–0x7F` quedan reservados para comandos futuros de la PC, y `0x82–0xFF` para respuestas futuras del ESP32.
 
 ### 4.1 POSE (`0x00`): postura detectada
 
@@ -145,6 +146,17 @@ Sin payload. Sirve para:
 
 Sin payload. El ESP32 pasa a **estado seguro** (robot en posición neutral). La PC lo envía cuando se detiene la detección.
 
+### 4.5b AJUSTE (`0x05`): cero de una unidad
+
+| Byte | Campo | Tipo | Valores |
+|---|---|---|---|
+| 0 | `unit` | u8 | `0`–`15` (0 = abajo-izquierda … 15 = arriba-derecha, igual que la app de alineación) |
+| 1 | `flags` | u8 | bit 0 = **reacomodar** (sacudida corta de ±4° y se asienta) |
+| 2–3 | `x` | i16 | cero del servo X en décimas de grado (−200 a 200) |
+| 4–5 | `y` | i16 | cero del servo Y en décimas de grado (−200 a 200) |
+
+El "cero" son los grados que el ESP32 le suma a cada servo para que la placa quede derecha en 0,0. Los mide el diagnóstico de alineación desde el menú **Alineación** de la GUI ("Tomar ceros" / "Alinear", que usa *reacomodar*) y se guardan en `Alignment/results/ceros_esp32.json`. **Al conectarse, la PC manda los 16 ceros guardados** (sin *reacomodar*), así el ESP32 usa esos en lugar de los de fábrica (`AJUSTE_X/Y`). Fuera de rango: NACK `ERR_PAYLOAD`.
+
 ### 4.6 ACK (`0x80`): confirmación
 
 | Byte | Campo | Descripción |
@@ -181,7 +193,7 @@ El ESP32 valida en este orden: **longitud → SOF → LEN → CRC → TYPE → P
 
 | # | Regla |
 |---|---|
-| **R1** | **Stop-and-wait para comandos.** POSE, PING, MODE y STOP se envían de uno en uno: la PC no envía el siguiente comando hasta recibir ACK/NACK o agotar los reintentos. TRACK sí puede enviarse mientras se espera un ACK. |
+| **R1** | **Stop-and-wait para comandos.** POSE, PING, MODE, STOP y AJUSTE se envían de uno en uno: la PC no envía el siguiente comando hasta recibir ACK/NACK o agotar los reintentos. TRACK sí puede enviarse mientras se espera un ACK. |
 | **R2** | **Tiempo de espera:** 300 ms por ACK. |
 | **R3** | **Reintentos:** hasta 3 envíos en total con el **mismo SEQ**. Se reintenta si no llega ACK o si llega un NACK de transmisión (SOF, longitud, CRC u ocupado), porque esos los causa el ruido y no el comando. Si los 3 fallan, el comando se reporta como fallido a la interfaz. |
 | **R4** | **Duplicados:** si el ESP32 recibe un comando con el mismo TYPE y SEQ que el último que ejecutó, dentro de una ventana de 1 s, **no lo vuelve a ejecutar** pero sí envía ACK otra vez. Así un reintento (porque se perdió el ACK) no hace que el robot actúe dos veces. |
@@ -189,7 +201,7 @@ El ESP32 valida en este orden: **longitud → SOF → LEN → CRC → TYPE → P
 | **R6** | **Frecuencia de TRACK:** máximo 20 tramas por segundo (una cada 50 ms). La PC descarta los excesos. |
 | **R7** | **Latido:** si la PC no ha **recibido** nada del ESP32 en 1 s, envía un PING (el ESP32 lo contesta con ACK). Se mira lo recibido y no lo enviado porque en TRACKING la PC manda TRACK sin parar y esos no llevan ACK. |
 | **R8** | **Vigilancia (watchdog):** si el ESP32 no recibe ninguna trama válida en 3 s, o si se pierde la conexión BLE, entra a **estado seguro**. |
-| **R9** | **Al conectar,** la PC envía MODE con el modo actual. **Al detener la detección,** la PC envía STOP. |
+| **R9** | **Al conectar,** la PC envía MODE con el modo actual (y al ESP32, los ceros guardados con AJUSTE, si existen). **Al detener la detección,** la PC envía STOP. |
 | **R10** | **Errores en TRACK:** se responden con NACK (para diagnóstico), pero la PC no los reintenta, porque el siguiente TRACK reemplaza al anterior. |
 | **R11** | **Enlace perdido en la PC:** si la PC no recibe ninguna respuesta en 3 s, cierra la conexión aunque el sistema operativo la siga viendo abierta. |
 | **R12** | **Reconexión automática:** si la conexión se pierde o no se logra y el usuario no pidió desconectar, la PC reintenta sola con esperas de 1, 2, 4, 8 y luego cada 10 s. Al reconectar se vuelve a enviar MODE (R9). El botón *Cancelar* detiene los reintentos. |

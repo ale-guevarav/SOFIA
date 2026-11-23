@@ -24,6 +24,7 @@ ESP32/
 | POSE 5 · FIN | El módulo dibuja **izquierda-derecha** (despedida, ~3.0 s) |
 | TRACK (solo en modo TRACKING) | **Apuntan hacia la mano**, por turnos de 4 |
 | STOP | Regresan al centro (por turnos de 4) |
+| AJUSTE (unidad 0–15 + cero X/Y) | **Nuevo cero** de esa unidad, medido con el diagnóstico de alineación (menú **Alineación** de la GUI). Con "reacomodar" hace una sacudida corta (±4°) y se asienta; sin él solo reescribe el PWM. La GUI manda los ceros guardados cada vez que se conecta. Solo las unidades de este ESP32; si el ESP32 se reinicia sin PC, usa `AJUSTE_X/Y` |
 | PING | Solo responde ACK (comando de prueba) |
 
 - **La figura la forma el módulo completo, con unidades fijas:** cada figura tiene un **grupo fijo** de unidades (`GRUPO_ESCUDO`…, las que quedan sobre la figura) y una **esfera virtual** recorre la figura a velocidad constante (`VEL_ESFERA`). Las unidades del grupo **siguen a la esfera como en el tracking**: se inclinan hacia ella (con la esfera encima quedan planas y la siguen cuando pasa), así que el movimiento es continuo.

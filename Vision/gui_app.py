@@ -18,6 +18,11 @@ Interfaz gráfica (PySide6 / Qt) que:
     - Manejo de fallas: reconexión automática con el ESP32 / Webots,
       recuperación de la cámara y errores que se avisan en la
       bitácora sin cerrar la aplicación.
+    - Menú ALINEACIÓN (interfaz/alineacion_worker.py, usa Alignment):
+        "Tomar ceros": mide las 16 unidades con la cámara que ve al
+        módulo y guarda sus ceros (Alignment/results/ceros_esp32.json).
+        "Alinear": corrige una por una las unidades desalineadas.
+      Al conectarse al ESP32 le manda los ceros guardados.
     - Registro de la sesión (evaluacion/session_logger.py): posturas,
       comandos, latencias y fallas en CSV + un resumen por condición
       de prueba, como evidencia de las pruebas.
@@ -45,7 +50,7 @@ import traceback
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QFont, QImage, QPixmap
+from PySide6.QtGui import QActionGroup, QFont, QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QButtonGroup,
@@ -56,6 +61,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
+    QMessageBox,
     QPlainTextEdit,
     QPushButton,
     QRadioButton,
@@ -76,6 +83,13 @@ from interfaz.vision_worker import (
     STATE_STOPPED,
 )
 from interfaz.sim_camera import SimCameraClient
+from interfaz.alineacion_worker import (
+    ALINEAR,
+    TOMAR_CEROS,
+    AlineacionWorker,
+    ceros_guardados,
+)
+from interfaz.alineacion_ventana import AlineacionVentana
 from evaluacion.session_logger import SessionLogger
 
 
@@ -123,6 +137,33 @@ QLabel#video { background: #0b0d10; border: 1px solid #2b3038; border-radius: 8p
 QLabel#bigValue { font-size: 30px; font-weight: 700; color: #58a6ff; }
 QLabel#muted { color: #9aa4b2; }
 QLabel#testBig { padding: 4px 0; }
+
+/* ---------- ALINEACIÓN ---------- */
+QPushButton#alignMenu {
+    min-height: 40px; font-size: 17px; font-weight: 800; letter-spacing: 1px; color: white;
+    border: 2px solid #3fb950; border-radius: 10px; padding: 6px 14px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3fb950, stop:1 #1a7f37);
+}
+QPushButton#alignMenu:hover:enabled {
+    border-color: #7ee787;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #56d364, stop:1 #238636);
+}
+QPushButton#alignMenu:disabled { color: #b7e4c0; border-color: #2f6f3e; background: #1c4428; }
+QPushButton#alignMenu::menu-indicator { subcontrol-position: right center; right: 10px; }
+QMenu { background: #1b1f25; border: 1px solid #2f6f3e; padding: 4px; }
+QMenu::item { padding: 8px 26px 8px 14px; border-radius: 6px; font-weight: 600; }
+QMenu::item:selected { background: #238636; color: white; }
+QMenu::separator { height: 1px; background: #2b3038; margin: 4px 6px; }
+QLabel#alignTitle { font-size: 22px; font-weight: 800; letter-spacing: 3px; color: #7ee787; }
+QLabel#alignStatus { font-size: 14px; font-weight: 600; color: #e6e8eb; }
+QProgressBar#align {
+    min-height: 24px; border: 1px solid #2f6f3e; border-radius: 12px;
+    background: #0f1115; color: #e6e8eb; text-align: center; font-weight: 700;
+}
+QProgressBar#align::chunk {
+    border-radius: 11px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #238636, stop:1 #56d364);
+}
 """
 
 # Gestos que se pueden probar en modo TEST (en orden de su número)
@@ -158,6 +199,11 @@ class MainWindow(QMainWindow):
         self.worker_state = STATE_STOPPED
         self.mode = MODE_GAME
         self.last_sent_gesture = NO_GESTURE
+
+        # ALINEACIÓN (mientras corre no se mandan posturas / TRACK)
+        self.align_worker = None
+        self.align_window = None
+        self._aligning = False
 
         # Evidencia de las pruebas (CSV + resumen)
         self.session = SessionLogger()
@@ -276,7 +322,35 @@ class MainWindow(QMainWindow):
         self.state_label.setTextFormat(Qt.TextFormat.RichText)
         grid.addWidget(self.state_label, 2, 0, 1, 2)
 
+        grid.addWidget(self._build_align_button(), 3, 0, 1, 2)
+
         return group
+
+
+    def _build_align_button(self):
+
+        self.btn_align = QPushButton("⚙  Alineación")
+        self.btn_align.setObjectName("alignMenu")
+        self.btn_align.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        menu = QMenu(self.btn_align)
+        menu.addAction("Tomar ceros", lambda: self.start_alignment(TOMAR_CEROS))
+        menu.addAction("Alinear", lambda: self.start_alignment(ALINEAR))
+        menu.addSeparator()
+
+        # Cámara que ve al módulo (la 0 es la de la persona)
+        camera_menu = menu.addMenu("Cámara del módulo")
+        self.align_camera = 1
+        group = QActionGroup(self)
+        for index in range(5):
+            action = camera_menu.addAction(f"Cámara {index}")
+            action.setCheckable(True)
+            action.setChecked(index == self.align_camera)
+            action.triggered.connect(lambda _=False, i=index: setattr(self, "align_camera", i))
+            group.addAction(action)
+
+        self.btn_align.setMenu(menu)
+        return self.btn_align
 
 
     def _build_mode_group(self):
@@ -677,7 +751,7 @@ class MainWindow(QMainWindow):
 
     def _targets(self):
         """Enlaces a los que se mandan los resultados (todos los conectados)."""
-        if not self.chk_send.isChecked():
+        if not self.chk_send.isChecked() or self._aligning:
             return []
         return [link for link in self.links.values() if link.connected]
 
@@ -875,6 +949,10 @@ class MainWindow(QMainWindow):
         if state == "conectado" and link in self.links.values():
             link.send_mode(self.mode)
 
+        # Al conectar al ESP32, mandarle los ceros guardados (si hay)
+        if state == "conectado" and link is self.links[TARGET_ESP32]:
+            self.send_saved_zeros(link)
+
         self._refresh_links()
 
 
@@ -1026,7 +1104,120 @@ class MainWindow(QMainWindow):
     # CIERRE
     # =============================================
 
+    # =============================================
+    # ALINEACIÓN
+    # =============================================
+
+    def send_saved_zeros(self, link):
+        """Manda al ESP32 los ceros de Alignment/results/ceros_esp32.json."""
+        try:
+            zeros = ceros_guardados()
+        except Exception as error:
+            self.append_log(f"Ceros: no se pudieron leer ({error})")
+            return
+        if zeros is None:
+            self.append_log("Ceros: no hay ceros guardados, el ESP32 usa los suyos")
+            return
+        for unit, (x, y) in enumerate(zeros):
+            link.send_adjust(unit, x, y, settle=False)
+        self.append_log("Ceros guardados enviados al ESP32 (16 unidades)")
+
+
+    def _align_popup(self, title, text, critical=False):
+        box = QMessageBox(self)
+        box.setWindowTitle("SOFIA - Alineación")
+        box.setIcon(QMessageBox.Icon.Critical if critical else QMessageBox.Icon.Warning)
+        box.setTextFormat(Qt.TextFormat.RichText)
+        box.setText(f"<h2 style='margin:0'>{title}</h2>")
+        box.setInformativeText(text)
+        box.exec()
+
+
+    def start_alignment(self, action):
+
+        if self.align_worker is not None:
+            return
+
+        esp32 = self.links[TARGET_ESP32]
+        if not esp32.connected:
+            self._align_popup("Conecta el ESP32 primero",
+                              "La alineación manda los ceros nuevos al ESP32 por Bluetooth.")
+            return
+
+        if self.worker is not None and self.align_camera == 0:
+            self._align_popup("La cámara 0 la está usando la detección",
+                              "Elige en el menú la cámara que ve al módulo, o detén la detección.")
+            return
+
+        self._aligning = True
+        self.btn_align.setEnabled(False)
+
+        # Todas a 0,0 antes de la foto (si no, el tracking o una figura
+        # se verían como desalineados)
+        esp32.send_stop()
+
+        title = "Tomar ceros" if action == TOMAR_CEROS else "Alinear"
+        self.align_window = AlineacionVentana(title, self)
+        self.align_worker = AlineacionWorker(action, self.align_camera, parent=self)
+
+        self.align_worker.progreso.connect(self.align_window.progreso)
+        self.align_worker.imagen.connect(self.align_window.imagen)
+        self.align_worker.terminado.connect(self.align_window.terminar)
+        self.align_worker.sin_sofia.connect(self.on_align_no_sofia)
+        self.align_worker.error.connect(self.on_align_error)
+        self.align_worker.ajustar.connect(self.on_align_adjust)
+        self.align_worker.log.connect(self.append_log)
+        self.align_worker.finished.connect(self.on_align_finished)
+        self.align_window.cancelar.connect(self.align_worker.detener)
+
+        self.align_window.show()
+        self.align_worker.start()
+        self.append_log(f"Alineación: {title}")
+
+
+    def _close_align_window(self):
+        if self.align_window is not None:
+            try:
+                self.align_window.cancelar.disconnect()
+            except (RuntimeError, TypeError):
+                pass
+            self.align_window.close()
+            self.align_window = None
+
+
+    @Slot(str)
+    def on_align_no_sofia(self, reason):
+        self._close_align_window()
+        self.append_log(f"Alineación: no hay un SOFIA a la vista ({reason})")
+        self._align_popup("⚠  ¡NO HAY UN SOFIA A LA VISTA!",
+                          f"La cámara del módulo no ve los 4 ArUco.<br><small>{reason}</small>",
+                          critical=True)
+
+
+    @Slot(str)
+    def on_align_error(self, message):
+        self._close_align_window()
+        self.append_log(f"Alineación: {message}")
+        self._align_popup("No se pudo alinear", message, critical=True)
+
+
+    @Slot(int, float, float, bool)
+    def on_align_adjust(self, unit, x, y, settle):
+        self.links[TARGET_ESP32].send_adjust(unit, x, y, settle=settle)
+
+
+    @Slot()
+    def on_align_finished(self):
+        self.align_worker = None
+        self._aligning = False
+        self.btn_align.setEnabled(True)
+
+
     def closeEvent(self, event):
+
+        if self.align_worker is not None:
+            self.align_worker.detener()
+            self.align_worker.wait(5000)
 
         if self.worker is not None:
             self.worker.stop()

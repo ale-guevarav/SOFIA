@@ -50,7 +50,8 @@ Alignment/
 │   ├── evaluaciones/           métricas, gráficas y comparacion.md de cada método
 │   ├── COMPARACION.md          geométrico vs CNN vs híbrido
 │   ├── marcadores_imprimir.png hoja para el marco del módulo real
-│   └── diagnosticos/           reportes guardados desde la app (no se suben)
+│   ├── diagnosticos/           reportes guardados desde la app (no se suben)
+│   └── ceros_esp32.json        ceros de los servos (menú Alineación de la GUI de visión)
 │
 └── requirements.txt
 ```
@@ -82,6 +83,10 @@ Usa `results/modelo/cnn.pt` con la **CNN** (la más precisa: 0.20° de error en 
 | **Webots en vivo** | Ver abajo |
 
 *■ Cerrar fuente* cierra la cámara o la conexión con Webots. *Guardar reporte* deja imagen + CSV en `results/diagnosticos/`.
+
+### Desde la GUI de visión (menú Alineación)
+
+La GUI de `Vision/` usa este mismo núcleo (`app/nucleo`) en su menú verde **Alineación**: *Tomar ceros* mide las 16 unidades y guarda el cero de cada servo en `results/ceros_esp32.json`; *Alinear* corrige una por una las que no están OK. La GUI manda esos ceros al ESP32 cada vez que se conecta. La conversión de ángulos a grados del servo (signos, ganancia y paso máximo) está en `app/nucleo/ceros.py`. Ver `Vision/README.md`.
 
 ### Webots en vivo
 

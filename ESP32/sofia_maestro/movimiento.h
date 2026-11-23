@@ -97,8 +97,12 @@ const bool INVERTIR_Y = false;
 
 // Ajuste fino por unidad (grados que se suman a su centro), por si
 // alguna placa no queda plana en 0°. Unidad 1 = posición 0
-const float AJUSTE_X[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-const float AJUSTE_Y[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+// Ceros de fábrica. La GUI los reemplaza con los ceros guardados
+// (Alignment/results/ceros_esp32.json) cada vez que se conecta por BLE,
+// y con "Alinear" / "Tomar ceros" (comando AJUSTE)
+float AJUSTE_X[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float AJUSTE_Y[NUM_UNIDADES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const int AJUSTE_MAX_DECIMAS = 200;   // ±20° como máximo por eje
 
 // Al arrancar se centran las unidades de una en una con esta pausa,
 // para no pedir la corriente de los 32 servos al mismo tiempo
@@ -262,6 +266,7 @@ enum FaseUnidad : uint8_t {
   U_REGRESO,    // volviendo al centro
   U_MANO,       // siguiendo la mano (TRACKING)
   U_PRUEBA,     // haciendo el movimiento de prueba
+  U_RECENTRAR,  // ALINEAR: se sacude un poco y se asienta en 0,0
 };
 
 struct Unidad {
@@ -298,6 +303,17 @@ const PuntoPrueba PASOS_PRUEBA[] = {
 const int NUM_PASOS_PRUEBA = sizeof(PASOS_PRUEBA) / sizeof(PASOS_PRUEBA[0]);
 int pasoPrueba = 0;
 unsigned long llegoPruebaMs = 0;   // 0 = va en camino al punto
+
+// AJUSTE con "reacomodar" (Alinear desde la GUI): con su cero nuevo, la
+// unidad hace una sacudida corta (para salir de la zona muerta del servo)
+// y se asienta en 0,0 llegando despacio; al final se reescribe el PWM
+const float VEL_RECENTRAR = 60.0f;     // °/s
+const float SACUDIDA = 4.0f;           // ° de cada lado
+const Punto PASOS_RECENTRAR[] = {
+  {SACUDIDA, 0}, {-SACUDIDA, 0}, {0, SACUDIDA}, {0, -SACUDIDA}, {0, 0},
+};
+const int NUM_PASOS_RECENTRAR = sizeof(PASOS_RECENTRAR) / sizeof(PASOS_RECENTRAR[0]);
+uint8_t pasoRecentrar[NUM_UNIDADES] = {0};
 
 EstadoMovimiento estado = QUIETO;
 Unidad unidades[NUM_UNIDADES];
@@ -754,6 +770,26 @@ void seguirMano(float xNorm, float yNorm) {
   estado = SIGUIENDO_MANO;
 }
 
+// AJUSTE: nuevo cero de una unidad (grados del servo que se suman a 0,0).
+// sacudir = true: se reacomoda con la sacudida; false: solo se reescribe
+// el PWM (así llegan los ceros guardados al conectarse, sin mover de golpe)
+void fijarAjuste(int u, float ajusteX, float ajusteY, bool sacudir) {
+  if (u < 0 || u >= NUM_UNIDADES) return;
+  AJUSTE_X[u] = ajusteX;
+  AJUSTE_Y[u] = ajusteY;
+  if (u >= placasEncontradas * UNIDADES_POR_PLACA) {
+    Serial.printf("[AJUSTE] La unidad %d no tiene PCA9685 en este ESP32\n", u + 1);
+    return;
+  }
+  if (sacudir) {
+    detenerPrueba();
+    unidades[u].fase = U_RECENTRAR;
+    pasoRecentrar[u] = 0;
+  } else {
+    escribirUnidad(u);
+  }
+}
+
 bool enMovimiento() {
   return estado == PATRON || estado == REGRESANDO;
 }
@@ -945,6 +981,23 @@ void actualizarMovimiento() {
         } else if (millis() - llegoPruebaMs >= PAUSA_PRUEBA_MS) {
           pasoPrueba = (pasoPrueba + 1) % NUM_PASOS_PRUEBA;
           llegoPruebaMs = 0;
+        }
+        break;
+      }
+
+      case U_RECENTRAR: {
+        const Punto& pr = PASOS_RECENTRAR[pasoRecentrar[u]];
+        if (avanzarHacia(un, pr.x, pr.y, VEL_RECENTRAR)) {
+          pasoRecentrar[u]++;
+          if (pasoRecentrar[u] >= NUM_PASOS_RECENTRAR) {
+            un.x = 0.0f;
+            un.y = 0.0f;
+            un.vx = 0.0f;
+            un.vy = 0.0f;
+            un.fase = U_QUIETA;
+            escribirUnidad(u);   // PWM del centro otra vez, aunque no haya cambiado
+            Serial.printf("[AJUSTE] Unidad %d reacomodada en su cero\n", u + 1);
+          }
         }
         break;
       }

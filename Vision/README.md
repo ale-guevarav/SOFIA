@@ -149,7 +149,9 @@ SOFIA/
 │   │
 │   ├── interfaz/                 ← piezas de la GUI
 │   │   ├── vision_worker.py
-│   │   └── sim_camera.py         ← imágenes de la cámara de Webots
+│   │   ├── sim_camera.py         ← imágenes de la cámara de Webots
+│   │   ├── alineacion_worker.py  ← menú Alineación (usa Alignment/app/nucleo)
+│   │   └── alineacion_ventana.py ← ventana emergente con la barra de progreso
 │   │
 │   ├── comunicacion/             ← Bluetooth con el ESP32 / Webots
 │   │   ├── protocol.py
@@ -198,6 +200,21 @@ La detección en sí está en `vision_pipeline.py`, que es el mismo código que 
 ### `gui_app.py`
 
 Interfaz gráfica. Muestra el video, el resultado, los botones de control, el selector de modo, la conexión con el ESP32 y una bitácora. **No procesa video**: eso lo hace `vision_worker.py` en otro hilo.
+
+### `interfaz/alineacion_worker.py` y `interfaz/alineacion_ventana.py`
+
+Menú verde **Alineación** de la GUI (debajo de Iniciar / Detener). Une la visión con el diagnóstico de alineación sin mover su código (sigue en `Alignment/app/nucleo`):
+
+| Opción | Qué hace |
+|---|---|
+| **Tomar ceros** | Mide las 16 unidades con la **cámara del módulo** (la que ve al SOFIA, no a la persona; se elige en el mismo menú, por defecto la 1), calcula el cero de cada servo, lo guarda en `Alignment/results/ceros_esp32.json` y se lo manda al ESP32 |
+| **Alinear** | Mide y corrige **una por una** las unidades que no están OK, de la menos a la más desalineada (cada una se reacomoda con su cero nuevo). Guarda los ceros y toma otra foto para revisar |
+
+- Antes de medir, la GUI manda STOP (todas a 0,0) y deja de mandar posturas / TRACK.
+- El progreso sale en una **ventana emergente** con la foto analizada y la barra; si no se ven los 4 ArUco sale el aviso **"¡NO HAY UN SOFIA A LA VISTA!"**.
+- **Cada vez que se conecta al ESP32**, la GUI le manda los ceros guardados (comando `AJUSTE`, `0x05`), en lugar de los de fábrica del firmware.
+- La conversión de los ángulos de la app a grados del servo (signos y ganancia) está en `Alignment/app/nucleo/ceros.py`.
+- Para usar la CNN, el entorno de Vision necesita PyTorch (ver `Alignment/requirements.txt`); sin PyTorch usa el método geométrico, que es menos preciso.
 
 ### `interfaz/vision_worker.py`
 

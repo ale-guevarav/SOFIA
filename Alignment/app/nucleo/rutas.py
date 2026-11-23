@@ -11,7 +11,8 @@ Todas las carpetas del proyecto en un solo lugar:
     └── results/   lo que sale del build y usa la app
         ├── modelo/cnn.pt              modelo publicado (sí se sube)
         ├── evaluaciones/<método>_<sesión>_<conjunto>/
-        └── diagnosticos/              reportes guardados desde la app (no se suben)
+        ├── diagnosticos/              reportes guardados desde la app (no se suben)
+        └── ceros_esp32.json           ceros de los servos (menú Alineación de la GUI de visión)
 """
 
 import glob
@@ -32,6 +33,7 @@ CARPETA_MODELO = os.path.join(RESULTS, "modelo")
 MODELO_PUBLICADO = os.path.join(CARPETA_MODELO, "cnn.pt")
 EVALUACIONES = os.path.join(RESULTS, "evaluaciones")
 DIAGNOSTICOS = os.path.join(RESULTS, "diagnosticos")
+CEROS_ESP32 = os.path.join(RESULTS, "ceros_esp32.json")   # ceros de los servos (GUI de visión)
 
 
 def ultima_sesion():

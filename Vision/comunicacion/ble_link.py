@@ -204,6 +204,11 @@ class BleLink(QObject):
         self._queue_command(p.TYPE_STOP)
 
 
+    def send_adjust(self, unit, x_deg, y_deg, settle=False, tag=None):
+        """Nuevo cero (grados del servo) de la unidad 0-15."""
+        self._queue_command(p.TYPE_ADJUST, p.adjust_payload(unit, x_deg, y_deg, settle), tag)
+
+
     def send_track(self, hand_position):
         """
         Envía la posición de una mano (HandPosition).
