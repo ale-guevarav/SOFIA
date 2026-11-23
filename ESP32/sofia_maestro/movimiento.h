@@ -196,6 +196,16 @@ const char* NOMBRES_SUAVIZADOR[] = {
 };
 int suavizador = S_EMA;
 
+// EMA TAMBIÉN FUERA DE LAS FIGURAS: con el EMA los servos se mueven
+// mejor, así que se usa (con K_SUAVIZADO) en vez de velocidad constante.
+// Con TRACKING / REGRESO en true las 16 unidades se mueven a la vez (sin
+// turnos de 4): si el ESP32 se reinicia por corriente al hacer STOP o
+// tracking, regresa esos dos a false
+const bool EMA_EN_ALINEAR  = true;   // reacomodo del comando AJUSTE
+const bool EMA_EN_TRACKING = true;   // seguir la mano
+const bool EMA_EN_REGRESO  = true;   // volver al centro (STOP, fin del tracking...)
+const float LLEGADA_EMA = 0.2f;      // ° : más cerca que esto ya "llegó"
+
 const float ACELERACION  = 4000.0f;   // S_FRENA: °/s² (llega a 300 °/s en 0.075 s)
 const float VEL_UNIDAD   = 300.0f;    // S_FRENA: °/s máximo
 const float OMEGA_SUAVE  = 30.0f;     // S_SUAVE: rad/s (llega en ~0.15 s)
@@ -669,6 +679,18 @@ void seguirObjetivo(Unidad& un, float tx, float ty) {
   }
 }
 
+// Un paso de EMA hacia (tx, ty). Regresa true si ya llegó (y la deja ahí)
+bool emaHacia(Unidad& un, float tx, float ty) {
+  un.x += (tx - un.x) * K_SUAVIZADO;
+  un.y += (ty - un.y) * K_SUAVIZADO;
+  if (fabsf(tx - un.x) < LLEGADA_EMA && fabsf(ty - un.y) < LLEGADA_EMA) {
+    un.x = tx;
+    un.y = ty;
+    return true;
+  }
+  return false;
+}
+
 // Para probar desde el Monitor Serie
 void cambiarSuavizador() {
   suavizador = (suavizador + 1) % NUM_SUAVIZADORES;
@@ -987,7 +1009,9 @@ void actualizarMovimiento() {
 
       case U_RECENTRAR: {
         const Punto& pr = PASOS_RECENTRAR[pasoRecentrar[u]];
-        if (avanzarHacia(un, pr.x, pr.y, VEL_RECENTRAR)) {
+        bool llego = EMA_EN_ALINEAR ? emaHacia(un, pr.x, pr.y)
+                                    : avanzarHacia(un, pr.x, pr.y, VEL_RECENTRAR);
+        if (llego) {
           pasoRecentrar[u]++;
           if (pasoRecentrar[u] >= NUM_PASOS_RECENTRAR) {
             un.x = 0.0f;
@@ -1003,6 +1027,12 @@ void actualizarMovimiento() {
       }
 
       case U_REGRESO:
+        if (EMA_EN_REGRESO) {
+          if (emaHacia(un, 0.0f, 0.0f)) {
+            un.fase = U_QUIETA;
+          }
+          break;
+        }
         // Por turnos, para que un STOP o el fin del TRACKING no
         // regrese las 16 de golpe. El salto se escala a VEL_REGRESO
         if (!necesitaTurno(un)) {
@@ -1016,6 +1046,10 @@ void actualizarMovimiento() {
         break;
 
       case U_MANO:
+        if (EMA_EN_TRACKING) {
+          emaHacia(un, objetivoMano.x, objetivoMano.y);
+          break;
+        }
         // Solo se mueve cuando le toca turno (salto corto hacia la mano)
         if (turno[u]) {
           avanzarHacia(un, objetivoMano.x, objetivoMano.y, salto / TS_S);
