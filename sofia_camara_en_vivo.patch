@@ -1,0 +1,311 @@
+diff --git a/Vision/README.md b/Vision/README.md
+index 86985b4..6ff890b 100644
+--- a/Vision/README.md
++++ b/Vision/README.md
+@@ -211,6 +211,7 @@ Menú verde **Alineación** de la GUI (debajo de Iniciar / Detener). Une la visi
+ | **Alinear** | Mide y corrige **una por una** las unidades que no están OK, de la menos a la más desalineada (cada una se reacomoda con su cero nuevo). Guarda los ceros y toma otra foto para revisar |
+ 
+ - **¿Cuál cámara es?** La de la GUI (la persona) es siempre la 0. En *Alineación → Cámara del módulo → Buscar cámaras* sale una foto de cada cámara conectada y con *Usar esta* se elige la que ve al SOFIA.
++- Al elegir *Tomar ceros* o *Alinear*, primero sale la **cámara del módulo en vivo**, con los ArUco que ve marcados en verde, para acomodarla. Cuando se vean los 4, se pica **Comenzar**.
+ - Antes de medir, la GUI manda STOP (todas a 0,0) y deja de mandar posturas / TRACK.
+ - El progreso sale en una **ventana emergente** con la foto analizada y la barra; si no se ven los 4 ArUco sale el aviso **"¡NO HAY UN SOFIA A LA VISTA!"**.
+ - **Cada vez que se conecta al ESP32**, la GUI le manda los ceros guardados (comando `AJUSTE`, `0x05`), en lugar de los de fábrica del firmware.
+diff --git a/Vision/gui_app.py b/Vision/gui_app.py
+index 4f5beea..36773a3 100644
+--- a/Vision/gui_app.py
++++ b/Vision/gui_app.py
+@@ -88,6 +88,7 @@ from interfaz.alineacion_worker import (
+     TOMAR_CEROS,
+     AlineacionWorker,
+     BuscarCamarasWorker,
++    VistaCamaraWorker,
+     ceros_guardados,
+ )
+ from interfaz.alineacion_ventana import AlineacionVentana, CamarasVentana
+@@ -204,6 +205,7 @@ class MainWindow(QMainWindow):
+         # ALINEACIÓN (mientras corre no se mandan posturas / TRACK)
+         self.align_worker = None
+         self.align_window = None
++        self.align_preview = None
+         self.camera_search = None
+         self._aligning = False
+ 
+@@ -1138,7 +1140,7 @@ class MainWindow(QMainWindow):
+ 
+     def search_cameras(self):
+         """Prueba las cámaras y muestra una foto de cada una para elegir."""
+-        if self.camera_search is not None or self.align_worker is not None:
++        if self.camera_search is not None or self.align_worker is not None or self.align_preview is not None:
+             return
+         busy = [0] if self.worker is not None else []    # la 0 la usa la detección
+         self.btn_align.setEnabled(False)
+@@ -1175,7 +1177,7 @@ class MainWindow(QMainWindow):
+ 
+     def start_alignment(self, action):
+ 
+-        if self.align_worker is not None:
++        if self.align_worker is not None or self.align_preview is not None:
+             return
+ 
+         esp32 = self.links[TARGET_ESP32]
+@@ -1198,6 +1200,60 @@ class MainWindow(QMainWindow):
+ 
+         title = "Tomar ceros" if action == TOMAR_CEROS else "Alinear"
+         self.align_window = AlineacionVentana(title, self)
++        self.align_window.cancelar.connect(self._cancel_alignment)
++        self.align_window.comenzar.connect(lambda: self._begin_alignment(action))
++
++        # 1. Cámara en vivo para acomodarla; "Comenzar" sigue con el paso 2
++        self.align_preview = VistaCamaraWorker(self.align_camera, parent=self)
++        self.align_preview.cuadro.connect(self.align_window.imagen)
++        self.align_preview.marcadores.connect(self.align_window.marcadores)
++        self.align_preview.error.connect(self.on_align_error)
++        self.align_preview.finished.connect(self._on_preview_finished)
++
++        self.align_window.modo_vista(self.align_camera)
++        self.align_window.show()
++        self.align_preview.start()
++        self.append_log(f"Alineación: {title} (acomoda la cámara y pica Comenzar)")
++
++
++    def _stop_preview(self):
++        if self.align_preview is not None:
++            preview, self.align_preview = self.align_preview, None
++            preview.finished.disconnect(self._on_preview_finished)
++            preview.detener()
++            preview.wait(3000)
++
++
++    @Slot()
++    def _on_preview_finished(self):
++        # La vista se cerró sola (error de cámara): se termina la alineación
++        self.align_preview = None
++        if self.align_worker is None:
++            self._reset_alignment()
++
++
++    @Slot()
++    def _cancel_alignment(self):
++        if self.align_preview is not None:
++            self._stop_preview()
++            self._reset_alignment()
++        elif self.align_worker is not None:
++            self.align_worker.detener()
++
++
++    def _reset_alignment(self):
++        self._aligning = False
++        self.btn_align.setEnabled(True)
++
++
++    def _begin_alignment(self, action):
++
++        # 2. Suelta la cámara en vivo y empieza a medir
++        self._stop_preview()
++        if self.align_window is None:
++            return
++
++        title = "Tomar ceros" if action == TOMAR_CEROS else "Alinear"
+         self.align_worker = AlineacionWorker(action, self.align_camera, parent=self)
+ 
+         self.align_worker.progreso.connect(self.align_window.progreso)
+@@ -1208,11 +1264,9 @@ class MainWindow(QMainWindow):
+         self.align_worker.ajustar.connect(self.on_align_adjust)
+         self.align_worker.log.connect(self.append_log)
+         self.align_worker.finished.connect(self.on_align_finished)
+-        self.align_window.cancelar.connect(self.align_worker.detener)
+ 
+-        self.align_window.show()
+         self.align_worker.start()
+-        self.append_log(f"Alineación: {title}")
++        self.append_log(f"Alineación: {title} - comenzando")
+ 
+ 
+     def _close_align_window(self):
+@@ -1257,12 +1311,13 @@ class MainWindow(QMainWindow):
+     @Slot()
+     def on_align_finished(self):
+         self.align_worker = None
+-        self._aligning = False
+-        self.btn_align.setEnabled(True)
++        self._reset_alignment()
+ 
+ 
+     def closeEvent(self, event):
+ 
++        self._stop_preview()
++
+         if self.align_worker is not None:
+             self.align_worker.detener()
+             self.align_worker.wait(5000)
+diff --git a/Vision/interfaz/alineacion_ventana.py b/Vision/interfaz/alineacion_ventana.py
+index 6e15a5e..bcf87ed 100644
+--- a/Vision/interfaz/alineacion_ventana.py
++++ b/Vision/interfaz/alineacion_ventana.py
+@@ -1,9 +1,14 @@
+ """
+ VENTANA DE ALINEACIÓN - SOFIA
+ 
+-Ventana emergente del menú "Alineación" de la GUI: muestra la foto
+-analizada, lo que va haciendo y la barra de progreso. Al terminar
+-muestra el resumen; "Cancelar" detiene el proceso.
++Ventana emergente del menú "Alineación" de la GUI:
++
++    1. CÁMARA EN VIVO: para apuntar la cámara al SOFIA (marca los ArUco
++       que ve). Cuando esté bien, se pica "Comenzar".
++    2. PROCESO: la foto analizada, lo que va haciendo y la barra de
++       progreso. Al terminar muestra el resumen.
++
++"Cancelar" detiene todo en cualquier momento.
+ """
+ 
+ from PySide6.QtCore import Qt, Signal
+@@ -22,6 +27,7 @@ from PySide6.QtWidgets import (
+ class AlineacionVentana(QDialog):
+ 
+     cancelar = Signal()
++    comenzar = Signal()
+ 
+     def __init__(self, titulo, parent=None):
+         super().__init__(parent)
+@@ -64,9 +70,43 @@ class AlineacionVentana(QDialog):
+         self.boton.setObjectName("danger")
+         self.boton.clicked.connect(self._boton)
+         botones.addWidget(self.boton)
++        self.boton_comenzar = QPushButton("▶  Comenzar")
++        self.boton_comenzar.setObjectName("alignMenu")
++        self.boton_comenzar.clicked.connect(self._comenzar)
++        self.boton_comenzar.hide()
++        botones.addWidget(self.boton_comenzar)
+         box.addLayout(botones)
+ 
+     # -----------------------------
++    # 1. CÁMARA EN VIVO
++    # -----------------------------
++
++    def modo_vista(self, camara):
++        self.foto.setText(f"Abriendo la cámara {camara}...")
++        self.barra.hide()
++        self.boton_comenzar.show()
++        self.boton_comenzar.setDefault(True)
++        self.marcadores(0)
++
++    def marcadores(self, cuantos):
++        if cuantos == 4:
++            texto = ("<span style='color:#7ee787'><b>✔ Se ven los 4 ArUco.</b></span> "
++                     "Cuando esté bien acomodada, pica <b>Comenzar</b>.")
++        else:
++            texto = (f"<span style='color:#e0b341'><b>Se ven {cuantos} de 4 ArUco.</b></span> "
++                     "Mueve la cámara hasta que se vean los 4 (marcados en verde).")
++        self.estado.setText(texto)
++
++    def _comenzar(self):
++        self.boton_comenzar.hide()
++        self.barra.show()
++        self.barra.setRange(0, 0)
++        self.estado.setText("Empezando...")
++        self.comenzar.emit()
++
++    # -----------------------------
++    # 2. PROCESO
++    # -----------------------------
+ 
+     def progreso(self, valor, maximo, texto):
+         if maximo <= 0:
+diff --git a/Vision/interfaz/alineacion_worker.py b/Vision/interfaz/alineacion_worker.py
+index ac5648c..024663a 100644
+--- a/Vision/interfaz/alineacion_worker.py
++++ b/Vision/interfaz/alineacion_worker.py
+@@ -333,3 +333,92 @@ class BuscarCamarasWorker(QThread):
+             finally:
+                 camara.release()
+         self.listas.emit(resultado)
++
++
++# =============================================
++# CÁMARA EN VIVO (para apuntar la cámara antes de empezar)
++# =============================================
++
++PERIODO_VISTA_S = 1 / 15        # ~15 cuadros por segundo
++ANCHO_VISTA = 960               # se reduce para no cargar la GUI
++
++
++class VistaCamaraWorker(QThread):
++    """Muestra la cámara del módulo en vivo y marca los ArUco que ve."""
++
++    cuadro = Signal(QImage)
++    # cuántos de los 4 ArUco del marco se ven
++    marcadores = Signal(int)
++    error = Signal(str)
++
++    def __init__(self, indice_camara, parent=None):
++        super().__init__(parent)
++        self.indice_camara = indice_camara
++        self._detener = False
++
++    def detener(self):
++        self._detener = True
++
++    def run(self):
++        try:
++            import preprocesamiento as pp
++        except ImportError as error:
++            self.error.emit(f"No se encontró el diagnóstico de Alignment ({error})")
++            return
++
++        camara = cv2.VideoCapture(self.indice_camara)
++        if not camara.isOpened():
++            self.error.emit(f"No se pudo abrir la cámara del módulo ({self.indice_camara})")
++            return
++        camara.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
++        camara.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
++
++        fallas = 0
++        try:
++            while not self._detener:
++                inicio = time.monotonic()
++                ok, foto = camara.read()
++                if not ok:
++                    fallas += 1
++                    if fallas > 30:
++                        self.error.emit(f"La cámara del módulo ({self.indice_camara}) no manda imagen")
++                        return
++                    time.sleep(0.05)
++                    continue
++                fallas = 0
++
++                centros = pp.detectar_marcadores(cv2.cvtColor(foto, cv2.COLOR_BGR2GRAY))
++                vista = self._dibujar(foto, centros)
++                self.cuadro.emit(a_qimage(vista))
++                self.marcadores.emit(len(centros))
++
++                espera = PERIODO_VISTA_S - (time.monotonic() - inicio)
++                if espera > 0:
++                    time.sleep(espera)
++        finally:
++            camara.release()
++
++    def _dibujar(self, foto, centros):
++        escala = ANCHO_VISTA / foto.shape[1]
++        vista = cv2.resize(foto, None, fx=escala, fy=escala, interpolation=cv2.INTER_AREA)
++        alto, ancho = vista.shape[:2]
++
++        # Guía: cruz al centro (el SOFIA debe quedar más o menos ahí)
++        cx, cy = ancho // 2, alto // 2
++        cv2.line(vista, (cx - 25, cy), (cx + 25, cy), (200, 200, 200), 1, cv2.LINE_AA)
++        cv2.line(vista, (cx, cy - 25), (cx, cy + 25), (200, 200, 200), 1, cv2.LINE_AA)
++
++        # ArUco que se ven
++        for id_, (x, y) in centros.items():
++            p = (int(x * escala), int(y * escala))
++            cv2.circle(vista, p, 22, (80, 185, 63), 4, cv2.LINE_AA)
++            cv2.putText(vista, str(id_), (p[0] - 8, p[1] + 8), cv2.FONT_HERSHEY_SIMPLEX,
++                        0.8, (80, 185, 63), 2, cv2.LINE_AA)
++
++        # Letrero arriba
++        listos = len(centros) == 4
++        texto = "ArUco 4/4  -  listo" if listos else f"ArUco {len(centros)}/4"
++        color = (80, 185, 63) if listos else (65, 179, 224)
++        cv2.rectangle(vista, (0, 0), (ancho, 44), (20, 20, 20), -1)
++        cv2.putText(vista, texto, (14, 31), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2, cv2.LINE_AA)
++        return vista

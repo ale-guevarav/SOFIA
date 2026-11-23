@@ -88,6 +88,7 @@ from interfaz.alineacion_worker import (
     TOMAR_CEROS,
     AlineacionWorker,
     BuscarCamarasWorker,
+    VistaCamaraWorker,
     ceros_guardados,
 )
 from interfaz.alineacion_ventana import AlineacionVentana, CamarasVentana
@@ -204,6 +205,7 @@ class MainWindow(QMainWindow):
         # ALINEACIÓN (mientras corre no se mandan posturas / TRACK)
         self.align_worker = None
         self.align_window = None
+        self.align_preview = None
         self.camera_search = None
         self._aligning = False
 
@@ -1138,7 +1140,7 @@ class MainWindow(QMainWindow):
 
     def search_cameras(self):
         """Prueba las cámaras y muestra una foto de cada una para elegir."""
-        if self.camera_search is not None or self.align_worker is not None:
+        if self.camera_search is not None or self.align_worker is not None or self.align_preview is not None:
             return
         busy = [0] if self.worker is not None else []    # la 0 la usa la detección
         self.btn_align.setEnabled(False)
@@ -1175,7 +1177,7 @@ class MainWindow(QMainWindow):
 
     def start_alignment(self, action):
 
-        if self.align_worker is not None:
+        if self.align_worker is not None or self.align_preview is not None:
             return
 
         esp32 = self.links[TARGET_ESP32]
@@ -1198,6 +1200,60 @@ class MainWindow(QMainWindow):
 
         title = "Tomar ceros" if action == TOMAR_CEROS else "Alinear"
         self.align_window = AlineacionVentana(title, self)
+        self.align_window.cancelar.connect(self._cancel_alignment)
+        self.align_window.comenzar.connect(lambda: self._begin_alignment(action))
+
+        # 1. Cámara en vivo para acomodarla; "Comenzar" sigue con el paso 2
+        self.align_preview = VistaCamaraWorker(self.align_camera, parent=self)
+        self.align_preview.cuadro.connect(self.align_window.imagen)
+        self.align_preview.marcadores.connect(self.align_window.marcadores)
+        self.align_preview.error.connect(self.on_align_error)
+        self.align_preview.finished.connect(self._on_preview_finished)
+
+        self.align_window.modo_vista(self.align_camera)
+        self.align_window.show()
+        self.align_preview.start()
+        self.append_log(f"Alineación: {title} (acomoda la cámara y pica Comenzar)")
+
+
+    def _stop_preview(self):
+        if self.align_preview is not None:
+            preview, self.align_preview = self.align_preview, None
+            preview.finished.disconnect(self._on_preview_finished)
+            preview.detener()
+            preview.wait(3000)
+
+
+    @Slot()
+    def _on_preview_finished(self):
+        # La vista se cerró sola (error de cámara): se termina la alineación
+        self.align_preview = None
+        if self.align_worker is None:
+            self._reset_alignment()
+
+
+    @Slot()
+    def _cancel_alignment(self):
+        if self.align_preview is not None:
+            self._stop_preview()
+            self._reset_alignment()
+        elif self.align_worker is not None:
+            self.align_worker.detener()
+
+
+    def _reset_alignment(self):
+        self._aligning = False
+        self.btn_align.setEnabled(True)
+
+
+    def _begin_alignment(self, action):
+
+        # 2. Suelta la cámara en vivo y empieza a medir
+        self._stop_preview()
+        if self.align_window is None:
+            return
+
+        title = "Tomar ceros" if action == TOMAR_CEROS else "Alinear"
         self.align_worker = AlineacionWorker(action, self.align_camera, parent=self)
 
         self.align_worker.progreso.connect(self.align_window.progreso)
@@ -1208,11 +1264,9 @@ class MainWindow(QMainWindow):
         self.align_worker.ajustar.connect(self.on_align_adjust)
         self.align_worker.log.connect(self.append_log)
         self.align_worker.finished.connect(self.on_align_finished)
-        self.align_window.cancelar.connect(self.align_worker.detener)
 
-        self.align_window.show()
         self.align_worker.start()
-        self.append_log(f"Alineación: {title}")
+        self.append_log(f"Alineación: {title} - comenzando")
 
 
     def _close_align_window(self):
@@ -1257,11 +1311,12 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_align_finished(self):
         self.align_worker = None
-        self._aligning = False
-        self.btn_align.setEnabled(True)
+        self._reset_alignment()
 
 
     def closeEvent(self, event):
+
+        self._stop_preview()
 
         if self.align_worker is not None:
             self.align_worker.detener()

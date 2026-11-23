@@ -1,9 +1,14 @@
 """
 VENTANA DE ALINEACIÓN - SOFIA
 
-Ventana emergente del menú "Alineación" de la GUI: muestra la foto
-analizada, lo que va haciendo y la barra de progreso. Al terminar
-muestra el resumen; "Cancelar" detiene el proceso.
+Ventana emergente del menú "Alineación" de la GUI:
+
+    1. CÁMARA EN VIVO: para apuntar la cámara al SOFIA (marca los ArUco
+       que ve). Cuando esté bien, se pica "Comenzar".
+    2. PROCESO: la foto analizada, lo que va haciendo y la barra de
+       progreso. Al terminar muestra el resumen.
+
+"Cancelar" detiene todo en cualquier momento.
 """
 
 from PySide6.QtCore import Qt, Signal
@@ -22,6 +27,7 @@ from PySide6.QtWidgets import (
 class AlineacionVentana(QDialog):
 
     cancelar = Signal()
+    comenzar = Signal()
 
     def __init__(self, titulo, parent=None):
         super().__init__(parent)
@@ -64,8 +70,42 @@ class AlineacionVentana(QDialog):
         self.boton.setObjectName("danger")
         self.boton.clicked.connect(self._boton)
         botones.addWidget(self.boton)
+        self.boton_comenzar = QPushButton("▶  Comenzar")
+        self.boton_comenzar.setObjectName("alignMenu")
+        self.boton_comenzar.clicked.connect(self._comenzar)
+        self.boton_comenzar.hide()
+        botones.addWidget(self.boton_comenzar)
         box.addLayout(botones)
 
+    # -----------------------------
+    # 1. CÁMARA EN VIVO
+    # -----------------------------
+
+    def modo_vista(self, camara):
+        self.foto.setText(f"Abriendo la cámara {camara}...")
+        self.barra.hide()
+        self.boton_comenzar.show()
+        self.boton_comenzar.setDefault(True)
+        self.marcadores(0)
+
+    def marcadores(self, cuantos):
+        if cuantos == 4:
+            texto = ("<span style='color:#7ee787'><b>✔ Se ven los 4 ArUco.</b></span> "
+                     "Cuando esté bien acomodada, pica <b>Comenzar</b>.")
+        else:
+            texto = (f"<span style='color:#e0b341'><b>Se ven {cuantos} de 4 ArUco.</b></span> "
+                     "Mueve la cámara hasta que se vean los 4 (marcados en verde).")
+        self.estado.setText(texto)
+
+    def _comenzar(self):
+        self.boton_comenzar.hide()
+        self.barra.show()
+        self.barra.setRange(0, 0)
+        self.estado.setText("Empezando...")
+        self.comenzar.emit()
+
+    # -----------------------------
+    # 2. PROCESO
     # -----------------------------
 
     def progreso(self, valor, maximo, texto):

@@ -333,3 +333,92 @@ class BuscarCamarasWorker(QThread):
             finally:
                 camara.release()
         self.listas.emit(resultado)
+
+
+# =============================================
+# CÁMARA EN VIVO (para apuntar la cámara antes de empezar)
+# =============================================
+
+PERIODO_VISTA_S = 1 / 15        # ~15 cuadros por segundo
+ANCHO_VISTA = 960               # se reduce para no cargar la GUI
+
+
+class VistaCamaraWorker(QThread):
+    """Muestra la cámara del módulo en vivo y marca los ArUco que ve."""
+
+    cuadro = Signal(QImage)
+    # cuántos de los 4 ArUco del marco se ven
+    marcadores = Signal(int)
+    error = Signal(str)
+
+    def __init__(self, indice_camara, parent=None):
+        super().__init__(parent)
+        self.indice_camara = indice_camara
+        self._detener = False
+
+    def detener(self):
+        self._detener = True
+
+    def run(self):
+        try:
+            import preprocesamiento as pp
+        except ImportError as error:
+            self.error.emit(f"No se encontró el diagnóstico de Alignment ({error})")
+            return
+
+        camara = cv2.VideoCapture(self.indice_camara)
+        if not camara.isOpened():
+            self.error.emit(f"No se pudo abrir la cámara del módulo ({self.indice_camara})")
+            return
+        camara.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        camara.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+        fallas = 0
+        try:
+            while not self._detener:
+                inicio = time.monotonic()
+                ok, foto = camara.read()
+                if not ok:
+                    fallas += 1
+                    if fallas > 30:
+                        self.error.emit(f"La cámara del módulo ({self.indice_camara}) no manda imagen")
+                        return
+                    time.sleep(0.05)
+                    continue
+                fallas = 0
+
+                centros = pp.detectar_marcadores(cv2.cvtColor(foto, cv2.COLOR_BGR2GRAY))
+                vista = self._dibujar(foto, centros)
+                self.cuadro.emit(a_qimage(vista))
+                self.marcadores.emit(len(centros))
+
+                espera = PERIODO_VISTA_S - (time.monotonic() - inicio)
+                if espera > 0:
+                    time.sleep(espera)
+        finally:
+            camara.release()
+
+    def _dibujar(self, foto, centros):
+        escala = ANCHO_VISTA / foto.shape[1]
+        vista = cv2.resize(foto, None, fx=escala, fy=escala, interpolation=cv2.INTER_AREA)
+        alto, ancho = vista.shape[:2]
+
+        # Guía: cruz al centro (el SOFIA debe quedar más o menos ahí)
+        cx, cy = ancho // 2, alto // 2
+        cv2.line(vista, (cx - 25, cy), (cx + 25, cy), (200, 200, 200), 1, cv2.LINE_AA)
+        cv2.line(vista, (cx, cy - 25), (cx, cy + 25), (200, 200, 200), 1, cv2.LINE_AA)
+
+        # ArUco que se ven
+        for id_, (x, y) in centros.items():
+            p = (int(x * escala), int(y * escala))
+            cv2.circle(vista, p, 22, (80, 185, 63), 4, cv2.LINE_AA)
+            cv2.putText(vista, str(id_), (p[0] - 8, p[1] + 8), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.8, (80, 185, 63), 2, cv2.LINE_AA)
+
+        # Letrero arriba
+        listos = len(centros) == 4
+        texto = "ArUco 4/4  -  listo" if listos else f"ArUco {len(centros)}/4"
+        color = (80, 185, 63) if listos else (65, 179, 224)
+        cv2.rectangle(vista, (0, 0), (ancho, 44), (20, 20, 20), -1)
+        cv2.putText(vista, texto, (14, 31), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2, cv2.LINE_AA)
+        return vista
