@@ -1,0 +1,138 @@
+%=================================================================
+% PLANTILLA -- Respuesta a los revisores -- Segundo Corte
+% LabDST RoboCoffee, ITESO.
+%
+% Como usarla:
+%   1. Copien esta carpeta junto a la carpeta de su paper revisado
+%      (las dos carpetas deben ser HERMANAS) y cambien "N" por el
+%      numero de su equipo, en el nombre de la carpeta y del .tex.
+%   2. Ajusten la ruta de \LabDSTpaper: relativa, SIN extension,
+%      entre comillas y en UNA sola linea.
+%   3. En el paper, marquen cada cambio con \linelabel{ln:...} (texto)
+%      o \label{sec:/fig:/tab:/eq:...} (secciones, figuras, tablas,
+%      ecuaciones).
+%   4. Escriban un \LabDSTcomment por CADA clave del PDF de
+%      observaciones (R1.1, R1.2, ..., R4.n), en el mismo orden.
+%   5. Compilen primero el paper (pdflatex -> bibtex -> pdflatex ->
+%      pdflatex) y despues esta carta DOS veces (pdflatex x2).
+%      Si aparece "??", revisen la ruta o el nombre de la etiqueta.
+%
+% La carta se escribe en ingles, como el paper. El comentario del
+% revisor se copia TEXTUAL desde el PDF de observaciones.
+%
+% \LabDSTcomment{Clave}{Estado}{Ubicacion}{Comentario}{Respuesta}
+%   Estado:    A = Addressed
+%              P = Partially addressed
+%              N = Not addressed (justified)
+%   Ubicacion: \rln{x} -> "line NN"     \rlns{x}{y} -> "lines NN--MM"
+%              \Rln, \Rlns (inicio de oracion), Section~\ref{sec:...},
+%              Fig.~\ref{fig:...}, Table~\ref{tab:...}, \eqref{eq:...}
+%   \LabDSTquote{...} cita el texto NUEVO del paper.
+%
+% Borren los comentarios <...> y todo lo que este entre < >.
+%=================================================================
+\documentclass{LabDSTresponse}
+\LabDSTpaper{"../Equipo 3 - cuarto corte/Equipo 3 - cuarto corte"}
+
+\begin{document}
+	\LabDSTtitle{Fourth Cut}{Team 3}{Vision-Based Orientation Estimation and Correction for the
+		SOFIA Modular Kinetic Surface}
+	
+	%-----------------------------------------------------------------
+	\LabDSTsection{Acknowledgements}
+	
+	The authors thank the reviewers for their
+	detailed evaluation of the second-cut
+	manuscript. Their observations contributed
+	to improving the technical documentation,
+	clarity, and consistency of the proposed
+	SOFIA system.
+	
+	The following responses address the
+	reviewers' comments individually, indicating
+	the modifications introduced and the aspects
+	that remain subject to further development.
+	All references to sections, figures, tables,
+	and lines correspond to the revised manuscript
+	accompanying this letter.
+	
+	\textbf{Main changes.} Falta hacer esto.
+	
+	\LabDSTsummary
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{1}{Formato, LaTeX y cumplimiento de la plantilla}
+	
+	\LabDSTcomment{R1.1}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R1.2}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R1.3}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R1.4}{}{}
+	{}
+	{}
+	
+	
+	\LabDSTcomment{R1.5}{}{}
+	{}
+	{}
+	
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{2}{Redacción científica e idioma}
+	
+	\LabDSTcomment{R2.1}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R2.2}{}{}
+	{}
+	{}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
+	
+	\LabDSTcomment{R3.1}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R3.2}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R3.3}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R3.4}{}{}
+	{}
+	{}
+	
+	%-----------------------------------------------------------------
+	\LabDSTreviewer{4}{Metodología D-Lab, resultados y validación}
+	
+	\LabDSTcomment{R4.1}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R4.2}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R4.3}{}{}
+	{}
+	{}
+	
+	\LabDSTcomment{R4.4}{}{}
+	{}
+	{}
+	
+	
+\end{document}
