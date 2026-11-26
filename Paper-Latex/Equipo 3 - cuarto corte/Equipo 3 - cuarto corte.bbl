@@ -98,18 +98,18 @@ J.~A. Lizárraga, ``Sesión técnica 1 - análisis de componentes de hardware y
   \url{https://www.analog.com/media/en/technical-documentation/data-sheets/MAX13487E-MAX13488E.pdf}
 \BIBentrySTDinterwordspacing
 
-\bibitem{mg996r}
-\BIBentryALTinterwordspacing
-{Tower Pro Hong Kong}, ``{MG996R High Torque Metal Gear Servo Specification},''
-  accessed: 11 October 2026. [Online]. Available:
-  \url{https://www.towerpro.com.tw/product/mg996r-2/}
-\BIBentrySTDinterwordspacing
-
 \bibitem{sg90}
 \BIBentryALTinterwordspacing
 {TowerPro}, ``{SG90 Micro Servo Motor Specification Sheet},'' Jul. 2016,
   accessed: 13 Oct. 2026. [Online]. Available:
   \url{https://www.towerpro.com.tw/product/sg90-7/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{mg996r}
+\BIBentryALTinterwordspacing
+{Tower Pro Hong Kong}, ``{MG996R High Torque Metal Gear Servo Specification},''
+  accessed: 11 October 2026. [Online]. Available:
+  \url{https://www.towerpro.com.tw/product/mg996r-2/}
 \BIBentrySTDinterwordspacing
 
 \bibitem{stm32f4}

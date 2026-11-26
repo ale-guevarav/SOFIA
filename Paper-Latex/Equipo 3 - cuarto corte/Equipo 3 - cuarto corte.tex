@@ -51,7 +51,12 @@
 	estimation and correction system that uses a neural network to evaluate the physical inclination of the hexagonal platforms. The proposed approach integrates visual perception with the existing embedded control architecture, 
 	consisting of an ESP32-C3 microcontroller and PCA9685 PWM drivers. The estimated orientation is compared with the desired reference to determine angular deviations and generate corrective commands for the servomotors. 
 	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. The CNN achieved a mean angular estimation error of $0.204^\circ$ and a maximum error of $3.3^\circ$ on the simulated test dataset.
-	Further experimental evaluation is required to quantify residual orientation error and correction performance under physical operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
+	Additionally, the gesture recognition subsystem was evaluated
+	across ten experimental sessions involving two participants
+	and 111 recognition attempts. The system achieved an overall
+	recognition accuracy of 93.7\%, reaching 100\% under normal
+	lighting conditions. Performance decreased under low-light
+	conditions, particularly for the ATTACK gesture. Further experimental evaluation is required to quantify residual orientation error and correction performance under physical operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
 \end{abstract}
 
 	
@@ -942,88 +947,172 @@
 	
 	\linelabel{ln:vision-func-ema}The implementation of EMA filtering and five-frame temporal confirmation maintained the functionality of the recognition system while providing mechanisms to reduce unstable detections. Additionally, the final adjustments to RELOAD and ATTACK were verified, confirming that the updated gesture definitions could be recognized during functional testing.
 	
-	\linelabel{ln:vision-func-summary}These results demonstrate the functional operation of the five-gesture recognition subsystem. Quantitative validation of the final implementation and its robustness under different environmental conditions remains pending.
+	\linelabel{ln:vision-func-summary}These functional tests
+	confirmed the operation of the five-gesture recognition
+	subsystem. A subsequent quantitative evaluation was
+	conducted across ten experimental sessions, including
+	111 recognition attempts with two participants under
+	different lighting conditions, camera distances, and
+	multi-person scenarios. The corresponding recognition
+	performance and limitations are presented in the
+	following subsection.
 
 	\subsection{Gesture Recognition Performance Evaluation}
+	
+	\linelabel{ln:res-vision-intro}A new experimental evaluation
+	of the gesture recognition subsystem was conducted on
+	November 18, 2026, using two participants across ten
+	sessions and 111 recognition attempts. The experiments
+	evaluated five predefined gestures under different
+	camera distances, lighting conditions, and the presence
+	of additional people. Each trial started with a visual
+	signal, after which the participant performed the
+	requested gesture. Recognition was confirmed after five
+	consecutive valid frames. The tests were performed on
+	Linux using Python 3.14.8, OpenCV 5.0.0, and MediaPipe
+	Pose Landmarker and Hand Landmarker.
 
-	\linelabel{ln:res-vision-intro}Preliminary performance tests
-	were conducted with three participants under adequate lighting
-	conditions and at a comfortable distance from the webcam.
-	The exact distance and illumination levels were not recorded.
-	These tests evaluated an earlier version of the gesture
-	recognition system and recorded the expected gesture, detected
-	gesture, response time, and instantaneous frames per second
-	(FPS).
-
+	
 	\linelabel{ln:vision-performance}As shown in
-	Table~\ref{tab:gesture_benchmark}, 42 out of 50 attempts were
-	correctly recognized, resulting in an overall accuracy of
-	84.0\%. Dynamic gestures (START and END) achieved 100\%
-	recall, while static gestures achieved recall values between
-	75.0\% and 88.9\%. Wilson confidence intervals at the 95\%
-	level were calculated assuming independent trials.
+	Table~\ref{tab:gesture_benchmark}, the system correctly
+	recognized 104 out of 111 attempts, achieving an overall
+	recognition accuracy of 93.7\%. Five of the ten sessions
+	achieved 100\% accuracy. START and END reached 100\%
+	recall, while RELOAD and SHIELD achieved 95.5\% and
+	95.7\%, respectively. ATTACK showed the lowest
+	performance, with 77.3\% recall. Overall, six gestures
+	were not detected and one was incorrectly classified.
 
 	\begin{table}[!t]
 		\centering
-		\caption{Preliminary Gesture Recognition Performance}
+		\caption{Final Gesture Recognition Performance}
 		\label{tab:gesture_benchmark}
-		\scriptsize
-		\setlength{\tabcolsep}{3pt}
+		\footnotesize
+		\setlength{\tabcolsep}{5pt}
 		\renewcommand{\arraystretch}{1.1}
-		\begin{tabular}{@{}l c c c c c@{}}
+		\begin{tabular}{@{}l c c c c@{}}
 			\toprule
 			\textbf{Gesture} &
 			\textbf{Trials} &
 			\textbf{Hits} &
 			\textbf{Recall (\%)} &
-			\textbf{95\% CI (\%)} &
-			\textbf{Response (s)} \\
+			\textbf{Processing (s)} \\
 			\midrule
-			START  & 6  & 6  & 100.0 & 61.0--100 & 1.33 \\
-			RELOAD & 9  & 8  & 88.9  & 56.5--98.0 & 4.17 \\
-			SHIELD & 12 & 9  & 75.0  & 46.8--91.1 & 1.06 \\
-			ATTACK & 16 & 12 & 75.0  & 50.5--89.8 & 1.14 \\
-			END    & 7  & 7  & 100.0 & 64.6--100 & 0.95 \\
+			START  & 22 & 22 & 100.0 & 1.58 \\
+			RELOAD & 22 & 21 & 95.5  & 0.22 \\
+			SHIELD & 23 & 22 & 95.7  & 0.23 \\
+			ATTACK & 22 & 17 & 77.3  & 0.20 \\
+			END    & 22 & 22 & 100.0 & 1.50 \\
+			\midrule
+			Total  & 111 & 104 & 93.7 & -- \\
 			\bottomrule
 		\end{tabular}
 	\end{table}
 
-	\linelabel{ln:vision-shield}During an initial evaluation of
-	SHIELD, two out of four attempts were correctly classified,
-	while the remaining two were incorrectly identified as RELOAD.
-	The relationship between these four attempts and the 50-trial
-	evaluation could not be verified.
+	\begin{table}[!t]
+		\centering
+		\caption{Gesture Recognition Confusion Matrix Across 111 Trials}
+		\label{tab:gesture_confusion_matrix}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.1}
+		\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{@{}lcccccc@{}}
+			\toprule
+			\textbf{Expected} &
+			\multicolumn{6}{c}{\textbf{Predicted Gesture}} \\
+			\cmidrule(l){2-7}
+			& \textbf{START}
+			& \textbf{RELOAD}
+			& \textbf{SHIELD}
+			& \textbf{ATTACK}
+			& \textbf{END}
+			& \textbf{NONE} \\
+			\midrule
+			START  & 22 & 0  & 0  & 0  & 0  & 0 \\
+			RELOAD & 0  & 21 & 0  & 0  & 0  & 1 \\
+			SHIELD & 0  & 1  & 22 & 0  & 0  & 0 \\
+			ATTACK & 0  & 0  & 0  & 17 & 0  & 5 \\
+			END    & 0  & 0  & 0  & 0  & 22 & 0 \\
+			\bottomrule
+		\end{tabular}%
+		}
+	\end{table}
 
-	\linelabel{ln:vision-overlap}These preliminary observations
-	helped identify overlapping recognition conditions, leading
-	to refinements in the geometric classification rules.
+	\linelabel{ln:vision-confusion}Table~\ref{tab:gesture_confusion_matrix}
+	presents the confusion matrix obtained from the 111 recognition
+	attempts. The system correctly classified 104 gestures,
+	resulting in an overall accuracy of 93.7\%. Of the seven
+	unsuccessful attempts, six corresponded to missed detections
+	and only one to an incorrect classification, where SHIELD
+	was recognized as RELOAD. ATTACK accounted for five missed
+	detections, representing the main recognition limitation
+	observed during the experiments.
 
-	\linelabel{ln-vision-latency}The recorded response times
-	included user reaction, gesture execution, and software
-	processing. Therefore, they do not represent the algorithm's
-	computational latency alone.
+	\linelabel{ln:vision-shield}The experimental results showed
+	that recognition performance was strongly affected by lighting
+	conditions. Under normal illumination, both participants
+	achieved 100\% accuracy (25/25 attempts). Tests at different
+	camera distances achieved 95.1\% accuracy (39/41 attempts),
+	while reducing illumination to 50\% maintained 100\%
+	accuracy (15/15 attempts). However, performance decreased
+	to 80\% (16/20 attempts) under darkness and flashlight
+	illumination.
 
-	\linelabel{ln:vision-adjustments}Following these observations,
-	the recognition conditions for RELOAD and ATTACK were adjusted
-	and their functionality was verified. However, individual
-	trial records were unavailable to reconstruct a complete
-	confusion matrix, preventing reliable calculation of
-	precision and F1-score. The limited number of participants
-	and potentially dependent trials also restrict the
-	generalizability of the results. Quantitative validation
-	of the final implementation remains pending.
+	\linelabel{ln:vision-overlap}ATTACK was the most challenging
+	gesture, accounting for five of the seven recognition
+	failures. Four missed detections occurred under low-light
+	conditions, suggesting that reduced hand visibility affects
+	the performance of the Hand Landmarker. Another ATTACK
+	gesture was missed at a greater camera distance.
+
+	\linelabel{ln-vision-latency}The remaining failures included
+	one missed RELOAD gesture with two additional people in
+	the camera frame and one SHIELD gesture incorrectly
+	classified as RELOAD. The latter occurred shortly after
+	a previous RELOAD trial, suggesting that the participant
+	may not have fully returned to a neutral posture before
+	the next evaluation.
+
+	\linelabel{ln:vision-adjustments}Overall, six of the seven
+	failures were missed detections, while only one involved
+	an incorrect classification. These results indicate that
+	the system generally avoided producing an incorrect
+	gesture label when recognition conditions were insufficient.
+	Nevertheless, the evaluation involved only two participants,
+	and additional testing is required to assess performance
+	across a larger and more diverse population.
 
 		
 	\section{Discussion}
 	\label{sec:discussion}
+	
+	\linelabel{ln:disc}The final gesture recognition evaluation
+	demonstrated the feasibility of geometric classification
+	for human-robot interaction, achieving an overall accuracy
+	of 93.7\% across 111 attempts. The system achieved 100\%
+	accuracy under normal lighting and 95.1\% at different
+	camera distances. However, accuracy decreased to 80\%
+	under low-light conditions, particularly affecting ATTACK,
+	which accounted for five of the seven recognition failures.
 
-	\linelabel{ln:disc}The preliminary gesture recognition results demonstrate the
-	feasibility of geometric classification for human-robot
-	interaction, achieving an overall accuracy of 84.0\%.
-	Dynamic gestures showed higher recall than static gestures
-	in the evaluated trials. However, the limited sample size,
-	overlapping recognition conditions, and wide confidence
-	intervals restrict the generalization of these results.
+	The average processing time for gesture confirmation was
+	0.79~s, while the average total trial time was 1.68~s.
+	Static gestures required approximately 0.2~s for
+	confirmation, whereas dynamic gestures required longer
+	processing times due to their movement sequences.
+	Under adequate lighting, the system operated at
+	approximately 24--26 FPS, decreasing to around 15 FPS
+	under poor illumination.
+
+	Although these results demonstrate improved recognition
+	performance compared with the preliminary evaluation,
+	the experiments involved only two participants.
+	Therefore, further testing is necessary to assess
+	robustness across different users and environmental
+	conditions. These measurements evaluate the vision
+	subsystem and do not establish the physical actuation
+	accuracy of SOFIA.
 
 	The electronic architecture supports the integration of
 	visual perception and servomotor control. Nevertheless,
@@ -1042,13 +1131,19 @@
 	
 	\section{Conclusions}
 	\label{sec:conclusions}
-
+	
 	The development of SOFIA integrates mechanical actuation,
 	embedded control, and computer vision into a modular
-	robotic platform. Preliminary gesture recognition tests
-	achieved an overall accuracy of 84.0\%, demonstrating
-	the potential of geometric classification for human-robot
-	interaction.
+	robotic platform. The final gesture recognition evaluation
+	achieved an overall accuracy of 93.7\% across 111 attempts
+	and ten experimental sessions. The system demonstrated
+	reliable performance under normal lighting and different
+	camera distances, although recognition accuracy decreased
+	under low-light conditions, particularly for the ATTACK
+	gesture. These findings support the feasibility of
+	vision-based human-robot interaction while highlighting
+	the need for further evaluation with more participants.
+
 
 	\linelabel{ln:concl-corr}The implementation of a vision-based orientation estimation
 	and correction system enables automatic servomotor
