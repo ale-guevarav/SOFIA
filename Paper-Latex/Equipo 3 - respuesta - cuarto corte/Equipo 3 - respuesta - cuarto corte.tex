@@ -1,3 +1,4 @@
+
 %=================================================================
 % PLANTILLA -- Respuesta a los revisores -- Segundo Corte
 % LabDST RoboCoffee, ITESO.
@@ -63,75 +64,174 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{1}{Formato, LaTeX y cumplimiento de la plantilla}
 	
-	\LabDSTcomment{R1.1}{}{}
-	{}
-	{}
-	
-	\LabDSTcomment{R1.2}{}{}
-	{}
-	{}
-	
-	\LabDSTcomment{R1.3}{}{}
-	{}
+	\LabDSTcomment{R1.1}{N}{}
+	{El artículo termina en Conclusions: no hay
+		Author Contributions, Data Availability,
+		Acknowledgment (con la declaración de uso de IA)
+		ni Conflicts of Interest. Viene del segundo
+		corte (R1.1). Además, la profesora Graciela Baca
+		no está en la lista de autores.}
 	{}
 	
-	\LabDSTcomment{R1.4}{}{}
-	{}
+	\LabDSTcomment{R1.2}{N}{}
+	{El PDF tiene 11 páginas; el máximo es 10.
+		En este corte se señala sin descuento.
+		La Sección II dedica cerca de tres páginas
+		a las fichas técnicas y las tablas de
+		trade-off (Tablas IV--XII).}
 	{}
 	
-	
-	\LabDSTcomment{R1.5}{}{}
+	\LabDSTcomment{R1.3}{N}{}
+	{Detalles de formato:
+		
+		\par\noindent\textbullet\ el título de sección
+		``Exclusion ofResNet18'' no tiene espacio;
+		
+		\par\noindent\textbullet\ la Fig. 6 y la Fig. 7
+		son capturas en PNG; el esquemático se lee,
+		pero con poca resolución;
+		
+		\par\noindent\textbullet\
+		State\_machine\_livemode.png está en figures/
+		y no se usa, aunque describe el modo en vivo
+		del diagnóstico.}
 	{}
-	{}
-	
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{2}{Redacción científica e idioma}
 	
-	\LabDSTcomment{R2.1}{}{}
-	{}
+	\LabDSTcomment{R2.1}{N}{}
+	{El título dice ``Estimation and Correction'',
+		y el texto afirma:
+		
+		\par\noindent\textbullet\ ``The estimated
+		orientation is compared with the desired
+		reference to determine angular deviations
+		and generate corrective commands''
+		(abstract);
+		
+		\par\noindent\textbullet\ ``The implementation
+		of vision-based orientation correction
+		introduces external feedback to the
+		SOFIA control system'' (Línea 572);
+		
+		\par\noindent\textbullet\ ``enables automatic
+		servomotor adjustments using external
+		visual feedback'' (Línea 584).
+		
+		\par Pero el artículo no describe ni prueba
+		ninguna corrección: no hay ley de corrección,
+		ni lazo cerrado, ni resultado con servos.
+		La pregunta rectora (Línea 56) solo
+		pregunta por la estimación.}
 	{}
 	
-	\LabDSTcomment{R2.2}{}{}
-	{}
+	\LabDSTcomment{R2.2}{N}{}
+	{La introducción todavía presenta el reto
+		general de coordinar 32 actuadores y el
+		RS-485, y el diagnóstico aparece en una
+		sola oración al final (Línea 39).
+		El lector no sabe que el artículo trata
+		de visión hasta la Sección II.}
 	{}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
 	
-	\LabDSTcomment{R3.1}{}{}
-	{}
+	\LabDSTcomment{R3.1}{N}{}
+	{Todo el diagnóstico se entrenó y se probó
+		con imágenes de Webots. El objetivo 2
+		(Línea 60) promete ``sim-to-real finetuning''
+		sobre el módulo físico, pero no hay ninguna
+		foto real. El propio artículo muestra que
+		un cambio de geometría eleva el error de
+		$0.204^\circ$ a $1.6^\circ$ (Línea 493);
+		el salto de simulación a cámara real
+		puede ser mayor.}
 	{}
 	
-	\LabDSTcomment{R3.2}{}{}
-	{}
+	\LabDSTcomment{R3.2}{N}{}
+	{En la segunda corrida, la regla híbrida
+		reporta el mismo máximo que la CNN
+		($3.3^\circ$) y la misma columna
+		$>15^\circ$ (0.41), pero su exactitud
+		de estados (94.1\%) es idéntica a la del
+		método geométrico. No se explica cómo
+		se calcula States ni con qué umbrales
+		se cuenta un acierto.}
 	{}
 	
-	\LabDSTcomment{R3.3}{}{}
-	{}
-	{}
-	
-	\LabDSTcomment{R3.4}{}{}
-	{}
+	\LabDSTcomment{R3.3}{N}{}
+	{El firmware de la ESP32-C3, el formato
+		de los mensajes con la PC y el uso del
+		RS-485 siguen sin describirse; la carta
+		los deja como trabajo futuro. Tampoco
+		se explica cómo el diagnóstico se
+		comunica con el controlador para corregir.}
 	{}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{4}{Metodología D-Lab, resultados y validación}
 	
-	\LabDSTcomment{R4.1}{}{}
-	{}
+	\LabDSTcomment{R4.1}{N}{}
+	{De los tres objetivos, ninguno está
+		validado en el prototipo:
+		
+		\par\noindent\textbullet\ objetivo 1 (PCB):
+		diseñada, sin fabricar ni probar
+		(Línea 449);
+		
+		\par\noindent\textbullet\ objetivo 2
+		(diagnóstico en el módulo físico):
+		solo en simulación;
+		
+		\par\noindent\textbullet\ objetivo 3
+		(máquina de estados con gestos en tiempo
+		real): los gestos funcionan, pero no
+		hay integración con los servos.}
 	{}
 	
-	\LabDSTcomment{R4.2}{}{}
-	{}
+	\LabDSTcomment{R4.2}{N}{}
+	{Discussion y Conclusions tienen tres
+		y dos párrafos. Les falta:
+		
+		\par\noindent\textbullet\ análisis de fallas
+		(p. ej. el error de $74^\circ$ del método
+		geométrico, la confusión SHIELD--RELOAD);
+		
+		\par\noindent\textbullet\ comparación con
+		la literatura y con la Tabla II;
+		
+		\par\noindent\textbullet\ limitaciones
+		y amenazas a la validez (simulación,
+		tres participantes, versión anterior
+		del reconocedor);
+		
+		\par\noindent\textbullet\ replicabilidad
+		(qué se publica y dónde);
+		
+		\par\noindent\textbullet\ una respuesta
+		explícita a la pregunta rectora
+		en las conclusiones.}
 	{}
 	
-	\LabDSTcomment{R4.3}{}{}
-	{}
+	\LabDSTcomment{R4.3}{N}{}
+	{No se entregan el generador de Webots,
+		el código de entrenamiento, el modelo,
+		el reconocedor de gestos ni los datos.
+		No hay carpeta algorithms/, ni repositorio,
+		ni bitácora, ni análisis Discover
+		(R4.4 del segundo corte).}
 	{}
 	
-	\LabDSTcomment{R4.4}{}{}
-	{}
+	\LabDSTcomment{R4.4}{N}{}
+	{El perfil de velocidad (12 consignas
+		de $30$ a $600^\circ/\mathrm{s}$)
+		se reporta solo con palabras:
+		``mechanical chatter and motion
+		desynchronization were observed''.
+		No hay tabla, gráfica, criterio
+		de chatter ni número de repeticiones.}
 	{}
 	
 	
