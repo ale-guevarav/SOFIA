@@ -64,24 +64,54 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{1}{Formato, LaTeX y cumplimiento de la plantilla}
 	
-	\LabDSTcomment{R1.1}{N}{}
+	\LabDSTcomment{R1.1}{P}{\rln{author-contributions}, \rln{data-availability}, \rln{acknowledgment}, \rln{ai-declaration}, \rln{conflicts-interest}}
 	{El artículo termina en Conclusions: no hay
 		Author Contributions, Data Availability,
 		Acknowledgment (con la declaración de uso de IA)
 		ni Conflicts of Interest. Viene del segundo
 		corte (R1.1). Además, la profesora Graciela Baca
 		no está en la lista de autores.}
-	{}
+	{\textcolor{red}{FALTA TERMINAR LA CONCLUSIÓN The four required declarations have been incorporated
+		into the revised manuscript: Author Contributions,
+		Data Availability, Acknowledgment (including the
+		declaration of generative AI use), and Conflicts of
+		Interest.
+		The author list was also reviewed. Graciela Baca
+		was not included because she is not a Professor in this course.}}
 	
-	\LabDSTcomment{R1.2}{N}{}
+	\LabDSTcomment{R1.2}{A}{Table~\ref{tab:component_specs},
+		Table~\ref{tab:technology_selection}}
 	{El PDF tiene 11 páginas; el máximo es 10.
 		En este corte se señala sin descuento.
 		La Sección II dedica cerca de tres páginas
 		a las fichas técnicas y las tablas de
 		trade-off (Tablas IV--XII).}
-	{}
+	{The revised manuscript has been reduced from
+		11 to 10 pages, complying with the maximum
+		length requirement.
+		
+		To achieve this reduction, the three individual
+		component specification tables for the ESP32-C3,
+		PCA9685, and MG90S, together with the verification
+		summary, were consolidated into a single table
+		entitled ``Consolidated Component Specifications
+		and Design Verification.''
+		
+		Additionally, the four trade-off tables covering
+		actuation, PWM expansion, main controller selection,
+		and communication were merged into a single table
+		entitled ``Consolidated Technological Selection.''
+		
+		Redundant descriptions were removed, while the
+		main technical specifications, design considerations,
+		and selection rationale were retained. These
+		modifications improved the conciseness of
+		Section II without removing the experimental
+		results of the study.}
 	
-	\LabDSTcomment{R1.3}{N}{}
+	\LabDSTcomment{R1.3}{N}{\Rln{resnet},
+		Fig.~\ref{fig:sofia_schematic},
+		Fig.~\ref{fig:sofia_pcb}}
 	{Detalles de formato:
 		
 		\par\noindent\textbullet\ el título de sección
@@ -95,7 +125,16 @@
 		State\_machine\_livemode.png está en figures/
 		y no se usa, aunque describe el modo en vivo
 		del diagnóstico.}
-	{}
+	{The formatting error in the subsection title
+		``Exclusion ofResNet18'' has been corrected to
+		``Exclusion of ResNet18.''
+		
+		The electronic schematic and PCB layout figures
+		are currently included as PNG images. Their
+		replacement with higher-quality vector graphics
+		remains pending.
+		
+		\textcolor{red}{FALTA CORROBORAR State\_machine\_livemode.png}}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{2}{Redacción científica e idioma}
