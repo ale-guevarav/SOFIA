@@ -56,6 +56,7 @@ ZONA_GEOMETRICO_GRADOS = 6.0
 METODOS = {
     "geometrico": "Geométrico",
     "cnn": "CNN pequeña",
+    "cnn_sim": "CNN solo simulación",   # results/modelo/cnn_sim.pt: el modelo anterior, para comparar
     "hibrido": "Híbrido",
 }
 
@@ -132,12 +133,24 @@ class Diagnosticador:
         self.cnn = None
         self.ruta_modelo = None
 
-        if metodo != "geometrico":
+        if metodo == "cnn_sim":
+            # Mismo método que "cnn", con el modelo anterior (solo simulación)
+            self._cargar_cnn(ruta_modelo or rutas.MODELO_SIM, "results/modelo/cnn_sim.pt")
+            if self.cnn is not None:
+                self.metodo = "cnn"
+        elif metodo != "geometrico":
             self._cargar_cnn(ruta_modelo or buscar_modelo())
 
-    def _cargar_cnn(self, ruta):
+    @property
+    def nombre_metodo(self):
+        """El método que se está usando de verdad (para mostrarlo)."""
+        if self.metodo_pedido == "cnn_sim" and self.cnn is not None:
+            return "cnn_sim"
+        return self.metodo
+
+    def _cargar_cnn(self, ruta, nombre="results/modelo/cnn.pt"):
         if not ruta or not os.path.isfile(ruta):
-            self._sin_cnn("no hay modelo (results/modelo/cnn.pt)")
+            self._sin_cnn(f"no hay modelo ({nombre})")
             return
         try:
             from inferencia import ModeloAlineacion

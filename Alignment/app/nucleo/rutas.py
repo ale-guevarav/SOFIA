@@ -31,8 +31,10 @@ ENTRENADOS = os.path.join(BUILD, "entrenados")
 RESULTS = os.path.join(ALIGNMENT, "results")
 CARPETA_MODELO = os.path.join(RESULTS, "modelo")
 MODELO_PUBLICADO = os.path.join(CARPETA_MODELO, "cnn.pt")
+MODELO_SIM = os.path.join(CARPETA_MODELO, "cnn_sim.pt")      # el anterior (solo simulación), para comparar
 EVALUACIONES = os.path.join(RESULTS, "evaluaciones")
 DIAGNOSTICOS = os.path.join(RESULTS, "diagnosticos")
+CENTROS_REALES = os.path.join(RESULTS, "centros_reales.json")   # centro de cada placa en el módulo real
 CEROS_ESP32 = os.path.join(RESULTS, "ceros_esp32.json")   # ceros de los servos (GUI de visión)
 
 

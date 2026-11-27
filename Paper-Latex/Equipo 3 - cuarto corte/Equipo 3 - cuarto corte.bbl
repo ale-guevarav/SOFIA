@@ -90,6 +90,12 @@ J.~A. Lizárraga, ``Sesión técnica 1 - análisis de componentes de hardware y
   Available: \url{https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf}
 \BIBentrySTDinterwordspacing
 
+\bibitem{sofia_repository}
+\BIBentryALTinterwordspacing
+{SOFIA Development Team}, ``{SOFIA}: Source code and technical documentation,''
+  2026. [Online]. Available: \url{https://github.com/ale-guevarav/SOFIA}
+\BIBentrySTDinterwordspacing
+
 \bibitem{max13487e}
 \BIBentryALTinterwordspacing
 {Analog Devices}, ``{MAX13487E/MAX13488E - Half-Duplex RS-485/RS-422

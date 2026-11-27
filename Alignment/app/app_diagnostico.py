@@ -40,7 +40,8 @@ import geometria as g  # noqa: E402
 import rutas  # noqa: E402
 from diagnostico_worker import CAMARA, FOTOS, SIN_FUENTE, WEBOTS, DiagnosticoWorker  # noqa: E402
 
-METODOS = [("cnn", "CNN pequeña"), ("hibrido", "Híbrido (geométrico + CNN)"), ("geometrico", "Geométrico")]
+METODOS = [("cnn", "CNN pequeña"), ("cnn_sim", "CNN solo simulación (anterior)"),
+           ("hibrido", "Híbrido (geométrico + CNN)"), ("geometrico", "Geométrico")]
 
 COLOR_ESTADO = {
     "OK": QColor(200, 240, 200),

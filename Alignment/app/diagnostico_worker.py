@@ -307,7 +307,7 @@ class DiagnosticoWorker(QThread):
             self._diag.geometrico = anterior.geometrico
             self._diag.referencia = True
 
-        self.metodo_listo.emit(self._diag.metodo, self._diag.dispositivo, self._diag.aviso)
+        self.metodo_listo.emit(self._diag.nombre_metodo, self._diag.dispositivo, self._diag.aviso)
         if self._diag.aviso:
             self.mensaje.emit(self._diag.aviso)
 
@@ -331,6 +331,8 @@ class DiagnosticoWorker(QThread):
             self.foto_actual.emit(0, 0, "-")
 
     def _cambiar_fuente(self, fuente, nombre):
+        # Cámara = módulo real (centros reales); Webots en vivo = diseño
+        pp.usar_centros_reales(fuente == CAMARA)
         self._fuente = fuente
         self._ultimo_nombre = nombre
         self.fuente_cambiada.emit(fuente)
@@ -378,6 +380,8 @@ class DiagnosticoWorker(QThread):
             return
 
         self._fotos = fotos
+        # Fotos del módulo real (no una sesión de Webots): centros reales
+        pp.usar_centros_reales(not self._reales_sesion)
         self._fuente = FOTOS
         self.fuente_cambiada.emit(FOTOS)
         extra = " · sesión de Webots con ángulos reales" if self._reales_sesion else ""

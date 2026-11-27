@@ -32,11 +32,10 @@
  *  arriba. Unidad 1 = abajo a la izquierda, 16 = arriba a la derecha.
  *  Las mismas figuras están en la sim (patrones.hpp).
  *
- *  En modo TRACKING las 16 apuntan hacia la mano POR TURNOS, como el
- *  reloj de un CPU: cada 20 ms solo 4 unidades dan un salto corto y
- *  ceden el turno a las siguientes 4. Avanzan casi juntas pero nunca
- *  arrancan más de 8 servos a la vez. El regreso al centro (STOP,
- *  estado seguro, fin del TRACKING) usa los mismos turnos.
+ *  En modo TRACKING las 16 apuntan hacia la mano con el mismo EMA de
+ *  las figuras; el regreso al centro (STOP, estado seguro, fin del
+ *  TRACKING) y el reacomodo de AJUSTE también (ver EMA_EN_*). Con esos
+ *  flags en false se usan turnos de 4 unidades (más abajo).
  *
  *  Hardware y calibración tomados de las pruebas de
  *  mecatrónica (Prueba_Servos / SG90_WindowVelocity_PCA).
@@ -218,7 +217,8 @@ float escalaVelocidad = 1.0f;
 const float VEL_REGRESO = 120.0f;   // °/s al volver al centro si se interrumpe
 const float VEL_TRACK   = 120.0f;   // °/s promedio de cada unidad en TRACKING
 
-// TRACKING POR TURNOS (como el reloj de un CPU): en cada paso de 20 ms
+// TURNOS (solo con EMA_EN_TRACKING / EMA_EN_REGRESO en false, por si la
+// fuente no aguanta las 16 a la vez). Como el reloj de un CPU: en cada paso de 20 ms
 // solo se mueven TRACK_POR_TURNO unidades, dan un salto corto hacia la
 // mano y le ceden el turno a las siguientes 4. Así las 16 avanzan casi
 // juntas pero nunca hay más de 4 unidades (8 servos) arrancando a la vez.
@@ -891,13 +891,8 @@ bool avanzarHacia(Unidad& un, float x, float y, float velocidad) {
 }
 
 // -----------------------------
-// TURNOS (TRACKING y regreso al centro)
+// TURNOS (TRACKING y regreso al centro sin EMA; ver TRACK_POR_TURNO)
 // -----------------------------
-// Como el reloj de un CPU: cada paso de 20 ms solo TRACK_POR_TURNO
-// unidades que aún no llegan dan un salto corto; el siguiente paso les
-// toca a las siguientes, en ronda. Ninguna completa su movimiento de
-// golpe: todas avanzan "a saltitos" casi al mismo tiempo, pero nunca
-// arrancan más de 4 unidades (8 servos) juntas
 
 int siguienteTurno = 0;   // por qué unidad empieza la siguiente ronda
 

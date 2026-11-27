@@ -55,6 +55,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QButtonGroup,
     QCheckBox,
+    QComboBox,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
@@ -92,6 +93,7 @@ from interfaz.alineacion_worker import (
     ceros_guardados,
 )
 from interfaz.alineacion_ventana import AlineacionVentana, CamarasVentana
+from interfaz import camaras
 from evaluacion.session_logger import SessionLogger
 
 
@@ -326,8 +328,23 @@ class MainWindow(QMainWindow):
         self.state_label.setTextFormat(Qt.TextFormat.RichText)
         grid.addWidget(self.state_label, 2, 0, 1, 2)
 
-        grid.addWidget(self._build_align_button(), 3, 0, 1, 2)
+        # Cámara de poses (la que ve a la persona)
+        camera_row = QHBoxLayout()
+        camera_row.addWidget(QLabel("Cámara de poses"))
+        self.combo_pose_camera = QComboBox()
+        self.combo_pose_camera.setToolTip("Cámara que ve a la persona (detección de poses y gestos)")
+        self.combo_pose_camera.currentIndexChanged.connect(self._on_pose_camera_changed)
+        camera_row.addWidget(self.combo_pose_camera, stretch=1)
+        self.btn_refresh_cameras = QPushButton("↻")
+        self.btn_refresh_cameras.setFixedWidth(34)
+        self.btn_refresh_cameras.setToolTip("Volver a buscar las cámaras conectadas")
+        self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
+        camera_row.addWidget(self.btn_refresh_cameras)
+        grid.addLayout(camera_row, 3, 0, 1, 2)
 
+        grid.addWidget(self._build_align_button(), 4, 0, 1, 2)
+
+        self.refresh_cameras()
         return group
 
 
@@ -342,20 +359,11 @@ class MainWindow(QMainWindow):
         menu.addAction("Alinear", lambda: self.start_alignment(ALINEAR))
         menu.addSeparator()
 
-        # Cámara que ve al módulo (la 0 es la de la persona)
-        camera_menu = menu.addMenu("Cámara del módulo")
-        camera_menu.addAction("🔍  Buscar cámaras...", self.search_cameras)
-        camera_menu.addSeparator()
-        self.align_camera = 1
-        self.align_camera_actions = []
-        group = QActionGroup(self)
-        for index in range(5):
-            action = camera_menu.addAction(f"Cámara {index}")
-            action.setCheckable(True)
-            action.setChecked(index == self.align_camera)
-            action.triggered.connect(lambda _=False, i=index: self.set_align_camera(i))
-            group.addAction(action)
-            self.align_camera_actions.append(action)
+        # Cámara que ve al módulo: se llena con las conectadas al abrir el menú
+        self.align_camera_menu = menu.addMenu("Cámara del módulo")
+        self.align_camera_menu.aboutToShow.connect(self._fill_align_camera_menu)
+        if not hasattr(self, "align_camera"):
+            self.align_camera = None
 
         self.btn_align.setMenu(menu)
         return self.btn_align
@@ -544,7 +552,16 @@ class MainWindow(QMainWindow):
         if self.worker is not None:
             return
 
-        self.worker = VisionWorker(camera_index=0, mode=self.mode)
+        camera = self._pose_camera()
+        if camera is None:
+            self.refresh_cameras()
+            camera = self._pose_camera()
+        if camera is None:
+            self.append_log("No hay cámaras conectadas para la detección de poses")
+            return
+
+        self.worker = VisionWorker(camera_index=camera, mode=self.mode)
+        self.append_log(f"Detección con: {self._camera_name(camera)}")
 
         self.worker.frame_ready.connect(self.show_frame)
         self.worker.result_ready.connect(self.show_result)
@@ -594,6 +611,9 @@ class MainWindow(QMainWindow):
         state = self.worker_state
 
         self.btn_start.setEnabled(state == STATE_STOPPED and self.worker is None)
+        # La cámara de poses solo se cambia con la detección detenida
+        self.combo_pose_camera.setEnabled(self.worker is None)
+        self.btn_refresh_cameras.setEnabled(self.worker is None)
         self.btn_pause.setEnabled(state == STATE_RUNNING)
         self.btn_resume.setEnabled(state == STATE_PAUSED)
         self.btn_stop.setEnabled(state in (STATE_RUNNING, STATE_PAUSED, STATE_LOADING))
@@ -1131,18 +1151,77 @@ class MainWindow(QMainWindow):
         self.append_log("Ceros guardados enviados al ESP32 (16 unidades)")
 
 
+    # =============================================
+    # CÁMARAS (nombres del sistema, solo las conectadas)
+    # =============================================
+
+    def _camera_name(self, index):
+        return self.camera_names.get(index, f"Cámara {index}")
+
+
+    def _pose_camera(self):
+        return self.combo_pose_camera.currentData()
+
+
+    def refresh_cameras(self):
+        """Vuelve a listar las cámaras conectadas (combo de poses y menú del módulo)."""
+        busy = [self.worker.camera_index] if self.worker is not None else []
+        found = camaras.listar(busy)
+        self.camera_names = dict(found)
+        previous = self.combo_pose_camera.currentData()
+        self.combo_pose_camera.blockSignals(True)
+        self.combo_pose_camera.clear()
+        for index, name in found:
+            self.combo_pose_camera.addItem(name, index)
+        if not found:
+            self.combo_pose_camera.addItem("(no hay cámaras)", None)
+        position = self.combo_pose_camera.findData(previous if previous is not None else (found[0][0] if found else None))
+        self.combo_pose_camera.setCurrentIndex(max(0, position))
+        self.combo_pose_camera.blockSignals(False)
+        # Cámara del módulo por defecto: una distinta a la de poses
+        if getattr(self, "align_camera", None) not in self.camera_names:
+            others = [i for i, _ in found if i != self._pose_camera()]
+            self.align_camera = others[0] if others else (found[0][0] if found else None)
+        if hasattr(self, "log_view"):
+            self.append_log("Cámaras: " + (", ".join(f"{n} [{i}]" for i, n in found) or "ninguna"))
+
+
+    def _on_pose_camera_changed(self):
+        index = self._pose_camera()
+        if index is not None and hasattr(self, "log_view"):
+            self.append_log(f"Cámara de poses: {self._camera_name(index)}")
+
+
+    def _fill_align_camera_menu(self):
+        menu = self.align_camera_menu
+        menu.clear()
+        menu.addAction("🔍  Buscar cámaras (con foto)...", self.search_cameras)
+        menu.addAction("↻  Actualizar lista", self.refresh_cameras)
+        menu.addSeparator()
+        if not self.camera_names:
+            action = menu.addAction("(no hay cámaras conectadas)")
+            action.setEnabled(False)
+            return
+        group = QActionGroup(menu)
+        for index, name in sorted(self.camera_names.items()):
+            label = name + ("   (poses)" if index == self._pose_camera() else "")
+            action = menu.addAction(label)
+            action.setCheckable(True)
+            action.setChecked(index == self.align_camera)
+            action.triggered.connect(lambda _=False, i=index: self.set_align_camera(i))
+            group.addAction(action)
+
+
     def set_align_camera(self, index):
         self.align_camera = index
-        for i, action in enumerate(self.align_camera_actions):
-            action.setChecked(i == index)
-        self.append_log(f"Alineación: cámara del módulo = {index}")
+        self.append_log(f"Alineación: cámara del módulo = {self._camera_name(index)}")
 
 
     def search_cameras(self):
         """Prueba las cámaras y muestra una foto de cada una para elegir."""
         if self.camera_search is not None or self.align_worker is not None or self.align_preview is not None:
             return
-        busy = [0] if self.worker is not None else []    # la 0 la usa la detección
+        busy = [self.worker.camera_index] if self.worker is not None else []    # la usa la detección
         self.btn_align.setEnabled(False)
         self.statusBar().showMessage("Buscando cámaras...")
         self.camera_search = BuscarCamarasWorker(busy, parent=self)
@@ -1186,9 +1265,15 @@ class MainWindow(QMainWindow):
                               "La alineación manda los ceros nuevos al ESP32 por Bluetooth.")
             return
 
-        if self.worker is not None and self.align_camera == 0:
-            self._align_popup("La cámara 0 la está usando la detección",
-                              "Elige en el menú la cámara que ve al módulo, o detén la detección.")
+        if self.align_camera is None:
+            self._align_popup("No hay cámara del módulo",
+                              "Conecta la cámara que ve al SOFIA y elígela en "
+                              "Alineación → Cámara del módulo.")
+            return
+
+        if self.worker is not None and self.align_camera == self.worker.camera_index:
+            self._align_popup(f"«{self._camera_name(self.align_camera)}» la está usando la detección",
+                              "Elige en el menú otra cámara para el módulo, o detén la detección.")
             return
 
         self._aligning = True
@@ -1210,7 +1295,7 @@ class MainWindow(QMainWindow):
         self.align_preview.error.connect(self.on_align_error)
         self.align_preview.finished.connect(self._on_preview_finished)
 
-        self.align_window.modo_vista(self.align_camera)
+        self.align_window.modo_vista(self._camera_name(self.align_camera))
         self.align_window.show()
         self.align_preview.start()
         self.append_log(f"Alineación: {title} (acomoda la cámara y pica Comenzar)")
@@ -1283,10 +1368,10 @@ class MainWindow(QMainWindow):
     def on_align_no_sofia(self, reason):
         # La ventana se queda abierta con la foto, para ver qué vio la cámara
         if self.align_window is not None:
-            self.align_window.fallar(f"¡No hay un SOFIA a la vista! (cámara {self.align_camera})")
+            self.align_window.fallar(f"¡No hay un SOFIA a la vista! ({self._camera_name(self.align_camera)})")
         self.append_log(f"Alineación: no hay un SOFIA a la vista ({reason})")
         self._align_popup("⚠  ¡NO HAY UN SOFIA A LA VISTA!",
-                          f"La cámara {self.align_camera} no ve los 4 ArUco "
+                          f"«{self._camera_name(self.align_camera)}» no ve los 4 ArUco "
                           "(atrás de este aviso está la foto que tomó).<br>"
                           "Si es la cámara equivocada: <b>Alineación → Cámara del módulo → "
                           f"Buscar cámaras</b>.<br><small>{reason}</small>",

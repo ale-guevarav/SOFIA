@@ -328,6 +328,7 @@
 	
 	Figure~\ref{fig:SOFIA_DIAGRAM} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (connected to a gesture capture camera and an overhead misalignment camera viewing the Master Module framed by four corner ArUco markers) and the Control PCB via Wi-Fi or Bluetooth protocols, while an external 5~V DC power supply feeds the board through a 5~V rail. Onboard processing is handled by an ESP32-C3 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is provided through an RS-485 transceiver connected via UART to the ESP32-C3, routing a Modbus bus through JST-PH male and female connectors.
 	
+	\linelabel{ln:firmware-communication} The ESP32-C3 communicates with the host PC through BLE and controls the servomotors through the PCA9685 PWM drivers. The vision-based diagnosis sends angular corrections to the controller through the BLE communication protocol. RS-485 provides an interface for inter-module communication using Modbus. The firmware, message formats, and communication protocol are documented in the project repository~\cite{sofia_repository}.
 	
 	\begin{figure}[!t]
 		\centering
@@ -779,7 +780,29 @@
 	\subsubsection{Exclusion of ResNet18}
 	
 	\linelabel{ln:resnet}In the first run, a ResNet18 model \cite{resnet} pretrained on ImageNet was also evaluated. Despite having approximately ten times more parameters (13.3~M), it was less accurate than the lightweight CNN (Table~\ref{tab:results_Vision_Train}). This suggests that features learned from ImageNet may offer limited advantages when estimating small pixel displacements. Due to its lower performance and higher computational cost, ResNet18 was excluded from the second run.
-
+	
+	\subsubsection{Live Diagnosis Mode}
+	
+	\label{sec:Live Diagnosis Mode}
+	
+	\linelabel{ln:live-diagnosis}
+	The live diagnosis follows the state machine shown
+	in Fig.~\ref{fig:live_diagnosis}. Each actuation
+	command increments a version counter ($v$).
+	Once all 16 plates are stationary, the corresponding
+	image is analyzed only once per version, preventing
+	the analysis of images captured during motion.
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=\columnwidth]
+		{figures/State_machine_livemode}
+		\caption{State machine of the live misalignment
+			diagnosis, synchronizing image analysis with
+			module actuation.}
+		\label{fig:live_diagnosis}
+	\end{figure}
+	
 	\subsection{Computer Vision Gesture Recognition System Architecture}
 	
 	\linelabel{ln:intro-vis}The computer vision subsystem of SOFIA recognizes human gestures in real time and translates them into discrete action labels. Using a webcam, the modular Python application captures user movements to enable gesture-based interaction with the robot's control and actuation systems.
@@ -963,7 +986,73 @@
 	\textbf{Second run.} The CNN achieved a mean error of $0.204^\circ$ and a maximum error of $3.3^\circ$ across 24\,000 plate samples, outperforming the other methods in overall mean error. The geometric method became less accurate near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the shorter arm of the real unit reduces displacement per degree, increasing the impact of pixel-level errors. However, its maximum error decreased to $5.9^\circ$. Consequently, the hybrid rule ranked second in overall mean error ($0.329^\circ$), as it relies on the geometric estimate near zero. Its inspection flags also showed limited reliability: 873 of the 901 flags corresponded to errors of the geometric method rather than the CNN. The CNN was therefore selected as the default method, while the geometric method remains an alternative when a GPU is unavailable.
 
 	\linelabel{ln:findings}Two main findings were identified. First, increasing the number and realism of training images improved CNN performance despite the more challenging geometry. Second, changes in the module geometry may require model retraining, as the CNN from the first run achieved an error of $1.6^\circ$ when evaluated on the second unit configuration.
-
+	
+	\subsection{Experimental Validation of the Vision-Based Misalignment Diagnosis}
+	\label{sec:experimental_misalignment}
+	
+	After the selection of the CNN as the primary method for angular estimation, we made an experimental evaluation using images from the physical SOFIA prototype. The evaluation considered estimation error, and misalignment state classification accuracy.
+	
+	\begin{table}[!t]
+		\centering
+		\caption{Simulation Test Error ($^\circ$) and State Accuracy}
+		\label{results_Vision_Train}
+		\scriptsize
+		\setlength{\tabcolsep}{2.5pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c c c c@{}}
+			\toprule
+			Method & Mean & Max & $0$--$5^\circ$ & $>15^\circ$ & States\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{First run (simplified plates, 2000 images)}}\\
+			Geometric & 0.539 & 74.0 & \textbf{0.13} & 1.30 & 97.2\,\%\\
+			CNN & 0.248 & 4.4 & 0.18 & \textbf{0.36} & 96.3\,\%\\
+			ResNet18 & 0.293 & 4.1 & 0.21 & 0.43 & 95.9\,\%\\
+			Hybrid & \textbf{0.223} & 4.4 & \textbf{0.13} & \textbf{0.36} & \textbf{97.2\,\%}\\
+			\midrule
+			\multicolumn{6}{@{}l}{\textit{Second run (real unit simulation, 10\,000 images)}}\\
+			Geometric & 0.521 & 5.9 & 0.33 & 1.60 & 94.1\,\%\\
+			CNN & \textbf{0.204} & \textbf{3.3} & \textbf{0.17} & \textbf{0.41} & \textbf{96.8\,\%}\\
+			Hybrid & 0.329 & \textbf{3.3} & 0.33 & \textbf{0.41} & 94.1\,\%\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\linelabel{ln:res-cnn}
+	Table~\ref{results_Vision_Train} compares the
+	evaluated methods on independent test sets of 300
+	and 1500 synthetic images. The datasets differ in
+	module geometry and angular distribution.
+	
+	\textbf{First run.} The geometric method achieved
+	the lowest error near zero ($0.13^\circ$), but
+	produced errors of up to $74^\circ$. The hybrid
+	method achieved the lowest mean error ($0.223^\circ$).
+	
+	\textbf{Second run.} Across 24\,000 plate samples,
+	the CNN achieved the lowest mean error ($0.204^\circ$).
+	The shorter mechanical arm reduced geometric
+	accuracy near zero ($0.13^\circ$ to $0.33^\circ$).
+	Furthermore, 873 of 901 hybrid inspection flags
+	corresponded to geometric estimation errors.
+	Consequently, the CNN was selected as the default
+	method.
+	
+	The CNN model was further tuned using 400 real photographs of the physical SOFIA model As shown in Fig.~\ref{fig:cnn_training_comparison}, the initial
+	CNN and ResNet18 achieved minimum validation errors
+	of $0.249^\circ$ and $0.300^\circ$, respectively.
+	The second CNN achieved $0.205^\circ$ at epoch 24,
+	while the fine-tuned CNN achieved $0.216^\circ$
+	at epoch 21.
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=\columnwidth]
+		{figures/cnn_training_comparison}
+		\caption{Validation error evolution across training
+			stages. Markers indicate the best validation epochs.}
+		\label{fig:cnn_training_comparison}
+	\end{figure}
+	
 	\subsection{Functional Validation of the Vision Gesture Recognition Subsystem}
 	
 	\linelabel{ln:res-func-intro}The computer vision subsystem was tested through real-time webcam experiments to verify its ability to recognize the five predefined gestures. The tests focused on body and hand landmark detection, geometric gesture classification, and temporal validation.

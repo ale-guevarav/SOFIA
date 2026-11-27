@@ -1,0 +1,87 @@
+{
+  "descripcion": "Corrimiento del centro de cada placa (derecha) respecto al diseño, en px de la imagen enderezada (1 px = 1 mm; x a la derecha, y hacia abajo). Medido con fotos de las placas alineadas a mano. Lo usa preprocesamiento.usar_centros_reales().",
+  "fecha": "2026-11-26",
+  "fotos_alineadas": 7,
+  "placas": [
+    {
+      "numero": 0,
+      "dx_px": 7.94,
+      "dy_px": -8.4
+    },
+    {
+      "numero": 1,
+      "dx_px": 5.6,
+      "dy_px": -6.15
+    },
+    {
+      "numero": 2,
+      "dx_px": 3.65,
+      "dy_px": -9.29
+    },
+    {
+      "numero": 3,
+      "dx_px": -3.04,
+      "dy_px": -10.81
+    },
+    {
+      "numero": 4,
+      "dx_px": 8.98,
+      "dy_px": -9.94
+    },
+    {
+      "numero": 5,
+      "dx_px": 4.15,
+      "dy_px": -5.96
+    },
+    {
+      "numero": 6,
+      "dx_px": -0.39,
+      "dy_px": -6.16
+    },
+    {
+      "numero": 7,
+      "dx_px": -4.49,
+      "dy_px": -6.75
+    },
+    {
+      "numero": 8,
+      "dx_px": 8.11,
+      "dy_px": -4.78
+    },
+    {
+      "numero": 9,
+      "dx_px": 5.51,
+      "dy_px": -6.13
+    },
+    {
+      "numero": 10,
+      "dx_px": 0.5,
+      "dy_px": -2.0
+    },
+    {
+      "numero": 11,
+      "dx_px": -6.5,
+      "dy_px": -1.0
+    },
+    {
+      "numero": 12,
+      "dx_px": 4.34,
+      "dy_px": -4.35
+    },
+    {
+      "numero": 13,
+      "dx_px": 5.82,
+      "dy_px": -3.32
+    },
+    {
+      "numero": 14,
+      "dx_px": -0.92,
+      "dy_px": 1.01
+    },
+    {
+      "numero": 15,
+      "dx_px": -4.76,
+      "dy_px": 1.77
+    }
+  ]
+}
