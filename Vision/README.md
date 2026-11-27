@@ -808,13 +808,14 @@ python -m evaluacion.generate_report metrics/sesion_AAAAMMDD_HHMMSS.json
 * [x] Menú **Alineación** en la GUI: *Tomar ceros* y *Alinear* (una por una, en lazo cerrado), con cámara en vivo y ventana de progreso.
 * [x] Comando **AJUSTE** (`0x05`) y ceros guardados que se mandan al conectar.
 * [x] Selección de la cámara de poses y la del módulo por su nombre del sistema.
+* [x] Evitar detecciones repetidas: confirmación temporal (5 frames) y envío de POSE solo cuando cambia la postura.
+* [x] Respuestas físicas de los 16 módulos: cada postura dibuja su figura en las 16 unidades (ESP32 y Webots).
 
-### Próximas etapas
 
-* [ ] Máquina de estados para evitar detecciones repetidas.
+### Próximas etapas opcionales
+
 * [ ] Implementación de la lógica del juego.
 * [ ] Medición de la latencia completa (gesto → movimiento).
-* [ ] Respuestas físicas de los 16 módulos según las acciones del juego.
 
 ---
 
