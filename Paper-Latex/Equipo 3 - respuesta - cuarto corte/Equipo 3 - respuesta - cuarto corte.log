@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  25 NOV 2026 13:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  26 NOV 2026 17:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -222,8 +222,8 @@ Package: xr 2024-12-22 v6.00 eXternal References (DPC)
 \c@LabDST@cN=\count307
 )
 Package xr Info: IMPORTING LABELS FROM ../Equipo 3 - cuarto corte/Equipo 3 - cu
-arto corte.aux on input line 36.
-LaTeX Font Info:    Trying to load font information for T1+ptm on input line 37
+arto corte.aux on input line 37.
+LaTeX Font Info:    Trying to load font information for T1+ptm on input line 38
 .
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1ptm.fd
@@ -236,20 +236,20 @@ File: l3backend-pdftex.def 2026-07-20 L3 backend support: PDF output (pdfTeX)
 ) (Equipo 3 - respuesta - cuarto corte.aux)
 \openout1 = `"Equipo 3 - respuesta - cuarto corte.aux"'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -302,235 +302,76 @@ ii
 \everyMPtoPDFconversion=\toks28
 )
 LaTeX Font Info:    Trying to load font information for OT1+ztmcm on input line
- 39.
+ 40.
  (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ztmcm.fd
 File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OML+ztmcm on input line
- 39.
+ 40.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omlztmcm.fd
 File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OMS+ztmcm on input line
- 39.
+ 40.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsztmcm.fd
 File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OMX+ztmcm on input line
- 39.
+ 40.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omxztmcm.fd
 File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
 )
-LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 3
-9.
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 4
+0.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 39.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 39.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 39.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.68 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.72 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.76 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.80 	{}
-        
-Use A, P o N.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 40.
 
 [1
 
 {C:/Users/Marrc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Marr
 c/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
+37.
 
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.85 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.93 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.97 	{}
-        
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.104 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.108 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.112 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.116 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.123 	{}
-         
-Use A, P o N.
-
-[2]
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.127 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.131 	{}
-         
-Use A, P o N.
-
-
-! Class LabDSTresponse Error: Estado desconocido `'.
-
-See the LabDSTresponse class documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.135 	{}
-         
-Use A, P o N.
-
-[3] (Equipo 3 - respuesta - cuarto corte.aux)
+(C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+)
+[2] [3] (Equipo 3 - respuesta - cuarto corte.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 3566 strings out of 467501
- 53936 string characters out of 5408550
- 501216 words of memory out of 5000000
- 32778 multiletter control sequences out of 15000+600000
- 657144 words of font info for 75 fonts, out of 8000000 for 9000
+ 3589 strings out of 467501
+ 54288 string characters out of 5408550
+ 497959 words of memory out of 5000000
+ 32792 multiletter control sequences out of 15000+600000
+ 659657 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,6n,79p,324b,197s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmsy10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/
-utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/
-utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmri8a.pfb>
-Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (3 pages, 72709 byt
+cmmi10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmsy10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/u
+rw/times/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/u
+rw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmri8a.pfb>
+Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (3 pages, 90740 byt
 es).
 PDF statistics:
- 38 PDF objects out of 1000 (max. 8388607)
+ 43 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

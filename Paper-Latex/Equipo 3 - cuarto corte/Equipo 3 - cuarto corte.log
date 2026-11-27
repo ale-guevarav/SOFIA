@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  25 NOV 2026 19:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  26 NOV 2026 17:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -626,24 +626,37 @@ Underfull \hbox (badness 2401) in paragraph at lines 818--819
 \OT1/ptm/m/n/10 ges-ture over-lap, and soft-ware in-te-gra-tion prompted tar-
  []
 
-<figures/sofia_pcb_schematic.png, id=54, 1154.81438pt x 627.09282pt>
-File: figures/sofia_pcb_schematic.png Graphic file (type png)
-<use figures/sofia_pcb_schematic.png>
-Package pdftex.def Info: figures/sofia_pcb_schematic.png  used on input line 85
+
+
+pdfTeX warning: pdflatex.exe (file ./figures/sofia_pcb_schematic.pdf): PDF incl
+usion: found PDF version <1.7>, but at most version <1.5> allowed
+<figures/sofia_pcb_schematic.pdf, id=54, 845.07724pt x 597.55246pt>
+File: figures/sofia_pcb_schematic.pdf Graphic file (type pdf)
+<use figures/sofia_pcb_schematic.pdf>
+Package pdftex.def Info: figures/sofia_pcb_schematic.pdf  used on input line 85
 3.
-(pdftex.def)             Requested size: 516.0pt x 280.20845pt.
-<figures/sofia_pcb.png, id=55, 731.73375pt x 625.58719pt>
-File: figures/sofia_pcb.png Graphic file (type png)
-<use figures/sofia_pcb.png>
-Package pdftex.def Info: figures/sofia_pcb.png  used on input line 870.
-(pdftex.def)             Requested size: 516.0pt x 441.17267pt.
-[7]
+(pdftex.def)             Requested size: 387.0pt x 210.0319pt.
+
+
+pdfTeX warning: pdflatex.exe (file ./figures/sofia_pcb.pdf): PDF inclusion: fou
+nd PDF version <1.7>, but at most version <1.5> allowed
+<figures/sofia_pcb.pdf, id=56, 614.295pt x 794.97pt>
+File: figures/sofia_pcb.pdf Graphic file (type pdf)
+<use figures/sofia_pcb.pdf>
+Package pdftex.def Info: figures/sofia_pcb.pdf  used on input line 870.
+(pdftex.def)             Requested size: 387.0pt x 323.29033pt.
+[7 <./figures/sofia_pcb_schematic.pdf>]
+Underfull \vbox (badness 1466) has occurred while \output is active []
+
+
+Underfull \vbox (badness 1466) has occurred while \output is active []
+
+
 Underfull \hbox (badness 1810) in paragraph at lines 941--942
 []  \OT1/ptm/m/n/10 Func-tional tests con-firmed the recog-ni-tion of START
  []
 
-[8 <./figures/sofia_pcb_schematic.png>] [9 <./figures/sofia_pcb.png>]
-(Equipo 3 - cuarto corte.bbl
+[8 <./figures/sofia_pcb.pdf>] [9] (Equipo 3 - cuarto corte.bbl
 Underfull \hbox (badness 2142) in paragraph at lines 25--27
 []\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - 
 con-texto,
@@ -656,10 +669,10 @@ L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7111 strings out of 467501
- 122008 string characters out of 5408550
- 597037 words of memory out of 5000000
- 36234 multiletter control sequences out of 15000+600000
+ 7116 strings out of 467501
+ 122164 string characters out of 5408550
+ 597105 words of memory out of 5000000
+ 36239 multiletter control sequences out of 15000+600000
  679325 words of font info for 133 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,10n,79p,1126b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -685,9 +698,9 @@ KTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/Marrc/AppData/Local/Programs
 /MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Program
 s/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Program
 s/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - cuarto corte.pdf" (10 pages, 954201 bytes).
+Output written on "Equipo 3 - cuarto corte.pdf" (10 pages, 746950 bytes).
 PDF statistics:
- 154 PDF objects out of 1000 (max. 8388607)
+ 158 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
