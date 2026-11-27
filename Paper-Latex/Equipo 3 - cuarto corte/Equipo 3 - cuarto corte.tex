@@ -301,6 +301,7 @@
 	
 	Figure~\ref{fig:SOFIA_DIAGRAM} \linelabel{ln:sim_architecture} illustrates the system architecture and signal flow of the SOFIA demonstrator. Telemetry and motion commands are communicated wirelessly between a central host PC (connected to a gesture capture camera and an overhead misalignment camera viewing the Master Module framed by four corner ArUco markers) and the Control PCB via Wi-Fi or Bluetooth protocols, while an external 5~V DC power supply feeds the board through a 5~V rail. Onboard processing is handled by an ESP32-C3 microcontroller, which interfaces with two PCA9685 PWM drivers over $\text{I}^2\text{C}$ to control a total of 32 servos. Driver 1 manages channels CH1--CH16 (grey group), while Driver 2 addresses channels CH17--CH32 (blue group, labeled CH1--CH16 on the second module) across the Master Module actuator array. \linelabel{ln:interconn}Interconnectivity between boards is provided through an RS-485 transceiver connected via UART to the ESP32-C3, routing a Modbus bus through JST-PH male and female connectors.
 	
+	\linelabel{ln:firmware-communication} The ESP32-C3 communicates with the host PC through BLE and controls the servomotors through the PCA9685 PWM drivers. The vision-based diagnosis sends angular corrections to the controller through the BLE communication protocol. RS-485 provides an interface for inter-module communication using Modbus. The firmware, message formats, and communication protocol are documented in the project repository~\cite{sofia_repository}.
 	
 	\begin{figure}[!t]
 		\centering
