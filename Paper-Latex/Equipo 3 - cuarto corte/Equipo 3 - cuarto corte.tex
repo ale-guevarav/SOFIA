@@ -69,22 +69,49 @@
 	
 	\label{sec:intro}
 	
-	\IEEEPARstart{S}{OFIA} \linelabel{ln:intro1}is a modular robotic installation composed of 16
-	mechatronic units arranged in a two-dimensional honeycomb configuration, with each
-	unit providing two rotational degrees of freedom actuated by servomotors. The
-	system aims to achieve coordinated control of the multiple actuators while
-	enabling interaction through static and dynamic human gestures. For this
-	purpose, SOFIA integrates embedded control, inter-module communication, and an
-	external computer vision system for gesture recognition.
+	\IEEEPARstart{S}{OFIA} \linelabel{ln:intro1}
+	is a modular kinetic surface composed of 16
+	electromechanical units arranged in a two-dimensional
+	honeycomb configuration, each providing two rotational
+	degrees of freedom. Accurate estimation of the
+	orientation of these units is essential for identifying
+	angular misalignments that may affect the coordinated
+	behavior of the surface.
 	
-	\linelabel{ln:intro-cap}The SOFIA system requires the
-	integration of mechanical actuation, servo control, embedded processing, and
-	communication subsystems. \linelabel{ln:intro-32}The complete demonstrator
-	requires the coordinated control of 32 actuators through
-	multiple PWM signals. The embedded controller must coordinate
-	the desired actuator positions, while the communication architecture should
-	support the future integration of additional SOFIA modules without
-	significantly increasing wiring and control complexity. This work proposes a vision-based approach for angular misalignment diagnosis and closed-loop orientation correction.
+	\linelabel{ln:intro-vision}
+	Conventional servomotor position commands do not
+	directly measure the actual inclination of each
+	platform. Mechanical backlash, wear, and external
+	disturbances may therefore produce deviations
+	between commanded and actual orientations.
+	To address this limitation, this study investigates
+	a vision-based diagnosis approach that estimates
+	the two tilt angles of the 16 hexagonal platforms
+	using a single overhead camera, without requiring
+	dedicated angular sensors on each module.
+	
+	\linelabel{ln:intro-cap}
+	The proposed methodology combines image rectification,
+	neural network-based angular estimation, and datasets
+	obtained from both simulation and physical image
+	acquisition. Synthetic images generated in Webots
+	were used to develop and evaluate the initial
+	estimation models. Additionally, real photographs
+	of the complete SOFIA module have been acquired
+	to support subsequent model adaptation and
+	experimental validation under physical conditions.
+	This approach establishes a foundation for
+	vision-based misalignment diagnosis and future
+	closed-loop orientation correction.
+	
+	\linelabel{ln:intro-32}
+	The SOFIA demonstrator also integrates 32
+	servomotors, an ESP32-C3 microcontroller,
+	two PCA9685 PWM drivers, and an RS-485
+	communication interface. These subsystems
+	provide the embedded actuation and communication
+	architecture supporting the development
+	of the complete system.
 	
 	\subsection{Problem Statement and Research Question}
 	The hexagonal platforms of SOFIA are actuated by low-cost micro-servomotors \cite{sofia_architecture}. Gear backlash, mechanical wear, and accidental manual contact may introduce angular misalignment across the surface, particularly in the absence of external joint feedback. Instrumenting all 16 units with dedicated angle sensors would increase wiring complexity, moving mass, and hardware cost.
