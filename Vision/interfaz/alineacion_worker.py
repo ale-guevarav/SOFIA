@@ -54,7 +54,7 @@ ESPERA_CEROS_S = 0.15           # TOMAR CEROS: entre unidad y unidad
 ESPERA_REVISION_S = 1.0         # antes de la foto de revisión
 FOTOS_CALENTAR = 15             # la cámara tarda unos cuadros en ajustar la luz
 PASOS_BARRA = 100               # resolución de la barra por unidad
-INTENTOS_MAX = 20               # ALINEAR: no pasa de unidad hasta OK o hasta estos intentos
+INTENTOS_MAX = 10               # ALINEAR: no pasa de unidad hasta OK o hasta estos intentos
 EMPEORA_GRADOS = 0.5            # un eje que crece más que esto (mismo lado) = servo al revés
 EJE_MINIMO_GRADOS = 1.0         # ejes más chicos no se usan para decidir
 

@@ -1,6 +1,6 @@
 {
   "descripcion": "Ceros de los servos (grados que suma el ESP32 a X, Y). Los mide la GUI de visión (menú Alineación).",
-  "fecha": "2026-11-27T12:34:54",
+  "fecha": "2026-11-27T13:39:03",
   "metodo": "cnn",
   "unidades": [
     {
@@ -22,19 +22,19 @@
       "x": -20.0,
       "y": -20.0,
       "signo_x": -1,
-      "signo_y": -1
+      "signo_y": 1
     },
     {
       "numero": 3,
-      "x": -13.9,
+      "x": -6.5,
       "y": -20.0,
       "signo_x": -1,
-      "signo_y": -1
+      "signo_y": 1
     },
     {
       "numero": 4,
       "x": -20.0,
-      "y": -16.7,
+      "y": -14.5,
       "signo_x": -1,
       "signo_y": -1
     },
@@ -47,16 +47,16 @@
     },
     {
       "numero": 6,
-      "x": -13.2,
+      "x": -10.1,
       "y": 20.0,
       "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 7,
-      "x": -20.0,
+      "x": -12.6,
       "y": -20.0,
-      "signo_x": -1,
+      "signo_x": 1,
       "signo_y": -1
     },
     {
@@ -76,13 +76,13 @@
     {
       "numero": 10,
       "x": -20.0,
-      "y": 20.0,
-      "signo_x": -1,
-      "signo_y": 1
+      "y": 4.0,
+      "signo_x": 1,
+      "signo_y": -1
     },
     {
       "numero": 11,
-      "x": 7.9,
+      "x": 0.6,
       "y": -20.0,
       "signo_x": 1,
       "signo_y": -1
@@ -96,15 +96,15 @@
     },
     {
       "numero": 13,
-      "x": 5.6,
+      "x": -14.1,
       "y": -20.0,
       "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 14,
-      "x": -16.3,
-      "y": -20.0,
+      "x": -20.0,
+      "y": -5.4,
       "signo_x": -1,
       "signo_y": -1
     },
