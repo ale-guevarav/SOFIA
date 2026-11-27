@@ -51,6 +51,7 @@ Alignment/
 │   ├── COMPARACION.md          geométrico vs CNN vs híbrido
 │   ├── marcadores_imprimir.png hoja para el marco del módulo real
 │   ├── diagnosticos/           reportes guardados desde la app (no se suben)
+│   ├── centros_reales.json     centro de cada placa en el módulo real (fotos alineadas a mano)
 │   └── ceros_esp32.json        ceros de los servos (menú Alineación de la GUI de visión)
 │
 └── requirements.txt

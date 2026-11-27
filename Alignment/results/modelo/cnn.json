@@ -1,8 +1,8 @@
 {
   "modelo": "cnn",
-  "sesion": "sesion_20261027_162614",
-  "epoca": 24,
-  "mae_val_grados": 0.2046,
-  "publicado": "2026-10-28T16:13:16",
-  "origen": "build\\entrenados\\cnn_sesion_20261027_162614\\modelo.pt"
+  "sesion": "sesion_real_20261126",
+  "epoca": 21,
+  "mae_val_grados": 0.2156,
+  "publicado": "2026-11-26T21:32:26",
+  "origen": "build\\entrenados\\cnn_real_v3\\modelo.pt"
 }

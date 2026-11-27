@@ -88,9 +88,38 @@ def homografia(centros):
     return cv2.getPerspectiveTransform(origen, destino)
 
 
+# CENTROS REALES (módulo físico). En el módulo real cada placa, derecha,
+# no queda exactamente donde dice el diseño (hasta ~1 cm). Su corrimiento
+# se midió con fotos de las placas alineadas a mano y está en
+# results/centros_reales.json. Con usar_centros_reales(True) los recortes
+# se centran en la placa real (cámara / fotos reales); Webots usa el diseño.
+_corrimientos = None        # {numero de la app: (dx, dy)} en px de la enderezada (x der., y abajo)
+
+
+def usar_centros_reales(activo):
+    """True: recortes centrados en las placas reales (si existe el JSON). Regresa si quedó activo."""
+    global _corrimientos
+    _corrimientos = None
+    if activo:
+        try:
+            import json
+            import rutas
+            with open(rutas.CENTROS_REALES, encoding="utf-8") as archivo:
+                datos = json.load(archivo)
+            _corrimientos = {int(p["numero"]): (float(p["dx_px"]), float(p["dy_px"]))
+                             for p in datos["placas"]}
+        except (OSError, ValueError, KeyError, TypeError):
+            _corrimientos = None
+    return _corrimientos is not None
+
+
 def centro_panel_px(fila, columna):
     """Centro del hexágono (en 0,0) en la imagen enderezada."""
-    return g.uv_a_pixel(*g.mundo_a_imagen(*g.panel_xy(fila, columna)))
+    cx, cy = g.uv_a_pixel(*g.mundo_a_imagen(*g.panel_xy(fila, columna)))
+    if _corrimientos:
+        dx, dy = _corrimientos.get(g.numero_panel(fila, columna), (0.0, 0.0))
+        cx, cy = cx + dx, cy + dy
+    return cx, cy
 
 
 def recortar(enderezada):

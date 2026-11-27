@@ -71,6 +71,9 @@ def cargar_diagnosticador():
     if _diagnosticador is None:
         from diagnosticador import Diagnosticador   # importa PyTorch solo aquí
         _diagnosticador = Diagnosticador(METODO)
+    # La cámara del módulo es el módulo REAL: recortes en los centros reales
+    import preprocesamiento as pp
+    pp.usar_centros_reales(True)
     return _diagnosticador
 
 
@@ -421,6 +424,7 @@ class VistaCamaraWorker(QThread):
         except ImportError as error:
             self.error.emit(f"No se encontró el diagnóstico de Alignment ({error})")
             return
+        pp.usar_centros_reales(True)
 
         camara = cv2.VideoCapture(self.indice_camara)
         if not camara.isOpened():
