@@ -43,11 +43,11 @@
 	\maketitle
 
 	\begin{abstract}
-		SOFIA is a modular kinetic surface that responds to the gestures of a user. This work presents its graphical user interface (GUI): the window that shows the camera, controls the gesture detection, and sends each recognized gesture to the robot or to its simulation. The GUI runs the video processing and each communication link in separate threads, so that it never freezes. Its behavior is explained with three state machines: the processing thread, which can be started, paused, resumed, and stopped; the reliable sending of commands, with acknowledgements and retransmission; and the link supervision. The same commands can be sent to the robot, to a Webots simulation, or to both at the same time, which turns the simulation into a digital twin of the robot.
-	\end{abstract}
+		SOFIA is a modular kinetic surface that responds to the gestures of a user. This work presents its graphical user interface (GUI): the window that shows the camera, controls the gesture detection, and sends each recognized gesture to the robot or to its simulation. The GUI runs the video processing and each communication link in separate threads, so that it never freezes. Its behavior is explained with three state machines: the processing thread, which can be started, paused, resumed, and stopped; the reliable sending of commands, with acknowledgements and retransmission; and the link supervision. The same commands can be sent to the robot, to a Webots simulation, or to both at the same time, which turns the simulation into a digital twin of the robot. The GUI also aligns the robot: a second camera measures the tilt of every unit, and the GUI computes and sends a new zero for each servo, unit by unit, in a closed loop. In an automatic test against the simulated robot, all commands were acknowledged with 3\,\% losses and 2\,\% damaged bytes, none was executed twice, and the link recovered by itself from every interruption.
+ \end{abstract}
 
 	\begin{IEEEkeywords}
-		Graphical user interface, multithreading, state machines, communication protocol, gesture recognition, Webots, digital twin.
+		Graphical user interface, multithreading, state machines, communication protocol, gesture recognition, Webots, digital twin, alignment.
 	\end{IEEEkeywords}
 
 
@@ -58,7 +58,7 @@
 
 	\section{Architecture}
 
-	The GUI was built with PySide6 \cite{pyside6}, the Python version of Qt, because it provides threads that are integrated with the interface (\texttt{QThread}), signals to pass data between threads safely, and a way to pause a thread without consuming CPU. Fig.~\ref{fig:arq} shows the threads. The \emph{GUI thread} only draws the window and handles the buttons. The \emph{vision thread} reads the camera and runs the detection, which takes tens of milliseconds per frame. Each \emph{link thread} talks to one target, the robot over Bluetooth Low Energy \cite{bleak} or the simulation over a local TCP socket, because waiting for an answer may take from milliseconds to seconds. A last thread receives the images of a virtual camera of the simulation. Threads never touch the widgets: they send their results to the GUI thread through Qt signals.
+	The GUI was built with PySide6 \cite{pyside6}, the Python version of Qt, because it provides threads that are integrated with the interface (\texttt{QThread}), signals to pass data between threads safely, and a way to pause a thread without consuming CPU. Fig.~\ref{fig:arq} shows the threads. The \emph{GUI thread} only draws the window and handles the buttons. The \emph{vision thread} reads the camera and runs the detection, which takes tens of milliseconds per frame. Each \emph{link thread} talks to one target, the robot over Bluetooth Low Energy \cite{bleak} or the simulation over a local TCP socket, because waiting for an answer may take from milliseconds to seconds. Another thread receives the images of a virtual camera of the simulation, and an \emph{alignment thread} exists only while the robot is being aligned (Section~\ref{sec:align}). Threads never touch the widgets: they send their results to the GUI thread through Qt signals.
 
 	\begin{figure}[!t]
 		\centering
@@ -67,28 +67,32 @@
 			box/.style={draw, rounded corners=2pt, align=center, minimum height=0.6cm, inner sep=2pt, fill=white},
 			arr/.style={-{Stealth[length=1.6mm]}, thick}
 			]
-			\node[box, fill=blue!8, minimum width=7.6cm] (gui) at (0,0) {GUI thread: video, result, controls, event log};
-			\node[box, fill=green!10, minimum width=1.7cm] (vis) at (-2.9,-1.3) {Vision\\thread};
-			\node[box, fill=orange!12, minimum width=1.7cm] (rob) at (-0.95,-1.3) {Robot link\\(BLE)};
-			\node[box, fill=orange!12, minimum width=1.7cm] (sim) at (0.95,-1.3) {Simulation\\link (TCP)};
-			\node[box, fill=gray!12, minimum width=1.7cm] (cam) at (2.9,-1.3) {Virtual\\camera};
-			\node[box, minimum width=1.7cm] (c) at (-2.9,-2.55) {Camera};
-			\node[box, minimum width=1.7cm] (r) at (-0.95,-2.55) {Robot\\controller};
-			\node[box, minimum width=3.6cm] (w) at (1.9,-2.55) {Webots simulation\\(16 units)};
-			\draw[arr] (vis) -- node[left, font=\tiny]{frame, gesture} (vis |- gui.south);
-			\draw[arr] (gui.south -| rob) -- node[left, font=\tiny]{commands} (rob);
+			\node[box, fill=blue!8, minimum width=8.2cm] (gui) at (0,0) {GUI thread: video, result, controls, event log};
+			\node[box, fill=green!10, minimum width=1.45cm] (vis) at (-3.3,-1.3) {Vision\\thread};
+			\node[box, fill=green!10, minimum width=1.45cm, dashed] (ali) at (-1.65,-1.3) {Alignment\\thread};
+			\node[box, fill=orange!12, minimum width=1.45cm] (rob) at (0,-1.3) {Robot link\\(BLE)};
+			\node[box, fill=orange!12, minimum width=1.45cm] (sim) at (1.65,-1.3) {Simulation\\link (TCP)};
+			\node[box, fill=gray!12, minimum width=1.45cm] (cam) at (3.3,-1.3) {Virtual\\camera};
+			\node[box, minimum width=1.45cm] (c) at (-3.3,-2.55) {Pose\\camera};
+			\node[box, minimum width=1.45cm] (mc) at (-1.65,-2.55) {Module\\camera};
+			\node[box, minimum width=1.45cm] (r) at (0,-2.55) {Robot\\controller};
+			\node[box, minimum width=3.1cm] (w) at (2.475,-2.55) {Webots simulation\\(16 units)};
+			\draw[arr] (vis) -- node[left, font=\tiny]{gesture} (vis |- gui.south);
+			\draw[arr] (ali) -- node[left, font=\tiny]{zeros} (ali |- gui.south);
+			\draw[arr] (gui.south -| rob) -- node[left, font=\tiny]{cmds} (rob);
 			\draw[arr] (gui.south -| sim) -- (sim);
 			\draw[arr] (cam) -- node[right, font=\tiny]{images} (cam |- gui.south);
 			\draw[arr] (c) -- (vis);
+			\draw[arr] (mc) -- (ali);
 			\draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (rob) -- (r);
 			\draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (sim) -- (sim |- w.north);
 			\draw[arr] (cam |- w.north) -- (cam);
 		\end{tikzpicture}
-		\caption{Threads of the GUI. Each box below the GUI thread runs in its own thread and only communicates with it through Qt signals.}
+		\caption{Threads of the GUI. Each box below the GUI thread runs in its own thread and only communicates with it through Qt signals; the alignment thread (dashed) only exists while aligning.}
 		\label{fig:arq}
 	\end{figure}
 
-	The window has the video on the left and, on the right, the controls in the order in which they are used: detection (start, pause, resume, stop), mode, result, targets (robot and simulation), and an event log with every command sent and its answer. There are three modes: \emph{game}, where each new gesture is sent once; \emph{tracking}, where the position of the right hand is sent continuously; and \emph{test}, where the GUI asks the user for gestures and measures how often and how fast they are recognized. The image is shown as a mirror, as in a selfie; since the detector names the hands for a non-mirrored image, the GUI swaps them, so that tracking follows the real right hand and ignores the other one.
+	The window has the video on the left and, on the right, the controls in the order in which they are used: detection (start, pause, resume, stop, the pose camera, and the \emph{Alignment} menu), mode, result, targets (robot and simulation), and an event log with every command sent and its answer. The cameras are listed by the name the operating system gives them (for example, the model of the webcam) and only if they are connected, so the user cannot pick a missing camera or the same one for the user and for the robot. There are three modes: \emph{game}, where each new gesture is sent once; \emph{tracking}, where the position of the right hand is sent continuously; and \emph{test}, where the GUI asks the user for gestures and measures how often and how fast they are recognized. The image is shown as a mirror, as in a selfie; since the detector names the hands for a non-mirrored image, the GUI swaps them, so that tracking follows the real right hand and ignores the other one.
 
 
 	\section{The Processing Thread}
@@ -120,7 +124,7 @@
 
 	\subsection{Messages}
 
-	Each message is a short frame: a start byte (\texttt{0xA5}), the type, a sequence number, the payload length, the payload (0--14 bytes), and a CRC-8 checksum that detects damaged frames. The messages are listed in Table~\ref{tab:msg}. A gesture is sent with POSE only when it changes, and the hand position with TRACK up to 20 times per second; TRACK is not acknowledged, since a newer position replaces an older one.
+	Each message is a short frame: a start byte (\texttt{0xA5}), the type, a sequence number, the payload length, the payload (0--14 bytes), and a CRC-8 checksum that detects damaged frames. The messages are listed in Table~\ref{tab:msg}. A gesture is sent with POSE only when it changes, and the hand position with TRACK up to 20 times per second; TRACK is not acknowledged, since a newer position replaces an older one. ADJUST (type \texttt{0x05}, 6 bytes) carries the unit, a flag that asks the unit to settle with a short shake, and the new zero of its two servos in tenths of a degree; the robot rejects zeros beyond $\pm20^\circ$.
 
 	\begin{table}[!t]
 		\centering
@@ -138,6 +142,7 @@
 			MODE & GUI $\rightarrow$ robot & Active mode (game, test, tracking)\\
 			PING & GUI $\rightarrow$ robot & Test of the link and heartbeat\\
 			STOP & GUI $\rightarrow$ robot & Go to a safe position\\
+			ADJUST & GUI $\rightarrow$ robot & New zero of the two servos of one unit\\
 			ACK / NACK & robot $\rightarrow$ GUI & Received / rejected, with an error code\\
 			\bottomrule
 		\end{tabularx}
@@ -169,7 +174,7 @@
 
 	\subsection{Link Supervision}
 
-	The link itself follows the state machine of Fig.~\ref{fig:link}. When the user presses \emph{connect}, the GUI searches for the robot and opens the link; on success, it sends the active mode. While connected, if nothing has been sent for 1~s, the GUI sends a PING (heartbeat), so that the robot can tell a quiet link from a lost one: if the robot receives nothing for 3~s, it moves to a safe position by itself. If the link is lost, the GUI shows it in the window and returns to DISCONNECTED without closing.
+	The link itself follows the state machine of Fig.~\ref{fig:link}. When the user presses \emph{connect}, the GUI searches for the robot and opens the link; on success, it sends the active mode and the 16 zeros saved by the last alignment (ADJUST), which replace the factory zeros of the firmware. While connected, if nothing has been sent for 1~s, the GUI sends a PING (heartbeat), so that the robot can tell a quiet link from a lost one: if the robot receives nothing for 3~s, it moves to a safe position by itself. If the link drops, or the robot stops answering for 3~s, the GUI marks it as RECONNECTING and tries again by itself after 1, 2, 4, and 8~s, and then every 10~s, until it succeeds or the user cancels; the application never closes.
 
 	\begin{figure}[!t]
 		\centering
@@ -177,11 +182,15 @@
 			\node[state, initial, initial text=] (des) at (0,0) {DISCON-\\NECTED};
 			\node[state] (bus) at (2.6,0) {SEARCH};
 			\node[state, fill=green!10] (con) at (5.2,0) {CONNEC-\\TED};
+			\node[state, fill=yellow!15] (rec) at (2.6,-2.1) {RECON-\\NECTING};
 			\draw[tr] (des) -- node[lb]{connect} (bus);
-			\draw[tr] (bus) -- node[lb]{found\\$\rightarrow$ MODE} (con);
-			\draw[tr] (bus) to[bend left=35] node[lb, below]{not found} (des);
+			\draw[tr] (bus) -- node[lb]{found $\rightarrow$\\MODE, zeros} (con);
+			\draw[tr] (bus) to[bend right=30] node[lb, above]{not found} (des);
 			\draw[tr] (con) edge[loop above] node[lb]{1 s quiet $\rightarrow$ PING} (con);
-			\draw[tr] (con) to[bend right=35] node[lb, above]{link lost / disconnect} (des);
+			\draw[tr] (con) to[bend right=55] node[lb, above]{disconnect} (des);
+			\draw[tr] (con) |- node[lb, right, pos=0.25]{lost or\\3 s no answer} (rec);
+			\draw[tr] (rec) -- node[lb, right]{retry 1, 2, 4,\\8, 10 s} (bus);
+			\draw[tr] (rec) -| node[lb, below, pos=0.3]{cancel} (des);
 		\end{tikzpicture}
 		\caption{State machine of the link supervision.}
 		\label{fig:link}
@@ -195,14 +204,45 @@
 	The GUI sends each command to \emph{every} connected target. With only the simulation connected, the whole system can be tested without the robot; with only the robot, it works as usual; and with both, every command reaches the robot and the simulation at the same time, which then works as a digital twin. The event log labels each answer with its target, so both responses can be compared.
 
 
+	\section{Aligning the Robot from the GUI}
+	\label{sec:align}
+
+	The servos are mounted by hand, so a unit commanded to $(0^\circ,0^\circ)$ may be tilted by several degrees. A second camera, the \emph{module camera}, looks at the array from above, and the GUI reuses the visual diagnosis of SOFIA: four ArUco markers rectify the image, and a small convolutional network estimates the two tilt angles of each unit. The \emph{Alignment} menu has two options. \emph{Take zeros} measures the 16 units once and stores the zero of every servo. \emph{Align} corrects, one by one and from the least to the most misaligned, the units that are not within $2^\circ$: it sends ADJUST with the new zero, waits, takes another picture, and repeats until the unit is aligned, up to four times. If an axis gets worse instead of better, the servo is mounted or wired the other way, so the GUI inverts the sign of that axis for that unit only. The zeros and signs are saved in a file that is sent to the robot on every connection.
+
+	Before starting, the GUI shows the module camera live, with the markers it sees, so the user can place it; aligning starts only when the four markers are visible. During the process the GUI sends STOP, stops sending gestures and positions, and shows the analyzed picture and a progress bar in a separate window; if the markers are lost, it warns that there is no SOFIA in view. Like the video processing, the alignment runs in its own thread, so the window remains responsive and the process can be canceled at any time.
+
 	\section{Verification}
 
-	The GUI was tested with the camera and the detection replaced by stubs, applying the controls in sequence: the thread went through LOADING, RUNNING, PAUSED, RUNNING, and STOPPED, and sent no frames while paused. The link was tested against a simulated robot: commands were acknowledged; a lost acknowledgement caused a retransmission with the same sequence number and a single execution; a robot that never answers produced three attempts and a failure; TRACK was limited to 20 frames per second; and a PING was sent after 1~s without traffic. With the Webots simulation, every gesture drew its pattern on the 16 units, and the units followed the sphere only in tracking mode. A preliminary test with the physical robot confirmed the wireless link and the movement of one unit. Pending are a quantitative measurement on the robot and the test of the digital twin with both targets connected.
+	The GUI was tested with the camera and the detection replaced by stubs, applying the controls in sequence: the thread went through LOADING, RUNNING, PAUSED, RUNNING, and STOPPED, and sent no frames while paused. The link was tested automatically against the controller of the simulated robot, using the same link code as the GUI (Table~\ref{tab:ver}). On a clean channel, the 100 gestures were acknowledged in 9.7~ms on average. With the simulated wireless channel, all 300 gestures were acknowledged, 39 of them after a retransmission, and each was executed exactly once; the same held when a new gesture was sent every 100~ms, and when tracking at 20~frames per second was mixed with a gesture every 2~s. When the simulated robot was switched off or stopped answering, the GUI detected it, reconnected by itself in all five repetitions, and the next gesture was acknowledged. A repeated frame was answered twice but executed once, a damaged frame was rejected, and the robot went to its safe position 3.02~s after the GUI went silent. The first run of this test found two errors in the link, which were corrected before the final run.
+
+ \begin{table}[!t]
+ \centering
+ \caption{Automatic test of the link against the simulated robot}
+ \label{tab:ver}
+ \scriptsize
+ \setlength{\tabcolsep}{2.5pt}
+ \renewcommand{\arraystretch}{1.08}
+ \begin{tabularx}{\columnwidth}{@{}P{2.7cm} Y@{}}
+ \toprule
+ Scenario & Result\\
+ \midrule
+ Clean channel, 100 gestures & 100/100 ACK; 9.7~ms mean, 14.4~ms p95\\
+ Wireless channel, 300 gestures & 300/300 ACK, 39 retransmitted, none executed twice; 105~ms mean\\
+ New gesture every 100~ms & 300/300 ACK; 319~ms mean\\
+ Tracking 20~Hz + gestures & 893 TRACK frames, 29/29 ACK, no false link loss\\
+ Robot switched off (5$\times$) & 5/5 reconnected; detected in 0.02~s\\
+ Robot not answering (5$\times$) & 5/5 detected in 2.0--2.2~s and recovered\\
+ Robot rules & Duplicate: 1 execution; bad CRC: NACK; safe state at 3.02~s\\
+ \bottomrule
+ \end{tabularx}
+ \end{table}
+
+ With the Webots simulation, every gesture drew its pattern on the 16 units, and the units followed the sphere only in tracking mode. On the physical robot, the GUI connected over Bluetooth, moved the 16 units with the five gestures and with tracking, and ran the alignment menu with the module camera. The alignment also exposed the limits of the hardware: some servos move their plate much less than commanded, so those units cannot be corrected by changing their zero. Pending are the tests with several users and lighting conditions in front of the camera, and the measurement of the time from gesture to movement on the robot.
 
 
 	\section{Conclusions}
 
-	The GUI of SOFIA keeps the interface responsive by running the video processing and each communication link in separate threads. Its main behaviors are simple state machines: the processing thread (start, pause, resume, stop, and recovery from camera errors), the reliable sending of commands (acknowledgement, retransmission with the same sequence number, and failure report), and the link supervision (heartbeat and safe position). Because the simulation speaks the same protocol as the robot, the system can be developed and tested without hardware and can run a digital twin of the robot. Future work includes the automatic reconnection of the link, the stress tests with several users and lighting conditions, and the measurement of the time from gesture to movement on the robot.
+	The GUI of SOFIA keeps the interface responsive by running the video processing and each communication link in separate threads. Its main behaviors are simple state machines: the processing thread (start, pause, resume, stop, and recovery from camera errors), the reliable sending of commands (acknowledgement, retransmission with the same sequence number, and failure report), and the link supervision (heartbeat and safe position). Because the simulation speaks the same protocol as the robot, the system can be developed and tested without hardware and can run a digital twin of the robot. The same window also aligns the robot with a second camera, through a single new message (ADJUST) and zeros that are restored on every connection. Future work includes the tests with several users and lighting conditions, the measurement of the time from gesture to movement on the robot, and replacing the servos that do not reach the commanded angle.
 
 	\balance
 

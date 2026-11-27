@@ -21,12 +21,11 @@ GUI (Vision/gui_app.py)
 | Archivo | Qué hace |
 | --- | --- |
 | `Sofia/worlds/sofia.wbt` | Mundo: 16 unidades (PROTO `sofia`), la esfera (maestro) y la cámara cenital |
-| `Sofia/protos/sofia.proto` + `protos/meshes/` | **PROTO de la unidad** (copiado de sofia-maquinas-estado). Motores `joint_1` (eje X, θ1), `joint_3` (eje Y, lleva la placa, θ2) y `joint_2` (segunda biela, mismo ángulo que `joint_3`). Tope ajustado a **±30°** como el robot real (el original trae ±35°) |
+| `Sofia/protos/sofia.proto` + `protos/meshes/` | **PROTO de la unidad** (copiado de sofia-maquinas-estado; ya viene en el repo). Motores `joint_1` (eje X, θ1), `joint_3` (eje Y, lleva la placa, θ2) y `joint_2` (segunda biela, mismo ángulo que `joint_3`). Tope ajustado a **±30°** como el robot real (el original trae ±35°) |
 | `Sofia/urdf/sofia.urdf` | URDF de donde sale el PROTO (para regenerarlo con `urdf2webots`) |
 | `controllers/sofia_maestro_sim/` | **Maestro** (Python), corre en la esfera. Hace lo mismo que el firmware del ESP32: valida tramas, contesta ACK/NACK, ignora duplicados y pasa a estado seguro. Reusa `Vision/comunicacion/protocol.py`. |
 | `controllers/tracker_esfera_cpp/` | **Unidades** (C++). Apuntan la placa a la esfera; si llega una postura, dibujan su patrón (`patrones.hpp`). |
 | `controllers/camara_sim/` | **Cámara cenital** (Python). Solo manda imágenes a la GUI. |
-| `controllers/esfera_control/` | Controlador original (la esfera se mueve sola). Ya no lo usa el mundo; se deja como referencia. |
 | `Sofia/worlds/sofia_dataset.wbt` y `sofia_diagnostico_vivo.wbt` | Mundos del **diagnóstico de alineación**, con las mismas 16 unidades (placa clara con `colorPlaca`). Los genera `Alignment/build/herramientas/crear_mundo_dataset.py` a partir de `sofia.wbt`; ver `Alignment/README.md` |
 | `controllers/panel_dataset/` | Unidades del diagnóstico (C++): ángulo exacto en `joint_1` y `joint_3`/`joint_2` + lectura de `joint_1_sensor` y `joint_3_sensor` |
 | `controllers/dataset_generator/` | Supervisor del dataset (Python): ángulos y escena al azar, fotos y etiquetas |
@@ -40,6 +39,7 @@ GUI (Vision/gui_app.py)
 | `MODE` | En **TRACKING** los paneles siguen la esfera; en **JUEGO / TEST** la ignoran, se quedan en 0,0 y la esfera se esconde bajo el piso |
 | `STOP` / estado seguro | Sin patrón: paneles en 0,0 (o apuntando a la esfera centrada en TRACKING) |
 | Sin GUI / al desconectar | Modo JUEGO: paneles en 0,0 |
+| `AJUSTE` (ceros de alineación) | Solo lo usa el ESP32 real: la GUI no se lo manda a Webots, donde las unidades ya están en su cero exacto |
 
 ### Patrones por postura
 
@@ -59,18 +59,17 @@ Las figuras, la amplitud y las velocidades se cambian en `controllers/tracker_es
 
 1. **La carpeta `Webots/` debe quedarse dentro del repositorio SOFIA.** El maestro busca `Vision/comunicacion/protocol.py` subiendo carpetas; si la mueves a otro lado, define la variable de entorno `SOFIA_PROTOCOL` con la ruta a ese archivo.
 2. **Python en Webots.** El maestro y la cámara son controladores de Python y solo usan la biblioteca estándar, no hace falta instalar nada. Si Webots no encuentra Python, ve a *Tools → Preferences → General → Python command* y pon la ruta de tu `python.exe`.
-3. **El PROTO de la unidad.** Copia del repo [sofia-maquinas-estado](https://github.com/lizarragaxyz/sofia-maquinas-estado) la carpeta `webots/protos/` (con `sofia.proto` y `meshes/`) a `Webots/Sofia/protos/` y `urdf/sofia.urdf` a `Webots/Sofia/urdf/`.
-4. **Compilar las unidades (cada vez que cambie el `.cpp`).** Abre `tracker_esfera_cpp.cpp` en el editor de Webots y usa *Build → Clean & Build*.
-5. Abre `Sofia/worlds/sofia.wbt` y **corre la simulación** (▶). En la consola debe salir:
+3. **Compilar las unidades (cada vez que cambie el `.cpp`).** Abre `tracker_esfera_cpp.cpp` en el editor de Webots y usa *Build → Clean & Build*. El ejecutable no se sube (cada quien lo compila).
+4. Abre `Sofia/worlds/sofia.wbt` y **corre la simulación** (▶). En la consola debe salir:
    ```
    [MAESTRO] Esperando la GUI en 127.0.0.1:5555...
    [CAMARA] 320x320 en 127.0.0.1:5556
    ```
-6. En la GUI (`python gui_app.py` desde `Vision/`), en el panel **Robot**:
+5. En la GUI (`python gui_app.py` desde `Vision/`), en el panel **Robot**:
    - En la fila **Webots (sim)** presiona **Conectar**.
    - Marca **Ver cámara de Webots** para ver la vista cenital junto al video.
    - *(Opcional)* Marca **Simular canal BLE en Webots** para agregar retraso (~30 ms), pérdidas (3 %) y bytes dañados (2 %), como un enlace Bluetooth real. Así se ven los reintentos y los NACK en la bitácora.
-7. Inicia la detección: en **Juego** cada postura hace su patrón y en **Tracking** la esfera sigue tu mano.
+6. Inicia la detección: en **Juego** cada postura hace su patrón y en **Tracking** la esfera sigue tu mano.
 
 ### Simulación sola o gemelo digital
 

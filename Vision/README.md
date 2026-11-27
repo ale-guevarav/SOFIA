@@ -26,6 +26,8 @@ Actualmente el sistema permite:
 * Seguir la posición de la mano en un plano cartesiano (modo TRACKING).
 * Operar el sistema desde una **interfaz gráfica (GUI)** con video en vivo y botones para iniciar, pausar, reanudar y detener la detección.
 * Enviar las posturas y la posición de la mano al **ESP32 maestro por Bluetooth Low Energy (BLE)**.
+* Elegir la cámara de poses y la del módulo por su **nombre del sistema** (solo las conectadas).
+* **Alinear el módulo** desde la GUI (menú *Alineación*): diagnóstico con la CNN de `Alignment/` y corrección del cero de cada servo.
 
 El sistema puede trabajar con hasta **75 landmarks simultáneamente**:
 
@@ -149,6 +151,7 @@ SOFIA/
 │   │
 │   ├── interfaz/                 ← piezas de la GUI
 │   │   ├── vision_worker.py
+│   │   ├── camaras.py            ← cámaras conectadas y su nombre del sistema
 │   │   ├── sim_camera.py         ← imágenes de la cámara de Webots
 │   │   ├── alineacion_worker.py  ← menú Alineación (usa Alignment/app/nucleo)
 │   │   └── alineacion_ventana.py ← ventana emergente con la barra de progreso
@@ -174,11 +177,13 @@ SOFIA/
 │   │
 │   ├── metrics/                  (se crea automáticamente; no se sube a git)
 │   ├── requirements.txt
-│   ├── .gitignore
 │   └── README.md
 │
-├── ESP32/                        ← firmware del ESP32 maestro (ver ESP32/README.md)
-└── Paper-Latex/                  ← documentos formales
+├── Alignment/                    ← diagnóstico de alineación (lo usa el menú Alineación)
+├── ESP32/                        ← firmware del ESP32 maestro y esclavos (ver ESP32/README.md)
+├── Webots/                       ← simulación (ver Webots/README.md)
+├── Paper-Latex/                  ← documentos formales
+└── .gitignore                    ← uno solo para todo el repositorio
 ```
 
 Cada carpeta agrupa una parte del sistema, y en la raíz de `Vision/` solo quedan los tres programas que se ejecutan. Cada carpeta tiene un `__init__.py` que describe lo que contiene.
@@ -199,7 +204,7 @@ La detección en sí está en `vision_pipeline.py`, que es el mismo código que 
 
 ### `gui_app.py`
 
-Interfaz gráfica. Muestra el video, el resultado, los botones de control, el selector de modo, la conexión con el ESP32 y una bitácora. **No procesa video**: eso lo hace `vision_worker.py` en otro hilo.
+Interfaz gráfica. Muestra el video, el resultado, los botones de control, el selector de cámara y de modo, la conexión con el ESP32 y una bitácora. **No procesa video**: eso lo hace `vision_worker.py` en otro hilo.
 
 ### `interfaz/alineacion_worker.py` y `interfaz/alineacion_ventana.py`
 
@@ -207,16 +212,21 @@ Menú verde **Alineación** de la GUI (debajo de Iniciar / Detener). Une la visi
 
 | Opción | Qué hace |
 |---|---|
-| **Tomar ceros** | Mide las 16 unidades con la **cámara del módulo** (la que ve al SOFIA, no a la persona; se elige en el mismo menú, por defecto la 1), calcula el cero de cada servo, lo guarda en `Alignment/results/ceros_esp32.json` y se lo manda al ESP32 |
+| **Tomar ceros** | Mide las 16 unidades con la **cámara del módulo** (la que ve al SOFIA, no a la persona; se elige en el mismo menú), calcula el cero de cada servo, lo guarda en `Alignment/results/ceros_esp32.json` y se lo manda al ESP32 |
 | **Alinear** | Mide y corrige **una por una** las unidades que no están OK, de la menos a la más desalineada. Cada unidad se corrige, se vuelve a medir y se repite hasta que queda OK (máx. 4 intentos). Si un eje **empeora** en vez de mejorar (servo montado o conectado al revés), invierte el signo de ese eje solo para esa unidad y lo guarda en el JSON. Al final toma otra foto para revisar |
 
-- **¿Cuál cámara es?** La de la GUI (la persona) es siempre la 0. En *Alineación → Cámara del módulo → Buscar cámaras* sale una foto de cada cámara conectada y con *Usar esta* se elige la que ve al SOFIA.
+- **¿Cuál cámara es?** La de la persona se elige en **Cámara de poses** (Control de detección); la del módulo, en *Alineación → Cámara del módulo* (por defecto, la primera que no es la de poses). Las dos listas muestran el nombre del sistema y solo las cámaras conectadas; *Buscar cámaras (con foto)* enseña una foto de cada una.
 - Al elegir *Tomar ceros* o *Alinear*, primero sale la **cámara del módulo en vivo**, con los ArUco que ve marcados en verde, para acomodarla. Cuando se vean los 4, se pica **Comenzar**.
 - Antes de medir, la GUI manda STOP (todas a 0,0) y deja de mandar posturas / TRACK.
 - El progreso sale en una **ventana emergente** con la foto analizada y la barra; si no se ven los 4 ArUco sale el aviso **"¡NO HAY UN SOFIA A LA VISTA!"**.
 - **Cada vez que se conecta al ESP32**, la GUI le manda los ceros guardados (comando `AJUSTE`, `0x05`), en lugar de los de fábrica del firmware.
+- Usa el modelo publicado (`Alignment/results/modelo/cnn.pt`, afinado con fotos reales) y centra los recortes en las placas reales (`Alignment/results/centros_reales.json`).
 - La conversión de los ángulos de la app a grados del servo (signos y ganancia) está en `Alignment/app/nucleo/ceros.py`.
 - Para usar la CNN, el entorno de Vision necesita PyTorch (ver `Alignment/requirements.txt`); sin PyTorch usa el método geométrico, que es menos preciso.
+
+### `interfaz/camaras.py`
+
+Lista las cámaras conectadas con su nombre del sistema y las abre de forma que el número coincida con el de OpenCV. En Windows usa **pygrabber** (DirectShow; si no está instalado, salen como "Cámara N"); en Linux lee `/sys/class/video4linux`.
 
 ### `interfaz/vision_worker.py`
 
@@ -446,8 +456,9 @@ VisionPipeline ── modo JUEGO ───► Pose + Hands ► posturas
 GUI (gui_app.py): video + resultado + controles
    │
    ▼
-Hilo BLE (ble_link.py) ── trama + CRC ──► ESP32 maestro ──► PCA9685 ──► 2 servos
-                       ◄── ACK / NACK ───
+Hilo BLE (ble_link.py) ── trama + CRC ──► ESP32 maestro ──► 2 × PCA9685 ──► 16 unidades (32 servos)
+                       ◄── ACK / NACK ───          │
+                                                   └── RS-485 (Modbus) ──► ESP32 esclavos ──► otros módulos
 ```
 
 ---
@@ -546,6 +557,8 @@ python Vision/gui_app.py
 │                                      │ Control de detección     │
 │                                      │ [Iniciar]  [Pausar]      │
 │                                      │ [Reanudar] [Detener]     │
+│                                      │ Cámara de poses [▼] [↻]  │
+│                                      │ [⚙ Alineación ▼]         │
 │           VIDEO EN VIVO              │ Modo: (•) Juego ( ) Track│
 │                                      │ Resultado: ESCUDO        │
 │                                      │ ESP32: ● Conectado       │
@@ -555,7 +568,7 @@ python Vision/gui_app.py
 
 | Botón | Qué hace |
 | --- | --- |
-| **Iniciar** | Crea el hilo de visión, abre la cámara y carga los modelos. |
+| **Iniciar** | Crea el hilo de visión, abre la **cámara de poses** elegida y carga los modelos. |
 | **Pausar** | El hilo se detiene sin consumir CPU (el video se congela). |
 | **Reanudar** | El hilo continúa donde se quedó. |
 | **Detener** | Termina el hilo, libera la cámara y manda STOP al ESP32. |
@@ -589,7 +602,8 @@ La PC envía al ESP32 maestro las posturas y la posición de la mano por **Bluet
 | TRACK (x, y, vector) | Continuamente en modo TRACKING (máx. 20 por segundo) |
 | PING | Comando de prueba y latido si no llega nada en 1 s |
 | MODE | Al conectar y al cambiar de modo |
-| STOP | Al detener la detección |
+| STOP | Al detener la detección y antes de alinear |
+| AJUSTE (unidad, cero X/Y) | Al conectar (los ceros guardados) y desde el menú Alineación |
 
 **Para conectar desde la GUI:** encender el Bluetooth de la laptop, encender el ESP32 y presionar **Conectar**. No es necesario (ni recomendable) emparejarlo desde la configuración de Windows.
 
@@ -786,7 +800,14 @@ python -m evaluacion.generate_report metrics/sesion_AAAAMMDD_HHMMSS.json
 * [x] Estándar de comunicación PC-ESP32 por BLE (tramas, CRC, ACK/NACK y códigos de error).
 * [x] Envío de posturas y posición de la mano desde la GUI.
 * [x] Firmware del ESP32 con un patrón de movimiento por postura (carpeta `ESP32/`).
-* [ ] Validación de la comunicación y del movimiento en el hardware real.
+* [x] Validación de la comunicación y del movimiento en el hardware real.
+
+### Cuarta etapa
+
+* [x] Figuras con grupos fijos de unidades que siguen una esfera virtual (ESP32 y Webots).
+* [x] Menú **Alineación** en la GUI: *Tomar ceros* y *Alinear* (una por una, en lazo cerrado), con cámara en vivo y ventana de progreso.
+* [x] Comando **AJUSTE** (`0x05`) y ceros guardados que se mandan al conectar.
+* [x] Selección de la cámara de poses y la del módulo por su nombre del sistema.
 
 ### Próximas etapas
 

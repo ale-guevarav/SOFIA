@@ -28,7 +28,7 @@
 }
 
 \begin{document}
-	\title{Vision-Based Misalignment Diagnosis of the SOFIA Units: From a First Run to a Larger Dataset}
+	\title{Vision-Based Misalignment Diagnosis of the SOFIA Units: From Simulation to the Physical Module}
 
 	\author{
 		Marco Heimdal Castro Magaña, Alejandro Amador Franco, Karen Alejandra Guevara Vasquez, María Alicia Vela Contreras, Juan Pablo Contreras Quiñones,
@@ -43,11 +43,11 @@
 	\maketitle
 
 	\begin{abstract}
-		A SOFIA module has 16 hexagonal plates, and each one can tilt in two directions \cite{sofia_architecture}. This work estimates the two angles of every plate from one overhead photograph and labels each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Three methods were compared on images generated in Webots: a geometric method without training, a small convolutional neural network (CNN), and a hybrid rule that combines them. A first run used simplified plates and 2000 images; a second run used the simulation model of the real unit and 10\,000 images. In the second run, the CNN reached a mean error of $0.20^\circ$ (before, $0.25^\circ$) and became the best method in every range, while the geometric method and, with it, the hybrid rule lost accuracy because the plate of the real unit moves less per degree. The algorithms are explained as state machines.
+		A SOFIA module has 16 hexagonal plates, and each one can tilt in two directions \cite{sofia_architecture}. This work estimates the two angles of every plate from one overhead photograph and labels each plate as OK ($<2^\circ$), REVIEW ($2$--$5^\circ$), or MISALIGNED ($>5^\circ$). Three methods were compared on images generated in Webots: a geometric method without training, a small convolutional neural network (CNN), and a hybrid rule that combines them. A first run used simplified plates and 2000 images; a second run used the simulation model of the real unit and 10\,000 images. In the second run, the CNN reached a mean error of $0.20^\circ$ (before, $0.25^\circ$) and became the best method in every range, while the geometric method and, with it, the hybrid rule lost accuracy because the plate of the real unit moves less per degree. On photographs of the physical module, however, the CNN trained only in simulation had an error of $2.04^\circ$. After fine-tuning it with about 400 photographs of the module, whose angles were measured from the photographs themselves, the error fell to $0.23^\circ$ and the state accuracy rose from 72\,\% to 96\,\%. The fine-tuned CNN is used to align the robot in a closed loop. The algorithms are explained as state machines.
 	\end{abstract}
 
 	\begin{IEEEkeywords}
-		Misalignment diagnosis, ArUco markers, convolutional neural networks, Webots, synthetic data, state machines.
+		Misalignment diagnosis, ArUco markers, convolutional neural networks, Webots, synthetic data, fine-tuning, state machines.
 	\end{IEEEkeywords}
 
 
@@ -86,6 +86,13 @@
 	\subsection{First Run and Second Run}
 
 	Table~\ref{tab:runs} compares the two runs. The second run replaced the simplified plates with the PROTO of the real unit (generated from its CAD model with \texttt{urdf2webots} \cite{urdf2webots}), placed the units as close as possible without collisions, moved the markers closer, used five times more images, and changed how the angles are chosen: in the first run they were uniform, while in the second they follow what is expected in the robot, mostly small misalignments and sometimes large ones, as if a plate were moved by hand or jammed. In both runs the images were split \emph{by photograph} into training, validation, and test sets, so the 16 plates of one photograph never fall in different sets.
+
+ \subsection{Photographs of the Physical Module}
+ \label{sec:real}
+
+ The third set comes from the physical module, photographed from above with a phone that stayed in place for the whole session. First, the module was aligned by hand and seven photographs were taken; since the plates of the physical module are not exactly where the design places them, these photographs give the real center of each plate, and the crops of the physical module are cut around those centers. Then a test program of the robot controller sent random angles to the 16 units, about 400 times, and a photograph was taken after each one.
+
+ The commanded angles could not be used as labels: the servos move their plate only a fraction of what is commanded (between 0 and 40\,\%, depending on the unit), and some axes barely move. Instead, the angles were \emph{measured} in each photograph: the shift of every plate with respect to the aligned photographs was found by template matching with subpixel precision and converted to angles with the kinematics of the unit (arm $L=37$~mm), as in the geometric method. The commanded angles were used only to pair each photograph with its command, through a least-squares fit between commanded angles and measured shifts (0.5~px of residual). Plates without a reliable measurement were left out. As with the simulated images, the photographs were split by photograph, with 60 for testing.
 
 	\begin{table}[!t]
 		\centering
@@ -139,6 +146,8 @@
 		\label{fig:train}
 	\end{figure}
 
+	For the physical module, the CNN of the second run was \emph{fine-tuned}: training starts from its weights, with a learning rate ten times smaller, so that it adapts to the real photographs (another camera, light, and plates) without forgetting what it learned in simulation. A few hundred photographs are enough, because the network already knows how a tilted plate looks.
+
 	\subsection{Hybrid Rule}
 
 	Both methods are run, and for each plate: if they differ by more than $2^\circ$, the CNN is used and the plate is marked for inspection; if they agree and the plate is near zero ($\le6^\circ$), the geometric value is used; otherwise, the CNN. It was designed in the first run, where the geometric method was the most accurate near zero.
@@ -184,10 +193,29 @@
 
 	Two lessons follow. First, more and more realistic images made the CNN better, even with a harder unit. Second, a CNN must be retrained when the unit changes: the CNN of the first run, tested on the real unit, had an error of $1.6^\circ$.
 
+	\textbf{Physical module.} Table~\ref{tab:real} shows the error on the 60 test photographs of the physical module (860 plates). The CNN trained only in simulation was ten times less accurate than in Webots ($2.04^\circ$, up to $13.3^\circ$) and classified only 72\,\% of the states correctly: the gap between the simulated and the real images is larger than the gap between the two runs. After fine-tuning, the mean error fell to $0.23^\circ$, close to that of the second run in simulation, the maximum to $3.0^\circ$, and the state accuracy rose to 96\,\%; of the plates that need attention (REVIEW or MISALIGNED), 98.8\,\% were detected. In exchange, the error on the Webots test images rose from $0.20^\circ$ to $0.53^\circ$, which no longer matters, since the simulation is not the target. The model trained only in simulation is kept in the application to compare both.
+
+	\begin{table}[!t]
+	\centering
+	\caption{Test Error ($^\circ$) on the Physical Module (60 Photographs)}
+	\label{tab:real}
+	\scriptsize
+	\setlength{\tabcolsep}{2.5pt}
+	\renewcommand{\arraystretch}{1.08}
+	\begin{tabularx}{\columnwidth}{@{}Y c c c c c@{}}
+	\toprule
+	CNN & Mean & Max & $0$--$5^\circ$ & $>15^\circ$ & States\\
+	\midrule
+	Simulation only & 2.039 & 13.3 & 1.38 & 1.82 & 72.4\,\%\\
+	Fine-tuned & \textbf{0.227} & \textbf{3.0} & \textbf{0.21} & \textbf{0.24} & \textbf{96.4\,\%}\\
+	\bottomrule
+	\end{tabularx}
+	\end{table}
+
 
 	\section{Diagnosis Application}
 
-	The methods are used in an application with its own processing thread, which can read a camera, saved photographs, or a live Webots simulation. In the live mode, the application moves the simulated plates and checks each diagnosis against the measured angles. The difficulty is to analyze the right photograph: one taken after the plates stopped, and only once per movement. This is solved with the state machine of Fig.~\ref{fig:live}: every command increases a version number, and a photograph carries that version only when the 16 plates are still.
+	The methods are used in an application with its own processing thread, which can read a camera, saved photographs, or a live Webots simulation. In the live mode, the application moves the simulated plates and checks each diagnosis against the measured angles. The difficulty is to analyze the right photograph: one taken after the plates stopped, and only once per movement. This is solved with the state machine of Fig.~\ref{fig:live}: every command increases a version number, and a photograph carries that version only when the 16 plates are still. With the camera and with real photographs, the crops are centered on the real plates (Section~\ref{sec:real}); the user can choose the fine-tuned CNN, the CNN trained only in simulation, the geometric method, or the hybrid rule.
 
 	\begin{figure}[!t]
 		\centering
@@ -207,9 +235,13 @@
 	\end{figure}
 
 
+	\section{Closed-Loop Alignment}
+
+	The same diagnosis is used by the graphical interface of SOFIA to align the robot. A second camera looks at the module, and for each plate that is not OK the interface computes a new zero for its two servos, sends it to the robot controller, waits, takes another photograph, and repeats until the plate is OK, up to four times. If an axis gets worse instead of better, the servo is mounted the other way, so the sign of that axis is inverted for that unit. The zeros are saved and restored every time the interface connects to the robot. On the physical module, the loop also revealed its limit: the units whose servos barely move (five axes in X and one in Y) cannot be corrected by changing their zero, and the diagnosis, in that case, points to a mechanical problem instead.
+
 	\section{Conclusions}
 
-	One photograph with four markers is enough to estimate the angles of the 16 plates. In a first run, a hybrid rule was the best method because the geometric method and the CNN failed in different places. With the real unit and five times more realistic images, the CNN became the best method everywhere ($0.20^\circ$ of mean error, $3.3^\circ$ at most, and 96.8\,\% of correct states), and the hybrid rule stopped being useful, since the shorter arm of the real unit penalizes the geometric method. ResNet18 was dropped because a larger network did not help. The next step is to test the CNN with photographs of the physical module and fine-tune it with a few real images.
+	One photograph with four markers is enough to estimate the angles of the 16 plates. In a first run, a hybrid rule was the best method because the geometric method and the CNN failed in different places. With the real unit and five times more realistic images, the CNN became the best method everywhere ($0.20^\circ$ of mean error, $3.3^\circ$ at most, and 96.8\,\% of correct states), and the hybrid rule stopped being useful, since the shorter arm of the real unit penalizes the geometric method. ResNet18 was dropped because a larger network did not help. On the physical module, the CNN trained in simulation lost most of its accuracy ($2.04^\circ$), and about 400 photographs, labeled by measuring the plates instead of trusting the commanded angles, were enough to recover it ($0.23^\circ$ and 96\,\% of correct states). The next steps are more real photographs, with other lights and camera heights, and replacing the servos that do not follow the command, so that the closed-loop alignment can correct every unit.
 
 	\balance
 

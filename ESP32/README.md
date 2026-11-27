@@ -1,14 +1,20 @@
-# SOFIA - Firmware del ESP32 maestro
+# SOFIA - Firmware de los ESP32
 
-Firmware que recibe por **Bluetooth Low Energy (BLE)** los comandos que envía el sistema de visión (PC) y mueve **las 16 unidades del módulo SOFIA (32 servos en dos PCA9685)** según la postura detectada. Por ahora las 16 unidades hacen el mismo movimiento.
+El **maestro** recibe por **Bluetooth Low Energy (BLE)** los comandos que envía el sistema de visión (PC) y mueve **las 16 unidades del módulo SOFIA (32 servos en dos PCA9685)** según la postura detectada. Además reenvía los comandos por **RS-485 (Modbus)** a los **esclavos**, que mueven otros módulos con el mismo `movimiento.h`.
 
 La estructura de los mensajes está definida en el estándar de comunicación: [`Vision/docs/PROTOCOLO_COMUNICACION.md`](../Vision/docs/PROTOCOLO_COMUNICACION.md).
 
 ```text
 ESP32/
-└── sofia_maestro/
-    ├── sofia_maestro.ino   ← BLE + protocolo (recibe, valida y confirma tramas)
-    └── movimiento.h        ← servos, 2 PCA9685 y patrones de movimiento
+├── sofia_maestro/
+│   ├── sofia_maestro.ino   ← BLE + protocolo (recibe, valida y confirma tramas) + maestro Modbus
+│   └── movimiento.h        ← servos, 2 PCA9685 y patrones de movimiento
+├── SOFIA_SLAVE/
+│   ├── SOFIA_SLAVE.ino     ← esclavo Modbus (RS-485): recibe POSE / MODE / STOP / TRACK del maestro
+│   └── movimiento.h        ← el mismo movimiento que el maestro
+└── sofia_desalineo_azar/   ← prueba para el diagnóstico de alineación (ángulos al azar conocidos)
+    ├── sofia_desalineo_azar.ino
+    └── monitor_muestreo.py ← Monitor Serie que guarda el CSV del muestreo en la PC
 ```
 
 ---
@@ -22,9 +28,9 @@ ESP32/
 | POSE 3 · ESCUDO | El módulo dibuja un **rombo** (~2.1 s) |
 | POSE 4 · ATAQUE | El módulo dibuja una **L** (~1.8 s) |
 | POSE 5 · FIN | El módulo dibuja **izquierda-derecha** (despedida, ~3.0 s) |
-| TRACK (solo en modo TRACKING) | **Apuntan hacia la mano**, por turnos de 4 |
-| STOP | Regresan al centro (por turnos de 4) |
-| AJUSTE (unidad 0–15 + cero X/Y) | **Nuevo cero** de esa unidad, medido con el diagnóstico de alineación (menú **Alineación** de la GUI). Con "reacomodar" hace una sacudida corta (±4°) y se asienta; sin él solo reescribe el PWM. La GUI manda los ceros guardados cada vez que se conecta. Solo las unidades de este ESP32; si el ESP32 se reinicia sin PC, usa `AJUSTE_X/Y` |
+| TRACK (solo en modo TRACKING) | **Apuntan hacia la mano** (EMA) |
+| STOP | Regresan al centro (EMA) |
+| AJUSTE (unidad 0–15 + cero X/Y) | **Nuevo cero** de esa unidad, medido con el diagnóstico de alineación (menú **Alineación** de la GUI). Con "reacomodar" hace una sacudida corta (±4°) y se asienta; sin él solo reescribe el PWM. La GUI manda los ceros guardados cada vez que se conecta. Solo las unidades del maestro (no se reenvía a los esclavos); si el ESP32 se reinicia sin PC, usa `AJUSTE_X/Y` |
 | PING | Solo responde ACK (comando de prueba) |
 
 - **La figura la forma el módulo completo, con unidades fijas:** cada figura tiene un **grupo fijo** de unidades (`GRUPO_ESCUDO`…, las que quedan sobre la figura) y una **esfera virtual** recorre la figura a velocidad constante (`VEL_ESFERA`). Las unidades del grupo **siguen a la esfera como en el tracking**: se inclinan hacia ella (con la esfera encima quedan planas y la siguen cuando pasa), así que el movimiento es continuo.
@@ -41,8 +47,9 @@ ESP32/
 - Las mismas figuras están en la sim (`Webots/.../tracker_esfera_cpp/patrones.hpp`).
 - Todas las inclinaciones miden ±20° como máximo: con 30 mm entre aristas, a ±20° quedan ~6 mm entre placas vecinas y a ±30° se tocan.
 - Una postura nueva reemplaza a la anterior: la esfera empieza otra vez desde el principio de la figura.
-- **EMA en todo:** el tracking, el regreso al centro y el reacomodo de *Alinear* usan el mismo EMA de las figuras (`K_SUAVIZADO`), porque así los servos se mueven mejor (`EMA_EN_TRACKING`, `EMA_EN_REGRESO`, `EMA_EN_ALINEAR` en `movimiento.h`). Con tracking/regreso en EMA se mueven las 16 a la vez; si el ESP32 se reinicia por corriente, regresa esos dos a `false` y vuelven los turnos de abajo.
-- **TRACKING por turnos (como el reloj de un CPU):** cada 20 ms solo 4 unidades dan un salto corto hacia la mano (máx. 10°) y ceden el turno a las siguientes 4. Ninguna completa su movimiento de golpe: las 16 avanzan casi juntas (llegan en ~0.3 s), pero nunca arrancan más de 8 servos a la vez, para no subir la corriente. El regreso al centro (STOP, estado seguro, fin del TRACKING) usa los mismos turnos. Se ajusta con `TRACK_POR_TURNO`, `TRACK_SALTO_MAX` y `VEL_TRACK`.
+- **EMA en todo:** el tracking, el regreso al centro y el reacomodo de *Alinear* usan el mismo EMA de las figuras (`K_SUAVIZADO`), porque así los servos se mueven mejor (`EMA_EN_TRACKING`, `EMA_EN_REGRESO`, `EMA_EN_ALINEAR` en `movimiento.h`). Con EMA las 16 se mueven a la vez.
+- **Turnos (si el ESP32 se reinicia por corriente):** con `EMA_EN_TRACKING` / `EMA_EN_REGRESO` en `false`, el tracking y el regreso al centro van por turnos, como el reloj de un CPU: cada 20 ms solo 4 unidades dan un salto corto (máx. 10°) y ceden el turno, así nunca arrancan más de 8 servos a la vez. Se ajusta con `TRACK_POR_TURNO`, `TRACK_SALTO_MAX` y `VEL_TRACK`.
+- **Sentido del tracking:** la imagen de la PC llega en espejo; con la mano arriba-derecha (vista de frente) las placas apuntan arriba-derecha. Si un eje sale al revés, `TRACK_INVERTIR_X` / `TRACK_INVERTIR_Y` (solo cambian el tracking, no las figuras).
 - Se ajusta al inicio de `movimiento.h`: `SIMULTANEAS` (cuántas a la vez, 3), `FIG_*` (camino de la esfera), `GRUPO_*` (unidades que pueden moverse en cada figura), `VEL_ESFERA` (mm/s), `DIST_LLENA` / `RADIO_LLENO` / `RADIO_ESFERA` / `RELEVO_MM` (cómo siguen a la esfera), `suavizador` y `escalaVelocidad`, y `FILA_UNIDAD` / `COLUMNA_UNIDAD` (dónde está cada unidad: fila 0 = abajo, columna 0 = izquierda).
 - Si se pierde la conexión o pasan 3 s sin mensajes, las unidades van al centro (estado seguro).
 
@@ -56,14 +63,14 @@ Igual que las pruebas de mecatrónica (`Prueba_Servos` y `SG90_WindowVelocity_PC
 |---|---|
 | Microcontrolador | ESP32-C3 |
 | Drivers PWM | 2 × PCA9685 en el mismo bus I2C, 50 Hz; se detectan solas al arrancar (normalmente `0x40` y `0x41`) |
-| I2C | SDA = GPIO 0, SCL = GPIO 1, 400 kHz |
+| I2C | SDA = GPIO 0, SCL = GPIO 1, 100 kHz (`I2C_HZ`) |
 | OE de los PCA9685 | GPIO 5 (LOW = habilitado), compartido |
 | Unidades 1–8 | PCA de dirección menor |
 | Unidades 9–16 | PCA de dirección mayor |
 | Canales en cada placa | Por pares: 0 = X y 1 = Y de su primera unidad, 2 = X y 3 = Y de la segunda, … 14 = X y 15 = Y de la octava |
 | Calibración | −60° → 385 cuentas, +60° → 225 cuentas (igual para todos los servos) |
 
-Todo esto se cambia al inicio de `movimiento.h`. Si un eje se mueve al revés en todas las unidades, pon `INVERTIR_X` o `INVERTIR_Y` en `true`. Si una sola unidad no queda plana en el centro, corrígela en `AJUSTE_X` / `AJUSTE_Y` (grados, una casilla por unidad).
+Todo esto se cambia al inicio de `movimiento.h`. Si un eje se mueve al revés en todas las unidades, pon `INVERTIR_X` o `INVERTIR_Y` en `true`. Si una unidad no queda plana en el centro, lo normal es corregirla desde la GUI (**Alineación → Tomar ceros / Alinear**): los ceros se guardan en la PC y se mandan al ESP32 cada vez que se conecta. `AJUSTE_X` / `AJUSTE_Y` son los ceros "de fábrica" que usa sin PC.
 
 La segunda placa necesita **otra dirección**: puentea el jumper `A0` (queda en `0x41`). Si las dos se quedan en `0x40`, el Monitor Serie solo reporta una placa y se mueven 8 unidades.
 
@@ -124,7 +131,7 @@ POSE confirmada:        OK
 Error de CRC detectado: OK
 ```
 
-En el Monitor Serie aparece cada comando y las unidades dibujan la X de ESCUDO.
+En el Monitor Serie aparece cada comando y las unidades dibujan el rombo de ESCUDO.
 
 También se puede usar la GUI (`python gui_app.py`): **Conectar → Enviar PING → Iniciar**, y hacer posturas frente a la cámara.
 
@@ -146,5 +153,21 @@ También se puede usar la GUI (`python gui_app.py`): **Conectar → Enviar PING 
 2. Cada 20 ms, `posicionEsfera()` calcula dónde va la esfera y `objetivoFigura()` decide, para cada unidad del grupo, si es de las `SIMULTANEAS` más cercanas. Si lo es, se inclina hacia la esfera (como en el tracking); si no, va a 0. RECARGAR usa `objetivoRecarga()`: la cabeza gira por el borde y solo se mueven las 3 más inclinadas.
 3. `seguirObjetivo()` la lleva a esa inclinación con el suavizador elegido. Cuando la esfera termina el camino y todas vuelven al centro, la postura termina.
 4. **Solo viajan por I2C las unidades que se movieron** (más de 0.1°): sus dos canales van en una transacción de 9 bytes, ~3 por ciclo. Las quietas no reciben nada; el PCA9685 las mantiene en su posición.
-5. En modo TRACKING, el objetivo es la posición de la mano (x, y normalizadas × 45°) y las 16 unidades la siguen por turnos de 4, a 120 °/s en promedio.
+5. En modo TRACKING, el objetivo es la posición de la mano (x, y normalizadas × 45°) y las 16 unidades la siguen con EMA (o por turnos, ver arriba).
 6. Si el Arduino IDE marca *Sketch too big*, es por la librería de Bluetooth, no por el movimiento: elige *Herramientas → Partition Scheme → Huge APP (3MB No OTA)*.
+
+---
+
+## Prueba de ángulos al azar (`sofia_desalineo_azar/`)
+
+Programa aparte (no es el firmware del maestro) para sacar fotos con **ángulos conocidos** y entrenar / validar el diagnóstico de alineación. Mismo hardware que el maestro. Monitor Serie a 115200, *Sin ajuste de línea*:
+
+| Tecla | Acción |
+|---|---|
+| `d` / `D` | 4 / las 16 unidades a ángulos al azar (±10° por eje); se quedan quietas e imprime la tabla con los ángulos (convención de la app: θ1 + derecha, θ2 + arriba). Avisa "Listo: … FOTO N" |
+| `0` | Todas al centro (también cuenta como muestra) |
+| `f` | Imprime el CSV de todo el muestreo (hasta 400 muestras, en la RAM del ESP32) |
+| `x` / `n` | Borra la última muestra / empieza un muestreo nuevo |
+
+En vez del Monitor Serie del Arduino IDE se puede usar `python monitor_muestreo.py COM5` (necesita `pyserial`): manda las teclas sin Enter, **guarda el CSV solo en la PC** (`muestreos/`) y lo va autoguardando aunque el ESP32 se reinicie. Una foto por muestra, en orden.
+

@@ -65,16 +65,20 @@ flowchart LR
 | `deteccion/hand_tracker.py` | Posición de la mano en el plano cartesiano. |
 | `comunicacion/ble_link.py` | Conexión BLE, envío con ACK y reintentos, en su propio hilo. |
 | `comunicacion/protocol.py` | Construcción y validación de tramas (Estándar de Comunicación). |
+| `interfaz/camaras.py` | Cámaras conectadas y su nombre del sistema (selector de cámara de poses y del módulo). |
+| `interfaz/alineacion_worker.py` | Hilos del menú **Alineación**: cámara del módulo en vivo, *Tomar ceros*, *Alinear* y búsqueda de cámaras. Usa el núcleo de `Alignment/`. |
+| `interfaz/alineacion_ventana.py` | Ventanas emergentes de la alineación (progreso con foto, cámaras disponibles). |
 
 ### 2.2 Modelo de hilos
 
-La aplicación usa **tres hilos**, para que ningún trabajo lento bloquee la interfaz:
+La aplicación usa **tres hilos** (más uno temporal mientras se alinea), para que ningún trabajo lento bloquee la interfaz:
 
 | Hilo | Qué hace | Por qué separado |
 |---|---|---|
 | **GUI** | Dibuja la ventana y atiende clics | Qt exige que los widgets solo se toquen desde este hilo |
 | **Visión** (`QThread`) | Cámara + MediaPipe (≈ 20–60 ms por frame) | Si corriera en el hilo de la GUI, los botones no responderían |
 | **BLE** (`threading` + `asyncio`) | Escaneo, conexión, envío y espera de ACK | `bleak` es asíncrono; esperar un ACK (hasta 900 ms) no debe congelar nada |
+| **Alineación** (`QThread`, solo mientras se usa el menú) | Cámara del módulo en vivo; luego fotos + CNN y una corrección por unidad | Una alineación tarda segundos o minutos; mientras, la GUI deja de mandar posturas / TRACK |
 
 **Comunicación entre hilos (thread-safe):**
 
@@ -98,7 +102,7 @@ stateDiagram-v2
 
 | Botón | Efecto en el hilo de visión | Cámara | Envío al ESP32 |
 |---|---|---|---|
-| **Iniciar** | Crea un `VisionWorker` y llama `start()`; dentro del hilo se abre la cámara y se cargan los modelos | Se abre | — |
+| **Iniciar** | Crea un `VisionWorker` con la **cámara de poses** elegida y llama `start()`; dentro del hilo se abre la cámara y se cargan los modelos | Se abre | — |
 | **Pausar** | `_paused = True`; al inicio del siguiente ciclo el hilo se bloquea en `QWaitCondition.wait()` | Abierta (el video se congela) | Deja de enviar |
 | **Reanudar** | `_paused = False` + `wakeAll()`; el hilo continúa el bucle | Abierta | Vuelve a enviar |
 | **Detener** | `_running = False` + `wakeAll()`; el bucle termina, se liberan cámara y MediaPipe, y el hilo finaliza | Se cierra | Envía **STOP** |
@@ -119,6 +123,8 @@ Los botones se habilitan según el estado, así nunca se puede, por ejemplo, rea
 │                                                    │ │ [▶ Iniciar][⏸ Pausar] ││
 │                                                    │ │ [⏵ Reanudar][■ Detener]│
 │                                                    │ │ ● Estado: CORRIENDO   ││
+│                                                    │ │ Cámara de poses [▼][↻]││
+│                                                    │ │ [ ⚙ Alineación  ▼ ]   ││
 │                                                    │ └───────────────────────┘│
 │                                                    │ ┌ Modo ─────────────────┐│
 │                VIDEO EN VIVO                       │ │ (•) Juego  ( ) Tracking││
@@ -225,6 +231,8 @@ Se compararon las opciones más comunes para GUIs de escritorio en Python:
 | **Bitácora** | Muestra cada trama enviada y su ACK/NACK; sirve como evidencia de la comunicación y para depurar. |
 | **Casilla "Enviar resultados al ESP32"** | Permite probar la visión sin mover el robot. |
 | **El pipeline es el mismo que el de `main.py`** | Una sola implementación de la detección: lo que se prueba con métricas en `main.py` es exactamente lo que corre en la GUI. |
+| **Alineación en un menú y en ventanas emergentes** | Es una tarea ocasional: un botón con dos opciones (*Tomar ceros*, *Alinear*) no ocupa espacio fijo; la cámara en vivo, la barra de progreso y los avisos ("¡No hay un SOFIA a la vista!") salen solo cuando hacen falta. |
+| **Cámaras por su nombre, solo las conectadas** | "Logitech C920" se reconoce; "cámara 1" no. Evita elegir una cámara que no existe o la misma para poses y módulo. |
 
 ---
 
