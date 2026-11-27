@@ -65,6 +65,7 @@ flowchart LR
 | `deteccion/hand_tracker.py` | Posición de la mano en el plano cartesiano. |
 | `comunicacion/ble_link.py` | Conexión BLE, envío con ACK y reintentos, en su propio hilo. |
 | `comunicacion/protocol.py` | Construcción y validación de tramas (Estándar de Comunicación). |
+| `juego/` (`reglas.py`, `cpu.py`, `partida.py`) | **Vaquerito (demo)**: reglas, CPU con dados 2d6 y máquina de estados de la partida. Sin Qt: la GUI la avanza con un `QTimer` de 50 ms y muestra los eventos (cuenta, ¡YA!, ronda, fin) en un letrero sobre el video. |
 | `interfaz/camaras.py` | Cámaras conectadas y su nombre del sistema (selector de cámara de poses y del módulo). |
 | `interfaz/alineacion_worker.py` | Hilos del menú **Alineación**: cámara del módulo en vivo, *Tomar ceros*, *Alinear* y búsqueda de cámaras. Usa el núcleo de `Alignment/`. |
 | `interfaz/alineacion_ventana.py` | Ventanas emergentes de la alineación (progreso con foto, cámaras disponibles). |

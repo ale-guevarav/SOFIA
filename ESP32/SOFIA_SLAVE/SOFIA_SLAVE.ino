@@ -31,7 +31,7 @@
 #define EX_ILLEGAL_ADDRESS  0x02
 #define EX_ILLEGAL_VALUE    0x03
 
-const char* POSE_NAMES[] = {"?", "INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN"};
+const char* POSE_NAMES[] = {"?", "INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN", "GANA", "PIERDE"};
 const char* MODE_NAMES[] = {"JUEGO", "TEST", "TRACKING"};
 
 // =============================================
@@ -136,7 +136,7 @@ void touchLink() {
 // 0 = valor correcto; si no, código de excepción
 uint8_t validateReg(uint16_t reg, uint16_t v) {
   switch (reg) {
-    case HREG_POSE:        return (v >= 1 && v <= 5) ? 0 : EX_ILLEGAL_VALUE;
+    case HREG_POSE:        return (v >= 1 && v <= 7) ? 0 : EX_ILLEGAL_VALUE;
     case HREG_MODE:        return (v <= 2) ? 0 : EX_ILLEGAL_VALUE;
     case HREG_STOP:        return (v == 1) ? 0 : EX_ILLEGAL_VALUE;
     case HREG_TRACK_HAND:  return (v <= 1) ? 0 : EX_ILLEGAL_VALUE;
@@ -355,7 +355,7 @@ void loop() {
   // -----------------------------
   while (Serial.available()) {
     char c = Serial.read();
-    if (c >= '1' && c <= '5') {
+    if (c >= '1' && c <= '7') {
       Serial.printf("[SERIAL] Prueba de %s\n", POSE_NAMES[c - '0']);
       iniciarPatron(c - '0');
     } else if (c == '0') {

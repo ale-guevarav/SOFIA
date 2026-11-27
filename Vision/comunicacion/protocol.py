@@ -54,7 +54,7 @@ TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"   # ESP32 notifica aquí
 # -----------------------------
 
 # PC -> ESP32
-TYPE_POSE = 0x00    # Postura detectada (1-5)
+TYPE_POSE = 0x00    # Postura (1-5) o reacción del juego (6-7)
 TYPE_TRACK = 0x01   # Posición de la mano (x, y, vector)
 TYPE_PING = 0x02    # Comando de prueba / latido
 TYPE_MODE = 0x03    # Modo activo del sistema de visión
@@ -91,6 +91,10 @@ POSE_IDS = {
     "ESCUDO": 3,
     "ATAQUE": 4,
     "FIN": 5,
+    # Reacciones del robot al terminar una partida de Vaquerito
+    # (no son posturas que se detecten: las manda el juego)
+    "GANA": 6,
+    "PIERDE": 7,
 }
 
 POSE_NAMES = {value: name for name, value in POSE_IDS.items()}
@@ -238,7 +242,7 @@ def parse_frame(data: bytes) -> Frame:
 def pose_payload(pose_id: int) -> bytes:
 
     if pose_id not in POSE_NAMES:
-        raise ValueError(f"Postura inválida: {pose_id} (debe ser 1-5)")
+        raise ValueError(f"Postura inválida: {pose_id} (debe ser 1-7)")
 
     return bytes([pose_id])
 

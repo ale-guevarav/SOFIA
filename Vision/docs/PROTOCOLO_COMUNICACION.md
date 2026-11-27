@@ -109,9 +109,11 @@ Los tipos `0x06–0x7F` quedan reservados para comandos futuros de la PC, y `0x8
 
 | Byte | Campo | Tipo | Valores |
 |---|---|---|---|
-| 0 | `pose_id` | u8 | `1` INICIO · `2` RECARGAR · `3` ESCUDO · `4` ATAQUE · `5` FIN |
+| 0 | `pose_id` | u8 | `1` INICIO · `2` RECARGAR · `3` ESCUDO · `4` ATAQUE · `5` FIN · `6` GANA · `7` PIERDE |
 
 Se envía **solo cuando aparece una postura nueva** (cambio de estado), no en cada frame.
+
+`6` GANA y `7` PIERDE no son posturas detectadas: los manda el juego **Vaquerito** (`Vision/juego/`) como reacción del robot al final de la partida. Durante la partida, la PC manda en cada ronda la jugada **del robot** (`2`, `3` o `4`) en lugar de la postura de la persona.
 
 ### 4.2 TRACK (`0x01`): posición de la mano
 

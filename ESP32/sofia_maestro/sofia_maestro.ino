@@ -82,7 +82,7 @@ const uint8_t SLAVE_IDS[] = {1};
 #define LINK_TIMEOUT_MS      3000
 #define DUPLICATE_WINDOW_MS  1000
 
-const char* POSE_NAMES[] = {"?", "INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN"};
+const char* POSE_NAMES[] = {"?", "INICIO", "RECARGAR", "ESCUDO", "ATAQUE", "FIN", "GANA", "PIERDE"};
 const char* MODE_NAMES[] = {"JUEGO", "TEST", "TRACKING"};
 
 // =============================================
@@ -566,7 +566,7 @@ void handleFrame(const RxPacket& packet) {
   switch (type) {
 
     case TYPE_POSE: {
-      if (payloadLength != 1 || payload[0] < 1 || payload[0] > 5) {
+      if (payloadLength != 1 || payload[0] < 1 || payload[0] > 7) {
         sendNack(type, seq, ERR_PAYLOAD);
         return;
       }
@@ -802,7 +802,7 @@ void loop() {
   // -----------------------------
   while (Serial.available()) {
     char c = Serial.read();
-    if (c >= '1' && c <= '5') {
+    if (c >= '1' && c <= '7') {
       Serial.printf("[SERIAL] Prueba de %s\n", POSE_NAMES[c - '0']);
       iniciarPatron(c - '0');
       fifoPush(HREG_POSE, c - '0');      // también a los esclavos

@@ -27,6 +27,8 @@
  *      3 ESCUDO    -> rombo
  *      4 ATAQUE    -> una L
  *      5 FIN       -> izquierda-derecha (despedida)
+ *      6 GANA      -> zigzag que sube por todo el módulo (Vaquerito: gana el robot)
+ *      7 PIERDE    -> zigzag que cae y se va cerrando (Vaquerito: pierde el robot)
  *
  *  El servo X inclina hacia la derecha de la cámara y el Y hacia
  *  arriba. Unidad 1 = abajo a la izquierda, 16 = arriba a la derecha.
@@ -138,14 +140,17 @@ const Punto FIG_INICIO[] = {{0, 0}, {0, 1}, {0, -1}, {0, 0}};                 //
 const Punto FIG_ESCUDO[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 1}};        // rombo
 const Punto FIG_ATAQUE[] = {{-0.5f, 1}, {-0.5f, -1}, {0.8f, -1}};             // L
 const Punto FIG_FIN[] = {{-1, 0}, {1, 0}, {-1, 0}, {1, 0}};                   // izq-der
+// Reacciones del robot al final de una partida de Vaquerito (las manda la PC)
+const Punto FIG_GANA[] = {{-1, -1}, {-0.6f, 1}, {-0.2f, -1}, {0.2f, 1}, {0.6f, -1}, {1, 1}};   // zigzag que sube (festejo)
+const Punto FIG_PIERDE[] = {{-1, 1}, {1, 0.5f}, {-0.6f, 0}, {0.6f, -0.5f}, {0, -1}};          // zigzag que cae y se cierra
 
 // Medio ancho y medio alto del arreglo (mm): tamaño de la figura
 const float TAM_FIGURA_X = 234.5f;
 const float TAM_FIGURA_Y = 174.1f;
 
 // Velocidad de la esfera en cada figura (mm/s)
-//                            -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
-const float VEL_ESFERA[6] = {0, 350,    0,        550,    360,    470};
+//                            -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN  GANA  PIERDE
+const float VEL_ESFERA[8] = {0, 350,    0,        550,    360,    470, 600,  300};
 
 // GRUPO FIJO de cada figura: las unidades que quedan a menos de ~85 mm
 // del camino (1 = abajo a la izquierda, 16 = arriba a la derecha).
@@ -160,6 +165,8 @@ const uint8_t GRUPO_INICIO[] = {3, 6, 11, 14};
 const uint8_t GRUPO_ESCUDO[] = {2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15};
 const uint8_t GRUPO_ATAQUE[] = {2, 3, 4, 5, 6, 10, 13, 14};
 const uint8_t GRUPO_FIN[] = {5, 6, 7, 8, 9, 10, 11, 12};
+const uint8_t GRUPO_GANA[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+const uint8_t GRUPO_PIERDE[] = {3, 5, 6, 7, 10, 11, 12, 13, 14, 15};
 
 // Cómo sigue cada unidad a la esfera:
 //  - se inclina HACIA la esfera; con la esfera encima queda plana y la
@@ -287,7 +294,8 @@ struct Unidad {
 };
 
 const char* NOMBRES_PATRON[] = {
-  "CENTRO", "ARRIBA-ABAJO", "CIRCULO DE CARGA", "ROMBO", "L", "IZQUIERDA-DERECHA"
+  "CENTRO", "ARRIBA-ABAJO", "CIRCULO DE CARGA", "ROMBO", "L", "IZQUIERDA-DERECHA",
+  "ZIGZAG QUE SUBE (GANA)", "ZIGZAG QUE CAE (PIERDE)"
 };
 
 Adafruit_PWMServoDriver* placas[NUM_PLACAS] = {nullptr, nullptr};
@@ -497,6 +505,8 @@ void figuraDe(int pose, const Punto*& fig, int& n, const uint8_t*& grupo, int& n
     case 3: fig = FIG_ESCUDO; n = N_ARR(FIG_ESCUDO); grupo = GRUPO_ESCUDO; ng = N_ARR(GRUPO_ESCUDO); break;
     case 4: fig = FIG_ATAQUE; n = N_ARR(FIG_ATAQUE); grupo = GRUPO_ATAQUE; ng = N_ARR(GRUPO_ATAQUE); break;
     case 5: fig = FIG_FIN;    n = N_ARR(FIG_FIN);    grupo = GRUPO_FIN;    ng = N_ARR(GRUPO_FIN);    break;
+    case 6: fig = FIG_GANA;   n = N_ARR(FIG_GANA);   grupo = GRUPO_GANA;   ng = N_ARR(GRUPO_GANA);   break;
+    case 7: fig = FIG_PIERDE; n = N_ARR(FIG_PIERDE); grupo = GRUPO_PIERDE; ng = N_ARR(GRUPO_PIERDE); break;
     default: fig = nullptr; n = 0; grupo = nullptr; ng = 0; break;
   }
 }
@@ -732,9 +742,9 @@ void irAlCentro() {
   estado = REGRESANDO;
 }
 
-// pose: 1 INICIO, 2 RECARGAR, 3 ESCUDO, 4 ATAQUE, 5 FIN
+// pose: 1 INICIO, 2 RECARGAR, 3 ESCUDO, 4 ATAQUE, 5 FIN, 6 GANA, 7 PIERDE
 void iniciarPatron(uint8_t pose) {
-  if (pose < 1 || pose > 5) {
+  if (pose < 1 || pose > 7) {
     irAlCentro();
     return;
   }

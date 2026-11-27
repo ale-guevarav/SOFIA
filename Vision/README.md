@@ -156,6 +156,11 @@ SOFIA/
 │   │   ├── alineacion_worker.py  ← menú Alineación (usa Alignment/app/nucleo)
 │   │   └── alineacion_ventana.py ← ventana emergente con la barra de progreso
 │   │
+│   ├── juego/                    ← Vaquerito (demo): reglas, CPU y partida
+│   │   ├── reglas.py
+│   │   ├── cpu.py
+│   │   └── partida.py
+│   │
 │   ├── comunicacion/             ← Bluetooth con el ESP32 / Webots
 │   │   ├── protocol.py
 │   │   ├── ble_link.py
@@ -463,19 +468,35 @@ Hilo BLE (ble_link.py) ── trama + CRC ──► ESP32 maestro ──► 2 ×
 
 ---
 
-# Flujo futuro
+# Vaquerito (demo)
+
+Partida contra el robot en modo **Juego**. Toda la lógica está en la PC (`juego/`); el robot solo dibuja figuras.
 
 ```text
-Posturas / posición de la mano
-   │
-   ▼
-Lógica del juego
-   │
-   ▼
-ESP32 maestro ──► 16 módulos de SOFIA
+INICIO o ▶ Jugar ─► "¡VAQUERITO!" ×3 ─► ¡YA! ─► tu postura ─► se resuelve la ronda ─► ...
+                    (el robot ya eligió)        (máx. 10 s)    (el robot dibuja SU jugada)
+                                                                       │
+                                               alguien recibe un disparo
+                                                                       ▼
+                                                    el robot dibuja GANA o PIERDE
 ```
 
-La lógica del juego podrá administrar aspectos como munición, acciones válidas, selección de acciones de SOFIA y condiciones de victoria o derrota.
+**Reglas** (como piedra, papel o tijera: los dos eligen al mismo tiempo):
+
+| Tú \ Robot | RECARGAR | ESCUDO | ATAQUE |
+| --- | --- | --- | --- |
+| **RECARGAR** | los dos +1 bala | tú +1 | **pierdes** |
+| **ESCUDO** | robot +1 | nada | bloqueas (gasta su bala) |
+| **ATAQUE** | **ganas** | te bloquea (gastas tu bala) | se cancelan (los dos gastan) |
+
+- Se empieza con 0 balas; el máximo es 6 (recargar de más no suma).
+- El escudo no da nada ni se acumula: solo protege esa ronda.
+- **ATAQUE sin balas es nulo** y te deja expuesto como si recargaras.
+- Gana el primero que le dispara al otro. Si en 10 s después del ¡YA! no se detecta ninguna jugada, la partida se cancela. **FIN** también la termina.
+
+**El robot (CPU)** elige y guarda su jugada en cuanto sale el primer "¡VAQUERITO!", antes de leer la tuya. No es 1 de 3 al azar: según las balas de cada quien está en un **estado** (nadie tiene balas, solo el rival, solo él, los dos, o el rival le lleva 2 o más) y tira **2 dados de 6**. Como con dos dados el 7 sale mucho más que el 2 o el 12, la jugada sensata va en el centro de la tabla y las "confusiones" en las orillas. Por ejemplo, sin balas y con el rival armado: escudo 67 %, recargar 31 % y solo un 12 (3 %) dispara. Las tablas están en `juego/cpu.py`.
+
+En la bitácora queda cada ronda con la tirada y el estado del CPU (se escribe después de resolverla, nunca antes). La lógica se puede probar sin cámara: `python -m juego.partida`.
 
 ---
 
@@ -810,11 +831,11 @@ python -m evaluacion.generate_report metrics/sesion_AAAAMMDD_HHMMSS.json
 * [x] Selección de la cámara de poses y la del módulo por su nombre del sistema.
 * [x] Evitar detecciones repetidas: confirmación temporal (5 frames) y envío de POSE solo cuando cambia la postura.
 * [x] Respuestas físicas de los 16 módulos: cada postura dibuja su figura en las 16 unidades (ESP32 y Webots).
-
+* [x] **Vaquerito (demo)**: reglas, contador de balas, máquina de estados de la partida, CPU con dados y reacciones GANA / PIERDE en el ESP32 y en Webots.
 
 ### Próximas etapas opcionales
 
-* [ ] Implementación de la lógica del juego.
+* [ ] Probar el Vaquerito con personas y ajustar las tablas del CPU.
 * [ ] Medición de la latencia completa (gesto → movimiento).
 
 ---

@@ -34,6 +34,8 @@
 //   ESCUDO   rombo
 //   ATAQUE   una L
 //   FIN      izquierda-derecha (despedida)
+//   GANA     zigzag que sube por todo el módulo (el robot gana el Vaquerito)
+//   PIERDE   zigzag que cae y se va cerrando (el robot pierde)
 //
 // Al terminar, el panel vuelve a apuntar a la esfera de la mano (la
 // ESFERA_TARGET del mundo, que no es la esfera virtual de las figuras).
@@ -61,19 +63,23 @@ const Punto FIG_INICIO[] = {{0, 0}, {0, 1}, {0, -1}, {0, 0}};
 const Punto FIG_ESCUDO[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 1}};
 const Punto FIG_ATAQUE[] = {{-0.5, 1}, {-0.5, -1}, {0.8, -1}};
 const Punto FIG_FIN[] = {{-1, 0}, {1, 0}, {-1, 0}, {1, 0}};
+const Punto FIG_GANA[] = {{-1, -1}, {-0.6, 1}, {-0.2, -1}, {0.2, 1}, {0.6, -1}, {1, 1}};
+const Punto FIG_PIERDE[] = {{-1, 1}, {1, 0.5}, {-0.6, 0}, {0.6, -0.5}, {0, -1}};
 
 const double TAM_FIGURA_U = 0.2345;   // medio ancho del arreglo (m)
 const double TAM_FIGURA_V = 0.1741;   // medio alto del arreglo (m)
 
 // Velocidad de la esfera (m/s)
-//                            -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN
-const double VEL_ESFERA[6] = {0, 0.350,  0,        0.550,  0.360,  0.470};
+//                            -  INICIO  RECARGAR  ESCUDO  ATAQUE  FIN    GANA   PIERDE
+const double VEL_ESFERA[8] = {0, 0.350,  0,        0.550,  0.360,  0.470, 0.600, 0.300};
 
 // Grupo fijo de cada figura (unidades a menos de ~85 mm del camino)
 const int GRUPO_INICIO[] = {3, 6, 11, 14};
 const int GRUPO_ESCUDO[] = {2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15};
 const int GRUPO_ATAQUE[] = {2, 3, 4, 5, 6, 10, 13, 14};
 const int GRUPO_FIN[] = {5, 6, 7, 8, 9, 10, 11, 12};
+const int GRUPO_GANA[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+const int GRUPO_PIERDE[] = {3, 5, 6, 7, 10, 11, 12, 13, 14, 15};
 
 // Cómo sigue cada unidad a la esfera (m)
 const double DIST_LLENA = 0.070;     // más lejos que esto: inclinada completa
@@ -94,6 +100,8 @@ inline void figura(int postura, const Punto *&fig, int &n, const int *&grupo, in
         case 3: fig = FIG_ESCUDO; n = SOFIA_N(FIG_ESCUDO); grupo = GRUPO_ESCUDO; ng = SOFIA_N(GRUPO_ESCUDO); break;
         case 4: fig = FIG_ATAQUE; n = SOFIA_N(FIG_ATAQUE); grupo = GRUPO_ATAQUE; ng = SOFIA_N(GRUPO_ATAQUE); break;
         case 5: fig = FIG_FIN;    n = SOFIA_N(FIG_FIN);    grupo = GRUPO_FIN;    ng = SOFIA_N(GRUPO_FIN);    break;
+        case 6: fig = FIG_GANA;   n = SOFIA_N(FIG_GANA);   grupo = GRUPO_GANA;   ng = SOFIA_N(GRUPO_GANA);   break;
+        case 7: fig = FIG_PIERDE; n = SOFIA_N(FIG_PIERDE); grupo = GRUPO_PIERDE; ng = SOFIA_N(GRUPO_PIERDE); break;
         default: fig = nullptr; n = 0; grupo = nullptr; ng = 0; break;
     }
 }
@@ -159,7 +167,7 @@ inline bool recarga(double t, int unidad, Punto &salida) {
     return true;
 }
 
-// Patrón de la postura (1-5) para la unidad (1-16), t segundos después
+// Patrón de la postura (1-7) para la unidad (1-16), t segundos después
 // de empezar. Regresa false si la postura no existe o ya terminó.
 inline bool patron(int postura, double t, int unidad, Punto &salida) {
     salida.u = 0;

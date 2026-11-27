@@ -23,6 +23,10 @@ Interfaz gráfica (PySide6 / Qt) que:
         módulo y guarda sus ceros (Alignment/results/ceros_esp32.json).
         "Alinear": corrige una por una las unidades desalineadas.
       Al conectarse al ESP32 le manda los ceros guardados.
+    - VAQUERITO (demo, modo Juego, juego/): partida contra el robot.
+      "¡VAQUERITO!" ×3 en grande, el robot ya eligió (CPU con dados 2d6),
+      se lee la postura y se resuelve la ronda; el robot dibuja su jugada
+      y al final GANA o PIERDE. INICIO empieza la partida y FIN la termina.
     - Registro de la sesión (evaluacion/session_logger.py): posturas,
       comandos, latencias y fallas en CSV + un resumen por condición
       de prueba, como evidencia de las pruebas.
@@ -49,7 +53,7 @@ import traceback
 # (rutas "models/..." relativas)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, QTimer, Slot
 from PySide6.QtGui import QActionGroup, QFont, QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -73,6 +77,7 @@ from PySide6.QtWidgets import (
 )
 
 from comunicacion.ble_link import BleLink
+from comunicacion.protocol import POSE_IDS
 from comunicacion.sim_link import WebotsLink
 from deteccion.gesture_recognition import GESTURE_IDS, NO_GESTURE
 from deteccion.vision_pipeline import MODE_GAME, MODE_TEST, MODE_TRACKING
@@ -95,6 +100,8 @@ from interfaz.alineacion_worker import (
 from interfaz.alineacion_ventana import AlineacionVentana, CamarasVentana
 from interfaz import camaras
 from evaluacion.session_logger import SessionLogger
+from juego.partida import Partida, VECES_VAQUERITO, ESPERA_MAX_S
+from juego.reglas import MAX_BALAS, NULO, ROBOT
 
 
 # -----------------------------
@@ -141,6 +148,13 @@ QLabel#video { background: #0b0d10; border: 1px solid #2b3038; border-radius: 8p
 QLabel#bigValue { font-size: 30px; font-weight: 700; color: #58a6ff; }
 QLabel#muted { color: #9aa4b2; }
 QLabel#testBig { padding: 4px 0; }
+
+/* ---------- VAQUERITO ---------- */
+QLabel#gameOverlay {
+    background: rgba(10, 12, 16, 170); color: #ffd33d;
+    border: 2px solid #ffd33d; border-radius: 8px; font-weight: 900;
+}
+QPushButton#gameStart:enabled { background: #9e6a03; border-color: #d29922; color: white; }
 
 /* ---------- ALINEACIÓN ---------- */
 QPushButton#alignMenu {
@@ -214,6 +228,15 @@ class MainWindow(QMainWindow):
         # Evidencia de las pruebas (CSV + resumen)
         self.session = SessionLogger()
 
+        # VAQUERITO (demo): la lógica vive en juego/, aquí solo se muestra
+        self.partida = Partida()
+        self.game_gesture = NO_GESTURE
+        self._game_hold_until = 0.0      # no reflejar posturas mientras el robot reacciona
+        self._overlay_token = 0
+        self.game_timer = QTimer(self)
+        self.game_timer.setInterval(50)
+        self.game_timer.timeout.connect(self._game_tick)
+
         # Dos enlaces independientes con la MISMA lógica de protocolo.
         # Los resultados se mandan a TODOS los que estén conectados:
         #   solo ESP32  -> robot real
@@ -262,6 +285,15 @@ class MainWindow(QMainWindow):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
 
+        # Letrero grande del Vaquerito, encima del video
+        self.game_overlay = QLabel(self.video_label)
+        self.game_overlay.setObjectName("gameOverlay")
+        self.game_overlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.game_overlay.setTextFormat(Qt.TextFormat.RichText)
+        self.game_overlay.setWordWrap(True)
+        self.game_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.game_overlay.hide()
+
         # Vista de la simulación (a la derecha del video, oculta
         # hasta que se active "Ver cámara de Webots")
         self.sim_label = QLabel("Esperando la cámara de Webots...")
@@ -288,6 +320,7 @@ class MainWindow(QMainWindow):
 
         side.addWidget(self._build_control_group())
         side.addWidget(self._build_mode_group())
+        side.addWidget(self._build_game_group())
         side.addWidget(self._build_result_group())
         side.addWidget(self._build_test_group())
         side.addWidget(self._build_ble_group())
@@ -389,6 +422,37 @@ class MainWindow(QMainWindow):
         row.addWidget(self.radio_test)
         row.addWidget(self.radio_tracking)
 
+        return group
+
+
+    def _build_game_group(self):
+
+        # Solo visible en modo JUEGO
+        group = QGroupBox("Vaquerito (demo)")
+        box = QVBoxLayout(group)
+
+        self.game_score = QLabel()
+        self.game_score.setTextFormat(Qt.TextFormat.RichText)
+
+        self.game_status = QLabel("INICIO o ▶ Jugar empieza la partida · FIN la termina")
+        self.game_status.setObjectName("muted")
+        self.game_status.setWordWrap(True)
+
+        row = QHBoxLayout()
+        self.btn_game_start = QPushButton("▶  Jugar")
+        self.btn_game_start.setObjectName("gameStart")
+        self.btn_game_start.clicked.connect(self.start_game)
+        self.btn_game_stop = QPushButton("■  Terminar")
+        self.btn_game_stop.clicked.connect(lambda: self.stop_game("terminada desde la GUI"))
+        row.addWidget(self.btn_game_start)
+        row.addWidget(self.btn_game_stop)
+
+        box.addWidget(self.game_score)
+        box.addWidget(self.game_status)
+        box.addLayout(row)
+
+        self.game_group = group
+        self._update_game_panel()
         return group
 
 
@@ -598,6 +662,7 @@ class MainWindow(QMainWindow):
         if self.worker is None:
             return
 
+        self.stop_game("se detuvo la detección")
         self.worker.stop()
         self.append_log("Deteniendo detección...")
 
@@ -621,6 +686,7 @@ class MainWindow(QMainWindow):
         self.state_label.setText(f"{dot(COLORS[state])}  Estado: <b>{state}</b>")
 
         self._update_test_buttons()
+        self._update_game_panel()
 
 
     # =============================================
@@ -653,6 +719,7 @@ class MainWindow(QMainWindow):
             self.session.event("camara", kind, detail)
 
         if kind == "perdida":
+            self.stop_game("se perdió la cámara")
             # Sin cámara no hay postura confiable: robot a estado seguro
             for link in self._targets():
                 link.send_stop()
@@ -678,6 +745,7 @@ class MainWindow(QMainWindow):
         self.worker_state = STATE_STOPPED
         self._update_controls()
 
+        self.stop_game("se detuvo la detección")
         self.video_label.clear()
         self.video_label.setText("Detección detenida")
         self.append_log("Detección detenida")
@@ -718,14 +786,26 @@ class MainWindow(QMainWindow):
             "Persona detectada" if result.person_detected else "Persona no detectada"
         )
 
+        self.game_gesture = result.gesture
+        new_gesture = result.gesture != self.last_sent_gesture
+
+        # Vaquerito: INICIO empieza la partida y FIN la termina
+        if new_gesture and result.gesture == "INICIO" and not self.partida.activa:
+            self.start_game()
+        elif new_gesture and result.gesture == "FIN" and self.partida.activa:
+            self.stop_game("FIN")
+
+        # Durante la partida el robot solo dibuja SUS jugadas (no las tuyas)
+        playing = self.partida.activa or time.monotonic() < self._game_hold_until
+
         # Se envía solo cuando APARECE una postura nueva
-        if result.gesture != self.last_sent_gesture:
+        if new_gesture:
 
             self.session.posture(
                 result.gesture, result.person_detected, result.processing_ms
             )
 
-            if result.gesture != NO_GESTURE:
+            if result.gesture != NO_GESTURE and not playing:
                 # tag: para medir el ciclo detección -> ACK del ESP32
                 tag = {
                     "postura": result.gesture,
@@ -805,6 +885,10 @@ class MainWindow(QMainWindow):
 
         self.test_group.setVisible(mode == MODE_TEST)
         self._set_test_idle()
+        if mode != MODE_GAME:
+            self.stop_game("cambio de modo")
+        self.game_group.setVisible(mode == MODE_GAME)
+        self._update_game_panel()
 
         if self.worker is not None:
             self.worker.set_mode(mode)
@@ -1259,6 +1343,8 @@ class MainWindow(QMainWindow):
         if self.align_worker is not None or self.align_preview is not None:
             return
 
+        self.stop_game("se abrió la alineación")
+
         esp32 = self.links[TARGET_ESP32]
         if not esp32.connected:
             self._align_popup("Conecta el ESP32 primero",
@@ -1399,8 +1485,175 @@ class MainWindow(QMainWindow):
         self._reset_alignment()
 
 
+    # =============================================
+    # VAQUERITO (demo)
+    # =============================================
+
+    def start_game(self):
+
+        if self.partida.activa:
+            return
+        if self.mode != MODE_GAME or self.worker_state != STATE_RUNNING:
+            self.append_log("Vaquerito: inicia la detección en modo Juego para jugar")
+            return
+        if self._aligning:
+            return
+
+        self.append_log("Vaquerito: ¡nueva partida! (balas: 0 y 0, máximo 6)")
+        self._handle_game_events(self.partida.iniciar(time.monotonic()))
+        self.game_timer.start()
+
+
+    def stop_game(self, reason):
+        if self.partida.activa:
+            self._handle_game_events(self.partida.cancelar(reason))
+
+
+    @Slot()
+    def _game_tick(self):
+        events = self.partida.actualizar(time.monotonic(), self.game_gesture)
+        self._handle_game_events(events)
+        if not self.partida.activa:
+            self.game_timer.stop()
+
+
+    def _send_robot_figure(self, name):
+        # Sin proc_ms en el tag: no cuenta en el ciclo detección -> ACK
+        for link in self._targets():
+            link.send_pose(POSE_IDS[name], {"postura": f"juego:{name}"})
+
+
+    def _handle_game_events(self, events):
+
+        for event in events:
+            data = event.datos
+
+            if event.tipo == "cuenta":
+                n = data["n"]
+                self._show_overlay(
+                    f'<div style="font-size:72px;">¡VAQUERITO!</div>'
+                    f'<div style="font-size:30px; color:#e6e8eb;">{n} / {VECES_VAQUERITO}</div>'
+                )
+                self.game_status.setText(f"Ronda {data['ronda']}: prepárate (el robot ya eligió)")
+
+            elif event.tipo == "ya":
+                self._show_overlay('<div style="font-size:96px; color:#ff7b72;">¡YA!</div>')
+                self.game_status.setText(
+                    f"Ronda {data['ronda']}: haz RECARGAR, ESCUDO o ATAQUE "
+                    f"({ESPERA_MAX_S:.0f} s)"
+                )
+
+            elif event.tipo == "ronda":
+                ronda = data["ronda"]
+                # El robot dibuja la jugada que eligió (un disparo NULO también se ve como ATAQUE)
+                self._send_robot_figure(ronda.jugada_robot)
+                tu = ronda.efectiva_jugador if ronda.efectiva_jugador != NULO else "ATAQUE (sin balas)"
+                robot = ronda.efectiva_robot if ronda.efectiva_robot != NULO else "ATAQUE (sin balas)"
+                self._show_overlay(
+                    f'<div style="font-size:30px; color:#e6e8eb;">Tú: <b>{tu}</b> &nbsp;·&nbsp; '
+                    f'Robot: <b>{robot}</b></div>'
+                    f'<div style="font-size:44px;">{ronda.texto}</div>'
+                )
+                self.game_status.setText(ronda.texto)
+                self.append_log(
+                    f"Vaquerito ronda {ronda.numero}: tú {ronda.efectiva_jugador}, robot "
+                    f"{ronda.efectiva_robot} (2d6={ronda.tirada}, {ronda.estado_cpu}) -> "
+                    f"{ronda.texto} · balas tú {ronda.balas_jugador}, robot {ronda.balas_robot}"
+                )
+
+            elif event.tipo == "fin":
+                robot_gana = data["ganador"] == ROBOT
+                # Primero se ve la jugada del robot y luego su reacción
+                self._game_hold_until = time.monotonic() + 7.5
+                QTimer.singleShot(2500, lambda g=robot_gana: self._game_over(g))
+                self.append_log(
+                    f"Vaquerito: {'gana el robot' if robot_gana else '¡ganaste!'} "
+                    f"en {data['rondas']} rondas"
+                )
+
+            elif event.tipo == "cancelada":
+                self._show_overlay(
+                    f'<div style="font-size:44px;">Partida cancelada</div>'
+                    f'<div style="font-size:22px; color:#e6e8eb;">{data["motivo"]}</div>',
+                    hide_after_ms=3000,
+                )
+                self.game_status.setText(f"Partida cancelada: {data['motivo']}")
+                self.append_log(f"Vaquerito: partida cancelada ({data['motivo']})")
+                self.game_timer.stop()
+
+        self._update_game_panel()
+
+
+    def _game_over(self, robot_gana):
+        self._send_robot_figure("GANA" if robot_gana else "PIERDE")
+        if robot_gana:
+            text = '<div style="font-size:84px; color:#ff7b72;">¡PERDISTE!</div>'
+            status = "Ganó el robot. INICIO o ▶ Jugar para la revancha"
+        else:
+            text = '<div style="font-size:84px; color:#3fb950;">¡GANASTE!</div>'
+            status = "¡Le ganaste al robot! INICIO o ▶ Jugar para otra"
+        self._show_overlay(text, hide_after_ms=5000)
+        self.game_status.setText(status)
+
+
+    def _show_overlay(self, html, hide_after_ms=None):
+        self._overlay_token += 1
+        self.game_overlay.setText(html)
+        self._place_overlay()
+        self.game_overlay.show()
+        self.game_overlay.raise_()
+        if hide_after_ms:
+            token = self._overlay_token
+            QTimer.singleShot(hide_after_ms, lambda: self._hide_overlay(token))
+
+
+    def _hide_overlay(self, token):
+        # Solo si nadie más lo cambió mientras tanto
+        if token == self._overlay_token and not self.partida.activa:
+            self.game_overlay.hide()
+
+
+    def _place_overlay(self):
+        rect = self.video_label.rect()
+        margin = 24
+        height = min(rect.height() - 2 * margin, 260)
+        self.game_overlay.setGeometry(
+            margin, (rect.height() - height) // 2, rect.width() - 2 * margin, height
+        )
+
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, "game_overlay") and self.game_overlay.isVisible():
+            self._place_overlay()
+
+
+    def _update_game_panel(self):
+
+        if not hasattr(self, "game_score"):
+            return
+
+        def bullets(n):
+            full = '<span style="color:#ffd33d;">●</span>' * n
+            empty = '<span style="color:#3a3f47;">●</span>' * (MAX_BALAS - n)
+            return f'<span style="font-size:17px;">{full}{empty}</span>'
+
+        self.game_score.setText(
+            f"<table><tr><td>Tú&nbsp;&nbsp;</td><td>{bullets(self.partida.balas_jugador)}</td>"
+            f"<td>&nbsp;{self.partida.balas_jugador}</td></tr>"
+            f"<tr><td>Robot&nbsp;&nbsp;</td><td>{bullets(self.partida.balas_robot)}</td>"
+            f"<td>&nbsp;{self.partida.balas_robot}</td></tr></table>"
+        )
+
+        can_play = self.mode == MODE_GAME and self.worker_state == STATE_RUNNING
+        self.btn_game_start.setEnabled(can_play and not self.partida.activa)
+        self.btn_game_stop.setEnabled(self.partida.activa)
+        self.game_group.setVisible(self.mode == MODE_GAME)
+
+
     def closeEvent(self, event):
 
+        self.game_timer.stop()
         self._stop_preview()
 
         if self.align_worker is not None:

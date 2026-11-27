@@ -52,6 +52,8 @@ Vistos desde la cámara cenital:
 | ESCUDO | Rombo, todos al unísono |
 | ATAQUE | Una L, todos al unísono |
 | FIN | Izquierda-derecha (despedida), todos al unísono |
+| GANA (6) | Zigzag que sube por todo el módulo: el robot ganó el Vaquerito |
+| PIERDE (7) | Zigzag que cae y se va cerrando: el robot perdió |
 
 Las figuras, la amplitud y las velocidades se cambian en `controllers/tracker_esfera_cpp/patrones.hpp`.
 

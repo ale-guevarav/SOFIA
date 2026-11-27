@@ -28,6 +28,8 @@ ESP32/
 | POSE 3 · ESCUDO | El módulo dibuja un **rombo** (~2.1 s) |
 | POSE 4 · ATAQUE | El módulo dibuja una **L** (~1.8 s) |
 | POSE 5 · FIN | El módulo dibuja **izquierda-derecha** (despedida, ~3.0 s) |
+| POSE 6 · GANA | Vaquerito: el robot ganó. **Zigzag que sube** por todo el módulo (~3.0 s) |
+| POSE 7 · PIERDE | Vaquerito: el robot perdió. **Zigzag que cae** y se va cerrando (~4.4 s) |
 | TRACK (solo en modo TRACKING) | **Apuntan hacia la mano** (EMA) |
 | STOP | Regresan al centro (EMA) |
 | AJUSTE (unidad 0–15 + cero X/Y) | **Nuevo cero** de esa unidad, medido con el diagnóstico de alineación (menú **Alineación** de la GUI). Con "reacomodar" hace una sacudida corta (±4°) y se asienta; sin él solo reescribe el PWM. La GUI manda los ceros guardados cada vez que se conecta. Solo las unidades del maestro (no se reenvía a los esclavos); si el ESP32 se reinicia sin PC, usa `AJUSTE_X/Y` |
@@ -107,7 +109,7 @@ En el Monitor Serie, con *"Sin ajuste de línea"*, escribe:
 
 | Tecla | Acción |
 |---|---|
-| `1` – `5` | Dibuja la figura de esa postura |
+| `1` – `7` | Dibuja la figura de esa postura (`6` GANA, `7` PIERDE) |
 | `0` | Regresa al centro |
 | `u` | Prueba unidad por unidad: **elige la siguiente unidad** (1, 2… 16 y al final "todas"). El Monitor Serie dice su placa y canales. No la mueve sola: con `e` empieza su prueba. Si ya había una prueba en curso, sigue con la nueva unidad |
 | `e` | **Empieza el movimiento de prueba** de la unidad elegida (si no hay ninguna, la 1): arriba, abajo, izquierda, derecha, diagonal ↗ ↙ y diagonal ↖ ↘, a 60 °/s con una pausa en cada punto, en ciclo (~9 s por vuelta). Las demás se quedan al centro |
