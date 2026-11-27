@@ -10,4 +10,4 @@ results/diagnosticos/
 
 __pycache__/
 
-.venv/
+.venv/build/entrenados/
