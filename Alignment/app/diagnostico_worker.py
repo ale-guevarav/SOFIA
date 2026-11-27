@@ -307,7 +307,7 @@ class DiagnosticoWorker(QThread):
             self._diag.geometrico = anterior.geometrico
             self._diag.referencia = True
 
-        self.metodo_listo.emit(self._diag.metodo, self._diag.dispositivo, self._diag.aviso)
+        self.metodo_listo.emit(self._diag.nombre_metodo, self._diag.dispositivo, self._diag.aviso)
         if self._diag.aviso:
             self.mensaje.emit(self._diag.aviso)
 
