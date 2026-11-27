@@ -253,7 +253,7 @@ uint8_t buildFrame(uint8_t* out, uint8_t addr, const Job& job) {
 void fifoPush(uint16_t reg, uint16_t value) {
   uint8_t next = (fifoHead + 1) % FIFO_SIZE;
   if (next == fifoTail) {
-    Serial.println("[MODBUS] Cola llena, comando descartado");
+    //Serial.println("[MODBUS] Cola llena, comando descartado");
     return;
   }
   fifo[fifoHead].reg = reg;
@@ -322,8 +322,8 @@ void failTransaction(const char* why) {
 
   if (curCritical || millis() - lastMbErrMs > 2000) {
     lastMbErrMs = millis();
-    Serial.printf("[MODBUS] Fallo con nodo 0x%02X (reg %u): %s\n",
-                  txFrame[0], curJob.reg, why);
+    //Serial.printf("[MODBUS] Fallo con nodo 0x%02X (reg %u): %s\n",
+     //             txFrame[0], curJob.reg, why);
   }
   advanceTarget();
 }

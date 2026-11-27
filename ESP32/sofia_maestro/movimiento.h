@@ -91,8 +91,8 @@ const int PWM_EN_THETA_MAX = 225;   // cuentas del PCA9685 en +60°
 
 // Si un eje se mueve al revés de lo esperado,
 // cambiar a true (no hace falta tocar nada más)
-const bool INVERTIR_X = false;
-const bool INVERTIR_Y = false;
+const bool INVERTIR_X = true;
+const bool INVERTIR_Y = true;
 
 // Ajuste fino por unidad (grados que se suman a su centro), por si
 // alguna placa no queda plana en 0°. Unidad 1 = posición 0
