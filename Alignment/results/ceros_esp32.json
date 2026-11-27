@@ -1,119 +1,119 @@
 {
   "descripcion": "Ceros de los servos (grados que suma el ESP32 a X, Y). Los mide la GUI de visión (menú Alineación).",
-  "fecha": "2026-11-23T06:11:44",
+  "fecha": "2026-11-27T12:34:54",
   "metodo": "cnn",
   "unidades": [
     {
       "numero": 0,
-      "x": 20.0,
-      "y": 3.8,
+      "x": -13.3,
+      "y": -20.0,
       "signo_x": -1,
-      "signo_y": 1
+      "signo_y": -1
     },
     {
       "numero": 1,
-      "x": 0.0,
-      "y": 0.0,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -20.0,
+      "y": -18.0,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 2,
-      "x": 0.0,
-      "y": -3.4,
-      "signo_x": 1,
+      "x": -20.0,
+      "y": -20.0,
+      "signo_x": -1,
       "signo_y": -1
     },
     {
       "numero": 3,
-      "x": -8.9,
-      "y": 20.0,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -13.9,
+      "y": -20.0,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 4,
-      "x": 8.6,
-      "y": -1.0,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -20.0,
+      "y": -16.7,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 5,
-      "x": 0.0,
-      "y": 0.0,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -20.0,
+      "y": -20.0,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 6,
-      "x": 8.7,
-      "y": 5.1,
-      "signo_x": 1,
+      "x": -13.2,
+      "y": 20.0,
+      "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 7,
-      "x": 4.2,
-      "y": 1.1,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -20.0,
+      "y": -20.0,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 8,
-      "x": 0.0,
-      "y": 0.0,
-      "signo_x": 1,
-      "signo_y": 1
+      "x": -20.0,
+      "y": -20.0,
+      "signo_x": -1,
+      "signo_y": -1
     },
     {
       "numero": 9,
-      "x": 6.2,
-      "y": 6.5,
-      "signo_x": 1,
+      "x": -20.0,
+      "y": -16.4,
+      "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 10,
-      "x": 15.1,
-      "y": -4.6,
-      "signo_x": 1,
+      "x": -20.0,
+      "y": 20.0,
+      "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 11,
-      "x": -7.6,
-      "y": -16.9,
-      "signo_x": -1,
-      "signo_y": 1
+      "x": 7.9,
+      "y": -20.0,
+      "signo_x": 1,
+      "signo_y": -1
     },
     {
       "numero": 12,
-      "x": -0.3,
+      "x": -20.0,
       "y": -20.0,
       "signo_x": -1,
-      "signo_y": 1
+      "signo_y": -1
     },
     {
       "numero": 13,
-      "x": 11.2,
-      "y": 0.1,
-      "signo_x": 1,
+      "x": 5.6,
+      "y": -20.0,
+      "signo_x": -1,
       "signo_y": 1
     },
     {
       "numero": 14,
-      "x": 5.6,
-      "y": -15.7,
+      "x": -16.3,
+      "y": -20.0,
       "signo_x": -1,
-      "signo_y": 1
+      "signo_y": -1
     },
     {
       "numero": 15,
-      "x": -0.9,
+      "x": -15.7,
       "y": -20.0,
       "signo_x": 1,
-      "signo_y": 1
+      "signo_y": -1
     }
   ]
 }

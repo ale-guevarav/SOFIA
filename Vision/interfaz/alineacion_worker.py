@@ -8,10 +8,10 @@ Alignment/app/nucleo; aquí solo se usa.
     TOMAR CEROS  mide las 16 unidades, calcula el cero de cada servo,
                  lo guarda en Alignment/results/ceros_esp32.json y se
                  lo manda al ESP32.
-    ALINEAR      mide, y corrige UNA POR UNA las unidades que no están
-                 OK, de la menos a la más desalineada. Con cada unidad:
-                 corrige, toma otra foto y vuelve a medirla, hasta que
-                 queda OK (máx. INTENTOS_MAX). Si un eje EMPEORA, ese servo
+    ALINEAR      recorre las unidades EN ORDEN, de la 0 a la 15. Con cada
+                 una que no esté OK: corrige, toma otra foto y vuelve a
+                 medirla, y no pasa a la siguiente hasta que queda OK o
+                 lleva INTENTOS_MAX intentos. Si un eje EMPEORA, ese servo
                  está al revés: invierte su signo (solo esa unidad) y lo
                  guarda. Al final toma otra foto para revisar.
 
@@ -54,7 +54,7 @@ ESPERA_CEROS_S = 0.15           # TOMAR CEROS: entre unidad y unidad
 ESPERA_REVISION_S = 1.0         # antes de la foto de revisión
 FOTOS_CALENTAR = 15             # la cámara tarda unos cuadros en ajustar la luz
 PASOS_BARRA = 100               # resolución de la barra por unidad
-INTENTOS_MAX = 4                # ALINEAR: correcciones por unidad como máximo
+INTENTOS_MAX = 20               # ALINEAR: no pasa de unidad hasta OK o hasta estos intentos
 EMPEORA_GRADOS = 0.5            # un eje que crece más que esto (mismo lado) = servo al revés
 EJE_MINIMO_GRADOS = 1.0         # ejes más chicos no se usan para decidir
 
@@ -224,21 +224,21 @@ class AlineacionWorker(QThread):
 
             ceros = cz.cargar()      # los que tiene el ESP32 (se mandan al conectar)
 
-            if self.accion == TOMAR_CEROS:
-                unidades = list(range(cz.NUM_UNIDADES))
-            else:
-                # Las que no están OK, de la menos a la más desalineada
-                unidades = sorted((n for n, m in medidos.items() if m[3] != "OK"),
-                                  key=lambda n: medidos[n][2])
+            # Las 16 en orden, de la 0 a la 15. Al alinear, cada una se revisa con la
+            # medición más nueva: la que ya está OK se salta
+            unidades = list(range(cz.NUM_UNIDADES))
+            mal = [n for n in unidades if medidos[n][3] != "OK"]
 
-            self.imagen.emit(a_qimage(dibujar(d, unidades if self.accion == ALINEAR else ())))
+            self.imagen.emit(a_qimage(dibujar(d, mal if self.accion == ALINEAR else ())))
 
-            if not unidades:
+            if self.accion == ALINEAR and not mal:
                 self.progreso.emit(1, 1, "¡Todo alineado!")
                 self.terminado.emit("¡Todo alineado! Ninguna unidad necesita corrección.")
                 return
 
             signos = cz.cargar_signos()
+            self._ultimo = dict(medidos)     # la medición más nueva de cada unidad
+            self._sin_alinear = []           # las que llegaron a INTENTOS_MAX sin quedar OK
 
             # Una por una
             total = len(unidades)
@@ -252,7 +252,12 @@ class AlineacionWorker(QThread):
                     if not self._tomar_cero(numero, medidos[numero], ceros, signos,
                                             i, total, maximo):
                         break
-                elif not self._alinear_unidad(diag, camara, numero, medidos[numero], ceros,
+                elif self._ultimo[numero][3] == "OK":
+                    self.progreso.emit((i + 1) * PASOS_BARRA, maximo, f"#{numero} ya está OK")
+                    self.log.emit(f"  #{numero}: ya está OK, se salta")
+                    hechas.pop()
+                    continue
+                elif not self._alinear_unidad(diag, camara, numero, self._ultimo[numero], ceros,
                                               signos, i, total, maximo):
                     cz.guardar(ceros, d.metodo, signos=signos)
                     return                               # ya no se ve el SOFIA
@@ -313,7 +318,8 @@ class AlineacionWorker(QThread):
             if d is None:
                 return False
             self.imagen.emit(a_qimage(dibujar(d, [numero])))
-            n1, n2, n_mag, n_estado = por_numero(d)[numero]
+            self._ultimo = por_numero(d)
+            n1, n2, n_mag, n_estado = self._ultimo[numero]
 
             # ¿Algún eje se fue más para el mismo lado? -> ese servo está al revés
             for eje, (antes, ahora) in enumerate(((theta1, n1), (theta2, n2))):
@@ -325,8 +331,12 @@ class AlineacionWorker(QThread):
 
             theta1, theta2, magnitud = n1, n2, n_mag
             if n_estado == "OK":
-                break
+                self.log.emit(f"  #{numero}: OK en {intento} intento(s)")
+                return True
 
+        self._sin_alinear.append(numero)
+        self.log.emit(f"  #{numero}: sigue en {magnitud:.1f}° después de {INTENTOS_MAX} intentos; "
+                      "se pasa a la siguiente (revisa ese servo)")
         return True
 
     def _resumen(self, hechas, antes, despues, conteo):
@@ -342,6 +352,11 @@ class AlineacionWorker(QThread):
             lineas.append(f"#{n}: {a:.1f}° → {b:.1f}°")
             if b > a + 1.0:
                 empeoraron.append(n)
+        sin_alinear = getattr(self, "_sin_alinear", [])
+        if sin_alinear:
+            lineas += ["", f"<span style='color:#d29922'><b>No quedaron OK en {INTENTOS_MAX} intentos: "
+                       f"{', '.join(f'#{n}' for n in sin_alinear)}</b> — probablemente el servo no "
+                       "sigue el comando</span>"]
         if empeoraron:
             lineas += ["", f"<span style='color:#ff7b72'><b>Empeoraron: "
                        f"{', '.join(f'#{n}' for n in empeoraron)}</b> — revisa los signos en "
