@@ -29,6 +29,8 @@ import cv2
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QImage
 
+from interfaz import camaras
+
 
 # Núcleo de Alignment (SOFIA/Alignment/app/nucleo)
 RAIZ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -201,7 +203,7 @@ class AlineacionWorker(QThread):
             self.log.emit(f"Alineación: {diag.aviso}")
 
         self.progreso.emit(0, 0, f"Abriendo la cámara del módulo ({self.indice_camara})...")
-        camara = cv2.VideoCapture(self.indice_camara)
+        camara = camaras.abrir(self.indice_camara)
         if not camara.isOpened():
             self.error.emit(f"No se pudo abrir la cámara del módulo ({self.indice_camara})")
             return
@@ -361,7 +363,7 @@ MAX_CAMARAS = 5
 
 
 class BuscarCamarasWorker(QThread):
-    """Prueba las cámaras 0..MAX_CAMARAS-1 y regresa una foto de cada una."""
+    """Prueba las cámaras conectadas y regresa una foto de cada una."""
 
     # lista de (indice, QImage o None, texto)
     listas = Signal(list)
@@ -372,23 +374,23 @@ class BuscarCamarasWorker(QThread):
 
     def run(self):
         resultado = []
-        for indice in range(MAX_CAMARAS):
+        for indice, nombre in camaras.listar(self.ocupadas):
             if indice in self.ocupadas:
-                resultado.append((indice, None, "en uso por la detección (ve a la persona)"))
+                resultado.append((indice, None, f"{nombre}<br>en uso por la detección de poses"))
                 continue
-            camara = cv2.VideoCapture(indice)
+            camara = camaras.abrir(indice)
             try:
                 if not camara.isOpened():
-                    continue                       # no existe: no se muestra
+                    continue                       # no abre: no se muestra
                 foto = None
                 for _ in range(10):                # unos cuadros para que ajuste la luz
                     ok, cuadro = camara.read()
                     if ok:
                         foto = cuadro
                 if foto is None:
-                    resultado.append((indice, None, "abre pero no manda imagen"))
+                    resultado.append((indice, None, f"{nombre}<br>abre pero no manda imagen"))
                 else:
-                    resultado.append((indice, a_qimage(foto), f"{foto.shape[1]}x{foto.shape[0]}"))
+                    resultado.append((indice, a_qimage(foto), f"{nombre}<br>{foto.shape[1]}x{foto.shape[0]}"))
             finally:
                 camara.release()
         self.listas.emit(resultado)
@@ -426,7 +428,7 @@ class VistaCamaraWorker(QThread):
             return
         pp.usar_centros_reales(True)
 
-        camara = cv2.VideoCapture(self.indice_camara)
+        camara = camaras.abrir(self.indice_camara)
         if not camara.isOpened():
             self.error.emit(f"No se pudo abrir la cámara del módulo ({self.indice_camara})")
             return

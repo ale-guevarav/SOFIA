@@ -24,3 +24,6 @@ openpyxl==3.1.5
 # (no usar PySide6 6.12.0: tiene un bug que cierra el programa)
 PySide6==6.11.2
 bleak==3.0.2
+
+# Nombres de las cámaras en Windows (DirectShow)
+pygrabber==0.2; sys_platform == "win32"
