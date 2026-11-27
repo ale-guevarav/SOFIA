@@ -4,10 +4,11 @@ Aquí va el modelo que **sí** se sube al repositorio, para que el equipo lo ten
 
 | Archivo | Qué es |
 | --- | --- |
-| `cnn.pt` | Pesos de la CNN pequeña (~5 MB) |
+| `cnn.pt` | Pesos de la CNN pequeña (~5 MB), afinada con fotos del módulo real (`sesion_real_20261126`) |
 | `cnn.json` | De dónde salió: sesión, época y MAE en val |
+| `cnn_sim.pt` | El modelo anterior, entrenado solo con Webots. Se conserva para compararlos en la app (*CNN solo simulación (anterior)*) |
 
-La app (`Alignment/app/app_diagnostico.py`) y el método híbrido usan `cnn.pt` por defecto.
+La app (`Alignment/app/app_diagnostico.py`), el método híbrido y el menú Alineación de la GUI usan `cnn.pt` por defecto.
 
 ## Publicar una versión nueva
 

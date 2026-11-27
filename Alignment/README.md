@@ -31,6 +31,7 @@ Alignment/
 │       ├── metodo_geometrico.py    método sin entrenamiento
 │       ├── modelos.py, inferencia.py   CNN / ResNet18 y cómo usarlas
 │       ├── diagnosticador.py       lo que llama la app (CNN, geométrico o híbrido)
+│       ├── ceros.py                ángulos de la app -> ceros de los servos (menú Alineación)
 │       └── rutas.py                dónde está cada carpeta
 │
 ├── build/      DONDE SE ENTRENA (o reentrena)
@@ -43,10 +44,12 @@ Alignment/
 │   ├── publicar_modelo.py      copia el modelo bueno a results/modelo/
 │   ├── herramientas/           marcadores ArUco y mundos de Webots
 │   ├── datos/webots/<sesión>/  fotos de Webots              (no se sube)
+│   ├── datos/reales/<sesión>/  fotos del módulo real        (no se sube)
 │   └── entrenados/<modelo>_<sesión>/  pesos (no se suben), historial y curvas
 │
 ├── results/    LO QUE SALE DEL BUILD Y USA LA APP
-│   ├── modelo/cnn.pt           modelo publicado (sí se sube, ~5 MB)
+│   ├── modelo/cnn.pt           modelo publicado: Webots + fotos reales (sí se sube, ~5 MB)
+│   ├── modelo/cnn_sim.pt       modelo anterior, solo Webots (para comparar)
 │   ├── evaluaciones/           métricas, gráficas y comparacion.md de cada método
 │   ├── COMPARACION.md          geométrico vs CNN vs híbrido
 │   ├── marcadores_imprimir.png hoja para el marco del módulo real
@@ -75,7 +78,9 @@ Todo se corre **desde la carpeta `SOFIA`** con el entorno activado.
 python Alignment/app/app_diagnostico.py
 ```
 
-Usa `results/modelo/cnn.pt` con la **CNN** (la más precisa: 0.20° de error en test). Sin PyTorch o sin modelo, avisa y usa el geométrico.
+Usa `results/modelo/cnn.pt` con la **CNN** (afinada con fotos del módulo real: 0.23° de error en las fotos reales de test, 0.53° en Webots). Sin PyTorch o sin modelo, avisa y usa el geométrico.
+
+En **Método** se elige: *CNN pequeña* (la publicada), *CNN solo simulación (anterior)* (`cnn_sim.pt`, 2.04° en las fotos reales), *Geométrico* o *Híbrido*. Con la cámara y con fotos reales, los recortes se centran en las placas reales (`results/centros_reales.json`); con sesiones de Webots, en las del diseño.
 
 | Fuente | Cómo |
 | --- | --- |
@@ -163,7 +168,14 @@ python Alignment/build/entrenar.py --desde Alignment/results/modelo/cnn.pt <sesi
 
 Empieza con los pesos del modelo y un learning rate 10 veces menor (para ajustar sin "desaprender") y sale en `build/entrenados/<modelo>_<sesión>_afinado/`.
 
-**Fotos del módulo real:** se arma una sesión con la misma estructura que las de Webots (`imagenes/00000.jpg …` con la foto 0 en 0,0, y `etiquetas.csv` con θ1 y θ2 de cada panel en cada foto, por ejemplo mandando ángulos conocidos con el ESP32), se prepara con `preparar_dataset.py` y se afina la CNN de Webots con `--desde`. Con pocas fotos reales basta, porque la red ya aprendió en la simulación.
+**Fotos del módulo real:** se arma una sesión con la misma estructura que las de Webots (`imagenes/00000.jpg …` con la foto 0 en 0,0, y `etiquetas.csv` con θ1 y θ2 de cada panel en cada foto), se prepara con `preparar_dataset.py` y se afina la CNN de Webots con `--desde`. Con pocas fotos reales basta, porque la red ya aprendió en la simulación.
+
+Así se hizo `sesion_real_20261126` (el modelo publicado):
+
+1. Se alineó el módulo a mano y se tomaron 7 fotos de referencia en 0,0; de ellas salen los centros reales de cada placa (`results/centros_reales.json`).
+2. Con `ESP32/sofia_desalineo_azar/` se mandaron ~400 posiciones al azar y se tomó una foto de cada una (el CSV del monitor guarda los ángulos mandados).
+3. Los servos no llegan al ángulo mandado (mueven la placa entre 0 y 40 %), así que la etiqueta **no** es el ángulo mandado: se **midió** en cada foto cuánto se corrió cada placa respecto a las fotos alineadas (comparación de plantillas, subpíxel) y se convirtió a ángulo con la cinemática. El ángulo mandado solo sirvió para emparejar cada foto con su muestra.
+4. Se afinó la CNN de Webots con `--desde` y se publicó: 2.04° → **0.23°** en las 60 fotos reales de test, y la exactitud de estados de 72 % a 96 %.
 
 Todos usan la **última sesión** si no se les pasa otra. Publica (y sube con `git add Alignment/results/modelo`) solo cuando el modelo mejore: cada versión subida se queda en el historial de git.
 
@@ -191,6 +203,6 @@ Cuando el módulo esté listo hay que medir y actualizar en `geometria.py`: posi
 
 ## Siguientes pasos
 
-1. Fotos del módulo real: ajuste fino de la CNN y evaluación.
-2. Meter la app como modo **Diagnóstico** en la GUI principal (el hilo ya está hecho igual que el de la GUI).
-3. Comparación con el gemelo digital.
+1. Más fotos reales (otra luz, otra altura de cámara) para que el modelo no dependa de esta sesión.
+2. Revisar los servos que casi no mueven la placa (X de las unidades 2, 3, 7, 8 y 15; Y de la 9): con ellos *Alinear* no puede corregir.
+3. Las unidades 10 y 11 (placas plateadas sobre base blanca) se miden peor: pintarlas o cambiar la base.

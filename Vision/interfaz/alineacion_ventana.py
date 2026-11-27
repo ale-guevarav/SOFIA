@@ -210,6 +210,7 @@ class CamarasVentana(QDialog):
                 foto.setText("Sin imagen")
             marca = "  ✔ (la elegida)" if indice == actual else ""
             nombre = QLabel(f"<b>Cámara {indice}</b>{marca}<br><small>{texto}</small>")
+            nombre.setWordWrap(True)
             nombre.setTextFormat(Qt.TextFormat.RichText)
             boton = QPushButton("Usar esta")
             boton.setObjectName("primary")

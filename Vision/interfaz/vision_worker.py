@@ -47,6 +47,7 @@ from PySide6.QtGui import QImage
 from deteccion.gesture_recognition import NO_GESTURE
 from deteccion.vision_pipeline import VisionPipeline, MODE_GAME, MODE_TEST
 from evaluacion.metrics_logger import PerformanceMetrics
+from interfaz import camaras
 
 
 # Reintentos de la cámara
@@ -183,7 +184,7 @@ class VisionWorker(QThread):
 
         while True:
 
-            cap = cv2.VideoCapture(self.camera_index)
+            cap = camaras.abrir(self.camera_index)
 
             if cap.isOpened():
                 ok, _ = cap.read()

@@ -85,8 +85,19 @@ La tabla completa (con p95 y recall de "necesita atención") se genera con:
 python Alignment/build/comparar_resultados.py
 ```
 
+## Con fotos del módulo real
+
+Test: **60 fotos reales** de `sesion_real_20261126` (860 hexágonos medidos), que el modelo no vio al entrenar. Las etiquetas se midieron en cada foto contra las fotos alineadas a mano (ver `Alignment/README.md`).
+
+| Modelo | MAE (°) | RMSE (°) | Error máx (°) | MAE en Webots (°) |
+| --- | --- | --- | --- | --- |
+| CNN solo simulación (`cnn_sim.pt`) | 2.039 | 3.025 | 13.27 | 0.204 |
+| **CNN afinada con fotos reales (`cnn.pt`)** | **0.227** | **0.331** | **2.99** | 0.53 |
+
+El modelo de simulación pierde casi 10 veces la precisión con el módulo real (otra luz, otras placas, cámara de celular); con ~400 fotos reales se recupera. A cambio, empeora un poco en Webots, que ya no es el caso que importa. Reportes en `results/evaluaciones/cnn_sesion_real_20261126_test_*`.
+
 ## Cuándo usar cuál
 
-- **Con PyTorch (de preferencia con GPU):** la **CNN**. Es la que usa la app por defecto.
+- **Con PyTorch (de preferencia con GPU):** la **CNN** (`cnn.pt`). Es la que usan la app y la GUI por defecto; `cnn_sim.pt` solo para comparar.
 - **Sin PyTorch o sin modelo:** geométrico (la app cambia sola y lo avisa).
 - **Híbrido:** solo para comparar.

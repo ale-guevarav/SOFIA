@@ -1,7 +1,58 @@
-.history/
-*.kicad_prl
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
 
-# Ejecutable del controlador de Webots: cada quien lo compila (make)
+# ===== Editores y sistema =====
+.vscode/
+# Extensión "Local History" de VS Code
+.history/
+.DS_Store
+Thumbs.db
+
+# ===== LaTeX (Paper-Latex/, Respuesta revisores/) =====
+# Archivos intermedios de la compilación; el .tex, el .bbl y el .pdf sí se suben
+*.aux
+*.log
+*.out
+*.toc
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# ===== KiCad (PCB/) =====
+# Preferencias locales de cada quien (zoom, capas visibles)
+*.kicad_prl
+# Respaldos automáticos que KiCad guarda solo en <proyecto>-backups/
+*-backups/
+
+# ===== Webots =====
+Webots/**/build/
+Webots/**/*.o
+Webots/**/*.d
+Webots/**/*.exe
+# Estado de la ventana de Webots: cada quien tiene el suyo
+Webots/**/*.wbproj
+# Ejecutables de los controladores en C++: cada quien los compila con Build
 Webots/Sofia/controllers/tracker_esfera_cpp/tracker_esfera_cpp
-Webots/Sofia/controllers/tracker_esfera_cpp/tracker_esfera_cpp.exe
-Webots/Sofia/controllers/tracker_esfera_cpp/build/
+Webots/Sofia/controllers/panel_dataset/panel_dataset
+
+# ===== Vision =====
+# Métricas de cada corrida de la GUI; las que valen se copian a Vision/evidencia/
+Vision/metrics/
+
+# ===== Alignment =====
+# Sesiones de Webots / fotos reales y su caché (pesan GB; se regeneran)
+Alignment/build/datos/
+# Pesos de los modelos entrenados (historial.csv y curvas.png sí se suben)...
+Alignment/**/*.pt
+Alignment/**/*.pth
+Alignment/**/*.npz
+# ...menos los modelos publicados, que usan la app y la GUI
+!Alignment/results/modelo/*.pt
+# Lo que guarda la app con "Guardar reporte"
+Alignment/results/diagnosticos/
+
+# Parches sueltos que se pasan por chat (ya aplicados, no se suben)
+*.patch
