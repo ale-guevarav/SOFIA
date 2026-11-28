@@ -57,7 +57,46 @@
 	and lines correspond to the revised manuscript
 	accompanying this letter.
 	
-	\textbf{Main changes.} \textcolor{red}{FALTA HACER ESTOOOO}
+	\textbf{Main changes.} The main modifications introduced
+	in the revised manuscript are summarized as follows:
+	
+	\begin{itemize}
+		\item Incorporation of the required declarations and
+		correction of formatting issues, including improved
+		schematic and PCB layout figures.
+		
+		\item Revision of the Introduction to emphasize
+		vision-based orientation estimation and correction
+		as the primary research focus.
+		
+		\item Experimental validation of the CNN on the
+		physical SOFIA prototype through sim-to-real
+		fine-tuning using approximately 400 real photographs.
+		
+		\item Clarification of the hybrid decision rule,
+		angular classification thresholds, and state
+		accuracy metric.
+		
+		\item Implementation and preliminary experimental
+		evaluation of vision-based closed-loop orientation
+		correction on the physical prototype.
+		
+		\item Addition of experimental evidence regarding
+		PCB functionality and gesture recognition performance.
+		
+		\item Expansion of the Discussion and Conclusions
+		to address failure analysis, comparison with related
+		work, experimental limitations, reproducibility,
+		and the research question.
+		
+		\item Inclusion of the project repository as a
+		reference for source code, implementation details,
+		and available research resources.
+		
+		\item Removal of the preliminary servomotor dynamic
+		response subsection due to insufficient quantitative
+		experimental evidence.
+	\end{itemize}
 	
 	\LabDSTsummary
 	
@@ -239,7 +278,9 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
 	
-	\LabDSTcomment{R3.1}{N}{}
+	\LabDSTcomment{R3.1}{A}{Section~\ref{sec:experimental_misalignment},
+		Table~\ref{tab:real_photos},
+		Fig.~\ref{fig:physical_diagnosis}}
 	{Todo el diagnóstico se entrenó y se probó
 		con imágenes de Webots. El objetivo 2
 		(Línea 60) promete ``sim-to-real finetuning''
@@ -249,9 +290,15 @@
 		$0.204^\circ$ a $1.6^\circ$ (Línea 493);
 		el salto de simulación a cámara real
 		puede ser mayor.}
-	{}
+	{The revised manuscript includes experimental
+		validation on the physical SOFIA prototype. The CNN was fine-tuned using approximately 400 real photographs and evaluated on 60 independent test photographs with 860 plate samples.
+		
+		After fine-tuning, the mean angular error decreased from $2.04^\circ$ to $0.227^\circ$, and state accuracy increased from 72.4\% to 96.4\%.
+		
+		Only the CNN was selected for physical implementation. A photograph of the prototype during operation is included as experimental evidence.}
 	
-	\LabDSTcomment{R3.2}{N}{}
+	\LabDSTcomment{R3.2}{A}{\rln{hardware-config},
+		\rln{hybrid}, \rln{hybrid-results}, Table~\ref{tab:results_Vision_Train}}
 	{En la segunda corrida, la regla híbrida
 		reporta el mismo máximo que la CNN
 		($3.3^\circ$) y la misma columna
@@ -260,7 +307,29 @@
 		método geométrico. No se explica cómo
 		se calcula States ni con qué umbrales
 		se cuenta un acierto.}
-	{}
+	{The methodology now explicitly defines
+		the angular magnitude
+		$m=\sqrt{\theta_1^2+\theta_2^2}$
+		and the three classification thresholds:
+		\textit{OK} ($m<2^\circ$),
+		\textit{REVIEW} ($2^\circ\leq m\leq5^\circ$),
+		and \textit{MISALIGNED} ($m>5^\circ$).
+		
+		State accuracy is defined as the percentage
+		of plates whose estimated and reference
+		states match.
+		
+		The hybrid decision rule has also been
+		clarified. Its preference for geometric
+		estimates near the classification thresholds
+		explains the identical rounded state accuracy
+		of 94.1\%, while CNN selection at larger
+		angles explains the matching maximum error
+		and error above $15^\circ$.
+		
+		The hybrid method was evaluated only in
+		simulation, and the CNN was selected
+		for physical implementation.}
 	
 	\LabDSTcomment{R3.3}{P}{\Rln{firmware-communication}, repository~\cite{sofia_repository}}
 	{El firmware de la ESP32-C3, el formato
@@ -346,7 +415,13 @@
 		experimental limitations.
 	}
 	
-	\LabDSTcomment{R4.2}{N}{}
+	\LabDSTcomment{R4.2}{A}{Section~\ref{sec:discussion},
+		Section~\ref{sec:conclusions},
+		\rln{discussion-failures},
+		\rln{discussion-literature},
+		\rln{discussion-validity},
+		\rln{discussion-reproducibility},
+		\rln{conclusion-research-question}}
 	{Discussion y Conclusions tienen tres
 		y dos párrafos. Les falta:
 		
@@ -368,18 +443,31 @@
 		\par\noindent\textbullet\ una respuesta
 		explícita a la pregunta rectora
 		en las conclusiones.}
-	{}
+	{The Discussion and Conclusions sections
+		have been expanded to include failure analysis,
+		comparison with related systems, experimental
+		limitations, threats to validity, and
+		reproducibility considerations.
+		
+		Furthermore, the Conclusions section now
+		explicitly addresses the research question
+		and acknowledges the limitations of physical
+		correction and system validation.}
 	
-	\LabDSTcomment{R4.3}{N}{}
+	\LabDSTcomment{R4.3}{P}{\rln{data-availability}}
 	{No se entregan el generador de Webots,
 		el código de entrenamiento, el modelo,
 		el reconocedor de gestos ni los datos.
 		No hay carpeta algorithms/, ni repositorio,
 		ni bitácora, ni análisis Discover
 		(R4.4 del segundo corte).}
-	{}
+	{The Data Availability section now provides a direct reference to the SOFIA project repository:
+		
+	\texttt{https://github.com/ale-guevarav/SOFIA}.
+		
+	The repository contains the simulation environment, dataset generation scripts, training and evaluation code, trained models, and available project resources.}
 	
-	\LabDSTcomment{R4.4}{N}{}
+	\LabDSTcomment{R4.4}{N}{Section~\ref{sec:results}}
 	{El perfil de velocidad (12 consignas
 		de $30$ a $600^\circ/\mathrm{s}$)
 		se reporta solo con palabras:
@@ -387,7 +475,7 @@
 		desynchronization were observed''.
 		No hay tabla, gráfica, criterio
 		de chatter ni número de repeticiones.}
-	{}
+	{The preliminary servomotor dynamic response subsection has been removed from the revised manuscript due to the lack of sufficient quantitative experimental data to support the reported observations.}
 	
 	
 \end{document}

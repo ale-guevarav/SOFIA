@@ -287,7 +287,7 @@
 	
 	\linelabel{ln:materials-intro}The SOFIA kinetic surface uses 32 MG90S servomotors for platform actuation \cite{sofia_architecture,mg90s}. Rather than instrumenting individual actuators mechanically, this study evaluates the orientation of all 16 hexagonal platforms simultaneously through an overhead computer vision pipeline.
 
-	\linelabel{ln:hardware-config}The methodology is divided into three main stages: embedded hardware configuration, vision-based rectification with dataset generation in Webots, and comparative evaluation of angular estimation models. The first stage involves the selection and electrical verification of the electronic components required for 32-channel servomotor control and inter-module communication \cite{technical_session}. The second stage establishes an overhead camera calibration procedure using four coplanar ArUco markers to generate metric top-down crops ($1~\text{px} = 1~\text{mm}$) and automates the acquisition of labeled datasets in Webots. The third stage benchmarks a geometric displacement model, a lightweight convolutional neural network (CNN), and a hybrid decision rule to estimate platform tilt angles and classify each unit as \textit{OK} ($<2^\circ$), \textit{REVIEW} ($2^\circ\text{--}5^\circ$), or \textit{MISALIGNED} ($>5^\circ$).
+	\linelabel{ln:hardware-config}The methodology is divided into three main stages: embedded hardware configuration, vision-based rectification with dataset generation in Webots, and comparative evaluation of angular estimation models. The first stage involves the selection and electrical verification of the electronic components required for 32-channel servomotor control and inter-module communication \cite{technical_session}. The second stage establishes an overhead camera calibration procedure using four coplanar ArUco markers to generate metric top-down crops ($1~\text{px} = 1~\text{mm}$) and automates the acquisition of labeled datasets in Webots. The third stage benchmarks a geometric displacement model, a lightweight convolutional neural network (CNN), and a hybrid decision rule using simulated images. Each plate is classified according to its angular magnitude $m=\sqrt{\theta_1^2+\theta_2^2}$ as \textit{OK} ($m<2^\circ$), \textit{REVIEW} ($2^\circ\leq m\leq5^\circ$), or \textit{MISALIGNED} ($m>5^\circ$). State accuracy is defined as the percentage of plates whose estimated and reference states match. Only the CNN was selected for physical implementation and subsequent sim-to-real fine-tuning.
 	
 	\linelabel{ln:methods-variables}The electronic architecture of the complete SOFIA system includes an ESP32-C3 microcontroller and two PCA9685 PWM drivers, which provide the 32 PWM channels required for actuator control \cite{sofia_architecture,esp32c3,pca9685}.
 	
@@ -782,7 +782,7 @@
 	\vspace{1.5ex}
 	\subsubsection{Hybrid Rule}
 	
-	\linelabel{ln:hybrid}Both methods are evaluated for each plate. If their estimates differ by more than $2^\circ$, the CNN estimate is selected and the plate is marked for inspection. If the estimates agree and the plate is near zero ($\le6^\circ$), the geometric estimate is selected; otherwise, the CNN estimate is used. This rule was developed during the first run, in which the geometric method achieved the highest accuracy near zero.
+	\linelabel{ln:hybrid}Both methods are evaluated for each plate. If their estimates differ by more than $2^\circ$ on either rotation axis, the CNN estimate is selected and the plate is marked for inspection. If the estimates agree and the CNN-estimated angular magnitude $m=\sqrt{\theta_1^2+\theta_2^2}$ is $\leq6^\circ$, the geometric estimate is selected; otherwise, the CNN estimate is used. This rule was developed during the first run, in which the geometric method achieved the highest accuracy near zero. The hybrid rule was evaluated only in simulation.
 
 	\vspace{1.5ex}
 	\subsubsection{Exclusion of ResNet18}
@@ -959,8 +959,6 @@
 	\section{Results}
 	\label{sec:results}
 	
-	\subsection{Preliminary Servomotor Dynamic Response}
-	\linelabel{ln:speed}Preliminary speed profiling was conducted on a single module across 12 setpoints ($30^\circ/\text{s}$ to $600^\circ/\text{s}$). The servomotors demonstrated smooth trajectory execution at low-to-medium velocities ($30^\circ/\text{s}$--$350^\circ/\text{s}$). Beyond $500^\circ/\text{s}$, mechanical chatter and motion desynchronization were observed. Based on these preliminary tests, $350^\circ/\text{s}$ was selected as the operating limit for smooth servomotor actuation.
 
 	\subsection{Results for the Training Methods of Vision-Based Misalignment Diagnosis}
 	
@@ -983,7 +981,7 @@
 			ResNet18 & 0.293 & 4.1 & 0.21 & 0.43 & 95.9\,\%\\
 			Hybrid & \textbf{0.223} & 4.4 & \textbf{0.13} & \textbf{0.36} & \textbf{97.2\,\%}\\
 			\midrule
-			\multicolumn{6}{@{}l}{\textit{Second run (real unit, 10\,000 images)}}\\
+			\multicolumn{6}{@{}l}{\textit{Second run (real unit prototype, 10\,000 images)}}\\
 			Geometric & 0.521 & 5.9 & 0.33 & 1.60 & 94.1\,\%\\
 			CNN & \textbf{0.204} & \textbf{3.3} & \textbf{0.17} & \textbf{0.41} & \textbf{96.8\,\%}\\
 			Hybrid & 0.329 & \textbf{3.3} & 0.33 & \textbf{0.41} & 94.1\,\%\\
@@ -994,6 +992,8 @@
 	\textbf{First run.} Each method exhibited different strengths. The geometric method was the most accurate near zero ($0.13^\circ$), but occasionally produced large estimation errors (up to $74^\circ$) when a highly tilted plate was confused with an adjacent one. The CNN maintained a lower maximum error ($4.4^\circ$). The hybrid rule combined the advantages of both methods and achieved the lowest mean error ($0.223^\circ$).
 
 	\textbf{Second run.} The CNN achieved a mean error of $0.204^\circ$ and a maximum error of $3.3^\circ$ across 24\,000 plate samples, outperforming the other methods in overall mean error. The geometric method became less accurate near zero ($0.13^\circ \rightarrow 0.33^\circ$) because the shorter arm of the real unit reduces displacement per degree, increasing the impact of pixel-level errors. However, its maximum error decreased to $5.9^\circ$. Consequently, the hybrid rule ranked second in overall mean error ($0.329^\circ$), as it relies on the geometric estimate near zero. Its inspection flags also showed limited reliability: 873 of the 901 flags corresponded to errors of the geometric method rather than the CNN. The CNN was therefore selected as the default method, while the geometric method remains an alternative when a GPU is unavailable.
+	
+	\linelabel{ln:hybrid-results} The preference for geometric estimates near the state thresholds explains the identical rounded state accuracy of 94.1\%, while CNN selection at larger angles explains the matching maximum error and error above $15^\circ$.
 
 	\linelabel{ln:findings}Two main findings were identified. First, increasing the number and realism of training images improved CNN performance despite the more challenging geometry. Second, changes in the module geometry may require model retraining, as the CNN from the first run achieved an error of $1.6^\circ$ when evaluated on the second unit configuration.
 	
@@ -1019,6 +1019,19 @@
 	\end{figure}
 
 	\textbf{Physical prototype.} Table~\ref{tab:real_photos} reports the error on 60 real test photographs (860 plates) that were not used for training. The labels were measured in each photograph against seven photographs of the module aligned by hand, instead of using the commanded angles, because the servos move the plates only a fraction of the commanded angle. The CNN trained only in simulation reached $2.04^\circ$ of mean error and 72.4\,\% of correct states; after fine-tuning, the mean error fell to $0.227^\circ$, the maximum to $3.0^\circ$, and the state accuracy rose to 96.4\,\%.
+	
+	Figure~\ref{fig:physical_diagnosis} shows the
+	physical prototype during operation using the
+	fine-tuned CNN.
+	
+	\begin{figure}[!t]
+		\centering
+		\includegraphics[width=0.6\columnwidth]
+		{figures/physical_diagnosis}
+		\caption{CNN-based misalignment diagnosis
+			on the physical SOFIA prototype.}
+		\label{fig:physical_diagnosis}
+	\end{figure}
 
 	\begin{table}[!t]
 		\centering
