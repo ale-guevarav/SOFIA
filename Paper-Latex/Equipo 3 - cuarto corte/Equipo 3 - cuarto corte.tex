@@ -91,18 +91,19 @@
 	dedicated angular sensors on each module.
 	
 	\linelabel{ln:intro-cap}
-	The proposed methodology combines image rectification,
-	neural network-based angular estimation, and datasets
-	obtained from both simulation and physical image
-	acquisition. Synthetic images generated in Webots
-	were used to develop and evaluate the initial
-	estimation models. Additionally, real photographs
-	of the complete SOFIA module have been acquired
-	to support subsequent model adaptation and
-	experimental validation under physical conditions.
-	This approach establishes a foundation for
-	vision-based misalignment diagnosis and future
-	closed-loop orientation correction.
+	The proposed methodology combines image
+	rectification, neural network-based angular
+	estimation, and datasets obtained from
+	simulation and physical image acquisition.
+	Synthetic images generated in Webots were
+	used to develop and evaluate the initial
+	estimation models. Subsequently, the
+	selected CNN was fine-tuned using 400
+	photographs of the physical SOFIA prototype,
+	and its validation performance was evaluated.
+	These developments support vision-based
+	misalignment diagnosis and its integration
+	with the orientation correction system.
 	
 	\linelabel{ln:intro-32}
 	The SOFIA demonstrator also integrates 32
@@ -929,21 +930,23 @@
 		\label{fig:sofia_pcb}
 	\end{figure*}
 	
-	\subsection{PCB Prototype Limitations}
-	\linelabel{ln:pcb-revision}
-	The PCB was developed as a functional
-	prototype for integrating the SOFIA
-	electronic subsystems. However, its
-	current-carrying capacity and power
-	distribution performance have not yet
-	been validated under full system load.
 	
-	Future work will focus on characterizing
-	servomotor current consumption, verifying
-	PCB trace and connector ratings, and
-	evaluating power distribution and
-	decoupling requirements to support
-	reliable operation of the complete system.
+	\subsection{PCB Prototype Limitations}
+	The PCB was successfully designed, fabricated,
+	and functionally tested as an electronic
+	integration prototype for the SOFIA modular
+	kinetic surface. During experimental operation,
+	the board handled transient current peaks
+	of up to 3.5 A without observed functional
+	failures.
+	
+	However, this preliminary evaluation does
+	not establish the maximum continuous current
+	capacity of the PCB. Further testing is
+	required to characterize sustained current
+	operation, voltage drops, thermal behavior,
+	and power distribution under full system load.
+	
 	
 	
 	\section{Results}
@@ -1268,6 +1271,22 @@
 	whose servos follow the command; where they do not, the
 	diagnosis points to a mechanical problem rather than to a
 	wrong zero.
+	
+	\linelabel{ln:objectives-validation}
+	The three research objectives achieved different
+	levels of experimental validation. The PCB
+	architecture and layout were developed,
+	although full-load electrical verification
+	remains pending. Vision-based misalignment
+	diagnosis was validated using real photographs,
+	and closed-loop orientation correction was
+	experimentally implemented, with limited
+	improvement due to mechanical and camera
+	configuration constraints. Gesture recognition
+	was quantitatively validated, while
+	end-to-end evaluation of gesture-triggered
+	physical actuation remains to be documented.
+	
 
 	
 	

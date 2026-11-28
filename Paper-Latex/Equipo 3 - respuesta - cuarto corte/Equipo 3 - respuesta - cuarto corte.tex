@@ -152,14 +152,39 @@
 		pregunta por la estimación.}
 	{}
 	
-	\LabDSTcomment{R2.2}{N}{}
+	\LabDSTcomment{R2.2}{A}
+	{\Rln{intro1},
+		\rln{intro-vision},
+		\rln{intro-cap},
+		\rln{intro-32}}
 	{La introducción todavía presenta el reto
 		general de coordinar 32 actuadores y el
 		RS-485, y el diagnóstico aparece en una
 		sola oración al final (Línea 39).
 		El lector no sabe que el artículo trata
 		de visión hasta la Sección II.}
-	{}
+	{
+		The Introduction was revised to establish
+		vision-based orientation estimation and
+		misalignment diagnosis as the primary
+		research focus from the opening paragraphs.
+		
+		The revised text explains the limitations
+		of relying exclusively on commanded
+		servomotor positions and introduces the
+		overhead camera-based estimation approach.
+		
+		The methodology now also acknowledges
+		the fine-tuning of the selected CNN
+		using 400 photographs of the physical
+		SOFIA prototype.
+		
+		The embedded control architecture,
+		including the 32 servomotors and RS-485
+		communication, is presented as supporting
+		technology rather than the central
+		research contribution.
+	}
 	
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{3}{Contenido técnico: Materials and Methods y Design and Implementation}
@@ -199,7 +224,10 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{4}{Metodología D-Lab, resultados y validación}
 	
-	\LabDSTcomment{R4.1}{N}{}
+	\LabDSTcomment{R4.1}{P}
+	{Section~\ref{subsec:pcb_design},
+		Section~\ref{sec:experimental_misalignment},
+		Table~\ref{tab:gesture_benchmark}}
 	{De los tres objetivos, ninguno está
 		validado en el prototipo:
 		
@@ -215,7 +243,58 @@
 		(máquina de estados con gestos en tiempo
 		real): los gestos funcionan, pero no
 		hay integración con los servos.}
-	{}
+	{
+		The revised manuscript includes additional
+		experimental evidence regarding the three
+		research objectives.
+		
+		For the first objective, the PCB was
+		successfully designed, fabricated, and
+		functionally tested. The experimental
+		evaluation demonstrated its operation
+		with currents of up to 3.5 A, providing
+		physical evidence of the electronic
+		integration and functionality of the
+		developed board.
+		
+		Further characterization under full
+		system load remains necessary to
+		evaluate thermal performance and
+		power distribution reliability.
+		
+		For the second objective, the CNN was
+		fine-tuned using approximately 400
+		photographs of the physical SOFIA prototype.
+		Experimental testing on 60 real photographs
+		yielded a mean angular estimation error
+		of $0.227^\circ$ and a state classification
+		accuracy of 96.4\%.
+		
+		Additionally, a physical closed-loop
+		correction experiment was conducted.
+		The number of units classified as OK
+		increased from four to five, while the
+		mean misalignment of the twelve corrected
+		units decreased from $9.2^\circ$ to
+		$8.4^\circ$. The limited correction
+		performance and its experimental
+		constraints are discussed in the manuscript.
+		
+		For the third objective, the gesture
+		recognition subsystem was experimentally
+		evaluated across 111 attempts, achieving
+		an overall recognition accuracy of 93.7\%.
+		Nevertheless, quantitative end-to-end
+		validation of gesture-triggered physical
+		actuation has not been presented.
+		
+		Therefore, the manuscript now provides
+		physical validation evidence for the
+		vision-based diagnosis and correction
+		system, while explicitly acknowledging
+		the remaining integration and
+		experimental limitations.
+	}
 	
 	\LabDSTcomment{R4.2}{N}{}
 	{Discussion y Conclusions tienen tres
