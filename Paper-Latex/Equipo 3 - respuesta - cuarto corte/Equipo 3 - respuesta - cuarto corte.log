@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  26 NOV 2026 18:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  27 NOV 2026 15:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -342,11 +342,17 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 {C:/Users/Marrc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Marr
 c/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-22.
+24.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
+! Too many }'s.
+l.129 		actuation and image analysis.}
+                                      
+You've closed more groups than you opened.
+Such booboos are generally harmless, so keep going.
+
 [2] [3] (Equipo 3 - respuesta - cuarto corte.aux)
  ***********
 LaTeX2e <2026-06-01>
@@ -354,10 +360,10 @@ L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 3591 strings out of 467501
- 54339 string characters out of 5408550
- 498055 words of memory out of 5000000
- 32794 multiletter control sequences out of 15000+600000
+ 3600 strings out of 467501
+ 54547 string characters out of 5408550
+ 498717 words of memory out of 5000000
+ 32803 multiletter control sequences out of 15000+600000
  659657 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,6n,79p,324b,216s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -368,7 +374,7 @@ rw/times/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (3 pages, 90576 byt
+Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (3 pages, 91950 byt
 es).
 PDF statistics:
  43 PDF objects out of 1000 (max. 8388607)
