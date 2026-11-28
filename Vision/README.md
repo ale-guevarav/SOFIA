@@ -213,7 +213,7 @@ Menú verde **Alineación** de la GUI (debajo de Iniciar / Detener). Une la visi
 | Opción | Qué hace |
 |---|---|
 | **Tomar ceros** | Mide las 16 unidades con la **cámara del módulo** (la que ve al SOFIA, no a la persona; se elige en el mismo menú), calcula el cero de cada servo, lo guarda en `Alignment/results/ceros_esp32.json` y se lo manda al ESP32 |
-| **Alinear** | Mide y corrige **una por una** las unidades que no están OK, de la menos a la más desalineada. Cada unidad se corrige, se vuelve a medir y se repite hasta que queda OK (máx. 4 intentos). Si un eje **empeora** en vez de mejorar (servo montado o conectado al revés), invierte el signo de ese eje solo para esa unidad y lo guarda en el JSON. Al final toma otra foto para revisar |
+| **Alinear** | Recorre las unidades **en orden, de la 0 a la 15**, y corrige las que no están OK. Cada unidad se corrige, se vuelve a medir y se repite; **no pasa a la siguiente hasta que queda OK o lleva 10 intentos** (las que no lo logran salen al final en el resumen). Si un eje **empeora** en vez de mejorar (servo montado o conectado al revés), invierte el signo de ese eje solo para esa unidad y lo guarda en el JSON. Al final toma otra foto para revisar |
 
 - **¿Cuál cámara es?** La de la persona se elige en **Cámara de poses** (Control de detección); la del módulo, en *Alineación → Cámara del módulo* (por defecto, la primera que no es la de poses). Las dos listas muestran el nombre del sistema y solo las cámaras conectadas; *Buscar cámaras (con foto)* enseña una foto de cada una.
 - Al elegir *Tomar ceros* o *Alinear*, primero sale la **cámara del módulo en vivo**, con los ArUco que ve marcados en verde, para acomodarla. Cuando se vean los 4, se pica **Comenzar**.

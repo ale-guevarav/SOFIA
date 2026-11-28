@@ -992,27 +992,7 @@
 	
 	After the selection of the CNN as the primary method for angular estimation, we made an experimental evaluation using images from the physical SOFIA prototype. The evaluation considered estimation error, and misalignment state classification accuracy.
 	
-	\linelabel{ln:res-cnn}
-	Table~\ref{results_Vision_Train} compares the
-	evaluated methods on independent test sets of 300
-	and 1500 synthetic images. The datasets differ in
-	module geometry and angular distribution.
-	
-	\textbf{First run.} The geometric method achieved
-	the lowest error near zero ($0.13^\circ$), but
-	produced errors of up to $74^\circ$. The hybrid
-	method achieved the lowest mean error ($0.223^\circ$).
-	
-	\textbf{Second run.} Across 24\,000 plate samples,
-	the CNN achieved the lowest mean error ($0.204^\circ$).
-	The shorter mechanical arm reduced geometric
-	accuracy near zero ($0.13^\circ$ to $0.33^\circ$).
-	Furthermore, 873 of 901 hybrid inspection flags
-	corresponded to geometric estimation errors.
-	Consequently, the CNN was selected as the default
-	method.
-	
-	The CNN model was further tuned using 400 real photographs of the physical SOFIA model As shown in Fig.~\ref{fig:cnn_training_comparison}, the initial
+	The CNN model was further tuned using about 400 real photographs of the physical SOFIA prototype. As shown in Fig.~\ref{fig:cnn_training_comparison}, the initial
 	CNN and ResNet18 achieved minimum validation errors
 	of $0.249^\circ$ and $0.300^\circ$, respectively.
 	The second CNN achieved $0.205^\circ$ at epoch 24,
@@ -1027,6 +1007,57 @@
 			stages. Markers indicate the best validation epochs.}
 		\label{fig:cnn_training_comparison}
 	\end{figure}
+
+	\textbf{Physical prototype.} Table~\ref{tab:real_photos} reports the error on 60 real test photographs (860 plates) that were not used for training. The labels were measured in each photograph against seven photographs of the module aligned by hand, instead of using the commanded angles, because the servos move the plates only a fraction of the commanded angle. The CNN trained only in simulation reached $2.04^\circ$ of mean error and 72.4\,\% of correct states; after fine-tuning, the mean error fell to $0.227^\circ$, the maximum to $3.0^\circ$, and the state accuracy rose to 96.4\,\%.
+
+	\begin{table}[!t]
+		\centering
+		\caption{Test Error ($^\circ$) on the Physical Prototype (60 Real Photographs)}
+		\label{tab:real_photos}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c c@{}}
+			\toprule
+			CNN & Mean & Max & States\\
+			\midrule
+			Simulation only & 2.039 & 13.3 & 72.4\,\%\\
+			Fine-tuned (about 400 real photographs) & \textbf{0.227} & \textbf{3.0} & \textbf{96.4\,\%}\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subsection{Closed-Loop Correction on the Physical Prototype}
+	\label{sec:closed_loop}
+
+	The host PC uses the fine-tuned CNN to correct the zero of each servo. The units are visited in order, from 0 to 15. For each unit that is not OK, the PC computes a new zero for its two servos, sends it to the ESP32-C3 over BLE, waits, takes another photograph, and measures the unit again; it does not move to the next unit until the unit is OK or ten attempts have been made. If an axis gets worse instead of better, the sign of that axis is inverted for that unit.
+
+	\textbf{Correction without the loop.} In a first test, the zeros were computed from a single photograph and sent once, without measuring again. The units of the top and bottom rows ended OK, while the units of the two middle rows remained in REVIEW. No numerical record was kept of this test.
+
+	\textbf{Closed-loop test.} Before the closed-loop test, the support of the upper right ArUco marker broke and was glued back, which moved that marker about 8~mm. The real plate centers were recomputed with a homography from the three markers that did not move (0.6~mm of spread across the seven aligned photographs). The module camera was placed at an oblique angle rather than overhead. Four units were already OK, and the loop corrected the other 12 (Table~\ref{tab:closed_loop}).
+
+	\begin{table}[!t]
+		\centering
+		\caption{Closed-Loop Correction Test on the Physical Prototype (16 Units)}
+		\label{tab:closed_loop}
+		\scriptsize
+		\setlength{\tabcolsep}{3pt}
+		\renewcommand{\arraystretch}{1.08}
+		\begin{tabularx}{\columnwidth}{@{}Y c c@{}}
+			\toprule
+			 & Before & After\\
+			\midrule
+			Units OK / REVIEW / MISALIGNED & 4 / 4 / 8 & 5 / 2 / 9\\
+			Mean $|\theta|$ of the 12 corrected units ($^\circ$) & 9.2 & 8.4\\
+			Maximum $|\theta|$ ($^\circ$) & 25.8 & 24.7\\
+			Units that improved by more than $1^\circ$ & -- & 5 of 12\\
+			Units that got worse by more than $1^\circ$ & -- & 1 of 12\\
+			Units that reached the 10-attempt limit & -- & 11 of 12\\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	The largest improvements were in units 10 ($18.2^\circ \rightarrow 14.2^\circ$), 13 ($8.0^\circ \rightarrow 5.3^\circ$) and 14 ($4.3^\circ \rightarrow 1.6^\circ$, which became OK); units 4 and 6 improved by $1.1^\circ$, unit 5 got worse ($6.9^\circ \rightarrow 8.1^\circ$), and the other six changed by less than $0.5^\circ$. The units that ended OK were in the top and bottom rows (0, 1, 14 and 15), plus unit 9.
 	
 	\subsection{Functional Validation of the Vision Gesture Recognition Subsystem}
 	
@@ -1215,8 +1246,28 @@
 	introduces external feedback to the SOFIA control system.
 	The CNN achieved a mean angular estimation error of
 	$0.204^\circ$ on the second simulated dataset, outperforming
-	the geometric and hybrid methods in mean error. However,
-	its effectiveness in correcting physical misalignment remains to be quantified.
+	the geometric and hybrid methods in mean error. On the
+	physical prototype, the model trained only in simulation
+	was ten times less accurate ($2.04^\circ$), and about 400
+	real photographs were enough to recover it ($0.227^\circ$).
+
+	The closed-loop correction, however, was limited. Without
+	the loop, the top and bottom rows ended OK and the middle
+	rows in REVIEW; with the loop, after the marker incident,
+	only 5 of 16 units ended OK and the mean misalignment of
+	the corrected units fell only from $9.2^\circ$ to $8.4^\circ$.
+	Three factors explain this result. First, most servos of
+	the vertical (up--down) axis did not respond or responded
+	very weakly, so changing their zero did not move the plate,
+	and the loop spent its ten attempts on them. Second, the
+	oblique module camera introduced a perspective that was
+	outside the training data, where the camera was always
+	nearly overhead (up to $\pm4^\circ$ of tilt). Third, the
+	moved marker was compensated by calculation rather than
+	by new aligned photographs. The loop corrects the units
+	whose servos follow the command; where they do not, the
+	diagnosis points to a mechanical problem rather than to a
+	wrong zero.
 
 	
 	
@@ -1241,9 +1292,18 @@
 	adjustments using external visual feedback. In simulation,
 	the CNN achieved a mean angular estimation error of
 	$0.204^\circ$ and a maximum error of $3.3^\circ$.
-	Further experimental validation is required to assess
-	physical orientation estimation accuracy, correction
-	performance, and the effectiveness of the integrated system.
+	On the physical prototype, fine-tuning with about 400 real
+	photographs reduced the error from $2.04^\circ$ to
+	$0.227^\circ$ and raised the state accuracy from 72.4\,\%
+	to 96.4\,\%. In the first closed-loop test, 5 of 16 units
+	ended OK (from 4); the correction was limited by vertical-axis
+	servos that do not follow the command and by an oblique
+	camera. Future work includes training the CNN with larger
+	tilt angles, more lighting conditions, and more camera
+	heights and angles, including oblique views; taking new
+	aligned photographs whenever a marker or the camera moves;
+	and replacing the vertical-axis servos before repeating the
+	closed-loop test with the camera overhead.
 	
 	\section*{Author Contributions}
 	\linelabel{ln:author-contributions}
