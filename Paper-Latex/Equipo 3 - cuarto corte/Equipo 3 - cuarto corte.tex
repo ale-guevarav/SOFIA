@@ -45,24 +45,65 @@
 	
 	
 	
+
 \begin{abstract}
-    \linelabel{ln:abstract}The SOFIA modular kinetic surface consists of 16 electromechanical modules arranged in a honeycomb configuration, each providing two rotational degrees of freedom through servomotors. 
-	Accurate orientation control is essential for coordinated movement, as differences between commanded and actual platform orientations may affect the system's performance. \linelabel{ln:abs-corr}This work presents a vision-based orientation 
-	estimation and correction system that uses a neural network to evaluate the physical inclination of the hexagonal platforms. The proposed approach integrates visual perception with the existing embedded control architecture, 
-	consisting of an ESP32-C3 microcontroller and PCA9685 PWM drivers. The estimated orientation is compared with the desired reference to determine angular deviations and generate corrective commands for the servomotors. 
-	This external feedback mechanism enables the system to adjust platform orientation based on visual measurements rather than relying exclusively on commanded servo positions. The CNN achieved a mean angular estimation error of $0.204^\circ$ and a maximum error of $3.3^\circ$ on the simulated test dataset.
-	Additionally, the gesture recognition subsystem was evaluated
-	across ten experimental sessions involving two participants
-	and 111 recognition attempts. The system achieved an overall
-	recognition accuracy of 93.7\%, reaching 100\% under normal
-	lighting conditions. Performance decreased under low-light
-	conditions, particularly for the ATTACK gesture. Further experimental evaluation is required to quantify residual orientation error and correction performance under physical operating conditions. The study aims to assess the feasibility of visual feedback for improving orientation control in modular kinetic surfaces.
+	\linelabel{ln:abstract}
+	The SOFIA modular kinetic surface consists
+	of 16 hexagonal platforms, each providing
+	two rotational degrees of freedom through
+	servomotors. This work presents a
+	vision-based orientation estimation and
+	correction system that detects platform
+	misalignment without requiring dedicated
+	angular sensors. A lightweight convolutional
+	neural network (CNN) was trained using
+	synthetic images generated in Webots and
+	fine-tuned with approximately 400 real
+	photographs of the physical prototype.
+	
+	\linelabel{ln:abs-corr}
+	The CNN achieved a mean angular estimation
+	error of $0.204^\circ$ in simulation.
+	On 60 real test photographs, fine-tuning
+	reduced the mean error from $2.04^\circ$
+	to $0.227^\circ$ and improved state
+	classification accuracy from 72.4\%
+	to 96.4\%.
+	
+	A preliminary closed-loop correction system
+	was implemented using visual feedback and
+	BLE communication with an ESP32-C3 controller.
+	Experimental results showed an increase
+	in correctly aligned units from four to
+	five out of 16, while mean misalignment
+	among the 12 corrected units decreased
+	from $9.2^\circ$ to $8.4^\circ$.
+	Correction performance remained limited
+	by insufficient servomotor response and
+	camera configuration.
+	
+	Additionally, gesture recognition achieved
+	93.7\% accuracy across 111 attempts with
+	two participants, although performance
+	decreased under poor lighting conditions.
+	These results demonstrate the feasibility
+	of vision-based misalignment diagnosis
+	while highlighting the limitations of
+	physical correction and gesture recognition
+	robustness.
 \end{abstract}
 
+
+	
 	
 	\begin{IEEEkeywords}
-		\linelabel{ln:keywords}Visual feedback control, orientation estimation, neural networks, computer vision, modular robotics, kinetic surfaces.
+		\linelabel{ln:keywords}
+		Vision-based orientation estimation,
+		closed-loop control, convolutional neural networks,
+		misalignment diagnosis, modular robotics,
+		human-robot interaction, kinetic surfaces.
 	\end{IEEEkeywords}
+	
 	
 	
 	\section{Introduction}
@@ -438,7 +479,7 @@
 	the TTL485-V2.0 TXD output and the ESP32-C3 UART receive
 	input. The divider consists of a 10 kOhm series resistor
 	and a 20 kOhm resistor connected to ground, producing
-	approximately 3.21 V from a nominal 5 V input.
+	approximately 3.33 V from a nominal 5 V input.
 	
 	The ESP32-C3 UART transmit output remains directly
 	connected to the TTL485-V2.0 RXD input, since the
@@ -1285,6 +1326,12 @@
 	limited servomotor response. These factors
 	affected correction performance and
 	restrict the generalizability of the results.
+	
+	Despite a reduction in mean angular
+	misalignment, the number of MISALIGNED
+	units increased from eight to nine,
+	indicating inconsistent correction
+	performance across the prototype.
 	
 	\linelabel{ln:discussion-reproducibility}
 	The project repository provides simulation,
