@@ -142,7 +142,11 @@
 	%-----------------------------------------------------------------
 	\LabDSTreviewer{2}{Redacción científica e idioma}
 	
-	\LabDSTcomment{R2.1}{N}{}
+	
+	\LabDSTcomment{R2.1}{P}
+	{Section~\ref{subsec:closed_loop_correction},
+		\rln{disc-corr},
+		\rln{concl-corr}}
 	{El título dice ``Estimation and Correction'',
 		y el texto afirma:
 		
@@ -166,7 +170,37 @@
 		ni lazo cerrado, ni resultado con servos.
 		La pregunta rectora (Línea 56) solo
 		pregunta por la estimación.}
-	{}
+	{
+		The revised manuscript now includes the
+		implementation and experimental evaluation
+		of a vision-based closed-loop orientation
+		correction system on the physical SOFIA
+		prototype.
+		
+		The host PC estimates platform orientation
+		using the fine-tuned CNN and iteratively
+		adjusts servomotor zero offsets through
+		BLE communication with the ESP32-C3.
+		Each correction is followed by a new
+		visual measurement, with a maximum of
+		ten attempts per unit.
+		
+		Experimental results showed that the
+		number of correctly aligned units increased
+		from four to five, while the mean angular
+		misalignment of the twelve corrected units
+		decreased from $9.2^\circ$ to $8.4^\circ$.
+		
+		Correction performance was limited by
+		insufficient servomotor response, an
+		oblique camera viewpoint, and displacement
+		of an ArUco marker. These limitations
+		are acknowledged in the Discussion and
+		Conclusions.
+		
+		The quantitative servo-offset update
+		rule remains to be fully documented.
+	}
 	
 	\LabDSTcomment{R2.2}{A}
 	{\Rln{intro1},
