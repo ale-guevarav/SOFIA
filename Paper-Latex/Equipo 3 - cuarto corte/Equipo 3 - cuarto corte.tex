@@ -1209,120 +1209,105 @@
 	across a larger and more diverse population.
 
 		
+	
 	\section{Discussion}
 	\label{sec:discussion}
 	
-	\linelabel{ln:disc}The final gesture recognition evaluation
-	demonstrated the feasibility of geometric classification
-	for human-robot interaction, achieving an overall accuracy
-	of 93.7\% across 111 attempts. The system achieved 100\%
-	accuracy under normal lighting and 95.1\% at different
-	camera distances. However, accuracy decreased to 80\%
-	under low-light conditions, particularly affecting ATTACK,
-	which accounted for five of the seven recognition failures.
-
-	The average processing time for gesture confirmation was
-	0.79~s, while the average total trial time was 1.68~s.
-	Static gestures required approximately 0.2~s for
-	confirmation, whereas dynamic gestures required longer
-	processing times due to their movement sequences.
-	Under adequate lighting, the system operated at
-	approximately 24--26 FPS, decreasing to around 15 FPS
-	under poor illumination.
-
-	Although these results demonstrate improved recognition
-	performance compared with the preliminary evaluation,
-	the experiments involved only two participants.
-	Therefore, further testing is necessary to assess
-	robustness across different users and environmental
-	conditions. These measurements evaluate the vision
-	subsystem and do not establish the physical actuation
-	accuracy of SOFIA.
-
-	The electronic architecture supports the integration of
-	visual perception and servomotor control. Nevertheless,
-	the current-carrying capacity of the PCB and the electrical
-	performance of the revised design require further
-	experimental validation.
-
-	\linelabel{ln:disc-corr}The implementation of vision-based orientation correction
-	introduces external feedback to the SOFIA control system.
-	The CNN achieved a mean angular estimation error of
-	$0.204^\circ$ on the second simulated dataset, outperforming
-	the geometric and hybrid methods in mean error. On the
-	physical prototype, the model trained only in simulation
-	was ten times less accurate ($2.04^\circ$), and about 400
-	real photographs were enough to recover it ($0.227^\circ$).
-
-	The closed-loop correction, however, was limited. Without
-	the loop, the top and bottom rows ended OK and the middle
-	rows in REVIEW; with the loop, after the marker incident,
-	only 5 of 16 units ended OK and the mean misalignment of
-	the corrected units fell only from $9.2^\circ$ to $8.4^\circ$.
-	Three factors explain this result. First, most servos of
-	the vertical (up--down) axis did not respond or responded
-	very weakly, so changing their zero did not move the plate,
-	and the loop spent its ten attempts on them. Second, the
-	oblique module camera introduced a perspective that was
-	outside the training data, where the camera was always
-	nearly overhead (up to $\pm4^\circ$ of tilt). Third, the
-	moved marker was compensated by calculation rather than
-	by new aligned photographs. The loop corrects the units
-	whose servos follow the command; where they do not, the
-	diagnosis points to a mechanical problem rather than to a
-	wrong zero.
+	\linelabel{ln:disc}
+	Gesture recognition achieved 93.7\% accuracy
+	across 111 attempts, reaching 100\% under
+	normal lighting but decreasing to 80\%
+	under poor illumination. The average
+	processing time was 0.79~s. However,
+	evaluation with only two participants
+	limits the generalizability of these results.
+	
+	\linelabel{ln:disc-corr}
+	The CNN achieved a mean angular error of
+	$0.204^\circ$ in simulation. On the physical
+	prototype, fine-tuning with approximately
+	400 real photographs reduced the error
+	from $2.04^\circ$ to $0.227^\circ$.
+	Closed-loop correction showed limited
+	improvement, increasing aligned units
+	from 4 to 5 and reducing mean misalignment
+	from $9.2^\circ$ to $8.4^\circ$.
 	
 	\linelabel{ln:objectives-validation}
-	The three research objectives achieved different
-	levels of experimental validation. The PCB
-	architecture and layout were developed,
-	although full-load electrical verification
-	remains pending. Vision-based misalignment
-	diagnosis was validated using real photographs,
-	and closed-loop orientation correction was
-	experimentally implemented, with limited
-	improvement due to mechanical and camera
-	configuration constraints. Gesture recognition
-	was quantitatively validated, while
-	end-to-end evaluation of gesture-triggered
-	physical actuation remains to be documented.
+	The PCB was designed, fabricated, and
+	functionally tested with transient current
+	peaks of 3.5~A, although full-load
+	validation remains pending. Vision-based
+	diagnosis and correction were experimentally
+	evaluated, while gesture recognition was
+	validated independently of physical actuation.
 	
-
+	\linelabel{ln:discussion-failures}
+	The geometric estimator reached a maximum
+	error of $74^\circ$ due to incorrect plate
+	identification. Gesture recognition showed
+	one SHIELD--RELOAD confusion and five
+	missed ATTACK detections, mainly under
+	poor lighting.
+	
+	\linelabel{ln:discussion-literature}
+	Compared with Table~\ref{tab:benchmarking},
+	SOFIA combines a two-dimensional modular
+	configuration, two rotational degrees of
+	freedom per unit, and visual orientation
+	estimation. However, superior performance
+	over related systems has not been established.
+	
+	\linelabel{ln:discussion-validity}
+	Experimental limitations include manually
+	established angular references, an oblique
+	camera, a displaced ArUco marker, and
+	limited servomotor response. These factors
+	affected correction performance and
+	restrict the generalizability of the results.
+	
+	\linelabel{ln:discussion-reproducibility}
+	The project repository provides simulation,
+	dataset generation, CNN training and
+	evaluation resources. Synthetic datasets
+	can be regenerated, while the availability
+	of real photographs remains to be documented.
 	
 	
 	\section{Conclusions}
 	\label{sec:conclusions}
 	
-	The development of SOFIA integrates mechanical actuation,
-	embedded control, and computer vision into a modular
-	robotic platform. The final gesture recognition evaluation
-	achieved an overall accuracy of 93.7\% across 111 attempts
-	and ten experimental sessions. The system demonstrated
-	reliable performance under normal lighting and different
-	camera distances, although recognition accuracy decreased
-	under low-light conditions, particularly for the ATTACK
-	gesture. These findings support the feasibility of
-	vision-based human-robot interaction while highlighting
-	the need for further evaluation with more participants.
 
+The SOFIA platform integrates mechanical actuation,
+embedded control, and computer vision. Gesture
+recognition achieved 93.7\% accuracy across 111
+attempts, although performance decreased under
+poor lighting, particularly for ATTACK.
 
-	\linelabel{ln:concl-corr}The implementation of a vision-based orientation estimation
-	and correction system enables automatic servomotor
-	adjustments using external visual feedback. In simulation,
-	the CNN achieved a mean angular estimation error of
-	$0.204^\circ$ and a maximum error of $3.3^\circ$.
-	On the physical prototype, fine-tuning with about 400 real
-	photographs reduced the error from $2.04^\circ$ to
-	$0.227^\circ$ and raised the state accuracy from 72.4\,\%
-	to 96.4\,\%. In the first closed-loop test, 5 of 16 units
-	ended OK (from 4); the correction was limited by vertical-axis
-	servos that do not follow the command and by an oblique
-	camera. Future work includes training the CNN with larger
-	tilt angles, more lighting conditions, and more camera
-	heights and angles, including oblique views; taking new
-	aligned photographs whenever a marker or the camera moves;
-	and replacing the vertical-axis servos before repeating the
-	closed-loop test with the camera overhead.
+\linelabel{ln:concl-corr}
+The CNN achieved a mean angular error of
+$0.204^\circ$ in simulation. Fine-tuning with
+approximately 400 real photographs reduced
+the physical estimation error from $2.04^\circ$
+to $0.227^\circ$ and improved state accuracy
+from 72.4\% to 96.4\%. Closed-loop correction
+increased aligned units from 4 to 5 out of 16,
+with performance limited by unresponsive
+vertical-axis servos and an oblique camera.
+Future work will address these mechanical
+limitations, expand training conditions, and
+improve camera and ArUco calibration.
+
+\linelabel{ln:conclusion-research-question}
+The research question is answered affirmatively
+under the evaluated conditions: vision-based
+estimation can determine platform tilt angles
+and classify misalignment without dedicated
+angular sensors. However, accurate estimation
+does not guarantee successful physical correction,
+and further validation is required under
+different operating conditions.
+
 	
 	\section*{Author Contributions}
 	\linelabel{ln:author-contributions}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  27 NOV 2026 20:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  27 NOV 2026 20:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -677,29 +677,29 @@ Underfull \hbox (badness 1810) in paragraph at lines 1071--1072
  []
 
 [10]
-Underfull \vbox (badness 1097) has occurred while \output is active []
+Underfull \hbox (badness 4378) in paragraph at lines 1253--1260
+[]  \OT1/ptm/m/n/10 Com-pared with Ta-ble II[], SOFIA com-bines a two-
+ []
 
-
-Underfull \vbox (badness 1097) has occurred while \output is active []
-
- [11]
 (Equipo 3 - cuarto corte.bbl
 Underfull \hbox (badness 2142) in paragraph at lines 25--27
 []\OT1/ptm/m/n/8 J. A. Liz[]arraga, ``Pre-sentaci[]on del labdst: Sesi[]on 1 - 
 con-texto,
  []
 
-) [12] (Equipo 3 - cuarto corte.aux)
+[11]) [12
+
+] (Equipo 3 - cuarto corte.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7158 strings out of 467501
- 123415 string characters out of 5408550
- 592607 words of memory out of 5000000
- 36281 multiletter control sequences out of 15000+600000
+ 7161 strings out of 467501
+ 123524 string characters out of 5408550
+ 592635 words of memory out of 5000000
+ 36284 multiletter control sequences out of 15000+600000
  679325 words of font info for 133 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,10n,79p,1126b,442s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -725,7 +725,7 @@ KTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/Marrc/AppData/Local/Programs
 /MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Program
 s/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Program
 s/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - cuarto corte.pdf" (12 pages, 850046 bytes).
+Output written on "Equipo 3 - cuarto corte.pdf" (12 pages, 848490 bytes).
 PDF statistics:
  168 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

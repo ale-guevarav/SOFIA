@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  27 NOV 2026 20:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.8.27)  27 NOV 2026 20:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -342,7 +342,7 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 {C:/Users/Marrc/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Marr
 c/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-24.
+40.
 
 (C:\Users\Marrc\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
@@ -354,13 +354,13 @@ L3 programming layer <2026-07-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 3603 strings out of 467501
- 54606 string characters out of 5408550
- 500217 words of memory out of 5000000
- 32806 multiletter control sequences out of 15000+600000
+ 3607 strings out of 467501
+ 54723 string characters out of 5408550
+ 499522 words of memory out of 5000000
+ 32810 multiletter control sequences out of 15000+600000
  659657 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,6n,79p,324b,216s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,6n,79p,324b,197s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmsy10.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/u
@@ -368,7 +368,7 @@ rw/times/utmb8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmbi8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmr8a.pfb><C:/Users/Marrc/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmri8a.pfb>
-Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (4 pages, 93458 byt
+Output written on "Equipo 3 - respuesta - cuarto corte.pdf" (4 pages, 93232 byt
 es).
 PDF statistics:
  46 PDF objects out of 1000 (max. 8388607)
