@@ -119,6 +119,13 @@
 	
 	\linelabel{ln:rq}To address this limitation, this work investigates the following research question: \textit{Can the two tilt angles of all 16 hexagonal plates be accurately estimated from a single overhead camera to classify each unit without per-module angle sensors?} \linelabel{ln:obj}This encompasses three primary objectives: (1) designing an embedded PCB integrating an ESP32-C3 microcontroller, dual PCA9685 PWM drivers, and RS-485 interfaces to coordinate the 32 actuators; (2) integrating the diagnosis pipeline onto the physical SOFIA module using an overhead camera, four coplanar ArUco markers, and sim-to-real fine-tuning; and (3) integrating state-machine execution with real-time gesture recognition.
 	
+	As a complementary objective, this study
+	also evaluates the feasibility of using
+	the estimated angular deviations to perform
+	iterative closed-loop orientation correction
+	on the physical SOFIA prototype.
+	
+	
 	\begin{table*}[!t]
 		\centering
 		\caption{Comparative matrix of related shape-changing interface systems}
@@ -1031,7 +1038,7 @@
 	\end{table}
 
 	\subsection{Closed-Loop Correction on the Physical Prototype}
-	\label{sec:closed_loop}
+	\label{subsec:closed_loop_correction}
 
 	The host PC uses the fine-tuned CNN to correct the zero of each servo. The units are visited in order, from 0 to 15. For each unit that is not OK, the PC computes a new zero for its two servos, sends it to the ESP32-C3 over BLE, waits, takes another photograph, and measures the unit again; it does not move to the next unit until the unit is OK or ten attempts have been made. If an axis gets worse instead of better, the sign of that axis is inverted for that unit.
 
